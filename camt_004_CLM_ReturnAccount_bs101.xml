@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--camt.004_CLM_ReturnAccount_bs101 -->
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.004.001.08" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:camt.004.001.08 CLM_GetAccount_ReturnAccount_camt_004_ReturnAccount_camt_004_001_08_20200121_1359.xsd">
+	<RtrAcct>
+		<MsgHdr>
+			<MsgId>NONREF</MsgId>
+			<OrgnlBizQry>
+				<MsgId>ABNANL2000001062133149</MsgId>
+			</OrgnlBizQry>
+		</MsgHdr>
+		<RptOrErr>
+			<OprlErr>
+				<Err>
+					<Prtry>T133</Prtry>
+				</Err>
+				<Desc>The specified cash account is not known to the service</Desc>
+			</OprlErr>
+		</RptOrErr>
+	</RtrAcct>
+</Document>
