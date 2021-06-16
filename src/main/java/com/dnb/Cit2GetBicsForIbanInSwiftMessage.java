@@ -1,5 +1,7 @@
 package com.dnb;
 
+import com.dnb.model.Bic;
+
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;

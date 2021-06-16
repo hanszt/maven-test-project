@@ -1,5 +1,6 @@
 package com.dnb;
 
+import com.dnb.model.Bic;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;

@@ -1,4 +1,4 @@
-package com.dnb;
+package com.dnb.model;
 
 import java.util.Objects;
 
@@ -14,7 +14,7 @@ public class Bic {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Bic bic = (Bic) o;
+        var bic = (Bic) o;
         return Objects.equals(name, bic.name);
     }
 
