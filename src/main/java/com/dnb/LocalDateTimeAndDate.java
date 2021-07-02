@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import static java.lang.System.*;
 
-public class DateFormatting {
+public class LocalDateTimeAndDate {
 
     public static void main(String[] args) {
         var localDate = LocalDate.now();

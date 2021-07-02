@@ -27,4 +27,11 @@ public class Base64EncoderAndDecoder {
         out.printf("Base 64 encoded: %s%n%n", encodedKey);
     }
 
+    String base64Encode(String stringToEncode) {
+        return Base64.getEncoder().encodeToString(stringToEncode.getBytes());
+    }
+
+    public String base64Decode(String stringToDecode) {
+        return new String(Base64.getDecoder().decode(stringToDecode));
+    }
 }
