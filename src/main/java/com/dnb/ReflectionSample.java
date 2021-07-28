@@ -20,8 +20,9 @@ public final class ReflectionSample {
 
     /**
      * @author Job de Noo
+     * Copied from Picasso. This class caused weird behaviour. (See ReflectionSampleTest) It is now eliminated from Picasso
      */
-    public static class PicassoFunctions {
+    public static final class PicassoFunctions {
 
         private PicassoFunctions() {
             //hide implicit public constructor
