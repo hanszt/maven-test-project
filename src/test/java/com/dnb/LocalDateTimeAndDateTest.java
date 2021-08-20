@@ -1,5 +1,7 @@
 package com.dnb;
 
+import org.awaitility.Awaitility;
+import org.awaitility.Duration;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -7,7 +9,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.Temporal;
 import java.util.Date;
+import java.util.concurrent.Callable;
 
+import static org.awaitility.Awaitility.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LocalDateTimeAndDateTest {
@@ -27,7 +31,27 @@ class LocalDateTimeAndDateTest {
 
 
         assertEquals(dateTime.toLocalDate(), dateTimeFromOldDate.toLocalDate());
+    }
 
+    /**
+     * @see <a href="https://www.baeldung.com/awaitlity-testing">Introduction to Awaitility</a>
+     */
+    @Test
+    void testComparingDate() {
+        final var now = new Date();
+        final var date1 = new Date(1L);
+        final var date2 = new Date(2L);
+        final var date3 = new Date(3L);
+        final var date4 = new Date(1L);
+        assertEquals(-1, date1.compareTo(date2));
+        assertEquals(1, date3.compareTo(date2));
+        assertEquals(0, date4.compareTo(date1));
+        await().atLeast(Duration.ONE_MILLISECOND).until(() -> prevMomentComparedToNow(now));
+    }
+
+    private boolean prevMomentComparedToNow(Date prevNow) {
+        assertEquals(-1, prevNow.compareTo(new Date()));
+        return true;
     }
 
 }

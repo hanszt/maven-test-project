@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class Book implements Serializable {
 
+    private static final long serialVersionUID = 1;
+
     private String bookName;
     private transient String description;
     private transient int copies;

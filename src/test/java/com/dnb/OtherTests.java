@@ -1,6 +1,7 @@
 package com.dnb;
 
 import com.dnb.model.Bic;
+import com.dnb.model.Book;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -10,10 +11,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.IntStream;
 
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -22,15 +27,15 @@ class OtherTests {
 
     @Test
     void testChars() {
-        IntStream.range(33, 900).mapToObj(this::toCharacter).forEach(System.out::println);
+        IntStream.range(33, 900).mapToObj(OtherTests::toCharacter).forEach(System.out::println);
         System.out.println();
-        "Hello".chars().mapToObj(this::toCharacter).forEach(System.out::println);
-        String.format("Hello,%nI'm Hans").lines().forEach(System.out::println);
+        "Hello".chars().mapToObj(OtherTests::toCharacter).forEach(System.out::println);
+        String.format("Hello,%nI'm Hans").lines().forEach(System.out::printf);
         char c = 'ͽ';
         assertEquals(893, c);
     }
 
-    private Character toCharacter(int i) {
+    private static Character toCharacter(int i) {
         return (char) i;
     }
 
@@ -143,4 +148,29 @@ class OtherTests {
         }
     }
 
+    @Test
+    void testThrowable() {
+        final var throwable = new Throwable();
+        System.out.println("throwable.getLocalizedMessage() = " + throwable.getLocalizedMessage());
+        assertNull(throwable.getMessage());
+    }
+
+    @Test
+    void testTreeSetWithComparator() {
+        SortedSet<Book> set = new TreeSet<>(comparing(Book::getBookName));
+        final var book = new Book("");
+        final var book2 = new Book("");
+        book.setBookName("Hallo");
+        book2.setBookName("Test");
+        set.addAll(Set.of(book, book2));
+        assertEquals(book2, set.last());
+    }
+
+    @Test
+    void testObjectRequireNonNullElseAndElseGet() {
+        Integer integer = Objects.requireNonNullElse(null, 4);
+        assertEquals(4, integer);
+        Integer integer2 = Objects.requireNonNullElseGet(null, () -> 4);
+        assertEquals(4, integer2);
+    }
 }

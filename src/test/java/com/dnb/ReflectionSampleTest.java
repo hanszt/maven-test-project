@@ -10,6 +10,12 @@ import java.util.stream.Collectors;
 import static com.dnb.ReflectionSample.PicassoFunctions.integerPropertyAccessor;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ *
+ * A class to test reflection examples.
+ * @see ReflectionSample
+ * @author Hans Zuidervaart
+ */
 class ReflectionSampleTest {
 
     @Test

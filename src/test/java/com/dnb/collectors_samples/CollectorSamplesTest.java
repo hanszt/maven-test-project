@@ -2,8 +2,10 @@ package com.dnb.collectors_samples;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,7 +20,7 @@ class CollectorSamplesTest {
                 expected,
                 new CashBalance("ing", false),
                 new CashBalance("triodos", false));
-        var actual = collectorSamples.collectingAndThen(items);
+        var actual = collectorSamples.collectingAndThenToFirstElementIfSizeOne(items).orElse(null);
         items.forEach(System.out::println);
         assertEquals(expected, actual);
     }
@@ -26,16 +28,16 @@ class CollectorSamplesTest {
     @Test
     void getNullWhenMoreThanOneInList() {
         var expected = new CashBalance("abn", true);
-        var actual = collectorSamples.collectingAndThen(List.of(
+        var actual = collectorSamples.collectingAndThenToFirstElementIfSizeOne(List.of(
                 expected,
                 new CashBalance("ing", true),
-                new CashBalance("triodos", false)));
+                new CashBalance("triodos", false))).orElse(null);
         assertNull(actual);
     }
 
     @Test
     void getNullWhenEmptyList() {
-        var actual = collectorSamples.collectingAndThen(Collections.emptyList());
+        var actual = collectorSamples.collectingAndThenToFirstElementIfSizeOne(Collections.emptyList()).orElse(null);
         assertNull(actual);
     }
 
@@ -70,5 +72,29 @@ class CollectorSamplesTest {
                 new CashBalance("ing", false),
                 new CashBalance("triodos", false));
         assertNull(collectorSamples.reduce(list));
+    }
+
+    @Test
+    void givenAListOfBigDecimals_calculateTheCorrectAverage() {
+        var average = new BigDecimal("2000.00");
+        var list = List.of(new BigDecimal("1000"), new BigDecimal("2000"), new BigDecimal("3000"));
+        //act
+        var actual = CollectorSamples.getBigDecimalAverage(list);
+        assertEquals(average, actual);
+    }
+
+    @Test
+    void givenAListOfBigDecimals_calculateBigDecimalSummaryStatistics() {
+        var average = new BigDecimal("2000.00");
+        final var min = new BigDecimal("1000");
+        final var max = new BigDecimal("3000");
+        var list = List.of(new BigDecimal("2000"), min, new BigDecimal("1500"), max, new BigDecimal("2500"));
+        //act
+        var summaryStatistics = CollectorSamples.getBigDecimalSummaryStatistics(list);
+        assertEquals(average, summaryStatistics.getAverage());
+        assertEquals(min, summaryStatistics.getMin());
+        assertEquals(max, summaryStatistics.getMax());
+        assertEquals(list.size(), summaryStatistics.getCount().intValue());
+        assertEquals(new BigDecimal("10000"), summaryStatistics.getSum());
     }
 }
