@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--camt.004_CLM_ReturnAccount_bs100 -->
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.004.001.08" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:camt.004.001.08 CLM_GetAccount_ReturnAccount_camt_004_ReturnAccount_camt_004_001_08_20200121_1359.xsd">
+	<RtrAcct>
+		<MsgHdr>
+			<MsgId>NONREF</MsgId>
+			<OrgnlBizQry>
+				<MsgId>ABNANL2000001062133149</MsgId>
+			</OrgnlBizQry>
+		</MsgHdr>
+		<RptOrErr>
+			<AcctRpt>
+				<AcctId>
+					<Othr>
+						<Id>MDEEURSOLADESTXXXSOLADESTXXX</Id>
+					</Othr>
+				</AcctId>
+				<AcctOrErr>
+					<Acct>
+						<Tp>
+							<Cd>CACC</Cd>
+						</Tp>
+						<Ccy>EUR</Ccy>
+						<Ownr>
+							<Nm>RABO</Nm>
+							<Id>
+								<OrgId>
+									<AnyBIC>SOLADESTXXX</AnyBIC>
+								</OrgId>
+							</Id>
+						</Ownr>
+					
+						<MulBal>
+							<Amt>100000.00</Amt>
+							<CdtDbtInd>CLST</CdtDbtInd>
+							<Tp>
+								<Cd>CRRT</Cd>
+							</Tp>
+							<Sts>STLD</Sts>
+							<ValDt>
+								<Dt>2021-06-01</Dt>
+							</ValDt>
+							<PrcgDt>
+								<Dt>2021-06-01</Dt>
+							</PrcgDt>
+						</MulBal>
+					</Acct>
+				</AcctOrErr>
+			</AcctRpt>
+		</RptOrErr>
+	</RtrAcct>
+</Document>
