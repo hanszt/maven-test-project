@@ -39,7 +39,7 @@ public class AsyncService {
         return value.longValue();
     }
 
-    private void sleep(int delay) {
+    private static void sleep(int delay) {
         try {
             Thread.sleep(delay);
         } catch (InterruptedException e) {
@@ -74,7 +74,7 @@ public class AsyncService {
 
     private static void expensiveMethodMock(int i) {
         try {
-            final var MILLIS_SECONDS = 1000;
+            final var MILLIS_SECONDS = 50;
             Thread.sleep(MILLIS_SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

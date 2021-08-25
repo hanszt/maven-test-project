@@ -45,8 +45,8 @@ class StreamsSampleTest {
     @Test
     void testStreamLimit() {
         List<Integer> list  = IntStream.range(0, 100).boxed().collect(Collectors.toList());
-        System.out.println("list.stream().limit(10).collect(Collectors.toList()) = " + list.stream().limit(10).collect(Collectors.toList()));
-        assertEquals(10, list.size());
+        final var limitedList = list.stream().limit(10).collect(Collectors.toList());
+        assertEquals(10, limitedList.size());
     }
 
 }

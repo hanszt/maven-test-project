@@ -5,6 +5,7 @@ import org.awaitility.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
@@ -66,11 +67,13 @@ class AsyncServiceTest {
 
     @Test
     void testParallelStreamExecutesFasterThanSequentialStream() {
-        final int TIMES_EXECUTED = 4;
+        final int TIMES_EXECUTED = 64;
         long durationSeq = AsyncService.executeAsyncServiceAndTime(TIMES_EXECUTED, asyncService::executeStreamCallingExpensiveMethodMock);
         long durationParallel = AsyncService.executeAsyncServiceAndTime(TIMES_EXECUTED, asyncService::executeStreamInParallelCallingExpensiveMethodMock);
-        System.out.println("durationSeq = " + durationSeq);
-        System.out.println("durationParallel = " + durationParallel);
+        System.out.println("durationSeq = " + durationSeq / 1e9 + " s");
+        System.out.println("durationParallel = " + durationParallel / 1e9 + " s");
+        long timesFaster = durationSeq / durationParallel;
+        System.out.println("timesFaster = " + timesFaster);
         assertTrue(durationSeq > durationParallel);
     }
 }

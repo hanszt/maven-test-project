@@ -1,6 +1,7 @@
 package com.dnb.model;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 public class Book implements Serializable {
 
@@ -14,6 +15,11 @@ public class Book implements Serializable {
     private final transient String language = "Java";
 
     public Book(String bookCategory) {
+        this("", bookCategory);
+    }
+
+    public Book(String bookName, String bookCategory) {
+        this.bookName = bookName;
         this.bookCategory = bookCategory;
     }
 
@@ -49,12 +55,22 @@ public class Book implements Serializable {
         return language;
     }
 
+    public boolean hasCopies() {
+        return copies > 0;
+    }
+
+    public boolean isAboutJava() {
+        return language.toLowerCase(Locale.ROOT).contains("java");
+    }
+
     @Override
     public String toString() {
         return "Book{" +
                 "bookName='" + bookName + '\'' +
                 ", description='" + description + '\'' +
                 ", copies=" + copies +
+                ", bookCategory='" + bookCategory + '\'' +
+                ", language='" + language + '\'' +
                 '}';
     }
 }
