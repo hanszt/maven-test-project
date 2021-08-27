@@ -6,15 +6,14 @@ import org.junit.jupiter.api.Test;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.dnb.HigherOrderFunctions.*;
+import static com.dnb.TestSampleGenerator.createBookList;
 import static java.util.Comparator.comparing;
 import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
@@ -50,7 +49,7 @@ class HigherOrderFunctionsTest {
     void testCombinePredicateUsingOrEvaluatesToTrue() {
         final var strings = new String[]{"hallo", "hoe", "gaat", "het", "met", "jou", "?"};
         assertEquals(strings.length, Stream.of(strings)
-                .filter(oneOrMoreValid(
+                .filter(anyMatch(
                         contains("h"),
                         contains("e"),
                         contains("g"),
@@ -62,7 +61,7 @@ class HigherOrderFunctionsTest {
     @Test
     void testCombinePredicateUsingOrEvaluatesToFalse() {
         assertEquals("", Stream.of("Dit is één fout", "?!", "Dan ", "is", "'t", "prima")
-                .filter(oneOrMoreValid(
+                .filter(anyMatch(
                         contains("h"),
                         contains("e"),
                         contains("g"),
@@ -74,7 +73,7 @@ class HigherOrderFunctionsTest {
     @Test
     void testCombinePredicateUsingAndEvaluatesToEmptyString() {
         assertEquals("", Stream.of("Dit is één fout", "?!", "Dan ", "is", "'t", "prima")
-                .filter(allValid(
+                .filter(allMatch(
                         contains("h"),
                         contains("e"),
                         contains("g"),
@@ -87,72 +86,89 @@ class HigherOrderFunctionsTest {
     void testCombinePredicateUsingAndEvaluatesToFalse() {
         final var TEST = "Dit is één fout";
         assertEquals(TEST, Stream.of(TEST, "?!", "Dan ", "is", "'t", "prima")
-                .filter(allValid(
-                        contains("D"),
+                .filter(allMatch(
+                        startsWith("D"),
                         contains("s"),
                         contains("é"),
+                        not(contains("raar")),
                         hasEqualLength(TEST.length())))
                 .findAny().orElse(""));
         assertFalse(isEqual("Hallo").or(isEqual("Raar")).test("f"));
     }
 
-    private Predicate<String> hasEqualLength(int length) {
-        return s -> s.length() == length;
-    }
-
     @Test
     void testCombineComparators() {
-        Set<Book> set = createBookSet();
-        final var expected = set.stream()
-                .filter(book -> by(book, Book::getBookCategory, isEqual("raar").negate()))
-                .sorted(comparing(Book::getBookCategory).reversed().thenComparing(Book::getBookName))
+        var bookList = createBookList();
+        final var expected = bookList.stream()
+                .sorted(comparing(Book::getCategory).reversed().thenComparing(Book::getTitle))
                 .collect(Collectors.toList());
-        final var actual = set.stream()
-                .sorted(firstAndThen(comparing(Book::getBookCategory).reversed(), comparing(Book::getBookName)))
+        final var actual = bookList.stream()
+                .sorted(sequential(comparing(Book::getCategory).reversed(), comparing(Book::getTitle)))
                 .collect(Collectors.toList());
         assertEquals(expected, actual);
     }
 
-    private static Set<Book> createBookSet() {
-        return Set.of(new Book("hallo", "1"),
-                new Book("wat", "1"),
-                new Book("tester", "2"),
-                new Book("een", "1"),
-                new Book("ingewikkelde", "2"),
-                new Book("test", "2"));
+    @Test
+    void testComparatorsThenComparing() {
+        var bookList = createBookList();
+        final var expected = bookList.stream()
+                .sorted(comparing(book -> book.getCategory() + book.getTitle()))
+                .collect(Collectors.toList());
+        final var actual = bookList.stream()
+                .sorted(comparing(Book::getCategory).thenComparing(Book::getTitle))
+                .collect(Collectors.toList());
+        assertEquals(expected, actual);
     }
 
     @Test
     void testMappingBeforeFiltering() {
-        Set<Book> books = createBookSet();
+        var books = createBookList();
+        final var E = "e";
+        final var A = "u";
+        final var expected = books.stream()
+                .filter(book -> !(book.getTitle().contains(E) || book.getTitle().contains(A)))
+                .collect(Collectors.toList());
         final var filteredBookList = books.stream()
-                .filter(not(by(Book::getBookName, contains("a").or(contains("i")))))
+                .filter(by(Book::getTitle, not(contains(E).or(contains(A)))))
                 .collect(Collectors.toList());
         filteredBookList.forEach(System.out::println);
-        assertEquals(3, filteredBookList.size());
+        assertEquals(expected, filteredBookList);
     }
 
     @Test
     void testCompose() {
-        Set<Book> books = createBookSet();
-        final var filteredBookList = books.stream()
+        var books = createBookList();
+        final var fieldListOfObjectClass = books.stream()
                 .map(by(Object::getClass)
-                        .compose(Book::getBookCategory)
+                        .compose(Book::getCategory)
                         .andThen(Class::getDeclaredFields))
                 .flatMap(Arrays::stream)
                 .collect(Collectors.toList());
-        filteredBookList.forEach(System.out::println);
-        assertEquals(60, filteredBookList.size());
+        fieldListOfObjectClass.forEach(System.out::println);
+        assertEquals(70, fieldListOfObjectClass.size());
     }
 
     @Test
     void testChainingAPredicate() {
-        Set<Book> books = createBookSet();
+        var books = createBookList();
         final var filteredBookList = books.stream()
-                .filter(by(Book::hasCopies).or(Book::isAboutJava))
+                .filter(by(Book::hasCopies).or(Book::isAboutProgramming))
                 .collect(Collectors.toList());
         filteredBookList.forEach(System.out::println);
-        assertEquals(6, filteredBookList.size());
+        assertEquals(2, filteredBookList.size());
+    }
+
+    @Test
+    void testChainingMultipleBy() {
+        var books = createBookList();
+        final var expected = books.stream()
+                .filter(book -> book.getTitle().startsWith("t") && book.getCategory().contains("2"))
+                .collect(Collectors.toList());
+        final var filteredBookList = books.stream()
+                .filter(by(Book::getTitle, startsWith("t")).and(by(Book::getCategory, contains("2"))))
+                .collect(Collectors.toList());
+        filteredBookList.forEach(System.out::println);
+        assertEquals(expected, filteredBookList);
     }
 
     @Test

@@ -6,21 +6,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MyFileUtilsTest {
 
-    private static boolean doesNotContain(Path path, String string) {
-        return !path.toFile().getPath().contains(string);
+    private static Predicate<Path> doesNotContain(String string) {
+        return path -> !path.toFile().getPath().contains(string);
     }
 
     @Test
     void testFindFilesWithDuplicateContent() {
-        final var root = Paths.get("");
-        final var filesWithDuplicateContent = MyFileUtils.findFilesWithDuplicateContent(root,
-                path -> doesNotContain(path, ".git"),
-                path -> doesNotContain(path, "target"));
+        final var filesWithDuplicateContent = MyFileUtils.findFilesWithDuplicateContent(
+                Paths.get(""),
+                doesNotContain(".git"),
+                doesNotContain("target"),
+                doesNotContain("sonarlint"));
         assertTrue(filesWithDuplicateContent.isEmpty(), () -> errorMessage(filesWithDuplicateContent.values()));
     }
 

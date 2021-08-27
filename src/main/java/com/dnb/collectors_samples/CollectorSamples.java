@@ -3,7 +3,9 @@ package com.dnb.collectors_samples;
 import com.dnb.custom_collectors.BigDecimalSummaryStatistics;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +40,7 @@ public class CollectorSamples {
                 .reduce((a, b) -> throwIfMoreThanOneElement()).orElse(null);
     }
 
-    private CashBalance throwIfMoreThanOneElement() {
+    private static CashBalance throwIfMoreThanOneElement() {
         throw new MoreThanOneElementException();
     }
 
@@ -55,5 +57,25 @@ public class CollectorSamples {
     }
 
     static class MoreThanOneElementException extends RuntimeException {
+    }
+
+    public static <T> ArrayList<T> combine(ArrayList<T> arrayList1, ArrayList<T> arrayList2) {
+        arrayList1.addAll(arrayList2);
+        return arrayList1;
+    }
+
+    public static <T> HashSet<T> combine(HashSet<T> hashSet1, HashSet<T> hashSet2) {
+        hashSet1.addAll(hashSet2);
+        return hashSet1;
+    }
+
+    public static <T> ArrayList<T> accumulate(ArrayList<T> arrayList, T t) {
+        arrayList.add(t);
+        return arrayList;
+    }
+
+    public static <T> HashSet<T> accumulate(HashSet<T> hashSet, T t) {
+        hashSet.add(t);
+        return hashSet;
     }
 }

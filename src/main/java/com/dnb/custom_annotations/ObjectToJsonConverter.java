@@ -3,6 +3,7 @@ package com.dnb.custom_annotations;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.Objects;
@@ -56,7 +57,19 @@ public class ObjectToJsonConverter {
     private static SimpleEntry<String, String> toKeyValuePair(Object object, Field field) {
         final var key = field.getAnnotation(JsonElement.class).key();
         try {
-            return new SimpleEntry<>(key.isEmpty() ? field.getName() : key, (String) field.get(object));
+            final var o = field.get(object);
+            String value;
+            if (o instanceof String) {
+                value = (String) o;
+            } else if (o instanceof LocalDate) {
+                value = ((LocalDate) o).toString();
+            } else {
+                throw new IllegalStateException("Field not of type string or LocalDate...");
+            }
+            if (key.isEmpty()) {
+                return new SimpleEntry<>(field.getName(), value);
+            }
+            return new SimpleEntry<>(key, value);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }

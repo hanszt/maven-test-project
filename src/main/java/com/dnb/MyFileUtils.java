@@ -22,7 +22,7 @@ public final class MyFileUtils {
      */
     @SafeVarargs
     public static Map<String, List<Path>> findFilesWithDuplicateContent(Path start, Predicate<Path>... pathFilters) {
-        Predicate<Path> combinedPathFilter = HigherOrderFunctions.allValid(pathFilters);
+        Predicate<Path> combinedPathFilter = HigherOrderFunctions.allMatch(pathFilters);
         try (final Stream<Path> walk = Files.walk(start)) {
             return walk.filter(path -> path.toFile().isFile())
                     .filter(combinedPathFilter)

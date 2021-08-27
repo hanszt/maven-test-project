@@ -9,6 +9,6 @@ public class BookReader {
     }
 
     public String getBookCategory() {
-        return book.getBookCategory();
+        return book.getCategory();
     }
 }

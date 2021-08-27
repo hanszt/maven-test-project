@@ -4,15 +4,18 @@ import com.dnb.model.Data;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StreamsSampleTest {
 
@@ -44,9 +47,73 @@ class StreamsSampleTest {
 
     @Test
     void testStreamLimit() {
-        List<Integer> list  = IntStream.range(0, 100).boxed().collect(Collectors.toList());
+        List<Integer> list  = getIntegerStream().collect(Collectors.toList());
         final var limitedList = list.stream().limit(10).collect(Collectors.toList());
         assertEquals(10, limitedList.size());
+    }
+
+    @Test
+    void testReturnStreamFromIterator() {
+        final var iterator = getIntegerStream().iterator();
+        final var result = StreamsSample.returnListFromIterator(iterator)
+                .map(String::valueOf)
+                .collect(Collectors.toList());
+        assertEquals(getIntegerStream().map(String::valueOf).collect(Collectors.toList()), result);
+    }
+
+    private Stream<Integer> getIntegerStream() {
+        return IntStream.range(0, 100).boxed();
+    }
+
+    @Test
+    void testFibonacciUsingStreams() {
+        final var expected = Stream.of(0, 1, 1, 2, 3, 5, 8, 13, 21, 34)
+                .map(BigInteger::valueOf)
+                .collect(Collectors.toList());
+        final var fibonacciList = StreamsSample.getFibonacci(10);
+        assertEquals(expected, fibonacciList);
+    }
+
+    @Test
+    void testNthFibonacciNrUsingStreams() {
+        final var fibonacciList = StreamsSample.getNthFibonacciNumber(500);
+        assertEquals(new BigDecimal(
+                "139423224561697880139724382870407283950070256587697307264108962948325571622863290691557658876222521294125"
+        ).toBigInteger(), fibonacciList);
+    }
+
+    @Test
+    void testSumFibonacciNrUsingStreams() {
+        final var fibonacciList = StreamsSample.getSumFibonacciNumbers(500);
+        assertEquals(new BigDecimal(
+                "365014740723634211012237077906479355996081581501455497852747829366800199361550174096573645929019489792750"
+        ).toBigInteger(), fibonacciList);
+    }
+
+    @Test
+    void testCalculatePiParallelUsingStreams() {
+        Timer<BigDecimal> timer = Timer.timeFunction(10_000_000, StreamsSample::calculatePi);
+        final var result = timer.getResult();
+        System.out.println("Milliseconds = " + timer.getTimeInMillis());
+        assertEquals(new BigDecimal("3.1415927972"), result);
+    }
+
+    @Test
+    void testCalculatePiParallelUsingDoubleStream() {
+        final var iterations = 100_000_000;
+        //act
+        Timer<Double> sequentialTimer = Timer.timeFunction(iterations,
+                (long nrOfIterations) -> StreamsSample.calculatePiAsDouble(nrOfIterations, false));
+        Timer<Double> parallelTimer = Timer.timeFunction(iterations,
+                (long nrOfIterations) -> StreamsSample.calculatePiAsDouble(nrOfIterations, true));
+
+        final var seqTimeInMillis = sequentialTimer.getTimeInMillis();
+        final var parallelTimeInMillis = parallelTimer.getTimeInMillis();
+        System.out.println("Sequential in milliseconds = " + seqTimeInMillis);
+        System.out.println("Parallel in milliseconds = " + parallelTimeInMillis);
+        //assert
+        assertTrue(parallelTimeInMillis < seqTimeInMillis);
+        assertEquals(parallelTimer.getResult(), sequentialTimer.getResult());
     }
 
 }

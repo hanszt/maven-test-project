@@ -32,18 +32,18 @@ public final class HigherOrderFunctions {
     }
 
     @SafeVarargs
-    static <T> Predicate<T> allValid(Predicate<T>... predicates) {
+    static <T> Predicate<T> allMatch(Predicate<T>... predicates) {
         return Stream.of(predicates).reduce(predicate -> true, Predicate::and);
     }
 
     @SafeVarargs
-    static <T> Predicate<T> oneOrMoreValid(Predicate<T>... predicates) {
+    static <T> Predicate<T> anyMatch(Predicate<T>... predicates) {
         return Stream.of(predicates).reduce(predicate -> false, Predicate::or);
     }
 
     @SafeVarargs
-    static <T> Comparator<T> firstAndThen(Comparator<T>... otherComparators) {
-        return Stream.of(otherComparators).reduce(Comparator::thenComparing).orElseThrow();
+    static <T> Comparator<T> sequential(Comparator<T> first, Comparator<T>... otherComparators) {
+        return Stream.concat(Stream.of(first), Stream.of(otherComparators)).reduce(Comparator::thenComparing).orElse(first);
     }
 
     public static  <T, R> boolean by(T t, Function<T, R> mapper, Predicate<R> predicate) {
@@ -64,6 +64,10 @@ public final class HigherOrderFunctions {
 
     public static <T> Predicate<T> contains(String string, Function<T, String> toStringMapper) {
         return t -> toStringMapper.apply(t).contains(string);
+    }
+
+    public static Predicate<String> hasEqualLength(int length) {
+        return s -> s.length() == length;
     }
     /**
      * A function that first maps to some other type which can than be used to test with.

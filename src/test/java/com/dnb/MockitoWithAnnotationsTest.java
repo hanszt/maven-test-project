@@ -25,7 +25,7 @@ class MockitoWithAnnotationsTest {
 
     @BeforeEach
     void setup() {
-        when(book.getBookCategory()).thenReturn("Test category");
+        when(book.getCategory()).thenReturn("Test category");
         bookReader = new BookReader(book);
     }
 

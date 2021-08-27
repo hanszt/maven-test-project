@@ -1,27 +1,34 @@
 package com.dnb;
 
+import com.dnb.collectors_samples.CollectorSamples;
 import com.dnb.model.Bic;
 import com.dnb.model.Book;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.partitioningBy;
+import static java.util.stream.Collectors.toList;
+import static org.junit.jupiter.api.Assertions.*;
 
 class OtherTests {
 
@@ -125,7 +132,7 @@ class OtherTests {
     }
 
     @Test
-    void creatingBathes() {
+    void testCreatingBathes() {
         List<String> data = IntStream.range(0, 950).mapToObj(i -> "item " + i).collect(toList());
 
         final int BATCH_SIZE = 100;
@@ -157,11 +164,11 @@ class OtherTests {
 
     @Test
     void testTreeSetWithComparator() {
-        SortedSet<Book> set = new TreeSet<>(comparing(Book::getBookName));
+        SortedSet<Book> set = new TreeSet<>(comparing(Book::getTitle));
         final var book = new Book("");
         final var book2 = new Book("");
-        book.setBookName("Hallo");
-        book2.setBookName("Test");
+        book.setTitle("Hallo");
+        book2.setTitle("Test");
         set.addAll(Set.of(book, book2));
         assertEquals(book2, set.last());
     }
@@ -170,7 +177,93 @@ class OtherTests {
     void testObjectRequireNonNullElseAndElseGet() {
         Integer integer = Objects.requireNonNullElse(null, 4);
         assertEquals(4, integer);
-        Integer integer2 = Objects.requireNonNullElseGet(null, () -> 4);
+        Integer integer2 = Objects.requireNonNullElse(null, 4);
         assertEquals(4, integer2);
     }
+
+    @Test
+    void testEnumerationToList() {
+        //unexpected
+        Enumeration<String> enumeration = new Enumeration<>() {
+            private int counter = 0;
+            @Override
+            public boolean hasMoreElements() {
+                return counter++ < 100;
+            }
+
+            @Override
+            public String nextElement() {
+                return String.valueOf(counter);
+            }
+        };
+        final var list = Collections.list(enumeration);
+        final var stringIterator = enumeration.asIterator();
+        final Iterable<String> iterable = () -> stringIterator;
+        final var strings = StreamSupport.stream(iterable.spliterator(), false).collect(toList());
+        System.out.println(strings);
+        assertNotEquals(strings, list);
+    }
+
+    @Test
+    void testCalcPiRandom() {
+        final var result = BigDecimal.valueOf(calcPiRandom(1_000_000));
+        final var actual = result.setScale(2, RoundingMode.HALF_UP);
+        final var expected = BigDecimal.valueOf(3.14);
+        assertEquals(expected, actual);
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private static double calcPiRandom(final int iterations) {
+        long successCount = IntStream.rangeClosed(0 , iterations)
+                .filter(OtherTests::sqrtTwoRandomNmbrsSmOne)
+                .count();
+        return (double) (4 * successCount) / iterations;
+    }
+
+    private static boolean sqrtTwoRandomNmbrsSmOne(int i) {
+        double x = Math.random();
+        double y = Math.random();
+        return x * x + y * y <= 1;
+    }
+
+    @Test
+    void testMapAndCollectionIllegalInitialisation() {
+        // Can lead to memory leaks:
+        // see: https://stackoverflow.com/questions/6802483/how-to-directly-initialize-a-hashmap-in-a-literal-way
+        Map<String, String> map = new HashMap<>() {{ put("wat", "gek");put("raar", "dit moet niet kunnen"); }};
+        List<String> list = new ArrayList<>() {
+            {
+                add("Hoi");
+                add("dit");
+                add("mag");
+                add("ook");
+                add("niet");
+            }
+        };
+        assertEquals(List.of("Hoi", "dit", "mag", "ook", "niet"), list);
+        assertEquals(Map.of("wat", "gek", "raar", "dit moet niet kunnen"), map);
+    }
+
+    @Test
+    void testStreamUsedWrongDontDoThis() {
+        //This can lead to a race condition when parallelized, does not maintain order
+        List<String> bookTitles = new ArrayList<>();
+        TestSampleGenerator.createBookList().stream()
+                .filter(Book::isAboutProgramming)
+                .map(Book::getTitle)
+                .forEach(bookTitles::add);
+        assertTrue(bookTitles.containsAll(List.of("Pragmatic Programmer", "OCP 11 Volume 1")));
+    }
+
+    @Test
+    void testCreatingListUSingReduce() {
+        //does not maintain order
+        // right way but can be delegated to Collect(toList()); //This does maintain order
+        final var reducedList = TestSampleGenerator.createBookList().stream()
+                .filter(Book::isAboutProgramming)
+                .map(Book::getTitle)
+                .reduce(new ArrayList<>(), CollectorSamples::accumulate, CollectorSamples::combine);
+        assertTrue(reducedList.containsAll(List.of("Pragmatic Programmer", "OCP 11 Volume 1")));
+    }
+
 }

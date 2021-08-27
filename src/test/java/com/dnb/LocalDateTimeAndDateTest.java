@@ -1,18 +1,14 @@
 package com.dnb;
 
-import org.awaitility.Awaitility;
 import org.awaitility.Duration;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.Temporal;
 import java.util.Date;
-import java.util.concurrent.Callable;
 
-import static org.awaitility.Awaitility.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LocalDateTimeAndDateTest {
 
@@ -26,8 +22,6 @@ class LocalDateTimeAndDateTest {
         LocalDateTime dateTimeFromOldDate = startDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
-        LocalDate localDate = LocalDate.now();
-        Temporal temporal = localDate.adjustInto(LocalDate.MAX);
 
         assertEquals(dateTime.toLocalDate(), dateTimeFromOldDate.toLocalDate());
     }
@@ -45,7 +39,7 @@ class LocalDateTimeAndDateTest {
         assertEquals(-1, date1.compareTo(date2));
         assertEquals(1, date3.compareTo(date2));
         assertEquals(0, date4.compareTo(date1));
-        await().atLeast(Duration.ONE_HUNDRED_MILLISECONDS).until(() -> prevMomentComparedToNow(now));
+        await().atLeast(Duration.ONE_MILLISECOND).until(() -> prevMomentComparedToNow(now));
     }
 
     private boolean prevMomentComparedToNow(Date prevNow) {

@@ -1,34 +1,33 @@
 package com.dnb.model;
 
 import java.io.Serializable;
-import java.util.Locale;
+import java.util.Objects;
 
 public class Book implements Serializable {
 
     private static final long serialVersionUID = 1;
 
-    private String bookName;
+    private String title;
     private transient String description;
     private transient int copies;
-    private final transient String bookCategory;
-    @SuppressWarnings("FieldCanBeLocal")
-    private final transient String language = "Java";
+    private final transient String category;
+    private transient String language = "Java";
 
-    public Book(String bookCategory) {
-        this("", bookCategory);
+    public Book(String category) {
+        this("", category);
     }
 
-    public Book(String bookName, String bookCategory) {
-        this.bookName = bookName;
-        this.bookCategory = bookCategory;
+    public Book(String title, String category) {
+        this.title = title;
+        this.category = category;
     }
 
-    public String getBookName() {
-        return bookName;
+    public String getTitle() {
+        return title;
     }
 
-    public void setBookName(String bookName) {
-        this.bookName = bookName;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
@@ -47,29 +46,50 @@ public class Book implements Serializable {
         this.copies = copies;
     }
 
-    public String getBookCategory() {
-        return bookCategory;
+    public String getCategory() {
+        return category;
     }
 
     public String getLanguage() {
         return language;
     }
 
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
     public boolean hasCopies() {
         return copies > 0;
     }
 
-    public boolean isAboutJava() {
-        return language.toLowerCase(Locale.ROOT).contains("java");
+    public boolean isAboutProgramming() {
+        return "Programming".equals(category);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Book book = (Book) o;
+        return Objects.equals(title, book.title) && Objects.equals(category, book.category);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, category);
     }
 
     @Override
     public String toString() {
         return "Book{" +
-                "bookName='" + bookName + '\'' +
+                "bookName='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", copies=" + copies +
-                ", bookCategory='" + bookCategory + '\'' +
+                ", bookCategory='" + category + '\'' +
                 ", language='" + language + '\'' +
                 '}';
     }

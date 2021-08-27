@@ -11,17 +11,17 @@ class SerializerTest {
     void testSerialisation() throws Exception {
         Book book = new Book("Fiction");
         String expectedBookName = "Java Reference";
-        book.setBookName(expectedBookName);
+        book.setTitle(expectedBookName);
         book.setDescription("will not be saved");
         book.setCopies(25);
 
         Serializer.serialize(book);
         Book deserializedBook = Serializer.deserialize();
 
-        assertEquals(expectedBookName, deserializedBook.getBookName());
+        assertEquals(expectedBookName, deserializedBook.getTitle());
         assertNull(deserializedBook.getDescription());
         assertEquals(0, deserializedBook.getCopies());
-        assertNull(deserializedBook.getBookCategory());
+        assertNull(deserializedBook.getCategory());
         assertEquals("Java", book.getLanguage());
     }
 }

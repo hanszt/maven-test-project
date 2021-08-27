@@ -5,6 +5,9 @@ import com.dnb.custom_annotations.Initializable;
 import com.dnb.custom_annotations.JsonElement;
 import com.dnb.custom_annotations.JsonSerializable;
 
+import java.time.LocalDate;
+import java.time.Period;
+
 @JsonSerializable
 public class Person {
 
@@ -14,19 +17,26 @@ public class Person {
     @JsonElement
     private String lastName;
 
-    @JsonElement(key = "personAge")
-    private String age;
+    @JsonElement(key = "birthDate")
+    private LocalDate dateOfBirth;
 
     private String address;
 
-    public Person(String firstName, String lastName, String age) {
+    private boolean playingPiano;
+
+    public Person(String firstName, String lastName, LocalDate dateOfBirth, boolean playingPiano) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.age = age;
+        this.dateOfBirth = dateOfBirth;
+        this.playingPiano = playingPiano;
+    }
+
+    public Person(String firstName, String lastName, LocalDate dateOfBirth) {
+        this(firstName, lastName, dateOfBirth, false);
     }
 
     public Person(String firstName) {
-        this(firstName, "Undefinied", "Undefinied");
+        this(firstName, "Undefinied", null, false);
     }
 
     @Initializable
@@ -51,12 +61,16 @@ public class Person {
         this.lastName = lastName;
     }
 
-    public String getAge() {
-        return age;
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setAge(String age) {
-        this.age = age;
+    public int getAge() {
+        return Period.between(dateOfBirth, LocalDate.now()).getYears();
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getAddress() {
@@ -65,5 +79,19 @@ public class Person {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public boolean isPlayingPiano() {
+        return playingPiano;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", address='" + address + '\'' +
+                '}';
     }
 }

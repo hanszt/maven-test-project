@@ -1,8 +1,10 @@
 package com.dnb.model;
 
+import java.time.LocalDate;
+
 public class Employee extends Person {
 
-    public Employee(String firstName, String lastName, String age) {
+    public Employee(String firstName, String lastName, LocalDate age) {
         super(firstName, lastName, age);
     }
 
