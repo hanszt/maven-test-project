@@ -90,7 +90,21 @@ public final class HigherOrderFunctions {
     public static <T, R> Predicate<T> by(Function<T, R> mapper, Predicate<R> predicate) {
         Objects.requireNonNull(predicate);
         Objects.requireNonNull(mapper);
-        return t -> predicate.test(mapper.apply(t));
+        return t -> {
+            final R r = mapper.apply(t);
+            return r != null && predicate.test(r);
+        };
+    }
+
+    public static <T, U, R> Predicate<T> by(Function<T, U> toUMapper, Function<U, R> toRMapper, Predicate<R> predicate) {
+        Objects.requireNonNull(predicate);
+        Objects.requireNonNull(toUMapper);
+        Objects.requireNonNull(toRMapper);
+        return t -> {
+            final U u = toUMapper.apply(t);
+            final R r = u != null ? toRMapper.apply(u) : null;
+            return r != null && predicate.test(r);
+        };
     }
 
     /**
@@ -131,7 +145,7 @@ public final class HigherOrderFunctions {
      * @see java.util.function.Function#andThen(Function)
      * @see java.util.function.Function#compose(Function)
      */
-    public static <T, R> Function<T, R> asFun(Function<T, R> function) {
+    public static <T, R> Function<T, R> function(Function<T, R> function) {
         Objects.requireNonNull(function);
         return function;
     }

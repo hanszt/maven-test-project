@@ -1,19 +1,32 @@
 package com.dnb;
 
 import com.dnb.model.Data;
+import com.dnb.model.Person;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.MonthDay;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.*;
+import static com.dnb.utils.HigherOrderFunctions.by;
+import static com.dnb.utils.HigherOrderFunctions.function;
+import static com.dnb.utils.predicates.ComparingPredicates.greaterThan;
+import static java.util.Map.Entry.*;
+import static java.util.function.Predicate.isEqual;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toUnmodifiableList;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StreamsSampleTest {
@@ -23,6 +36,10 @@ class StreamsSampleTest {
             new Data("2", BigDecimal.valueOf(4_000_000)),
             new Data("3", BigDecimal.valueOf(2_000_000)),
             new Data("4", BigDecimal.valueOf(2_000_000)));
+
+    private static <K, V> void printKeyAndValue(K key, V value) {
+        System.out.println("key = " + key + ", value = " + value);
+    }
 
     @Test
     void testGettingSumUsingStramReduction() {
@@ -34,13 +51,16 @@ class StreamsSampleTest {
     void testGroupingByAndMapping() {
         var map = list.stream()
                 .collect(groupingBy(Data::getAmount, mapping(Data::getId, toUnmodifiableSet())));
-        map.forEach((key, value) -> System.out.println("key = " + key + ", value = " + value));
+        map.forEach(StreamsSampleTest::printKeyAndValue);
         assertEquals(3, map.size());
     }
 
     @Test
     void testCounting() {
-        var summaryStatistics = list.stream().map(Data::getId).mapToInt(Integer::parseInt).summaryStatistics();
+        var summaryStatistics = list.stream()
+                .map(Data::getId)
+                .mapToInt(Integer::parseInt)
+                .summaryStatistics();
         assertEquals(2.5, summaryStatistics.getAverage());
     }
 
@@ -114,6 +134,22 @@ class StreamsSampleTest {
         //assert
         assertTrue(parallelTimeInMillis < seqTimeInMillis);
         assertEquals(parallelTimer.getResult(), sequentialTimer.getResult());
+    }
+
+    @Test
+    void testBirthDayStream() {
+        Month curMonth = Month.OCTOBER;
+        final var monthDayListMap1 = TestSampleGenerator.createTestPersonList().stream()
+                .filter(person -> person.getDateOfBirth().getMonth().equals(curMonth))
+                .collect(groupingBy(person -> MonthDay.from(person.getDateOfBirth())));
+        final var monthDayListMap = TestSampleGenerator.createTestPersonList().stream()
+                .filter(by(Person::getDateOfBirth, LocalDate::getMonth, isEqual(curMonth)))
+                .collect(groupingBy(function(Person::getDateOfBirth).andThen(MonthDay::from)));
+        monthDayListMap.entrySet().stream()
+                .filter(by(Entry::getValue, List::size, greaterThan(0)))
+                .sorted(comparingByKey())
+                .forEach(System.out::println);
+        assertFalse(monthDayListMap.isEmpty());
     }
 
 }

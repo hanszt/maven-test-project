@@ -158,7 +158,7 @@ class HigherOrderFunctionsTest {
     void testCompose() {
         var books = createBookList();
         final var fieldListOfObjectClass = books.stream()
-                .map(asFun(Object::getClass)
+                .map(function(Object::getClass)
                         .compose(Book::getCategory)
                         .andThen(Class::getDeclaredFields))
                 .flatMap(Arrays::stream)

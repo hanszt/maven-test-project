@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static com.dnb.utils.HigherOrderFunctions.asFun;
+import static com.dnb.utils.HigherOrderFunctions.function;
 import static com.dnb.utils.HigherOrderFunctions.by;
 import static com.dnb.utils.predicates.StringPredicates.doesntContain;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MyFileUtilsTest {
 
     private static Predicate<Path> doesNotContain(String string) {
-        return by(asFun(Path::toFile).andThen(File::getPath), doesntContain(string));
+        return by(function(Path::toFile).andThen(File::getPath), doesntContain(string));
     }
 
     @Test
