@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.dnb.ReflectionSample.PicassoFunctions.integerPropertyAccessor;
+import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -25,13 +26,14 @@ class ReflectionSampleTest {
         assertEquals("Hans", bic.getName());
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     @Test
     void testWeirdBehaviourIntegerPropertyAccessor() {
         final var bic1 = new Bic("1", "1");
         List<Bic> bics = List.of(bic1, new Bic("2", "2"), new Bic("3", "hallo"));
         //The map contains integer type keys but it's hash is created for the string type? Weird behaviour
         Map<Integer, Bic> integerToBicMap = bics.stream()
-                .collect(Collectors.toMap(integerPropertyAccessor("name"), bic -> bic));
+                .collect(toUnmodifiableMap(integerPropertyAccessor("name"), bic -> bic));
         //weird outcome, map with keys of type integer gives a value back when lookup key is of type String
         // but not when it it is of type integer!
         //So lets not use the integerPropertyAccessor function

@@ -29,7 +29,7 @@ class GenericsTest {
     private static List<String> takeListAsWildCardAndGoToStringList(List<? super Person> persons) {
         return persons.stream()
                 .map(Object::toString)
-                .collect(toList());
+                .collect(toUnmodifiableList());
     }
 
     @Test
@@ -42,7 +42,7 @@ class GenericsTest {
         list.forEach(System.out::println);
         final Object collect = list.stream().map(Object::getClass)
                 .filter(e -> e.equals(String.class))
-                .collect(toList());
+                .collect(toUnmodifiableList());
         for (Object object : list) {
             if (object instanceof Person) {
                 Person person = (Person) object;
@@ -60,6 +60,6 @@ class GenericsTest {
     }
 
     public <T> List<T> genericMethod(List<T> list) {
-        return list.stream().filter(Objects::nonNull).collect(toList());
+        return list.stream().filter(Objects::nonNull).collect(toUnmodifiableList());
     }
 }

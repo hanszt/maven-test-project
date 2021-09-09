@@ -1,10 +1,13 @@
-package com.dnb;
+package com.dnb.utils;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public final class HigherOrderFunctions {
@@ -19,13 +22,30 @@ public final class HigherOrderFunctions {
      * @return the new function that is a combination of the supplied functions
      * @see <a href="https://youtu.be/WN9kgdSVhDo?t=2529">
      *     Design Patterns in the Light of Lambda Expressions. Venkat Subramaniam, Agile developer, inc.</a>
+     * @see java.util.function.Function#andThen(Function)
      */
     @SafeVarargs
-    static <T> Function<T, T> combine(Function<T, T>... functions) {
+    static <T> Function<T, T> combineAll(Function<T, T>... functions) {
+        Objects.requireNonNull(functions);
         return Stream.of(functions).reduce(Function.identity(), Function::andThen);
     }
 
-    static <T, M, R> Function<T, R> combine(Function<T, M> function, Function<M, R> downStream) {
+    /**
+     * This only works when input and output type are the same. Using a unary operator does not work. Interesting...
+     * @param functions the functions that will be composed
+     * @param <T> the type for input and output
+     * @return the new function that is a composition of the supplied functions
+     * @see <a href="https://youtu.be/WN9kgdSVhDo?t=2529">
+     *     Design Patterns in the Light of Lambda Expressions. Venkat Subramaniam, Agile developer, inc.</a>
+     * @see java.util.function.Function#compose(Function)
+     */
+    @SafeVarargs
+    static <T> Function<T, T> composeAll(Function<T, T>... functions) {
+        Objects.requireNonNull(functions);
+        return Stream.of(functions).reduce(Function.identity(), Function::compose);
+    }
+
+    static <T, M, R> Function<T, R> combineAll(Function<T, M> function, Function<M, R> downStream) {
         Objects.requireNonNull(function);
         Objects.requireNonNull(downStream);
         return e -> downStream.apply(function.apply(e));
@@ -46,29 +66,6 @@ public final class HigherOrderFunctions {
         return Stream.concat(Stream.of(first), Stream.of(otherComparators)).reduce(Comparator::thenComparing).orElse(first);
     }
 
-    public static  <T, R> boolean by(T t, Function<T, R> mapper, Predicate<R> predicate) {
-        return predicate.test(mapper.apply(t));
-    }
-
-    public static Predicate<String> startsWith(String string) {
-        return startsWith(string, Function.identity());
-    }
-
-    public static <T> Predicate<T> startsWith(String string, Function<T, String> toStringMapper) {
-        return t -> toStringMapper.apply(t).startsWith(string);
-    }
-
-    public static Predicate<String> contains(String string) {
-        return contains(string, Function.identity());
-    }
-
-    public static <T> Predicate<T> contains(String string, Function<T, String> toStringMapper) {
-        return t -> toStringMapper.apply(t).contains(string);
-    }
-
-    public static Predicate<String> hasEqualLength(int length) {
-        return s -> s.length() == length;
-    }
     /**
      * A function that first maps to some other type which can than be used to test with.
      *
@@ -86,11 +83,9 @@ public final class HigherOrderFunctions {
      * List<Book> filteredBookList = books.stream()
      *          .filter(by(Book::getAuthor, contains("a")
      *          .or(startsWith("j"))))
-     *          .collect(Collectors.toList());
+     *          .collect(Collectors.toUnmodifiableList());
      * }</pre>
      * It can help clean up code
-     * @see #contains(String)
-     * @see #startsWith(String)
      */
     public static <T, R> Predicate<T> by(Function<T, R> mapper, Predicate<R> predicate) {
         Objects.requireNonNull(predicate);
@@ -110,7 +105,7 @@ public final class HigherOrderFunctions {
      *            .filter((by(Painting::isFromPicasso)
      *            .or(Painting::isFromRembrandt))
      *            .and(Painting::isInMuseum)))
-     *            .collect(Collectors.toList());
+     *            .collect(Collectors.toUnmodifiableList());
      * }</pre>
      * @see java.util.function.Predicate#and(Predicate)
      * @see java.util.function.Predicate#or(Predicate)
@@ -131,12 +126,12 @@ public final class HigherOrderFunctions {
      *  List<LocalDate> datesOfBirth = paintings.stream()
      *            .map(by(Painting::getPainter)
      *            .andThen(Painter::getDateOfBirth)))
-     *            .collect(Collectors.toList());
+     *            .collect(Collectors.toUnmodifiableList());
      * }</pre>
      * @see java.util.function.Function#andThen(Function)
      * @see java.util.function.Function#compose(Function)
      */
-    public static <T, R> Function<T, R> by(Function<T, R> function) {
+    public static <T, R> Function<T, R> asFun(Function<T, R> function) {
         Objects.requireNonNull(function);
         return function;
     }
@@ -153,14 +148,30 @@ public final class HigherOrderFunctions {
      *  List<LocalDate> datesOfBirth = paintings.stream()
      *            .map(by(Painting::getPainter)
      *            .andThen(Painter::getDateOfBirth)))
-     *            .collect(Collectors.toList());
+     *            .collect(Collectors.toUnmodifiableList());
      * }</pre>
      * @see java.util.function.Function#andThen(Function)
      * @see java.util.function.Function#compose(Function)
      */
-    public static <T, U, R> BiFunction<T, U, R> by(BiFunction<T, U, R> function) {
+    public static <T, U, R> BiFunction<T, U, R> asBiFun(BiFunction<T, U, R> function) {
         Objects.requireNonNull(function);
         return function;
+    }
+
+    public static <T> Consumer<T> first(Consumer<T> consumer) {
+        Objects.requireNonNull(consumer);
+        return consumer;
+    }
+
+    //shared mutability?
+    public static <T, U, R> Stream<R> listCombiner(List<T> list1, List<U> list2, BiFunction<T, U, R> combiner) {
+        return IntStream.iterate(0, i -> ++i)
+                .mapToObj(i -> combiner.apply(list1.get(i), list2.get(i)))
+                .limit(Math.min(list1.size(), list2.size()));
+    }
+
+    public static <T, R> Consumer<T> transformThen(Function<T, R> mappingFunction, Consumer<R> consumer) {
+        return t -> consumer.accept(mappingFunction.apply(t));
     }
 
 }

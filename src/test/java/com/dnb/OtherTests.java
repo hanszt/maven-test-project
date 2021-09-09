@@ -21,13 +21,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.partitioningBy;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OtherTests {
@@ -36,7 +35,9 @@ class OtherTests {
     void testChars() {
         IntStream.range(33, 900).mapToObj(OtherTests::toCharacter).forEach(System.out::println);
         System.out.println();
-        "Hello".chars().mapToObj(OtherTests::toCharacter).forEach(System.out::println);
+        "Hello".chars()
+                .mapToObj(OtherTests::toCharacter)
+                .forEach(System.out::println);
         String.format("Hello,%nI'm Hans").lines().forEach(System.out::printf);
         char c = 'ͽ';
         assertEquals(893, c);
@@ -62,7 +63,7 @@ class OtherTests {
     void testStreamFindFirstNotNullSafeButNotThrowing() {
         String expected = "Sophie";
         Optional<String> anyName = getAnyNameThrowingNull(List.of(new Bic(expected), new Bic(null)));
-        anyName.ifPresentOrElse(name -> assertEquals(expected, name), () -> fail("Not present"));
+        anyName.ifPresentOrElse(assertIsEqualTo(expected), () -> fail("Not present"));
     }
 
     private Optional<String> getAnyNameThrowingNull(List<Bic> bics) {
@@ -94,52 +95,32 @@ class OtherTests {
 
     @Test
     void testGenericsMethodToString() {
-        var opt = asOptional("Hallo");
-        opt.ifPresentOrElse(e -> assertEquals("Hallo", e), () -> fail("Not present"));
+        var opt = Optional.of("Hallo");
+        opt.ifPresentOrElse(assertIsEqualTo("Hallo"), () -> fail("Not present"));
     }
 
     @Test
     void testGenericsMethodToBic() {
         final var bic = new Bic("Hallo");
-        var opt = asOptional(bic);
-        opt.ifPresentOrElse(e -> assertEquals(bic, e), () -> fail("Not present"));
+        var opt = Optional.of(bic);
+        opt.ifPresentOrElse(assertIsEqualTo(bic), () -> fail("Not present"));
     }
 
-    private static <T> Optional<T> asOptional(T value) {
-        return Optional.ofNullable(value);
-    }
-
-    @Test
-    void testGroupingBy() {
-        List<String> strings = List.of("hallo", "hoe", "is", "het");
-
-        var groupedByMap = strings.stream()
-                .collect(groupingBy(String::length));
-        var wordsOfLengthThreeList = groupedByMap.get(3);
-        assertEquals(2, wordsOfLengthThreeList.size());
-        assertTrue(wordsOfLengthThreeList.containsAll(Set.of("hoe", "het")));
-    }
-
-    @Test
-    void testPartitioningBy() {
-        List<String> strings = List.of("hallo", "hoe", "is", "het");
-
-        var partitionedByMap = strings.stream()
-                .collect(partitioningBy(string -> string.contains("e")));
-        final var containsEList = partitionedByMap.get(true);
-        assertEquals(2, containsEList.size());
-        assertTrue(containsEList.containsAll(Set.of("hoe", "het")));
+    private static <T> Consumer<T> assertIsEqualTo(T other) {
+        return t -> assertEquals(t, other);
     }
 
     @Test
     void testCreatingBathes() {
-        List<String> data = IntStream.range(0, 950).mapToObj(i -> "item " + i).collect(toList());
+        List<String> data = IntStream.range(0, 950)
+                .mapToObj(i -> "item " + i)
+                .collect(toUnmodifiableList());
 
         final int BATCH_SIZE = 100;
 
         List<List<String>> batches = IntStream.range(0, (data.size() + BATCH_SIZE - 1) / BATCH_SIZE)
                 .mapToObj(i -> data.subList(i * BATCH_SIZE, Math.min(data.size(), (i + 1) * BATCH_SIZE)))
-                .collect(toList());
+                .collect(toUnmodifiableList());
 
         assertEquals(10, batches.size());
         printBatches(batches);
@@ -199,7 +180,7 @@ class OtherTests {
         final var list = Collections.list(enumeration);
         final var stringIterator = enumeration.asIterator();
         final Iterable<String> iterable = () -> stringIterator;
-        final var strings = StreamSupport.stream(iterable.spliterator(), false).collect(toList());
+        final var strings = StreamSupport.stream(iterable.spliterator(), false).collect(toUnmodifiableList());
         System.out.println(strings);
         assertNotEquals(strings, list);
     }
@@ -246,7 +227,8 @@ class OtherTests {
 
     @Test
     void testStreamUsedWrongDontDoThis() {
-        //This can lead to a race condition when parallelized, does not maintain order
+        //This can lead to a race condition when parallelized, does not maintain order.
+        //Example  of shared mutability. This is devils work
         List<String> bookTitles = new ArrayList<>();
         TestSampleGenerator.createBookList().stream()
                 .filter(Book::isAboutProgramming)
@@ -258,12 +240,37 @@ class OtherTests {
     @Test
     void testCreatingListUSingReduce() {
         //does not maintain order
-        // right way but can be delegated to Collect(toList()); //This does maintain order
+        // right way in the sense that it provides onlu local mutability.
+        // But can be delegated to Collect(toUnmodifiableList()); //This does maintain order
         final var reducedList = TestSampleGenerator.createBookList().stream()
                 .filter(Book::isAboutProgramming)
                 .map(Book::getTitle)
                 .reduce(new ArrayList<>(), CollectorSamples::accumulate, CollectorSamples::combine);
         assertTrue(reducedList.containsAll(List.of("Pragmatic Programmer", "OCP 11 Volume 1")));
+    }
+
+    @Test
+    void testGenerateArrayContainingOneBillionElements() {
+        final var ONE_BILLION = 1_000_000_000;
+        var array = IntStream.range(0, ONE_BILLION).toArray();
+        assertEquals(ONE_BILLION, array.length);
+    }
+
+    @Test
+    void testStartingWithMaxRangeGetNumbersByDivisor() {
+        final var DIVISOR = 20;
+        var array = IntStream.range(0, Integer.MAX_VALUE)
+        .filter(i -> i % DIVISOR == 0)
+        .toArray();
+        final var expected = (Integer.MAX_VALUE / DIVISOR) + 1;
+        assertEquals(expected, array.length);
+    }
+
+    @Test
+    void testGenerateArrayContainingMaxIntValueElementsThrowsOutOfMemoryError() {
+        final var intStream = IntStream.rangeClosed(0, Integer.MAX_VALUE);
+        //noinspection ResultOfMethodCallIgnored
+        assertThrows(OutOfMemoryError.class, intStream::toArray);
     }
 
 }

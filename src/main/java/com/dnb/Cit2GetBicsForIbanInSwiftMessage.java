@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.*;
+
 public class Cit2GetBicsForIbanInSwiftMessage {
 
     private Cit2GetBicsForIbanInSwiftMessage() {
@@ -15,6 +17,6 @@ public class Cit2GetBicsForIbanInSwiftMessage {
         return Arrays.stream(input.split(","))
                 .map(String::trim)
                 .map(Bic::new)
-                .collect(Collectors.toSet());
+                .collect(toUnmodifiableSet());
     }
 }

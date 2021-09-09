@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.*;
+
 /**
  * @author Hans Zuidervaart
  * To gain more insight in the workings of annotations.
@@ -50,7 +52,7 @@ public class ObjectToJsonConverter {
                 .filter(ObjectToJsonConverter::isAnnotatedAsJsonElement)
                 .map(field -> toKeyValuePair(object, field))
                 .map(entry -> String.format("\"%s\":\"%s\"", entry.getKey(), entry.getValue()))
-                .collect(Collectors.joining(","));
+                .collect(joining(","));
         return "{" + jsonString + "}";
     }
 

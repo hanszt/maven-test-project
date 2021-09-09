@@ -9,7 +9,7 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toUnmodifiableList;
 
 final class StreamsSample {
 
@@ -23,7 +23,7 @@ final class StreamsSample {
 
     public static List<BigInteger> getFibonacci(int length) {
         return getFibonacciStream(length, BigInteger.ZERO)
-                .collect(toList());
+                .collect(toUnmodifiableList());
     }
 
     public static BigInteger getNthFibonacciNumber(int n) {

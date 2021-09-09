@@ -5,12 +5,12 @@ import java.math.RoundingMode;
 
 public class BigDecimalSummaryStatistics {
 
-    private final BigDecimal count;
+    private final long count;
     private final BigDecimal sum;
     private final BigDecimal min;
     private final BigDecimal max;
 
-    public BigDecimalSummaryStatistics(BigDecimal count, BigDecimal sum, BigDecimal min, BigDecimal max) {
+    public BigDecimalSummaryStatistics(long count, BigDecimal sum, BigDecimal min, BigDecimal max) {
         this.count = count;
         this.sum = sum;
         this.min = min;
@@ -27,10 +27,11 @@ public class BigDecimalSummaryStatistics {
     }
 
     public BigDecimal getAverage(int scale, RoundingMode roundingMode) {
-        return BigDecimal.ZERO.compareTo(count) == 0 ? BigDecimal.ZERO : sum.divide(count, scale, roundingMode);
+        BigDecimal countAsBD = BigDecimal.valueOf(this.count);
+        return BigDecimal.ZERO.compareTo(countAsBD) == 0 ? BigDecimal.ZERO : sum.divide(countAsBD, scale, roundingMode);
     }
 
-    public BigDecimal getCount() {
+    public long getCount() {
         return count;
     }
 

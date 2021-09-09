@@ -10,21 +10,22 @@ import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
-import static com.dnb.custom_collectors.BigDecimalCollectors.toBigDecimalAverage;
-import static com.dnb.custom_collectors.BigDecimalCollectors.toBigDecimalSummaryStatistics;
+import static com.dnb.custom_collectors.MyCollectors.toBigDecimalAverage;
+import static com.dnb.custom_collectors.MyCollectors.toBigDecimalSummaryStatistics;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toUnmodifiableList;
 
 public class CollectorSamples {
 
-   Optional<CashBalance> collectingAndThenToFirstElementIfSizeOne(List<CashBalance> cashBalanceDetails) {
+    Optional<CashBalance> collectingAndThenToFirstElementIfSizeOne(List<CashBalance> cashBalanceDetails) {
         return cashBalanceDetails.stream()
                 .filter(CashBalance::isOpening)
                 .collect(toFirstElementIfSizeOne());
     }
 
     private static Collector<CashBalance, ?, Optional<CashBalance>> toFirstElementIfSizeOne() {
-        return Collectors.collectingAndThen(Collectors.toList(), CollectorSamples::returnElementIfSizeOne);
+        return collectingAndThen(toUnmodifiableList(), CollectorSamples::returnElementIfSizeOne);
     }
 
     private static Optional<CashBalance> returnElementIfSizeOne(List<CashBalance> openingCashBalances) {
@@ -49,7 +50,8 @@ public class CollectorSamples {
     }
 
     static BigDecimalSummaryStatistics getBigDecimalSummaryStatistics(Collection<BigDecimal> bigDecimals) {
-        return bigDecimals.stream().collect(toBigDecimalSummaryStatistics());
+        return bigDecimals.stream()
+                .collect(toBigDecimalSummaryStatistics());
     }
 
     static IntSummaryStatistics getInstSummaryStatistics(Collection<Integer> integers) {
@@ -78,4 +80,5 @@ public class CollectorSamples {
         hashSet.add(t);
         return hashSet;
     }
+
 }

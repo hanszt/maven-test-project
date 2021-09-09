@@ -39,7 +39,7 @@ class LocalDateTimeAndDateTest {
         assertEquals(-1, date1.compareTo(date2));
         assertEquals(1, date3.compareTo(date2));
         assertEquals(0, date4.compareTo(date1));
-        await().atLeast(Duration.ONE_MILLISECOND).until(() -> prevMomentComparedToNow(now));
+        await().atLeast(Duration.ONE_HUNDRED_MILLISECONDS).until(() -> prevMomentComparedToNow(now));
     }
 
     private boolean prevMomentComparedToNow(Date prevNow) {

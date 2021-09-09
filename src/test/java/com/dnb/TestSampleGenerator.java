@@ -28,7 +28,7 @@ public final class TestSampleGenerator {
                 new Person("Nikolai", "Jacobs", LocalDate.of(1990, 2, 1), true),
                 new Person("Ted", "Burgmeijer", LocalDate.of(1990, 3, 2)),
                 new Person("Martijn", "Ruigrok", LocalDate.of(1940, 7, 3)),
-                new Person("Henk", "Zuidervaart", LocalDate.of(1938, 6, 3), true),
+                new Person("Henk", "Zuidervaart", LocalDate.of(1940, 6, 3), true),
                 new Person("Ben", "Bello", LocalDate.of(1970, 6, 3)));
     }
 

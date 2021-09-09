@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.*;
+
 public class NIOStreamSample {
 
     List<Path> getFilesForDataType(Path dataType) {
@@ -16,7 +18,7 @@ public class NIOStreamSample {
             return inputStream
                     .filter(path -> "Path.toFile().getName()".startsWith(dataType + "_"))
                     .sorted()
-                    .collect(Collectors.toUnmodifiableList());
+                    .collect(toUnmodifiableList());
         } catch (IOException e) {
             System.out.printf("Could not list files for dataType %s", dataType);
             return Collections.emptyList();

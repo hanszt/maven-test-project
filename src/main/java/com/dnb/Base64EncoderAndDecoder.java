@@ -4,7 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Base64;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 public class Base64EncoderAndDecoder {
 
@@ -36,7 +37,7 @@ public class Base64EncoderAndDecoder {
         final var formattedContainingString = containingString.chars()
                 .mapToObj(i -> String.valueOf((char) i))
                 .filter(stringToCheck::contains)
-                .collect(Collectors.joining());
+                .collect(joining());
         LOGGER.info("Formatted containing string: {}", formattedContainingString);
         return formattedContainingString.contains(stringToCheck);
     }

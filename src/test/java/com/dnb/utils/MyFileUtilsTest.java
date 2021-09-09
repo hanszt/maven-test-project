@@ -1,19 +1,23 @@
-package com.dnb;
+package com.dnb.utils;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static com.dnb.utils.HigherOrderFunctions.asFun;
+import static com.dnb.utils.HigherOrderFunctions.by;
+import static com.dnb.utils.predicates.StringPredicates.doesntContain;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MyFileUtilsTest {
 
     private static Predicate<Path> doesNotContain(String string) {
-        return path -> !path.toFile().getPath().contains(string);
+        return by(asFun(Path::toFile).andThen(File::getPath), doesntContain(string));
     }
 
     @Test

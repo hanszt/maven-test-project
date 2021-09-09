@@ -1,39 +1,58 @@
-package com.dnb;
+package com.dnb.utils;
 
 import com.dnb.model.Book;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.dnb.HigherOrderFunctions.*;
 import static com.dnb.TestSampleGenerator.createBookList;
+import static com.dnb.utils.HigherOrderFunctions.*;
+import static com.dnb.utils.predicates.StringPredicates.contains;
+import static com.dnb.utils.predicates.StringPredicates.hasEqualLength;
+import static com.dnb.utils.predicates.StringPredicates.startsWith;
 import static java.util.Comparator.comparing;
 import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HigherOrderFunctionsTest {
 
+    /**
+     * combineAll and composeAll have exactly the same effect
+     */
     @Test
-    void testHigherOrderFunctionCombinerUsingColor() {
-        Function<Color, Color> func = combine(
+    void testHigherOrderFunctionCombinerAndComposerUsingColor() {
+        //arrange
+        final var originalColor = new Color(123, 32, 21);
+        Function<Color, Color> combinedFilter = combineAll(
                 Color::brighter,
                 HigherOrderFunctionsTest::maxRed,
                 HigherOrderFunctionsTest::removeBlue);
-        final var originalColor = Color.GRAY;
-        final var result = func.apply(originalColor);
-        assertEquals(0, result.getBlue());
-        assertEquals(255, result.getRed());
-        assertTrue(originalColor.getGreen() < result.getGreen());
+
+        Function<Color, Color> composedFilter = composeAll(
+                Color::brighter,
+                HigherOrderFunctionsTest::maxRed,
+                HigherOrderFunctionsTest::removeBlue);
+        //act
+        final var colorByCombinedFilter = combinedFilter.apply(originalColor);
+        final var colorByComposedFilter = composedFilter.apply(originalColor);
+        System.out.println("originalColor = " + originalColor);
+        System.out.println("colorByCombinedFilter = " + colorByCombinedFilter);
+        System.out.println("colorByComposedFilter = " + colorByComposedFilter);
+        //assert
+        assertEquals(colorByCombinedFilter, colorByComposedFilter);
+        assertEquals(0, colorByCombinedFilter.getBlue());
+        assertEquals(255, colorByCombinedFilter.getRed());
+        assertTrue(originalColor.getGreen() < colorByCombinedFilter.getGreen());
     }
 
     private static Color maxRed(Color t) {
@@ -101,10 +120,10 @@ class HigherOrderFunctionsTest {
         var bookList = createBookList();
         final var expected = bookList.stream()
                 .sorted(comparing(Book::getCategory).reversed().thenComparing(Book::getTitle))
-                .collect(Collectors.toList());
+                .collect(toUnmodifiableList());
         final var actual = bookList.stream()
                 .sorted(sequential(comparing(Book::getCategory).reversed(), comparing(Book::getTitle)))
-                .collect(Collectors.toList());
+                .collect(toUnmodifiableList());
         assertEquals(expected, actual);
     }
 
@@ -113,10 +132,10 @@ class HigherOrderFunctionsTest {
         var bookList = createBookList();
         final var expected = bookList.stream()
                 .sorted(comparing(book -> book.getCategory() + book.getTitle()))
-                .collect(Collectors.toList());
+                .collect(toUnmodifiableList());
         final var actual = bookList.stream()
                 .sorted(comparing(Book::getCategory).thenComparing(Book::getTitle))
-                .collect(Collectors.toList());
+                .collect(toUnmodifiableList());
         assertEquals(expected, actual);
     }
 
@@ -127,10 +146,10 @@ class HigherOrderFunctionsTest {
         final var A = "u";
         final var expected = books.stream()
                 .filter(book -> !(book.getTitle().contains(E) || book.getTitle().contains(A)))
-                .collect(Collectors.toList());
+                .collect(toUnmodifiableList());
         final var filteredBookList = books.stream()
                 .filter(by(Book::getTitle, not(contains(E).or(contains(A)))))
-                .collect(Collectors.toList());
+                .collect(toUnmodifiableList());
         filteredBookList.forEach(System.out::println);
         assertEquals(expected, filteredBookList);
     }
@@ -139,13 +158,13 @@ class HigherOrderFunctionsTest {
     void testCompose() {
         var books = createBookList();
         final var fieldListOfObjectClass = books.stream()
-                .map(by(Object::getClass)
+                .map(asFun(Object::getClass)
                         .compose(Book::getCategory)
                         .andThen(Class::getDeclaredFields))
                 .flatMap(Arrays::stream)
-                .collect(Collectors.toList());
+                .collect(toUnmodifiableList());
         fieldListOfObjectClass.forEach(System.out::println);
-        assertEquals(70, fieldListOfObjectClass.size());
+        assertFalse(fieldListOfObjectClass.isEmpty());
     }
 
     @Test
@@ -153,7 +172,7 @@ class HigherOrderFunctionsTest {
         var books = createBookList();
         final var filteredBookList = books.stream()
                 .filter(by(Book::hasCopies).or(Book::isAboutProgramming))
-                .collect(Collectors.toList());
+                .collect(toUnmodifiableList());
         filteredBookList.forEach(System.out::println);
         assertEquals(2, filteredBookList.size());
     }
@@ -163,29 +182,60 @@ class HigherOrderFunctionsTest {
         var books = createBookList();
         final var expected = books.stream()
                 .filter(book -> book.getTitle().startsWith("t") && book.getCategory().contains("2"))
-                .collect(Collectors.toList());
+                .collect(toUnmodifiableList());
         final var filteredBookList = books.stream()
                 .filter(by(Book::getTitle, startsWith("t")).and(by(Book::getCategory, contains("2"))))
-                .collect(Collectors.toList());
+                .collect(toUnmodifiableList());
         filteredBookList.forEach(System.out::println);
         assertEquals(expected, filteredBookList);
     }
 
     @Test
-    void testBiFunctionChaining() {
+    void testBiFunctionChainingAndThenUseCaseCalculateDifferenceElementsAtSameIndexAndThenConvertToBigDecimal() {
+        //arrange
         List<Double> list1 = Arrays.asList(1.0d, 2.1d, 3.3d, 5.3);
         List<Double> list2 = Arrays.asList(0.1d, 0.2d, 4d);
-        List<Boolean> result = listCombiner(list1, list2,
-                by(Double::compareTo).andThen(i -> i > 0));
-        assertEquals(List.of(true, true, false), result);
+        final var expected = Stream.of(.9, 1.9, -.7)
+                .map(BigDecimal::valueOf)
+                .collect(toUnmodifiableList());
+        //act
+        List<BigDecimal> result = listCombiner(list1, list2, asBiFun(HigherOrderFunctionsTest::difference)
+                .andThen(BigDecimal::valueOf))
+                .map(bigDecimal -> bigDecimal.setScale(1, RoundingMode.HALF_UP))
+                .collect(toUnmodifiableList());
+        //assert
+        assertEquals(expected, result);
     }
 
-    private static <T, U, R> List<R> listCombiner(List<T> list1, List<U> list2, BiFunction<T, U, R> combiner) {
-        final int endExclusive = Math.min(list1.size(), list2.size());
-        return IntStream.range(0, endExclusive)
-                .mapToObj(i -> combiner.apply(list1.get(i), list2.get(i)))
-                .collect(Collectors.toList());
+    @Test
+    void testComposedConsumer() {
+        //arrange
+        List<Double> list1 = Arrays.asList(1.0d, 2.1d, 3.3d, 5.3);
+        List<Double> list2 = Arrays.asList(0.1d, 0.2d, 4d);
+        final var expected = Stream.of(.9, 1.9, -.7)
+                .map(BigDecimal::valueOf)
+                .collect(toUnmodifiableList());
+        //act
+        listCombiner(list1, list2, asBiFun(HigherOrderFunctionsTest::difference)
+                .andThen(BigDecimal::valueOf))
+                .map(bigDecimal -> bigDecimal.setScale(1, RoundingMode.HALF_UP))
+                .forEach(first(System.out::println).andThen(System.out::println));
+        //assert
+        assertFalse(expected.isEmpty());
     }
 
+    @Test
+    void testMappedConsumer() {
+        //arrange
+        final var bookList = createBookList();
+        //act
+        bookList.forEach(transformThen(Book::getCategory, System.out::println));
+        //assert
+        assertFalse(bookList.isEmpty());
+    }
+
+    private static double difference(double aDouble, double anotherDouble) {
+        return aDouble - anotherDouble;
+    }
 
 }

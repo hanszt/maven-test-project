@@ -1,6 +1,7 @@
 package com.dnb.collectors_samples;
 
 import com.dnb.TestSampleGenerator;
+import com.dnb.custom_collectors.MyCollectors;
 import com.dnb.model.Book;
 import com.dnb.model.Employee;
 import com.dnb.model.Person;
@@ -12,18 +13,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
-import static com.dnb.TestSampleGenerator.createBookList;
-import static com.dnb.TestSampleGenerator.createTestPersonList;
+import static com.dnb.utils.HigherOrderFunctions.by;
+import static com.dnb.utils.predicates.ComparingPredicates.*;
+import static com.dnb.utils.predicates.StringPredicates.contains;
 import static java.util.AbstractMap.SimpleEntry;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CollectorSamplesTest {
 
@@ -93,7 +92,10 @@ class CollectorSamplesTest {
     @Test
     void testGivenAListOfBigDecimalsCalculateTheCorrectAverage() {
         var average = new BigDecimal("2000.00");
-        var list = List.of(new BigDecimal("1000"), new BigDecimal("2000"), new BigDecimal("3000"));
+        var list = List.of(
+                new BigDecimal("1000"),
+                new BigDecimal("2000"),
+                new BigDecimal("3000"));
         //act
         var actual = CollectorSamples.getBigDecimalAverage(list);
         assertEquals(average, actual);
@@ -104,19 +106,46 @@ class CollectorSamplesTest {
         var average = new BigDecimal("2000.00");
         final var min = new BigDecimal("1000");
         final var max = new BigDecimal("3000");
-        var list = List.of(new BigDecimal("2000"), min, new BigDecimal("1500"), max, new BigDecimal("2500"));
+        var list = List.of(
+                new BigDecimal("2000"), min,
+                new BigDecimal("1500"), max,
+                new BigDecimal("2500"));
         //act
         var summaryStatistics = CollectorSamples.getBigDecimalSummaryStatistics(list);
         assertEquals(average, summaryStatistics.getAverage());
         assertEquals(min, summaryStatistics.getMin());
         assertEquals(max, summaryStatistics.getMax());
-        assertEquals(list.size(), summaryStatistics.getCount().intValue());
+        assertEquals(list.size(), (int) summaryStatistics.getCount());
         assertEquals(new BigDecimal("10000"), summaryStatistics.getSum());
     }
 
     @Test
+    void testGroupingBy() {
+        List<String> strings =
+                List.of("hallo", "hoe", "is", "het", "?", "dit", "is", "een", "test", "hoe", "vind", "je", "dat");
+
+        var stringGroupedByLength = strings.stream()
+                .collect(groupingBy(String::length));
+
+        final var STRING_OF_LENGTH_THREE = 3;
+        assertEquals(List.of("hoe", "het", "dit", "een", "hoe", "dat"), stringGroupedByLength.get(STRING_OF_LENGTH_THREE));
+    }
+
+    @Test
+    void testPartitioningBy() {
+        List<String> strings =
+                List.of("hallo", "hoe", "is", "het", "?", "dit", "is", "een", "test", "hoe", "vind", "je", "dat");
+
+        var partitionedByMap = strings.stream()
+                .collect(partitioningBy(contains("e")));
+
+        assertEquals(List.of("hoe", "het", "een", "test", "hoe", "je"), partitionedByMap.get(true));
+        assertEquals(List.of("hallo", "is", "?", "dit", "is", "vind", "dat"), partitionedByMap.get(false));
+    }
+
+    @Test
     void testGroupingByThenCountingThenConvertingCountToInteger() {
-        final var countByBookCategory = createBookList().stream()
+        final var countByBookCategory = TestSampleGenerator.createBookList().stream()
                 .collect(groupingBy(Book::getCategory,
                         collectingAndThen(counting(),
                                 Long::intValue)));
@@ -127,7 +156,7 @@ class CollectorSamplesTest {
     @Test
     void testGroupingByThenMappingToTitleCollectingToList() {
         //act
-        final var bookTitleByCategory = createBookList().stream()
+        final var bookTitleByCategory = TestSampleGenerator.createBookList().stream()
                 .collect(groupingBy(Book::getCategory,
                         mapping(Book::getTitle, toUnmodifiableList())));
         //assert
@@ -140,12 +169,12 @@ class CollectorSamplesTest {
     }
 
     @Test
-    void testMaxBy() {
+    void testCollectingAndThenMaxByAndTransformResult() {
         //act
         final var personList = TestSampleGenerator.createTestPersonList();
         var personWithMaxAgeByCollectMaxBy = personList.stream()
                 .collect(collectingAndThen(maxBy(comparing(Person::getAge)),
-                        person -> person.map(Person::getFirstName)));
+                        personOpt -> personOpt.map(Person::getFirstName)));
 
         var personWithMaxAge = personList.stream()
                 .max(comparing(Person::getAge))
@@ -155,16 +184,16 @@ class CollectorSamplesTest {
     }
 
     @Test
-    void testGroupingByLastNameThenFilteringByAgeThenMappingByFirstName() {
+    void testGroupingByLastNameThenFilteringByIsPlayingPianoThenMappingToFirstName() {
         //act
-        final var groupedByLastNamePlayingPianoToFirstName = createTestPersonList().stream()
+        final var groupedByLastNamePlayingPianoToFirstName = TestSampleGenerator.createTestPersonList().stream()
                 .collect(groupingBy(Person::getLastName,
                         filtering(Person::isPlayingPiano,
                                 mapping(Person::getFirstName,
                                         toUnmodifiableList()))));
         final var peoplePlayingPiano = groupedByLastNamePlayingPianoToFirstName.values().stream()
                 .flatMap(Collection::stream)
-                .collect(toSet());
+                .collect(toUnmodifiableSet());
         //assert
         final var expectedKeySet = Set.of("Burgmeijer", "Ruigrok", "Jacobs", "Vullings", "Bello", "Zuidervaart");
         assertEquals(expectedKeySet, groupedByLastNamePlayingPianoToFirstName.keySet());
@@ -177,7 +206,7 @@ class CollectorSamplesTest {
         final var otherPersonList = List.of(
                 new Person("Matthijs", "Bayer", LocalDate.of(1993, 4, 4), true),
                 new Employee("Joop", "Schat", LocalDate.of(1994, 1, 2)));
-        final var listOfPersonLists = List.of(createTestPersonList(), otherPersonList);
+        final var listOfPersonLists = List.of(TestSampleGenerator.createTestPersonList(), otherPersonList);
         var groupedByLastNamePlayingPianoToFirstName2 = listOfPersonLists.stream()
                 .flatMap(Collection::stream)
                 .filter(Person::isPlayingPiano)
@@ -187,7 +216,8 @@ class CollectorSamplesTest {
         var groupedByLastNamePlayingPianoToFirstName = listOfPersonLists.stream()
                 .collect(flatMapping(Collection::stream,
                         filtering(Person::isPlayingPiano,
-                                mapping(Person::getFirstName, toUnmodifiableSet()))));
+                                mapping(Person::getFirstName,
+                                        toUnmodifiableSet()))));
         //assert
         final var expectedKeySet = Set.of("Sophie", "Henk", "Matthijs", "Nikolai", "Hans");
         assertEquals(expectedKeySet, groupedByLastNamePlayingPianoToFirstName);
@@ -196,13 +226,73 @@ class CollectorSamplesTest {
 
     @Test
     void testTeeing() {
-        final var setListSimpleEntry = createTestPersonList().stream()
-                .collect(teeing(filtering(Person::isPlayingPiano, toUnmodifiableSet()),
+        final var setListSimpleEntry = TestSampleGenerator.createTestPersonList().stream()
+                .collect(MyCollectors.teeing(filtering(Person::isPlayingPiano,
+                        toUnmodifiableSet()),
                         mapping(Person::getAge, toUnmodifiableList()),
                         SimpleEntry::new));
+
         System.out.println(setListSimpleEntry);
         assertFalse(setListSimpleEntry.getKey().isEmpty());
         assertFalse(setListSimpleEntry.getValue().isEmpty());
+    }
+
+    @Test
+    void testInceptionCollecting() {
+        final var testPersonList = TestSampleGenerator.createTestPersonList();
+
+        final var personSummaryStatistics = testPersonList.stream()
+                .collect(MyCollectors.teeing(
+                        filtering(by(Person::getAge, greaterThan(30)),
+                                MyCollectors.teeing(counting(), summingLong(Person::getAge),
+                                        SimpleEntry::new)),
+                        filtering(Person::isPlayingPiano,
+                                MyCollectors.teeing(maxBy(comparing(Person::getAge)),
+                                        minBy(comparing(Person::getAge)),
+                                        SimpleEntry::new)),
+                        PersonStatistics::new));
+
+        final var summaryStatistics = testPersonList.stream()
+                .mapToInt(Person::getAge)
+                .filter(greaterThanInt(30))
+                .summaryStatistics();
+        System.out.println(personSummaryStatistics);
+        assertEquals(personSummaryStatistics.getAverageAge(), summaryStatistics.getAverage());
+        assertEquals(personSummaryStatistics.getAgesSumPersonsOlderThan30(), summaryStatistics.getSum());
+    }
+
+    private static class PersonStatistics {
+
+        private final long nrOfPersonsOlderThan30;
+        private final long agesSumPersonsOlderThan30;
+        private final Person minAgePersonPlayingPiano;
+        private final Person maxAgePersonPlayingPiano;
+
+        public PersonStatistics(SimpleEntry<Long, Long> simpleEntry1,
+                                SimpleEntry<Optional<Person>, Optional<Person>> simpleEntry2) {
+            this.nrOfPersonsOlderThan30 = simpleEntry1.getKey();
+            this.agesSumPersonsOlderThan30 = simpleEntry1.getValue();
+            this.minAgePersonPlayingPiano = simpleEntry2.getKey().orElse(null);
+            this.maxAgePersonPlayingPiano = simpleEntry2.getValue().orElse(null);
+        }
+
+        public long getAgesSumPersonsOlderThan30() {
+            return agesSumPersonsOlderThan30;
+        }
+
+        public double getAverageAge() {
+            return nrOfPersonsOlderThan30 > 0 ? (double) agesSumPersonsOlderThan30 / nrOfPersonsOlderThan30 : 0.0d;
+        }
+
+        @Override
+        public String toString() {
+            return "PersonStatistics{" +
+                    "nrOfPersonsOlderThan30=" + nrOfPersonsOlderThan30 +
+                    ", agesSumPersonsOlderThan30=" + agesSumPersonsOlderThan30 +
+                    ", minAgePersonPlayingPiano=" + minAgePersonPlayingPiano +
+                    ", maxAgePersonPlayingPiano=" + maxAgePersonPlayingPiano +
+                    '}';
+        }
     }
 
 }

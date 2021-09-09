@@ -7,13 +7,12 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.*;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -34,7 +33,7 @@ class StreamsSampleTest {
     @Test
     void testGroupingByAndMapping() {
         var map = list.stream()
-                .collect(groupingBy(Data::getAmount, mapping(Data::getId, toSet())));
+                .collect(groupingBy(Data::getAmount, mapping(Data::getId, toUnmodifiableSet())));
         map.forEach((key, value) -> System.out.println("key = " + key + ", value = " + value));
         assertEquals(3, map.size());
     }
@@ -47,8 +46,8 @@ class StreamsSampleTest {
 
     @Test
     void testStreamLimit() {
-        List<Integer> list  = getIntegerStream().collect(Collectors.toList());
-        final var limitedList = list.stream().limit(10).collect(Collectors.toList());
+        List<Integer> list  = getIntegerStream().collect(toUnmodifiableList());
+        final var limitedList = list.stream().limit(10).collect(toUnmodifiableList());
         assertEquals(10, limitedList.size());
     }
 
@@ -57,8 +56,8 @@ class StreamsSampleTest {
         final var iterator = getIntegerStream().iterator();
         final var result = StreamsSample.returnListFromIterator(iterator)
                 .map(String::valueOf)
-                .collect(Collectors.toList());
-        assertEquals(getIntegerStream().map(String::valueOf).collect(Collectors.toList()), result);
+                .collect(toUnmodifiableList());
+        assertEquals(getIntegerStream().map(String::valueOf).collect(toUnmodifiableList()), result);
     }
 
     private Stream<Integer> getIntegerStream() {
@@ -69,7 +68,7 @@ class StreamsSampleTest {
     void testFibonacciUsingStreams() {
         final var expected = Stream.of(0, 1, 1, 2, 3, 5, 8, 13, 21, 34)
                 .map(BigInteger::valueOf)
-                .collect(Collectors.toList());
+                .collect(toUnmodifiableList());
         final var fibonacciList = StreamsSample.getFibonacci(10);
         assertEquals(expected, fibonacciList);
     }
@@ -92,7 +91,7 @@ class StreamsSampleTest {
 
     @Test
     void testCalculatePiParallelUsingStreams() {
-        Timer<BigDecimal> timer = Timer.timeFunction(10_000_000, StreamsSample::calculatePi);
+        Timer<BigDecimal> timer = Timer.timeAFunction(10_000_000, StreamsSample::calculatePi);
         final var result = timer.getResult();
         System.out.println("Milliseconds = " + timer.getTimeInMillis());
         assertEquals(new BigDecimal("3.1415927972"), result);
@@ -102,15 +101,16 @@ class StreamsSampleTest {
     void testCalculatePiParallelUsingDoubleStream() {
         final var iterations = 100_000_000;
         //act
-        Timer<Double> sequentialTimer = Timer.timeFunction(iterations,
+        Timer<Double> sequentialTimer = Timer.timeAFunction(iterations,
                 (long nrOfIterations) -> StreamsSample.calculatePiAsDouble(nrOfIterations, false));
-        Timer<Double> parallelTimer = Timer.timeFunction(iterations,
+        Timer<Double> parallelTimer = Timer.timeAFunction(iterations,
                 (long nrOfIterations) -> StreamsSample.calculatePiAsDouble(nrOfIterations, true));
 
         final var seqTimeInMillis = sequentialTimer.getTimeInMillis();
         final var parallelTimeInMillis = parallelTimer.getTimeInMillis();
         System.out.println("Sequential in milliseconds = " + seqTimeInMillis);
         System.out.println("Parallel in milliseconds = " + parallelTimeInMillis);
+        System.out.println("parallelTimer.getResult() = " + parallelTimer.getResult());
         //assert
         assertTrue(parallelTimeInMillis < seqTimeInMillis);
         assertEquals(parallelTimer.getResult(), sequentialTimer.getResult());
