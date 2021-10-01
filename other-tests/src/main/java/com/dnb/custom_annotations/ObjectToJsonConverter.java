@@ -60,10 +60,10 @@ public class ObjectToJsonConverter {
         try {
             final var o = field.get(object);
             String value;
-            if (o instanceof String) {
-                value = (String) o;
-            } else if (o instanceof LocalDate) {
-                value = ((LocalDate) o).toString();
+            if (o instanceof String s) {
+                value = s;
+            } else if (o instanceof LocalDate localDate) {
+                value = localDate.toString();
             } else {
                 throw new IllegalStateException("Field not of type string or LocalDate...");
             }

@@ -37,7 +37,7 @@ public class SSLServerSample {
                 LOGGER.info("Request made");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
     }
 
@@ -54,6 +54,5 @@ public class SSLServerSample {
 
     private static void shutDownServer(Duration duration) {
         LOGGER.info(() -> "Timed server shutdown. Run duration: " + duration.toSeconds() + " seconds");
-        System.exit(0);
     }
 }

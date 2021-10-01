@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class ExceptionThrowingTest {
 
     @Test
-    void exceptionGetMessageTest() {
+    void testExceptionGetMessageTest() {
         try {
             throwRuntimeException();
         }catch (RuntimeException e) {

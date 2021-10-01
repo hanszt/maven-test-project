@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GenericsTest {
@@ -29,7 +29,7 @@ class GenericsTest {
     private static List<String> takeListAsWildCardAndGoToStringList(List<? super Person> persons) {
         return persons.stream()
                 .map(Object::toString)
-                .collect(toUnmodifiableList());
+                .toList();
     }
 
     @Test
@@ -40,16 +40,18 @@ class GenericsTest {
         list.add("Raar");
         list.add(1);
         list.forEach(System.out::println);
+
         final Object collect = list.stream().map(Object::getClass)
                 .filter(e -> e.equals(String.class))
-                .collect(toUnmodifiableList());
+                .toList();
+
         for (Object object : list) {
-            if (object instanceof Person) {
-                Person person = (Person) object;
+            if (object instanceof Person person) {
                 System.out.println("person.getAddress() = " + person.getAddress());
             }
         }
         System.out.println(collect);
+        assertNotNull(collect);
     }
 
     @Test
@@ -60,6 +62,6 @@ class GenericsTest {
     }
 
     public <T> List<T> genericMethod(List<T> list) {
-        return list.stream().filter(Objects::nonNull).collect(toUnmodifiableList());
+        return list.stream().filter(Objects::nonNull).toList();
     }
 }

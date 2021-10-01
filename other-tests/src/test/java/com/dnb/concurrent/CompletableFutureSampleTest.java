@@ -1,5 +1,6 @@
 package com.dnb.concurrent;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class CompletableFutureSampleTest {
@@ -10,15 +11,18 @@ class CompletableFutureSampleTest {
     void testCompletableFuture() {
         final var integer = completableFutureSample.completableFuture().getNow(0);
         System.out.println("integer = " + integer);
+        Assertions.assertNotNull(integer);
     }
 
     @Test
     void testCombiningTwoCompletableFutures() {
-        completableFutureSample.getStockPriceAndThenCombine();
+        var completableFuture = completableFutureSample.getStockPriceAndThenCombine();
+        Assertions.assertNotNull(completableFuture);
     }
 
     @Test
     void testComposeAndThenCombiningTwoCompletableFutures() {
-        completableFutureSample.getStockPriceThenComposeAndThanCombine();
+        var completableFuture = completableFutureSample.getStockPriceThenComposeAndThanCombine();
+        Assertions.assertNotNull(completableFuture);
     }
 }
