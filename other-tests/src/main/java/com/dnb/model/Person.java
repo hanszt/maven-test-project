@@ -8,10 +8,12 @@ import com.dnb.custom_annotations.JsonSerializable;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.Period;
+import java.util.List;
 
 @JsonSerializable
 public class Person {
 
+    public static final String ZUIDERVAART = "Zuidervaart";
     @JsonElement
     private String firstName;
 
@@ -98,5 +100,16 @@ public class Person {
                 ", dateOfBirth=" + dateOfBirth +
                 ", address='" + address + '\'' +
                 '}';
+    }
+
+    public static List<Person> createTestPersonList() {
+        return List.of(new Person("Sophie", "Vullings", LocalDate.of(1994, 10, 20), true),
+                new Person("Hans", ZUIDERVAART, LocalDate.of(1989, 10, 18), true),
+                new Person("Huib", ZUIDERVAART, LocalDate.of(1951, 9, 23)),
+                new Person("Nikolai", "Jacobs", LocalDate.of(1990, 2, 1), true),
+                new Person("Ted", "Burgmeijer", LocalDate.of(1990, 3, 2)),
+                new Person("Martijn", "Ruigrok", LocalDate.of(1940, 7, 3)),
+                new Person("Henk", ZUIDERVAART, LocalDate.of(1940, 6, 3), true),
+                new Person("Ben", "Bello", LocalDate.of(1970, 6, 3)));
     }
 }

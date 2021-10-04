@@ -1,7 +1,7 @@
 package com.dnb;
 
-import com.dnb.model.Book;
 import com.dnb.model.BookReader;
+import org.hzt.model.Book;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

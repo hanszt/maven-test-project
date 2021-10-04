@@ -1,4 +1,4 @@
-package com.dnb.model;
+package org.hzt.model;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Optional;

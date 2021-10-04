@@ -2,8 +2,10 @@ package com.dnb;
 
 import com.dnb.collectors_samples.CollectorSamples;
 import com.dnb.model.Bic;
-import com.dnb.model.Book;
-import com.dnb.model.Painting;
+import com.dnb.model.Person;
+import org.hzt.TestSampleGenerator;
+import org.hzt.model.Book;
+import org.hzt.model.Painting;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,10 +31,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OtherTests {
@@ -119,14 +121,12 @@ class OtherTests {
     @Test
     void testCreatingBathes() {
         List<String> data = IntStream.range(0, 950)
-                .mapToObj(i -> "item " + i)
-                .collect(toUnmodifiableList());
+                .mapToObj(i -> "item " + i).toList();
 
         final int BATCH_SIZE = 100;
 
         List<List<String>> batches = IntStream.range(0, (data.size() + BATCH_SIZE - 1) / BATCH_SIZE)
-                .mapToObj(i -> data.subList(i * BATCH_SIZE, Math.min(data.size(), (i + 1) * BATCH_SIZE)))
-                .collect(toUnmodifiableList());
+                .mapToObj(i -> data.subList(i * BATCH_SIZE, Math.min(data.size(), (i + 1) * BATCH_SIZE))).toList();
 
         assertEquals(10, batches.size());
         printBatches(batches);
@@ -186,8 +186,7 @@ class OtherTests {
         final var list = Collections.list(enumeration);
         final var stringIterator = enumeration.asIterator();
         final Iterable<String> iterable = () -> stringIterator;
-        final var strings = StreamSupport.stream(iterable.spliterator(), false)
-                .collect(toUnmodifiableList());
+        final var strings = StreamSupport.stream(iterable.spliterator(), false).toList();
         System.out.println(strings);
         assertNotEquals(strings, list);
     }
@@ -237,7 +236,7 @@ class OtherTests {
         //This can lead to a race condition when parallelized, does not maintain order.
         //Example  of shared mutability. This is devils work
         List<String> bookTitles = new ArrayList<>();
-        TestSampleProvider.createBookList().stream()
+        TestSampleGenerator.createBookList().stream()
                 .filter(Book::isAboutProgramming)
                 .map(Book::getTitle)
                 .forEach(bookTitles::add);
@@ -249,7 +248,7 @@ class OtherTests {
         //does not maintain order
         // right way in the sense that it provides onlu local mutability.
         // But can be delegated to Collect(toUnmodifiableList()); //This does maintain order
-        final var reducedList = TestSampleProvider.createBookList().stream()
+        final var reducedList = TestSampleGenerator.createBookList().stream()
                 .filter(Book::isAboutProgramming)
                 .map(Book::getTitle)
                 .reduce(new ArrayList<>(), CollectorSamples::accumulate, CollectorSamples::combine);
@@ -261,7 +260,7 @@ class OtherTests {
         //does not maintain order
         // right way in the sense that it provides onlu local mutability.
         // But can be delegated to Collect(toUnmodifiableList()); //This does maintain order
-        final var reducedSet = TestSampleProvider.createBookList().stream()
+        final var reducedSet = TestSampleGenerator.createBookList().stream()
                 .filter(Book::isAboutProgramming)
                 .map(Book::getTitle)
                 .reduce(new HashSet<>(), CollectorSamples::accumulate, CollectorSamples::combine);
@@ -294,16 +293,14 @@ class OtherTests {
 
     @Test
     void testIsPrimitive() {
-        Set.of(boolean.class, char.class, byte.class, short.class, int.class, long.class, float.class, double.class, void.class)
-                .stream()
+        Stream.of(boolean.class, char.class, byte.class, short.class, int.class, long.class, float.class, double.class, void.class)
                 .map(Class::isPrimitive)
                 .forEach(Assertions::assertTrue);
     }
 
     @Test
     void testIsNotPrimitive() {
-        Set.of(Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Void.class)
-                .stream()
+        Stream.of(Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Void.class)
                 .map(Class::isPrimitive)
                 .sorted()
                 .forEach(Assertions::assertFalse);
@@ -311,8 +308,8 @@ class OtherTests {
 
     @Test
     void testObjectToString() {
-        final var painting = TestSampleProvider.getPaintingList().stream().findAny().orElseThrow();
-        final var person = TestSampleProvider.createTestPersonList().stream().findAny().orElseThrow();
+        final var painting = TestSampleGenerator.createPaintingList().stream().findAny().orElseThrow();
+        final var person = Person.createTestPersonList().stream().findAny().orElseThrow();
         List<Object> objects = List.of(painting, person, LocalDate.of(1989, 10, 18), new BigInteger("2000"));
         final var string = objects.stream()
                 .map(o -> o.getClass().getSimpleName())
@@ -324,8 +321,8 @@ class OtherTests {
 
     @Test
     void testObjectAsTypeContainerInStream() {
-        Map<String, Painting> nameToPaintingMap = TestSampleProvider.getPaintingList().stream()
-                .collect(Collectors.toUnmodifiableMap(Painting::getName, Function.identity()));
+        Map<String, Painting> nameToPaintingMap = TestSampleGenerator.createPaintingList().stream()
+                .collect(Collectors.toUnmodifiableMap(Painting::name, Function.identity()));
         nameToPaintingMap.entrySet().stream()
                 .map(entry -> new Object() {
                     private final String name = entry.getKey();

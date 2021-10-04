@@ -1,9 +1,10 @@
 package com.dnb;
 
-import com.dnb.model.Book;
 import com.dnb.model.Payment;
 import com.dnb.model.Person;
 import hzt.stream.predicates.StringPredicates;
+import org.hzt.TestSampleGenerator;
+import org.hzt.model.Book;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -68,23 +69,32 @@ class StreamsSampleTest {
         List<Integer> list  = getIntegerStream(100).collect(Collectors.toList());
         List<Integer> list2  = getIntegerStream(100).collect(Collectors.toList());
         Collections.shuffle(list);
-        list.sort(Comparator.naturalOrder());
-        final var expectedLimitedList = list.subList(0, 10);
         Collections.shuffle(list2);
+
+        list.sort(Comparator.naturalOrder());
+
+        final var expectedLimitedList = list.subList(0, 10);
+
         final var limitedList = list2.stream()
                 .sorted()
                 .limit(10)
-                .collect(toUnmodifiableList());
+                .toList();
+
         assertEquals(expectedLimitedList, limitedList);
     }
 
     @Test
     void testReturnStreamFromIterator() {
         final var iterator = getIntegerStream(100).iterator();
+        final var expected = getIntegerStream(100)
+                .map(String::valueOf)
+                .toList();
+
         final var result = StreamsSample.returnListFromIterator(iterator)
                 .map(String::valueOf)
-                .collect(toUnmodifiableList());
-        assertEquals(getIntegerStream(100).map(String::valueOf).collect(toUnmodifiableList()), result);
+                .toList();
+
+        assertEquals(expected, result);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -96,7 +106,8 @@ class StreamsSampleTest {
     void testFibonacciUsingStreams() {
         final var expected = Stream.of(0, 1, 1, 2, 3, 5, 8, 13, 21, 34)
                 .map(BigInteger::valueOf)
-                .collect(toUnmodifiableList());
+                .toList();
+
         final var fibonacciList = StreamsSample.getFibonacci(10);
         assertEquals(expected, fibonacciList);
     }
@@ -147,10 +158,11 @@ class StreamsSampleTest {
     @Test
     void testBirthDayStream() {
         Month curMonth = Month.OCTOBER;
-        final var monthDayListMap1 = TestSampleProvider.createTestPersonList().stream()
+        final var monthDayListMap1 = Person.createTestPersonList().stream()
                 .filter(person -> person.getDateOfBirth().getMonth().equals(curMonth))
                 .collect(groupingBy(person -> MonthDay.from(person.getDateOfBirth())));
-        final var monthDayListMap = TestSampleProvider.createTestPersonList().stream()
+
+        final var monthDayListMap = Person.createTestPersonList().stream()
                 .filter(by(Person::getDateOfBirth, LocalDate::getMonth, isEqual(curMonth)))
                 .collect(groupingBy(function(Person::getDateOfBirth).andThen(MonthDay::from)));
 
@@ -166,9 +178,9 @@ class StreamsSampleTest {
     void testStreamOnCloseMethod() {
         AtomicBoolean isClosedInTryWithResourcesBlock = new AtomicBoolean();
         AtomicBoolean isClosed = new AtomicBoolean();
-        final var stream = TestSampleProvider.createBookList().stream();
+        final var stream = TestSampleGenerator.createBookList().stream();
         final var expected = getFilteredBookTitleList("Stream", isClosed, stream);
-        try (final var bookStream = TestSampleProvider.createBookList().stream()) {
+        try (final var bookStream = TestSampleGenerator.createBookList().stream()) {
             final var filteredBookTitles = getFilteredBookTitleList(
                     "Stream in try with resources block", isClosedInTryWithResourcesBlock, bookStream);
             assertEquals(3, filteredBookTitles.size());

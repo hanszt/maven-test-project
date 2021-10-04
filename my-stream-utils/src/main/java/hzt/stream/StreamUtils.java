@@ -1,15 +1,22 @@
 package hzt.stream;
 
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
+/**
+ * A Utility class to write clean stream pipelines
+ *
+ * @author Hans Zuidervaart
+ */
 public final class StreamUtils {
 
     private StreamUtils() {
@@ -25,9 +32,23 @@ public final class StreamUtils {
      * @see java.util.function.Function#andThen(Function)
      */
     @SafeVarargs
-    static <T> Function<T, T> combine(Function<T, T>... functions) {
-        Objects.requireNonNull(functions);
-        return Stream.of(functions).reduce(Function.identity(), Function::andThen);
+    public static <T> Function<T, T> combine(Function<T, T>... functions) {
+        return Stream.of(functions)
+                .filter(Objects::nonNull)
+                .reduce(Function.identity(), Function::andThen);
+    }
+
+    @SafeVarargs
+    public static <T> UnaryOperator<T> combine(UnaryOperator<T>... unaryOperators) {
+        return Stream.of(unaryOperators)
+                .filter(Objects::nonNull)
+                .reduce(identity(), StreamUtils::combine);
+    }
+
+    private static <T> UnaryOperator<T> combine(UnaryOperator<T> before, UnaryOperator<T> after) {
+        Objects.requireNonNull(before);
+        Objects.requireNonNull(after);
+        return t -> after.apply(before.apply(t));
     }
 
     /**
@@ -40,9 +61,22 @@ public final class StreamUtils {
      * @see java.util.function.Function#compose(Function)
      */
     @SafeVarargs
-    static <T> Function<T, T> composeAll(Function<T, T>... functions) {
-        Objects.requireNonNull(functions);
-        return Stream.of(functions).reduce(Function.identity(), Function::compose);
+    public static <T> Function<T, T> composeAll(Function<T, T>... functions) {
+        return Stream.of(functions)
+                .filter(Objects::nonNull)
+                .reduce(Function.identity(), Function::compose);
+    }
+
+    @SafeVarargs
+    public static <T> Function<T, T> composeAll(UnaryOperator<T>... unaryOperators) {
+        return Stream.of(unaryOperators)
+                .filter(Objects::nonNull)
+                .reduce(identity(), StreamUtils::compose);
+    }
+
+    private static <T> UnaryOperator<T> compose(UnaryOperator<T> before, UnaryOperator<T> after) {
+        Objects.requireNonNull(before);
+        return t -> before.apply(after.apply(t));
     }
 
     static <T, M, R> Function<T, R> combine(Function<T, M> function, Function<M, R> downStream) {
@@ -52,18 +86,25 @@ public final class StreamUtils {
     }
 
     @SafeVarargs
-    static <T> Predicate<T> allMatch(Predicate<T>... predicates) {
-        return Stream.of(predicates).reduce(predicate -> true, Predicate::and);
+    public static <T> Predicate<T> allMatch(Predicate<T>... predicates) {
+        return Stream.of(predicates)
+                .filter(Objects::nonNull)
+                .reduce(predicate -> true, Predicate::and);
     }
 
     @SafeVarargs
-    static <T> Predicate<T> anyMatch(Predicate<T>... predicates) {
-        return Stream.of(predicates).reduce(predicate -> false, Predicate::or);
+    public static <T> Predicate<T> anyMatch(Predicate<T>... predicates) {
+        return Stream.of(predicates)
+                .filter(Objects::nonNull)
+                .reduce(predicate -> false, Predicate::or);
     }
 
     @SafeVarargs
-    static <T> Comparator<T> sequential(Comparator<T> first, Comparator<T>... otherComparators) {
-        return Stream.concat(Stream.of(first), Stream.of(otherComparators)).reduce(Comparator::thenComparing).orElse(first);
+    public static <T> Comparator<T> sequential(Comparator<T> first, Comparator<T>... otherComparators) {
+        return Stream.concat(Stream.of(first), Stream.of(otherComparators))
+                .filter(Objects::nonNull)
+                .reduce(Comparator::thenComparing)
+                .orElse(first);
     }
 
     /**
@@ -131,17 +172,146 @@ public final class StreamUtils {
 
     public static <T, R> Predicate<T> nonNull(Function<T, R> toRMapper) {
         Objects.requireNonNull(toRMapper);
-        return t -> toRMapper.apply(t) != null;
+        return t -> t != null && toRMapper.apply(t) != null;
     }
 
     public static <T, U, R> Predicate<T> nonNull(Function<T, U> toUMapper, Function<U, R> toRMapper) {
         Objects.requireNonNull(toUMapper);
         Objects.requireNonNull(toRMapper);
         return t -> {
-            final U u = toUMapper.apply(t);
+            final U u = t != null ? toUMapper.apply(t) : null;
             final R r = u != null ? toRMapper.apply(u) : null;
             return r != null;
         };
+    }
+
+    public static <T, U, V, R> Predicate<T> nonNull(Function<T, U> toUMapper, Function<U, V> toVMapper, Function<V, R> toRMapper) {
+        Objects.requireNonNull(toUMapper);
+        Objects.requireNonNull(toVMapper);
+        Objects.requireNonNull(toRMapper);
+        return t -> {
+            final U u = t != null ? toUMapper.apply(t) : null;
+            final V v = u != null ? toVMapper.apply(u) : null;
+            final R r = u != null ? toRMapper.apply(v) : null;
+            return r != null;
+        };
+    }
+
+    public static <T, R> Function<T, Stream<R>> nullSafeToCollection(Function<? super T, ? extends Collection<R>> toCollectionMapper) {
+        Objects.requireNonNull(toCollectionMapper);
+        return t -> {
+            final Collection<R> collection = t != null ? toCollectionMapper.apply(t) : null;
+            return collection != null ? collection.stream() : Stream.empty();
+        };
+    }
+
+    public static <T, R> BiConsumer<T, Consumer<R>> nullSafeToIterable(Function<? super T, ? extends Iterable<R>> toIterableMapper) {
+        Objects.requireNonNull(toIterableMapper);
+        return (t, consumer) -> {
+             var iterable = t != null ? toIterableMapper.apply(t) : null;
+             if (iterable != null) {
+                 iterable.forEach(consumer);
+             }
+        };
+    }
+
+    public static <T, R> Function<T, Stream<R>> nullSafe(Function<? super T, ? extends R> mapper) {
+        Objects.requireNonNull(mapper);
+        return t -> Stream.ofNullable(t != null ? mapper.apply(t) : null);
+    }
+
+    public static <T, U, R> Function<T, Stream<R>> nullSafe(
+            Function<? super T, ? extends U> toUMapper,
+            Function<? super U, ? extends R> toRMapper) {
+        Objects.requireNonNull(toUMapper);
+        Objects.requireNonNull(toRMapper);
+        return t -> {
+            final U u = t != null ? toUMapper.apply(t) : null;
+            final R r = u != null ? toRMapper.apply(u) : null;
+            return Stream.ofNullable(r);
+        };
+    }
+
+    public static <T, U, V, R> Function<T, Stream<R>> nullSafe(
+            Function<? super T, ? extends U> toUMapper,
+            Function<? super U, ? extends V> toVMapper,
+            Function<? super V, ? extends R> toRMapper) {
+        Objects.requireNonNull(toUMapper);
+        Objects.requireNonNull(toVMapper);
+        Objects.requireNonNull(toRMapper);
+        return t -> {
+            final U u = t != null ? toUMapper.apply(t) : null;
+            final V v = u != null ? toVMapper.apply(u) : null;
+            final R r = v != null ? toRMapper.apply(v) : null;
+            return Stream.ofNullable(r);
+        };
+    }
+
+    public static <T, U, V, W, R> Function<T, Stream<R>> nullSafe(
+            Function<? super T, ? extends U> toUMapper,
+            Function<? super U, ? extends V> toVMapper,
+            Function<? super V, ? extends W> toWMapper,
+            Function<? super W, ? extends R> toRMapper) {
+        Objects.requireNonNull(toUMapper);
+        Objects.requireNonNull(toVMapper);
+        Objects.requireNonNull(toWMapper);
+        Objects.requireNonNull(toRMapper);
+        return t -> {
+            final U u = t != null ? toUMapper.apply(t) : null;
+            final V v = u != null ? toVMapper.apply(u) : null;
+            final W w = v != null ? toWMapper.apply(v) : null;
+            final R r = w != null ? toRMapper.apply(w) : null;
+            return Stream.ofNullable(r);
+        };
+    }
+
+    public static <T, R> BiConsumer<T, Consumer<R>> nullSafeBy(Function<? super T, ? extends R> mapper) {
+        Objects.requireNonNull(mapper);
+        return (t, consumer) -> Optional.ofNullable(t)
+                .map(mapper)
+                .ifPresent(consumer);
+    }
+
+    public static <T, U, R> BiConsumer<T, Consumer<R>> nullSafeBy(
+            Function<? super T, ? extends U> toUMapper,
+            Function<? super U, ? extends R> toRMapper) {
+        Objects.requireNonNull(toUMapper);
+        Objects.requireNonNull(toRMapper);
+        return (t, consumer) -> Optional.ofNullable(t)
+                .map(toUMapper)
+                .map(toRMapper)
+                .ifPresent(consumer);
+    }
+
+    public static <T, U, V, R> BiConsumer<T, Consumer<R>> nullSafeBy(
+            Function<? super T, ? extends U> toUMapper,
+            Function<? super U, ? extends V> toVMapper,
+            Function<? super V, ? extends R> toRMapper) {
+        Objects.requireNonNull(toUMapper);
+        Objects.requireNonNull(toVMapper);
+        Objects.requireNonNull(toRMapper);
+        return (t, consumer) -> Optional.ofNullable(t)
+                .map(toUMapper)
+                .map(toVMapper)
+                .map(toRMapper)
+                .ifPresent(consumer);
+    }
+
+    public static <T, U, V, W, R> BiConsumer<T, Consumer<R>> nullSafeBy(
+            Function<? super T, ? extends U> toUMapper,
+            Function<? super U, ? extends V> toVMapper,
+            Function<? super V, ? extends W> toWMapper,
+            Function<? super W, ? extends R> toRMapper) {
+        Objects.requireNonNull(toUMapper);
+        Objects.requireNonNull(toVMapper);
+        Objects.requireNonNull(toWMapper);
+        Objects.requireNonNull(toRMapper);
+        return (t, consumer) -> Optional.ofNullable(t)
+                .map(toUMapper)
+                .map(toVMapper)
+                .map(toWMapper)
+                .map(toRMapper)
+                .ifPresent(consumer);
     }
 
     /**
@@ -193,14 +363,19 @@ public final class StreamUtils {
     }
 
     //shared mutability?
-    public static <T, U, R> Stream<R> listCombiner(List<T> list1, List<U> list2, BiFunction<T, U, R> combiner) {
-        return IntStream.iterate(0, i -> ++i)
-                .mapToObj(i -> combiner.apply(list1.get(i), list2.get(i)))
-                .limit(Math.min(list1.size(), list2.size()));
+    public static <T, U, R> Stream<R> combineToStream(Iterable<T> iterable1, Iterable<U> iterable2, BiFunction<T, U, R> combiner) {
+        final var iterator1 = iterable1.iterator();
+        final var iterator2 = iterable2.iterator();
+        return Stream.iterate(0, i -> iterator1.hasNext() && iterator2.hasNext(), identity())
+                .map(i -> combiner.apply(iterator1.next(), iterator2.next()));
     }
 
-    public static <T, R> Consumer<T> transformThen(Function<T, R> mappingFunction, Consumer<R> consumer) {
+    public static <T, R> Consumer<T> transformAndThen(Function<T, R> mappingFunction, Consumer<R> consumer) {
         return t -> consumer.accept(mappingFunction.apply(t));
+    }
+
+    public static <T> UnaryOperator<T> identity() {
+        return t -> t;
     }
 
     @SafeVarargs

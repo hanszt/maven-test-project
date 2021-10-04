@@ -1,8 +1,9 @@
 package hzt.stream;
 
-import hzt.stream.model.Book;
-import hzt.stream.model.Painter;
-import hzt.stream.model.Painting;
+import org.hzt.TestSampleGenerator;
+import org.hzt.model.Book;
+import org.hzt.model.Painter;
+import org.hzt.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.util.AbstractMap;
@@ -12,7 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static hzt.stream.EntryStreamUtils.*;
-import static hzt.stream.TestSampleGenerator.*;
 import static hzt.stream.collectors.MyCollectors.toUnmodifiableMap;
 import static hzt.stream.predicates.StringPredicates.startsWithAnyOf;
 import static java.util.function.Predicate.not;
@@ -25,7 +25,7 @@ class EntryStreamUtilsTest {
 
     @Test
     void testMappingEntriesWithEntryFunction() {
-        final var groupedByCategoryMap = createBookList().stream()
+        final var groupedByCategoryMap = TestSampleGenerator.createBookList().stream()
                 .collect(Collectors.groupingBy(Book::getCategory));
 
         final var groupedByBookNameListAsString = groupedByCategoryMap.entrySet().stream()
@@ -40,7 +40,7 @@ class EntryStreamUtilsTest {
 
     @Test
     void testMapEntryThenFilterByValueThenFilterByKeyThenCollectToMap() {
-        final var groupedByCategoryMap = createBookList().stream()
+        final var groupedByCategoryMap = TestSampleGenerator.createBookList().stream()
                 .collect(Collectors.groupingBy(Book::getCategory));
 
         System.out.println("groupedByCategoryMap:");
@@ -73,8 +73,8 @@ class EntryStreamUtilsTest {
 
     @Test
     void testStreamingOverMapEntriesThenFilterByEntryThenMappingToEntryThenCollectingToMap() {
-        final var groupedByPainterMap = getPaintingList().stream()
-                .collect(Collectors.groupingBy(Painting::getPainter));
+        final var groupedByPainterMap = TestSampleGenerator.createPaintingList().stream()
+                .collect(Collectors.groupingBy(Painting::painter));
 
         groupedByPainterMap.entrySet().stream()
                 .map(value(List::size))
@@ -96,8 +96,8 @@ class EntryStreamUtilsTest {
 
     @Test
     void testStreamingOverMapEntriesThenFilterByKeyThenMappingToInvertedEntryThrowsDuplicatedKeyException() {
-        final var groupedByPainterMap = getPaintingList().stream()
-                .collect(Collectors.groupingBy(Painting::getPainter));
+        final var groupedByPainterMap = TestSampleGenerator.createPaintingList().stream()
+                .collect(Collectors.groupingBy(Painting::painter));
 
         groupedByPainterMap.entrySet().stream()
                 .map(value(List::size))
@@ -117,7 +117,7 @@ class EntryStreamUtilsTest {
 
     @Test
     void testConsumingEntryStreamWithBiFunction() {
-        final var groupedByCategoryMap = createBookList().stream()
+        final var groupedByCategoryMap = TestSampleGenerator.createBookList().stream()
                 .collect(Collectors.groupingBy(Book::getCategory));
 
         System.out.println("groupedByCategoryMap:");
@@ -127,8 +127,8 @@ class EntryStreamUtilsTest {
                 .map(value(Set::copyOf))
                 .filter(byKey(startsWithAnyOf("E", "F")))
                 .filter(byValue(not(Set::isEmpty)))
-                .forEach(unwrapEntry(EntryStreamUtilsTest::assertResult)
-                        .andThen(unwrapEntry((k, v) -> System.out.println("key: " +  k + ", value: " + v))));
+                .forEach(entry(EntryStreamUtilsTest::assertResult)
+                        .andThen(entry((k, v) -> System.out.println("key: " +  k + ", value: " + v))));
     }
 
     private static void assertResult(String category, Set<Book> books) {

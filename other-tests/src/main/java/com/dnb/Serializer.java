@@ -1,6 +1,6 @@
 package com.dnb;
 
-import com.dnb.model.Book;
+import org.hzt.model.Book;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

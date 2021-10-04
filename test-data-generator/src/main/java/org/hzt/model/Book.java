@@ -1,10 +1,12 @@
-package hzt.stream.model;
+package org.hzt.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
 public class Book implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1;
 
     private String title;

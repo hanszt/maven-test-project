@@ -1,6 +1,6 @@
 package com.dnb;
 
-import com.dnb.model.Book;
+import org.hzt.model.Book;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

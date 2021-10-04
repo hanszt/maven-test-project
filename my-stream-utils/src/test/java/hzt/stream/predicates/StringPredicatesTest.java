@@ -1,7 +1,7 @@
 package hzt.stream.predicates;
 
-import hzt.stream.TestSampleGenerator;
-import hzt.stream.model.Painting;
+import org.hzt.TestSampleGenerator;
+import org.hzt.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -17,14 +17,14 @@ class StringPredicatesTest {
     void testContains() {
         final String O = "o";
         final String A = "a";
-        final List<Painting> paintingList = TestSampleGenerator.getPaintingList();
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
 
         final List<Painting> expected = paintingList.stream()
-                .filter(painting -> painting.getName().contains(O) || painting.getName().contains(A))
+                .filter(painting -> painting.name().contains(O) || painting.name().contains(A))
                 .toList();
 
         final List<Painting> result = paintingList.stream()
-                .filter(by(Painting::getName, containsAnyOf(O, A)))
+                .filter(by(Painting::name, containsAnyOf(O, A)))
                 .toList();
 
         result.forEach(System.out::println);
@@ -35,14 +35,14 @@ class StringPredicatesTest {
     void testIsEqualIgnoreCase() {
         final String NAME1 = "Meisje Met dE paRel";
         final String NAME2 = "GUERNICA";
-        final List<Painting> paintingList = TestSampleGenerator.getPaintingList();
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
 
         final List<Painting> expected = paintingList.stream()
-                .filter(painting -> painting.getName().equalsIgnoreCase(NAME1) || painting.getName().equalsIgnoreCase(NAME2))
+                .filter(painting -> painting.name().equalsIgnoreCase(NAME1) || painting.name().equalsIgnoreCase(NAME2))
                 .toList();
 
         final List<Painting> result = paintingList.stream()
-                .filter(by(Painting::getName, isEqualIgnoreCase(NAME1).or(isEqualIgnoreCase(NAME2))))
+                .filter(by(Painting::name, isEqualIgnoreCase(NAME1).or(isEqualIgnoreCase(NAME2))))
                 .toList();
 
         result.forEach(System.out::println);
@@ -53,14 +53,14 @@ class StringPredicatesTest {
     void testStartsWith() {
         final String LE = "Le";
         final String ME = "Me";
-        final List<Painting> paintingList = TestSampleGenerator.getPaintingList();
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
 
         final List<Painting> expected = paintingList.stream()
-                .filter(painting -> painting.getName().startsWith(LE) || painting.getName().startsWith(ME))
+                .filter(painting -> painting.name().startsWith(LE) || painting.name().startsWith(ME))
                 .toList();
 
         final List<Painting> result = paintingList.stream()
-                .filter(by(Painting::getName, startsWith(LE).or(startsWith(ME))))
+                .filter(by(Painting::name, startsWith(LE).or(startsWith(ME))))
                 .toList();
 
         result.forEach(System.out::println);
@@ -72,14 +72,14 @@ class StringPredicatesTest {
         final String EL = "el";
         final String HOED = "hoed";
         final String NON = "non";
-        final List<Painting> paintingList = TestSampleGenerator.getPaintingList();
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
 
         final List<Painting> expected = paintingList.stream()
-                .filter(painting -> painting.getName().endsWith(EL) || painting.getName().endsWith(HOED) || painting.getName().endsWith(NON))
+                .filter(painting -> painting.name().endsWith(EL) || painting.name().endsWith(HOED) || painting.name().endsWith(NON))
                 .toList();
 
         final List<Painting> result = paintingList.stream()
-                .filter(by(Painting::getName, endsWithAnyOf(EL, HOED, NON)))
+                .filter(by(Painting::name, endsWithAnyOf(EL, HOED, NON)))
                 .toList();
 
         result.forEach(System.out::println);
@@ -89,12 +89,12 @@ class StringPredicatesTest {
     @Test
     void testHasEqualLength() {
         final String NAME = "Meisje met de parel";
-        final List<Painting> paintingList = TestSampleGenerator.getPaintingList();
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
         final List<Painting> expected = paintingList.stream()
-                .filter(painting -> painting.getName().length() == NAME.length())
+                .filter(painting -> painting.name().length() == NAME.length())
                 .collect(toList());
         final List<Painting> result = paintingList.stream()
-                .filter(by(Painting::getName, hasEqualLength(NAME)))
+                .filter(by(Painting::name, hasEqualLength(NAME)))
                 .collect(toList());
         result.forEach(System.out::println);
         assertEquals(expected, result);
@@ -102,18 +102,18 @@ class StringPredicatesTest {
 
     @Test
     void testStringContainsAll() {
-        final List<Painting> paintingList = TestSampleGenerator.getPaintingList();
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
 
         final List<Painting> expected = paintingList.stream()
                 .filter(painting -> {
-                    boolean containsMeisje = painting.getName().contains("Meisje");
-                    boolean containsDe = painting.getName().contains("de");
-                    boolean containsA = painting.getName().contains("a");
+                    boolean containsMeisje = painting.name().contains("Meisje");
+                    boolean containsDe = painting.name().contains("de");
+                    boolean containsA = painting.name().contains("a");
                     return containsMeisje && containsDe && containsA;
                 }).toList();
 
         final List<Painting> result = paintingList.stream()
-                .filter(by(Painting::getName, containsAllOf("Meisje", "de", "a")))
+                .filter(by(Painting::name, containsAllOf("Meisje", "de", "a")))
                 .toList();
 
         result.forEach(System.out::println);
@@ -126,13 +126,13 @@ class StringPredicatesTest {
         final String EL = "el";
         final String HOED = "hoed";
         final String NON = "non";
-        final List<Painting> paintingList = TestSampleGenerator.getPaintingList();
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
         final List<Painting> expected = paintingList.stream()
-                .filter(painting -> painting.getName().contains(EL) || painting.getName().contains(HOED) || painting.getName().contains(NON))
+                .filter(painting -> painting.name().contains(EL) || painting.name().contains(HOED) || painting.name().contains(NON))
                 .toList();
         //act
         final List<Painting> result = paintingList.stream()
-                .filter(by(Painting::getName, containsAnyOf(EL, HOED, NON)))
+                .filter(by(Painting::name, containsAnyOf(EL, HOED, NON)))
                 .toList();
 
         System.out.println("Input:");
@@ -149,14 +149,14 @@ class StringPredicatesTest {
         final String EL = "el";
         final String HOED = "hoed";
         final String NON = "non";
-        final List<Painting> paintingList = TestSampleGenerator.getPaintingList();
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
 
         final List<Painting> expected = paintingList.stream()
-                .filter(painting -> !(painting.getName().contains(EL) || painting.getName().contains(HOED) || painting.getName().contains(NON)))
+                .filter(painting -> !(painting.name().contains(EL) || painting.name().contains(HOED) || painting.name().contains(NON)))
                 .toList();
         //act
         final List<Painting> result = paintingList.stream()
-                .filter(by(Painting::getName, containsNoneOf(EL, HOED, NON)))
+                .filter(by(Painting::name, containsNoneOf(EL, HOED, NON)))
                 .toList();
 
         System.out.println("Input:");

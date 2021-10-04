@@ -25,11 +25,11 @@ public class CompletableFutureSample {
 
     private static final Logger LOGGER = LogManager.getLogger(CompletableFutureSample.class);
 
-    CompletableFuture<Integer> completableFuture() {
-        return CompletableFuture.supplyAsync(CompletableFutureSample::newString)
+    CompletableFuture<Integer> integerSupplyingCompFuture() {
+        return CompletableFuture.supplyAsync(CompletableFutureSample::computationallyIntensiveMethod)
                 .thenApply(CompletableFutureSample::toInteger)
                 .exceptionally(CompletableFutureSample::handleError)
-                .orTimeout(10, TimeUnit.SECONDS);
+                .orTimeout(5, TimeUnit.SECONDS);
     }
 
     private static Integer handleError(Throwable throwable) {
@@ -44,7 +44,7 @@ public class CompletableFutureSample {
         return Integer.parseInt(String.valueOf((char) i));
     }
 
-    private static String newString() {
+    private static String computationallyIntensiveMethod() {
         final var STRING = "This is a String that is computationally intensive: 1";
         sleep(1000);
         return STRING;
@@ -53,10 +53,10 @@ public class CompletableFutureSample {
     /**
      * @see <a href="https://youtu.be/IwJ-SCfXoAU?t=8188">Complatable future google stock async</a>
      */
-    CompletableFuture<Void> getStockPriceAndThenCombine() {
+    CompletableFuture<Integer> getStockPriceAndThenCombine() {
         CompletableFuture<Integer> goog = CompletableFuture.supplyAsync(() -> getStockPrice("GOOG", 1));
         CompletableFuture<Integer> tesla = CompletableFuture.supplyAsync(() -> getStockPrice("TESLA", 1));
-        CompletableFuture<Void> completableFuture = goog.thenCombine(tesla, Integer::sum).thenAccept(LOGGER::info);
+        CompletableFuture<Integer> completableFuture = goog.thenCombine(tesla, Integer::sum);
         sleep(10_000);
         return completableFuture;
     }
@@ -65,15 +65,17 @@ public class CompletableFutureSample {
      * compose is like flatMap. When you have a Completable future of a completable future, compose wraps it back into a
      * single completable future
      */
-    CompletableFuture<Void> getStockPriceThenComposeAndThanCombine() {
+    CompletableFuture<Integer> getStockPriceThenComposeAndThanCombine() {
         CompletableFuture<Integer> goog = CompletableFuture
-                .supplyAsync(() -> getStockPriceReturningCompFut("GOOG", 1))
+                .supplyAsync(() -> getCompFutForStockPrice("GOOG", 1))
                 .thenCompose(CompletableFuture::toCompletableFuture);
+
         CompletableFuture<Integer> tesla = CompletableFuture
-                .supplyAsync(() -> getStockPriceReturningCompFut("TESLA", 1))
+                .supplyAsync(() -> getCompFutForStockPrice("TESLA", 1))
                 .thenCompose(CompletableFuture::toCompletableFuture);
-        CompletableFuture<Void> completableFuture = goog.thenCombine(tesla, Integer::sum).thenAccept(LOGGER::info);
-        sleep(10_000);
+
+        CompletableFuture<Integer> completableFuture = goog.thenCombine(tesla, Integer::sum);
+        sleep(3_000);
         return completableFuture;
     }
 
@@ -85,11 +87,11 @@ public class CompletableFutureSample {
         }
     }
 
-    private static CompletableFuture<Integer> getStockPriceReturningCompFut(String ticker, int numberOfShares) {
+    private static CompletableFuture<Integer> getCompFutForStockPrice(String ticker, int numberOfShares) {
         return CompletableFuture.supplyAsync(() -> getStockPrice(ticker, numberOfShares));
     }
 
-    private static int getStockPrice(String ticker, int numberOfShares) {
+    static int getStockPrice(String ticker, int numberOfShares) {
         int price = 1000;
         if ("GOOG".equals(ticker)) {
             price = 500;
@@ -97,4 +99,5 @@ public class CompletableFutureSample {
         sleep(price * 2);
         return numberOfShares * price;
     }
+
 }

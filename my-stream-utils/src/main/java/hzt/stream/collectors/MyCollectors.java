@@ -1,17 +1,20 @@
 package hzt.stream.collectors;
 
-import java.math.BigDecimal;
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class MyCollectors {
 
@@ -23,28 +26,42 @@ public final class MyCollectors {
     private MyCollectors() {
     }
 
-    public static Collector<BigDecimal, BigDecimalAccumulator, BigDecimal> toBigDecimalAverage() {
-        return new CollectorImpl<>(BigDecimalAccumulator::new,
-                BigDecimalAccumulator::accumulate,
-                BigDecimalAccumulator::combine,
-                BigDecimalAccumulator::getAverage,
-                CH_NOID);
-    }
-
-    public static Collector<BigDecimal, BigDecimalAccumulator, BigDecimalSummaryStatistics> toBigDecimalSummaryStatistics() {
-        return new CollectorImpl<>(BigDecimalAccumulator::new,
-                BigDecimalAccumulator::accumulate,
-                BigDecimalAccumulator::combine,
-                BigDecimalAccumulator::getSummaryStatistics,
-                CH_NOID);
-    }
-
     public static <K, V> Collector<Map.Entry<K, V>, ?, Map<K, V>> toUnmodifiableMap() {
         return Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue);
     }
 
     public static <K, V> Collector<Map.Entry<K, V>, ?, Map<K, V>> toMap() {
         return Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue);
+    }
+
+    public static <T> Collector<T, ?, List<T>> filteringToList(Predicate<? super T> predicate) {
+        return Collectors.filtering(predicate, Collectors.toUnmodifiableList());
+    }
+
+    public static <T, R> Collector<T, ?, List<R>> mappingToList(Function<? super T, ? extends R> mapper) {
+        return Collectors.mapping(mapper, Collectors.toUnmodifiableList());
+    }
+
+    public static <T, R> Collector<T, ?, List<R>> flatMappingToList(Function<? super T, ? extends Stream<? extends R>> mapper) {
+        return Collectors.flatMapping(mapper, Collectors.toUnmodifiableList());
+    }
+
+    public static <T> Collector<T, ?, Set<T>> filteringToSet(Predicate<? super T> predicate) {
+        return Collectors.filtering(predicate, Collectors.toUnmodifiableSet());
+    }
+
+    public static <T, R> Collector<T, ?, Set<R>> mappingToSet(Function<? super T, ? extends R> mapper) {
+        return Collectors.mapping(mapper, Collectors.toUnmodifiableSet());
+    }
+
+    public static <T, R> Collector<T, ?, Set<R>> flatMappingToSet(Function<? super T, ? extends Stream<? extends R>> mapper) {
+        return Collectors.flatMapping(mapper, Collectors.toUnmodifiableSet());
+    }
+
+    public static <T, R1, R2> Collector<T, ?, Map.Entry<R1, R2>> teeingToEntry(
+            Collector<? super T, ?, R1> downstream1,
+            Collector<? super T, ?, R2> downstream2) {
+        return Collectors.teeing(downstream1, downstream2, AbstractMap.SimpleEntry::new);
     }
 
     /**
@@ -86,6 +103,13 @@ public final class MyCollectors {
                                  Collector<? super T, ?, R3> downstream3,
                                  TriFunction<? super R1, ? super R2, ? super R3, R> merger) {
         return branching0(downstream1, downstream2, downstream3, merger);
+    }
+
+    public static <T, R1, R2, R3>
+    Collector<T, ?, TriTuple<R1, R2, R3>> branching(Collector<? super T, ?, R1> downstream1,
+                                                    Collector<? super T, ?, R2> downstream2,
+                                                    Collector<? super T, ?, R3> downstream3) {
+        return branching0(downstream1, downstream2, downstream3, MyCollectors::toTriTuple);
     }
 
     private static <T, A1, A2, A3, R1, R2, R3, R>
@@ -211,6 +235,14 @@ public final class MyCollectors {
         return branching0(downstream1, downstream2, downstream3, downstream4, merger);
     }
 
+    public static <T, R1, R2, R3, R4>
+    Collector<T, ?, QuadTuple<R1, R2, R3, R4>> branching(Collector<? super T, ?, R1> downstream1,
+                                                         Collector<? super T, ?, R2> downstream2,
+                                                         Collector<? super T, ?, R3> downstream3,
+                                                         Collector<? super T, ?, R4> downstream4) {
+        return branching0(downstream1, downstream2, downstream3, downstream4, MyCollectors::toQuadTuple);
+    }
+
     private static <T, A1, A2, A3, A4, R1, R2, R3, R4, R>
     Collector<T, ?, R> branching0(Collector<? super T, A1, R1> downstream1,
                                   Collector<? super T, A2, R2> downstream2,
@@ -304,17 +336,17 @@ public final class MyCollectors {
         R apply(A1 a1, A2 a2, A3 a3, A4 a4);
     }
 
-    public static <R1, R2, R3, R4> QuadTuple<R1, R2, R3, R4> toQuadTuple(R1 r1, R2 r2, R3 r3, R4 r4) {
-        return new QuadTuple<>(r1, r2, r3, r4);
-    }
-
-    public record QuadTuple<R1, R2, R3, R4>(R1 first, R2 second, R3 third, R4 fourth) {
-    }
-
     public static <R1, R2, R3> TriTuple<R1, R2, R3> toTriTuple(R1 r1, R2 r2, R3 r3) {
         return new TriTuple<>(r1, r2, r3);
     }
 
     public record TriTuple<R1, R2, R3>(R1 first, R2 second, R3 third) {
+    }
+
+    public static <R1, R2, R3, R4> QuadTuple<R1, R2, R3, R4> toQuadTuple(R1 r1, R2 r2, R3 r3, R4 r4) {
+        return new QuadTuple<>(r1, r2, r3, r4);
+    }
+
+    public record QuadTuple<R1, R2, R3, R4>(R1 first, R2 second, R3 third, R4 fourth) {
     }
 }

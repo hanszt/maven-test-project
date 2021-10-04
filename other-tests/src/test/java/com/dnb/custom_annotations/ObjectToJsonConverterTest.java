@@ -1,7 +1,7 @@
 package com.dnb.custom_annotations;
 
-import com.dnb.model.Book;
 import com.dnb.model.Person;
+import org.hzt.model.Book;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

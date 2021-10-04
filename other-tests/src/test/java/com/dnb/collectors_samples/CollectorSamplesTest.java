@@ -1,10 +1,10 @@
 package com.dnb.collectors_samples;
 
-import com.dnb.TestSampleProvider;
-import com.dnb.model.Book;
 import com.dnb.model.Employee;
-import com.dnb.model.Painting;
 import com.dnb.model.Person;
+import org.hzt.TestSampleGenerator;
+import org.hzt.model.Book;
+import org.hzt.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -19,8 +19,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static hzt.stream.StreamUtils.by;
-import static hzt.stream.collectors.MyCollectors.toBigDecimalAverage;
-import static hzt.stream.collectors.MyCollectors.toBigDecimalSummaryStatistics;
+import static hzt.stream.collectors.BigDecimalCollectors.averagingBigDecimal;
+import static hzt.stream.collectors.BigDecimalCollectors.summarizingBigDecimal;
 import static hzt.stream.predicates.ComparingPredicates.greaterThan;
 import static hzt.stream.predicates.ComparingPredicates.greaterThanInt;
 import static hzt.stream.predicates.StringPredicates.contains;
@@ -110,7 +110,7 @@ class CollectorSamplesTest {
                 new BigDecimal("2000"),
                 new BigDecimal("3000"));
         //act
-        var actual = list.stream().collect(toBigDecimalAverage());
+        var actual = list.stream().collect(averagingBigDecimal());
         assertEquals(average, actual);
     }
 
@@ -125,12 +125,12 @@ class CollectorSamplesTest {
                 new BigDecimal("2500"));
         //act
         var summaryStatistics = list.stream()
-                .collect(toBigDecimalSummaryStatistics());
+                .collect(summarizingBigDecimal());
         assertEquals(average, summaryStatistics.getAverage());
-        assertEquals(min, summaryStatistics.min());
-        assertEquals(max, summaryStatistics.max());
-        assertEquals(list.size(), (int) summaryStatistics.count());
-        assertEquals(new BigDecimal("10000"), summaryStatistics.sum());
+        assertEquals(min, summaryStatistics.getMin());
+        assertEquals(max, summaryStatistics.getMax());
+        assertEquals(list.size(), (int) summaryStatistics.getCount());
+        assertEquals(new BigDecimal("10000"), summaryStatistics.getSum());
     }
 
     @Test
@@ -159,7 +159,7 @@ class CollectorSamplesTest {
 
     @Test
     void testGroupingByThenCountingThenConvertingCountToInteger() {
-        final var countByBookCategory = TestSampleProvider.createBookList().stream()
+        final var countByBookCategory = TestSampleGenerator.createBookList().stream()
                 .collect(groupingBy(Book::getCategory,
                         collectingAndThen(counting(),
                                 Long::intValue)));
@@ -170,7 +170,7 @@ class CollectorSamplesTest {
     @Test
     void testGroupingByThenMappingToTitleCollectingToList() {
         //act
-        final var bookTitleByCategory = TestSampleProvider.createBookList().stream()
+        final var bookTitleByCategory = TestSampleGenerator.createBookList().stream()
                 .collect(groupingBy(Book::getCategory,
                         mapping(Book::getTitle, toUnmodifiableList())));
         //assert
@@ -185,7 +185,7 @@ class CollectorSamplesTest {
     @Test
     void testCollectingAndThenMaxByAndTransformResult() {
         //act
-        final var personList = TestSampleProvider.createTestPersonList();
+        final var personList = Person.createTestPersonList();
         var personWithMaxAgeByCollectMaxBy = personList.stream()
                 .collect(collectingAndThen(maxBy(comparing(Person::getAge)),
                         personOpt -> personOpt.map(Person::getFirstName)));
@@ -200,7 +200,7 @@ class CollectorSamplesTest {
     @Test
     void testGroupingByLastNameThenFilteringByIsPlayingPianoThenMappingToFirstName() {
         //act
-        final var groupedByLastNamePlayingPianoToFirstName = TestSampleProvider.createTestPersonList().stream()
+        final var groupedByLastNamePlayingPianoToFirstName = Person.createTestPersonList().stream()
                 .collect(groupingBy(Person::getLastName,
                         filtering(Person::isPlayingPiano,
                                 mapping(Person::getFirstName,
@@ -220,7 +220,7 @@ class CollectorSamplesTest {
         final var otherPersonList = List.of(
                 new Person("Matthijs", "Bayer", LocalDate.of(1993, 4, 4), true),
                 new Employee("Joop", "Schat", LocalDate.of(1994, 1, 2)));
-        final var listOfPersonLists = List.of(TestSampleProvider.createTestPersonList(), otherPersonList);
+        final var listOfPersonLists = List.of(Person.createTestPersonList(), otherPersonList);
         var groupedByLastNamePlayingPianoToFirstName2 = listOfPersonLists.stream()
                 .flatMap(Collection::stream)
                 .filter(Person::isPlayingPiano)
@@ -240,7 +240,7 @@ class CollectorSamplesTest {
 
     @Test
     void testTeeing() {
-        final var setListSimpleEntry = TestSampleProvider.createTestPersonList().stream()
+        final var setListSimpleEntry = Person.createTestPersonList().stream()
                 .collect(teeing(filtering(Person::isPlayingPiano,
                                 toUnmodifiableSet()),
                         mapping(Person::getAge, toUnmodifiableList()),
@@ -253,7 +253,7 @@ class CollectorSamplesTest {
 
     @Test
     void testInceptionCollecting() {
-        final var testPersonList = TestSampleProvider.createTestPersonList();
+        final var testPersonList = Person.createTestPersonList();
 
         final var personSummaryStatistics = testPersonList.stream()
                 .collect(teeing(
@@ -312,14 +312,14 @@ class CollectorSamplesTest {
     @Test
     void testTeeingByPaintingData() {
         //arrange
-        final List<Painting> paintingList = TestSampleProvider.getPaintingList();
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
         final double expectedAverage = paintingList.stream()
                 .mapToInt(Painting::ageInYears)
                 .average().orElse(0);
         //act
         final var result = paintingList.stream()
                 .collect(teeing(
-                        partitioningBy(Painting::isInMuseum, mapping(Painting::getName, toList())),
+                        partitioningBy(Painting::isInMuseum, mapping(Painting::name, toList())),
                         summarizingLong(Painting::ageInYears),
                         AbstractMap.SimpleEntry::new));
 
@@ -338,6 +338,5 @@ class CollectorSamplesTest {
         assertEquals(1, titlesOfPaintingsNotInMuseum.size());
         assertEquals("Lentetuin, de pastorietuin te Nuenen in het voorjaar", titlesOfPaintingsNotInMuseum.get(0));
     }
-
 
 }

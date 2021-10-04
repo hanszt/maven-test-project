@@ -29,6 +29,10 @@ public final class EntryStreamUtils {
                 keyToValueMapper.apply(entry.getKey()));
     }
 
+    public static <K, V> Function<Map.Entry<K, V>, Map.Entry<V, K>> toInvertedEntry() {
+        return toInvertedEntry(Function.identity(), Function.identity());
+    }
+
     public static <K, V, R1, R2> Function<Map.Entry<K, V>, Map.Entry<R1, R2>> toEntry(
             Function<K, R1> keyMapper, Function<V, R2> valueMapper) {
         Objects.requireNonNull(keyMapper);
@@ -63,7 +67,7 @@ public final class EntryStreamUtils {
         return e -> e != null && entryPredicate.test(e.getKey(), e.getValue());
     }
 
-    public static <K, V> Consumer<Map.Entry<K, V>> unwrapEntry(BiConsumer<K, V> biConsumer) {
+    public static <K, V> Consumer<Map.Entry<K, V>> entry(BiConsumer<K, V> biConsumer) {
         Objects.requireNonNull(biConsumer);
         return entry -> biConsumer.accept(entry.getKey(), entry.getValue());
     }
