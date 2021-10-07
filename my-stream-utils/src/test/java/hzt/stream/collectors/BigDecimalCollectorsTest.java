@@ -5,12 +5,9 @@ import org.hzt.model.BankAccount;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
-import static hzt.stream.collectors.BigDecimalCollectors.averagingBigDecimal;
-import static hzt.stream.collectors.BigDecimalCollectors.summarizingBigDecimal;
-import static hzt.stream.collectors.BigDecimalCollectors.summingBigDecimal;
-import static hzt.stream.collectors.BigDecimalCollectors.toMaxBigDecimal;
-import static hzt.stream.collectors.BigDecimalCollectors.toMinBigDecimal;
+import static hzt.stream.collectors.BigDecimalCollectors.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BigDecimalCollectorsTest {
@@ -49,6 +46,33 @@ class BigDecimalCollectorsTest {
 
         final var expected = bigDecimalSummaryStatistics.getAverage();
         assertEquals(average, expected);
+    }
+
+    @Test
+    void testStandardDeviatingBigDecimal() {
+        final var sampleBankAccountList = TestSampleGenerator.createSampleBankAccountList();
+        System.out.println("Sample bankaccountList:");
+        sampleBankAccountList.forEach(System.out::println);
+
+        final var doubleStatistics = sampleBankAccountList.stream()
+                .map(BankAccount::getBalance)
+                .collect(MyCollectors.toDoubleStatisticsBy(BigDecimal::doubleValue));
+
+        final var expectedStandardDeviationFromDouble = BigDecimal.valueOf(doubleStatistics.getStandardDeviation())
+                .setScale(2, RoundingMode.HALF_UP);
+
+        final var bigDecimalStatistics = sampleBankAccountList.stream()
+                .collect(toBigDecimalStatisticsBy(BankAccount::getBalance));
+        final var expected = bigDecimalStatistics.getStandardDeviation();
+
+        final var standarDeviationBalances = sampleBankAccountList.stream()
+                .collect(standarDeviatingBigDecimal(BankAccount::getBalance));
+
+        System.out.println("bigDecimalStatistics = " + bigDecimalStatistics);
+        System.out.println("doubleStatistics = " + doubleStatistics);
+
+        assertEquals(expected, standarDeviationBalances);
+        assertEquals(expectedStandardDeviationFromDouble, standarDeviationBalances.setScale(2, RoundingMode.HALF_UP));
     }
 
     @Test

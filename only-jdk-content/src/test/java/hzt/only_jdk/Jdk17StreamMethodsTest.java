@@ -87,11 +87,11 @@ class Jdk17StreamMethodsTest {
 
     @Test
     void testVoidMethodeTakingAConsumer() {
-        List<LocalDate> datesOfBirth = new ArrayList<>();
 
         final var paintingList = TestSampleGenerator.createPaintingList();
         Museum museum = new Museum("", LocalDate.of(2021, 10, 21), paintingList);
 
+        List<LocalDate> datesOfBirth = new ArrayList<>();
         museum.toDatesOfBirthPainters(datesOfBirth::add);
 
         System.out.println("datesOfBirth = " + datesOfBirth);

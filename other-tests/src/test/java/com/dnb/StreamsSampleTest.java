@@ -2,9 +2,12 @@ package com.dnb;
 
 import com.dnb.model.Payment;
 import com.dnb.model.Person;
-import hzt.stream.predicates.StringPredicates;
+import hzt.stream.collectors.MyCollectors;
 import org.hzt.TestSampleGenerator;
 import org.hzt.model.Book;
+import org.hzt.model.Museum;
+import org.hzt.model.Painter;
+import org.hzt.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -12,26 +15,36 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.MonthDay;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static hzt.stream.StreamUtils.*;
+import static hzt.stream.StreamUtils.by;
+import static hzt.stream.StreamUtils.function;
+import static hzt.stream.collectors.MyCollectors.flatMappingToList;
+import static hzt.stream.collectors.MyCollectors.mappingToSet;
+import static hzt.stream.collectors.MyCollectors.multiMappingToList;
 import static hzt.stream.predicates.ComparingPredicates.greaterThan;
-import static java.util.Map.Entry.*;
+import static hzt.stream.predicates.StringPredicates.containsAllOf;
+import static java.util.Map.Entry.comparingByKey;
 import static java.util.function.Predicate.isEqual;
-import static java.util.stream.Collectors.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toUnmodifiableSet;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StreamsSampleTest {
 
-    private static final List<Payment> list = Arrays.asList(
+    private static final List<Payment> PAYMENT_LIST = List.of(
             new Payment("1", BigDecimal.valueOf(1_000_000)),
             new Payment("2", BigDecimal.valueOf(4_000_000)),
             new Payment("3", BigDecimal.valueOf(2_000_000)),
@@ -43,24 +56,29 @@ class StreamsSampleTest {
 
     @Test
     void testGettingSumUsingStramReduction() {
-        BigDecimal sum = list.stream().map(Payment::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal sum = PAYMENT_LIST.stream()
+                .map(Payment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         assertEquals(BigDecimal.valueOf(9_000_000), sum);
     }
 
     @Test
     void testGroupingByAndMapping() {
-        var map = list.stream()
-                .collect(groupingBy(Payment::getAmount, mapping(Payment::getId, toUnmodifiableSet())));
+        var map = PAYMENT_LIST.stream()
+                .collect(groupingBy(Payment::getAmount, mappingToSet(Payment::getId)));
+
         map.forEach(StreamsSampleTest::printKeyAndValue);
         assertEquals(3, map.size());
     }
 
     @Test
     void testCounting() {
-        var summaryStatistics = list.stream()
+        var summaryStatistics = PAYMENT_LIST.stream()
                 .map(Payment::getId)
                 .mapToInt(Integer::parseInt)
                 .summaryStatistics();
+
         assertEquals(2.5, summaryStatistics.getAverage());
     }
 
@@ -141,9 +159,9 @@ class StreamsSampleTest {
         final var iterations = 100_000_000;
         //act
         Timer<Double> sequentialTimer = Timer.timeAFunction(iterations,
-                (long nrOfIterations) -> StreamsSample.calculatePiAsDouble(nrOfIterations, false));
+                nrOfIterations -> StreamsSample.calculatePiAsDouble(nrOfIterations, false));
         Timer<Double> parallelTimer = Timer.timeAFunction(iterations,
-                (long nrOfIterations) -> StreamsSample.calculatePiAsDouble(nrOfIterations, true));
+                nrOfIterations -> StreamsSample.calculatePiAsDouble(nrOfIterations, true));
 
         final var seqTimeInMillis = sequentialTimer.getTimeInMillis();
         final var parallelTimeInMillis = parallelTimer.getTimeInMillis();
@@ -158,6 +176,7 @@ class StreamsSampleTest {
     @Test
     void testBirthDayStream() {
         Month curMonth = Month.OCTOBER;
+
         final var monthDayListMap1 = Person.createTestPersonList().stream()
                 .filter(person -> person.getDateOfBirth().getMonth().equals(curMonth))
                 .collect(groupingBy(person -> MonthDay.from(person.getDateOfBirth())));
@@ -170,6 +189,7 @@ class StreamsSampleTest {
                 .filter(by(Entry::getValue, List::size, greaterThan(0)))
                 .sorted(comparingByKey())
                 .forEach(System.out::println);
+
         assertFalse(monthDayListMap.isEmpty());
         assertEquals(monthDayListMap1.size(), monthDayListMap.size());
     }
@@ -177,31 +197,76 @@ class StreamsSampleTest {
     @Test
     void testStreamOnCloseMethod() {
         AtomicBoolean isClosedInTryWithResourcesBlock = new AtomicBoolean();
-        AtomicBoolean isClosed = new AtomicBoolean();
+        AtomicBoolean isClosedOutsideTryWithResources = new AtomicBoolean();
+
         final var stream = TestSampleGenerator.createBookList().stream();
-        final var expected = getFilteredBookTitleList("Stream", isClosed, stream);
+        final var expected = getFilteredBookTitleList("Stream", isClosedOutsideTryWithResources, stream);
+
         try (final var bookStream = TestSampleGenerator.createBookList().stream()) {
             final var filteredBookTitles = getFilteredBookTitleList(
                     "Stream in try with resources block", isClosedInTryWithResourcesBlock, bookStream);
+
             assertEquals(3, filteredBookTitles.size());
             assertEquals(expected, filteredBookTitles);
         }
         assertTrue(isClosedInTryWithResourcesBlock.get());
-        assertFalse(isClosed.get());
+        assertFalse(isClosedOutsideTryWithResources.get());
     }
 
     private List<String> getFilteredBookTitleList(String message, AtomicBoolean isClosed, Stream<Book> bookStream) {
         return bookStream
                 .map(Book::getTitle)
-                .filter(StringPredicates.containsAllOf("a", "e"))
+                .filter(containsAllOf("a", "e"))
                 .distinct()
                 .onClose(() -> setClosedAndPrintClosed(message, isClosed))
-                .collect(toList());
+                .toList();
     }
 
     private void setClosedAndPrintClosed(String message, AtomicBoolean closed) {
         closed.set(true);
         System.out.println(message + " is closed now");
+    }
+
+    @Test
+    void testMultiMappingOptionals() {
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
+
+        final Set<LocalDate> expected = paintingList.stream()
+                .map(Painting::painter)
+                .map(Painter::getDateOfDeath)
+                .flatMap(Optional::stream)
+                .collect(toUnmodifiableSet());
+
+        final Set<LocalDate> actual = paintingList.stream()
+                .map(Painting::painter)
+                .map(Painter::getDateOfDeath)
+                .collect(MyCollectors.multiMapping(Optional::ifPresent, toUnmodifiableSet()));
+
+        System.out.println(actual);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testMultiMappingMuseums() {
+        final List<Museum> museumList = TestSampleGenerator.createMuseumList();
+
+        final var expected = museumList.stream()
+                .collect(groupingBy(museum -> museum.getPaintingList().size(),
+                        flatMappingToList(StreamsSampleTest::toDatesOfBirthPainters)));
+
+        final var actual = museumList.stream()
+                .collect(groupingBy(museum -> museum.getPaintingList().size(),
+                        multiMappingToList(Museum::toDatesOfBirthPainters)));
+
+        System.out.println(actual);
+
+        assertEquals(expected, actual);
+    }
+
+    private static Stream<? extends LocalDate> toDatesOfBirthPainters(Museum museum) {
+        List<LocalDate> localDates = new ArrayList<>();
+        museum.toDatesOfBirthPainters(localDates::add);
+        return localDates.stream();
     }
 
 }

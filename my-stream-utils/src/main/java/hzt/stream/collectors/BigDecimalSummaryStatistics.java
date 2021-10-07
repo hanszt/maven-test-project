@@ -2,14 +2,18 @@ package hzt.stream.collectors;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class BigDecimalSummaryStatistics implements Consumer<BigDecimal> {
 
+    public static final BigDecimal INIT_MIN_VALUE = BigDecimal.valueOf(Double.MAX_VALUE);
+    public static final BigDecimal INIT_MAX_VALUE = BigDecimal.valueOf(-Double.MAX_VALUE);
+
     private long count;
     private BigDecimal sum = BigDecimal.ZERO;
-    private BigDecimal min = BigDecimal.valueOf(Double.MAX_VALUE);
-    private BigDecimal max = BigDecimal.valueOf(-Double.MAX_VALUE);
+    private BigDecimal min = INIT_MIN_VALUE;
+    private BigDecimal max = INIT_MAX_VALUE;
 
     public BigDecimalSummaryStatistics() {
     }
@@ -22,24 +26,27 @@ public class BigDecimalSummaryStatistics implements Consumer<BigDecimal> {
             throw new IllegalArgumentException("Minimum greater than maximum");
         }
         this.count = count;
-        this.sum = sum;
-        this.min = min;
-        this.max = max;
+        this.sum = Objects.requireNonNullElse(sum, BigDecimal.ZERO);
+        this.min = Objects.requireNonNullElse(min, INIT_MIN_VALUE);
+        this.max = Objects.requireNonNullElse(max, INIT_MAX_VALUE);
     }
 
     @Override
     public void accept(BigDecimal value) {
-        ++count;
-        sum = sum.add(value);
-        min = min.compareTo(value) < 0 ? min : value;
-        max = max.compareTo(value) > 0 ? max : value;
+        if (value != null) {
+            ++count;
+            sum = sum.add(value);
+            min = min.compareTo(value) < 0 ? min : value;
+            max = max.compareTo(value) > 0 ? max : value;
+        }
     }
 
-    public void combine(BigDecimalSummaryStatistics other) {
+    public BigDecimalSummaryStatistics combine(BigDecimalSummaryStatistics other) {
         count += other.count;
         sum = sum.add(other.sum);
         min = min.compareTo(other.min) < 0 ? min : other.min;
         max = max.compareTo(other.max) > 0 ? max : other.max;
+        return other;
     }
 
     public BigDecimal getAverage() {

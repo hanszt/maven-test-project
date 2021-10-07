@@ -5,4 +5,5 @@ open module my.stream.utils {
     exports hzt.stream;
     exports hzt.stream.predicates;
     exports hzt.stream.collectors;
+    exports hzt.stream.function;
 }

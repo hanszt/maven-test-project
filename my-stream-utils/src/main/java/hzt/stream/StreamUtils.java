@@ -1,6 +1,5 @@
 package hzt.stream;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
@@ -11,6 +10,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * A Utility class to write clean stream pipelines
@@ -197,15 +197,15 @@ public final class StreamUtils {
         };
     }
 
-    public static <T, R> Function<T, Stream<R>> nullSafeToCollection(Function<? super T, ? extends Collection<R>> toCollectionMapper) {
-        Objects.requireNonNull(toCollectionMapper);
+    public static <T, R> Function<T, Stream<R>> iterableNullSafe(Function<? super T, ? extends Iterable<R>> toIterableMapper) {
+        Objects.requireNonNull(toIterableMapper);
         return t -> {
-            final Collection<R> collection = t != null ? toCollectionMapper.apply(t) : null;
-            return collection != null ? collection.stream() : Stream.empty();
+            final Iterable<R> iterable = t != null ? toIterableMapper.apply(t) : null;
+            return iterable != null ? StreamSupport.stream(iterable.spliterator(), false) : Stream.empty();
         };
     }
 
-    public static <T, R> BiConsumer<T, Consumer<R>> nullSafeToIterable(Function<? super T, ? extends Iterable<R>> toIterableMapper) {
+    public static <T, R> BiConsumer<T, Consumer<R>> iterableNullSafeBy(Function<? super T, ? extends Iterable<R>> toIterableMapper) {
         Objects.requireNonNull(toIterableMapper);
         return (t, consumer) -> {
              var iterable = t != null ? toIterableMapper.apply(t) : null;

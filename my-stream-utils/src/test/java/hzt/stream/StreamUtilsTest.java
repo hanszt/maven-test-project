@@ -353,7 +353,7 @@ class StreamUtilsTest {
                 .toList();
 
         final var listOfDayOfWeekBirthDateMostPopularPaintingPainters = concatenatedMuseumList.stream()
-                .flatMap(nullSafeToCollection(Museum::getPaintingList))
+                .flatMap(iterableNullSafe(Museum::getPaintingList))
                 .flatMap(nullSafe(
                         Painting::painter,
                         Painter::getDateOfBirth,

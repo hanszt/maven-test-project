@@ -30,9 +30,9 @@ class BigDecimalSummaryStatisticsTest {
     @Test
     void testUsingBigDecimalSummaryStatisticsListInMapMulti() {
         final var summaryStatistics = new BigDecimalSummaryStatistics(4, BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.TEN);
-        final var bigDecimalSummaryStatistics = List.of(new BigDecimalSummaryStatistics(), summaryStatistics);
+        final var bigDecimalSummaryStatisticsList = List.of(new BigDecimalSummaryStatistics(), summaryStatistics);
 
-        final var averages = bigDecimalSummaryStatistics.stream()
+        final var averages = bigDecimalSummaryStatisticsList.stream()
                 .<BigDecimal>mapMulti((statistics, consumer) -> consumer.accept(statistics.getAverage()))
                 .toList();
 

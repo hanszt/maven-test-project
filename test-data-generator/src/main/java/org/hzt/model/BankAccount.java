@@ -1,6 +1,7 @@
 package org.hzt.model;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class BankAccount {
 
@@ -33,6 +34,24 @@ public class BankAccount {
     public BigDecimal updateBalance(BigDecimal balance) {
         this.balance = balance;
         return this.balance;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        BankAccount that = (BankAccount) o;
+        return Objects.equals(accountNumber, that.accountNumber) && Objects.equals(customer,
+                that.customer) && Objects.equals(balance, that.balance);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accountNumber, customer, balance);
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.hzt.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class Customer {
 
@@ -17,6 +18,24 @@ public class Customer {
         this.id = id;
         this.name = name;
         this.bankAccounts = Collections.unmodifiableList(bankAccounts);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Customer customer = (Customer) o;
+        return Objects.equals(id, customer.id) && Objects.equals(name, customer.name) &&
+                Objects.equals(bankAccounts, customer.bankAccounts);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, bankAccounts);
     }
 
     public String getId() {

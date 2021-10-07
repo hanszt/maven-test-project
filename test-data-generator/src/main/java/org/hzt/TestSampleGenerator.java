@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,10 +57,14 @@ public final class TestSampleGenerator {
         final var groupedByLastName = createPaintingList().stream()
                 .collect(Collectors.groupingBy(painting -> painting.painter().getLastname()));
 
+        final List<Painting> vanGoghPaintings = groupedByLastName.get("van Gogh");
+        final List<Painting> vermeerPaintings = groupedByLastName.get("Vermeer");
+        final List<Painting> picassoPaintings = groupedByLastName.get("Picasso");
+
         return List.of(
-                new Museum("Van Gogh Museum", LocalDate.of(1992, Month.APRIL, 2), groupedByLastName.get("van Gogh")),
-                new Museum("Vermeer Museum", LocalDate.of(1940, Month.JANUARY, 23), groupedByLastName.get("Vermeer")),
-                new Museum("Picasso Museum", LocalDate.of(1965, Month.AUGUST, 4), groupedByLastName.get("Picasso")));
+                new Museum("Van Gogh Museum", LocalDate.of(1992, Month.APRIL, 2), vanGoghPaintings),
+                new Museum("Vermeer Museum", LocalDate.of(1940, Month.JANUARY, 23), vermeerPaintings),
+                new Museum("Picasso Museum", LocalDate.of(1965, Month.AUGUST, 4), picassoPaintings));
     }
 
     public static List<BankAccount> createSampleBankAccountList() {
@@ -69,6 +75,13 @@ public final class TestSampleGenerator {
                 new BankAccount("NL32INGB0004524542", new Customer("8", "Burgmeijer"), BigDecimal.valueOf(23)),
                 new BankAccount("NL65RABO00004342356", new Customer("22", "Claassen"), BigDecimal.valueOf(234))
         );
+    }
+
+    public static List<BankAccount> createSampleBankAccountListContainingNulls() {
+        final List<BankAccount> bankAccounts = new ArrayList<>(createSampleBankAccountList());
+        bankAccounts.add(new BankAccount("", null, null));
+        bankAccounts.add(new BankAccount("Test", new Customer("", "", Collections.emptyList()), null));
+        return bankAccounts;
     }
 
 }
