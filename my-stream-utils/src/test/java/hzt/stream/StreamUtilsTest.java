@@ -39,6 +39,7 @@ class StreamUtilsTest {
     void testHigherOrderFunctionCombinerAndComposerUsingColor() {
         //arrange
         final var originalColor = new Color(123, 32, 21);
+
         Function<Color, Color> combinedFilter = combine(
                 Color::brighter,
                 StreamUtilsTest::maxRed,
@@ -51,6 +52,7 @@ class StreamUtilsTest {
         //act
         final var colorByCombinedFilter = combinedFilter.apply(originalColor);
         final var colorByComposedFilter = composedFilter.apply(originalColor);
+
         System.out.println("originalColor = " + originalColor);
         System.out.println("colorByCombinedFilter = " + colorByCombinedFilter);
         System.out.println("colorByComposedFilter = " + colorByComposedFilter);
@@ -73,6 +75,7 @@ class StreamUtilsTest {
     @Test
     void testCombinePredicateUsingOrEvaluatesToTrue() {
         final var strings = new String[]{"hallo", "hoe", "gaat", "het", "met", "jou", "?"};
+
         assertEquals(strings.length, Stream.of(strings)
                 .filter(anyMatch(
                         contains("h"),
@@ -110,38 +113,48 @@ class StreamUtilsTest {
     @Test
     void testCombinePredicateUsingAndEvaluatesToFalse() {
         final var TEST = "Dit is één fout";
-        assertEquals(TEST, Stream.of(TEST, "?!", "Dan ", "is", "'t", "prima")
+
+        final String anyString = Stream.of(TEST, "?!", "Dan ", "is", "'t", "prima")
                 .filter(allMatch(
                         startsWith("D"),
                         contains("s"),
                         contains("é"),
                         not(contains("raar")),
                         hasEqualLength(TEST.length())))
-                .findAny().orElse(""));
+                .findAny()
+                .orElse("");
+
+        assertEquals(TEST, anyString);
         assertFalse(isEqual("Hallo").or(isEqual("Raar")).test("f"));
     }
 
     @Test
     void testCombineComparators() {
         var bookList = TestSampleGenerator.createBookList();
+
         final var expected = bookList.stream()
                 .sorted(comparing(Book::getCategory).reversed().thenComparing(Book::getTitle))
                 .toList();
+
         final var actual = bookList.stream()
                 .sorted(sequential(comparing(Book::getCategory).reversed(), comparing(Book::getTitle)))
                 .toList();
+
         assertEquals(expected, actual);
     }
 
     @Test
     void testComparatorsThenComparing() {
         var bookList = TestSampleGenerator.createBookList();
+
         final var expected = bookList.stream()
                 .sorted(comparing(book -> book.getCategory() + book.getTitle()))
                 .toList();
+
         final var actual = bookList.stream()
                 .sorted(comparing(Book::getCategory).thenComparing(Book::getTitle))
                 .toList();
+
         assertEquals(expected, actual);
     }
 
@@ -150,49 +163,63 @@ class StreamUtilsTest {
         var books = TestSampleGenerator.createBookList();
         final var E = "e";
         final var A = "u";
+
         final var expected = books.stream()
                 .filter(book -> !(book.getTitle().contains(E) || book.getTitle().contains(A)))
                 .toList();
+
         final var filteredBookList = books.stream()
                 .filter(by(Book::getTitle, containsNoneOf(E, A)))
                 .toList();
+
         filteredBookList.forEach(System.out::println);
+
         assertEquals(expected, filteredBookList);
     }
 
     @Test
     void testCompose() {
         var books = TestSampleGenerator.createBookList();
+
         final var fieldListOfObjectClass = books.stream()
                 .map(function(Object::getClass)
                         .compose(Book::getCategory)
                         .andThen(Class::getDeclaredFields))
                 .flatMap(Arrays::stream)
                 .toList();
+
         fieldListOfObjectClass.forEach(System.out::println);
+
         assertFalse(fieldListOfObjectClass.isEmpty());
     }
 
     @Test
     void testChainingAPredicate() {
         var books = TestSampleGenerator.createBookList();
+
         final var filteredBookList = books.stream()
                 .filter(by(Book::hasCopies).or(Book::isAboutProgramming))
                 .toList();
+
         filteredBookList.forEach(System.out::println);
+
         assertEquals(2, filteredBookList.size());
     }
 
     @Test
     void testChainingMultipleBy() {
         var books = TestSampleGenerator.createBookList();
+
         final var expected = books.stream()
                 .filter(book -> book.getTitle().startsWith("t") && book.getCategory().contains("2"))
                 .toList();
+
         final var filteredBookList = books.stream()
                 .filter(by(Book::getTitle, startsWith("t")).and(by(Book::getCategory, contains("2"))))
                 .toList();
+
         filteredBookList.forEach(System.out::println);
+
         assertEquals(expected, filteredBookList);
     }
 
@@ -201,6 +228,7 @@ class StreamUtilsTest {
         //arrange
         List<Double> list1 = Arrays.asList(1.0d, 2.1d, 3.3d, 5.3);
         List<Double> list2 = Arrays.asList(0.1d, 0.2d, 4d);
+
         final var expected = Stream.of(.9, 1.9, -.7)
                 .map(BigDecimal::valueOf)
                 .toList();
@@ -218,6 +246,7 @@ class StreamUtilsTest {
         //arrange
         List<Double> list1 = Arrays.asList(1.0d, 2.1d, 3.3d, 5.3);
         List<Double> list2 = Arrays.asList(0.1d, 0.2d, 4d);
+
         final var expected = Stream.of(.9, 1.9, -.7)
                 .map(BigDecimal::valueOf)
                 .toList();

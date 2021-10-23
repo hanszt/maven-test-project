@@ -17,6 +17,7 @@ class MyObjectsTest {
     void testRequireAllNonNull() {
         final int integer = 4;
         final double aDouble = 6.0;
+
         Throwable throwable = assertThrows(NullPointerException.class, () -> MyObjects.requireAllNonNull(Number.class,
                 integer, BigInteger.valueOf(4), aDouble, null));
 

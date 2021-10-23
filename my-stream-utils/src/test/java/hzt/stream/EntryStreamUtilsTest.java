@@ -128,7 +128,8 @@ class EntryStreamUtilsTest {
                 .filter(byKey(startsWithAnyOf("E", "F")))
                 .filter(byValue(not(Set::isEmpty)))
                 .forEach(entry(EntryStreamUtilsTest::assertResult)
-                        .andThen(entry((k, v) -> System.out.println("key: " +  k + ", value: " + v))));
+                        .andThen(entry((bookCategory, bookSet) ->
+                                System.out.println("key: " +  bookCategory + ", value: " + bookSet))));
     }
 
     private static void assertResult(String category, Set<Book> books) {

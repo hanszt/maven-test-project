@@ -124,7 +124,7 @@ public final class StreamUtils {
      * List<Book> filteredBookList = books.stream()
      *          .filter(by(Book::getAuthor, contains("a")
      *          .or(startsWith("j"))))
-     *          .collect(Collectors.toUnmodifiableList());
+     *          .toList();
      * }</pre>
      * It can help clean up code
      */
@@ -137,7 +137,8 @@ public final class StreamUtils {
         };
     }
 
-    public static <T, U, R> Predicate<T> by(Function<T, U> toUMapper, Function<U, R> toRMapper, Predicate<R> predicate) {
+    public static <T, U, R> Predicate<T> by(
+            Function<T, U> toUMapper, Function<U, R> toRMapper, Predicate<R> predicate) {
         Objects.requireNonNull(predicate);
         Objects.requireNonNull(toUMapper);
         Objects.requireNonNull(toRMapper);
@@ -160,7 +161,7 @@ public final class StreamUtils {
      *            .filter((by(Painting::isFromPicasso)
      *            .or(Painting::isFromRembrandt))
      *            .and(Painting::isInMuseum)))
-     *            .collect(Collectors.toUnmodifiableList());
+     *            .toList();
      * }</pre>
      * @see java.util.function.Predicate#and(Predicate)
      * @see java.util.function.Predicate#or(Predicate)
@@ -185,7 +186,8 @@ public final class StreamUtils {
         };
     }
 
-    public static <T, U, V, R> Predicate<T> nonNull(Function<T, U> toUMapper, Function<U, V> toVMapper, Function<V, R> toRMapper) {
+    public static <T, U, V, R> Predicate<T> nonNull(
+            Function<T, U> toUMapper, Function<U, V> toVMapper, Function<V, R> toRMapper) {
         Objects.requireNonNull(toUMapper);
         Objects.requireNonNull(toVMapper);
         Objects.requireNonNull(toRMapper);
@@ -197,7 +199,8 @@ public final class StreamUtils {
         };
     }
 
-    public static <T, R> Function<T, Stream<R>> iterableNullSafe(Function<? super T, ? extends Iterable<R>> toIterableMapper) {
+    public static <T, R> Function<T, Stream<R>> iterableNullSafe(
+            Function<? super T, ? extends Iterable<R>> toIterableMapper) {
         Objects.requireNonNull(toIterableMapper);
         return t -> {
             final Iterable<R> iterable = t != null ? toIterableMapper.apply(t) : null;
@@ -205,7 +208,8 @@ public final class StreamUtils {
         };
     }
 
-    public static <T, R> BiConsumer<T, Consumer<R>> iterableNullSafeBy(Function<? super T, ? extends Iterable<R>> toIterableMapper) {
+    public static <T, R> BiConsumer<T, Consumer<R>> iterableNullSafeBy(
+            Function<? super T, ? extends Iterable<R>> toIterableMapper) {
         Objects.requireNonNull(toIterableMapper);
         return (t, consumer) -> {
              var iterable = t != null ? toIterableMapper.apply(t) : null;
@@ -325,7 +329,7 @@ public final class StreamUtils {
      *  List<LocalDate> datesOfBirth = paintings.stream()
      *            .map(by(Painting::getPainter)
      *            .andThen(Painter::getDateOfBirth)))
-     *            .collect(Collectors.toUnmodifiableList());
+     *            .toList();
      * }</pre>
      * @see java.util.function.Function#andThen(Function)
      * @see java.util.function.Function#compose(Function)
@@ -347,7 +351,7 @@ public final class StreamUtils {
      *  List<LocalDate> datesOfBirth = paintings.stream()
      *            .map(by(Painting::getPainter)
      *            .andThen(Painter::getDateOfBirth)))
-     *            .collect(Collectors.toUnmodifiableList());
+     *            .toList();
      * }</pre>
      * @see java.util.function.Function#andThen(Function)
      * @see java.util.function.Function#compose(Function)
@@ -363,7 +367,8 @@ public final class StreamUtils {
     }
 
     //shared mutability?
-    public static <T, U, R> Stream<R> combineToStream(Iterable<T> iterable1, Iterable<U> iterable2, BiFunction<T, U, R> combiner) {
+    public static <T, U, R> Stream<R> combineToStream(
+            Iterable<T> iterable1, Iterable<U> iterable2, BiFunction<T, U, R> combiner) {
         final var iterator1 = iterable1.iterator();
         final var iterator2 = iterable2.iterator();
         return Stream.iterate(0, i -> iterator1.hasNext() && iterator2.hasNext(), identity())
