@@ -1,7 +1,6 @@
 package com.dnb;
 
 import com.dnb.model.Bic;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -28,7 +27,6 @@ class ReflectionSampleTest {
 
     @SuppressWarnings("SuspiciousMethodCalls")
     @Test
-    @Disabled("This is a non important test")
     void testWeirdBehaviourIntegerPropertyAccessor() {
         final var bic1 = new Bic("1", "1");
         List<Bic> bics = List.of(bic1, new Bic("2", "2"), new Bic("3", "hallo"));
@@ -45,7 +43,6 @@ class ReflectionSampleTest {
     }
 
     @Test
-    @Disabled("This test is just for a curiosity not important")
     void testThrowsExceptionWhenWrongPropertyName() {
         final var bic1 = new Bic("1", "");
         assertThrows(IllegalStateException.class, () -> integerPropertyAccessor("bic.id").apply(bic1));

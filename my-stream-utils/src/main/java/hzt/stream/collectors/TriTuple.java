@@ -27,17 +27,11 @@ public final class TriTuple<R1, R2, R3> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj instanceof TriTuple<?, ?, ?> that) {
-            return Objects.equals(this.first, that.first) &&
-                    Objects.equals(this.second, that.second) &&
-                    Objects.equals(this.third, that.third);
-        }
-        return false;
+        return obj == this || (obj instanceof TriTuple<?, ?, ?> other &&
+                Objects.equals(this.first, other.first) &&
+                Objects.equals(this.second, other.second) &&
+                Objects.equals(this.third, other.third));
     }
-
 
     @Override
     public int hashCode() {

@@ -4,12 +4,11 @@ import hzt.stream.StreamUtils;
 import hzt.stream.function.QuadFunction;
 import hzt.stream.function.QuintFunction;
 import hzt.stream.function.TriFunction;
-import hzt.stream.utils.MyCollections;
 import hzt.stream.utils.MyObjects;
 
-import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +56,7 @@ public final class MyCollectors {
     private MyCollectors() {
     }
 
+    //Experimental. Runs faster into out of memory error than mapMulti method from Stream. No buffer implemented here
     public static <T, U, A, R> Collector<T, ?, R> multiMapping(BiConsumer<? super T, ? super Consumer<U>> mapper,
                                                                Collector<? super U, A, R> downstream) {
         final BiConsumer<A, T> accumulator = (A a, T t) -> {
@@ -118,7 +118,7 @@ public final class MyCollectors {
     public static <T, R1, R2> Collector<T, ?, Map.Entry<R1, R2>> teeingToEntry(
             Collector<? super T, ?, R1> downstream1,
             Collector<? super T, ?, R2> downstream2) {
-        return Collectors.teeing(downstream1, downstream2, AbstractMap.SimpleEntry::new);
+        return Collectors.teeing(downstream1, downstream2, Map::entry);
     }
 
     public static <T> Collector<T, ?, DoubleStatistics> toDoubleStatisticsBy(ToDoubleFunction<? super T> toDoubleFunction) {
@@ -459,35 +459,35 @@ public final class MyCollectors {
         Function<A5, R5> c5Finisher = Objects.requireNonNull(downstream5.finisher(), DOWNSTREAM_5_FINISHER);
 
         class QuintBox {
-            private A1 left = c1Supplier.get();
-            private A2 middleLeft = c2Supplier.get();
-            private A3 middle = c3Supplier.get();
-            private A4 middleRight = c4Supplier.get();
-            private A5 right = c5Supplier.get();
+            private A1 a1 = c1Supplier.get();
+            private A2 a2 = c2Supplier.get();
+            private A3 a3 = c3Supplier.get();
+            private A4 a4 = c4Supplier.get();
+            private A5 a5 = c5Supplier.get();
 
             void add(T t) {
-                c1Accumulator.accept(left, t);
-                c2Accumulator.accept(middleLeft, t);
-                c3Accumulator.accept(middle, t);
-                c4Accumulator.accept(middleRight, t);
-                c5Accumulator.accept(right, t);
+                c1Accumulator.accept(a1, t);
+                c2Accumulator.accept(a2, t);
+                c3Accumulator.accept(a3, t);
+                c4Accumulator.accept(a4, t);
+                c5Accumulator.accept(a5, t);
             }
 
             QuintBox combine(QuintBox other) {
-                left = c1Combiner.apply(left, other.left);
-                middleLeft = c2Combiner.apply(middleLeft, other.middleLeft);
-                middle = c3Combiner.apply(middle, other.middle);
-                middleRight = c4Combiner.apply(middleRight, other.middleRight);
-                right = c5Combiner.apply(right, other.right);
+                a1 = c1Combiner.apply(a1, other.a1);
+                a2 = c2Combiner.apply(a2, other.a2);
+                a3 = c3Combiner.apply(a3, other.a3);
+                a4 = c4Combiner.apply(a4, other.a4);
+                a5 = c5Combiner.apply(a5, other.a5);
                 return this;
             }
 
             R get() {
-                R1 r1 = c1Finisher.apply(left);
-                R2 r2 = c2Finisher.apply(middleLeft);
-                R3 r3 = c3Finisher.apply(middle);
-                R4 r4 = c4Finisher.apply(middleRight);
-                R5 r5 = c5Finisher.apply(right);
+                R1 r1 = c1Finisher.apply(a1);
+                R2 r2 = c2Finisher.apply(a2);
+                R3 r3 = c3Finisher.apply(a3);
+                R4 r4 = c4Finisher.apply(a4);
+                R5 r5 = c5Finisher.apply(a5);
                 return merger.apply(r1, r2, r3, r4, r5);
             }
         }
@@ -564,14 +564,14 @@ public final class MyCollectors {
     private static Set<Collector.Characteristics> evaluateCharacteristics(Collector<?, ?, ?>... collectors) {
         boolean anyMatchOnChIDContainsAll = Stream.of(collectors)
                 .map(Collector::characteristics)
-                .anyMatch(c -> c.contains(Collector.Characteristics.IDENTITY_FINISH));
+                .anyMatch(EnumSet.of(Collector.Characteristics.IDENTITY_FINISH)::containsAll);
 
         if (anyMatchOnChIDContainsAll) {
             return Collections.emptySet();
         }
-        return MyCollections.intersect(Stream.of(collectors)
+        return Stream.of(collectors)
                 .map(Collector::characteristics)
-                .toList());
+                .collect(toIntersection());
     }
 
 }

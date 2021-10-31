@@ -38,15 +38,10 @@ public class BankAccount {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        BankAccount that = (BankAccount) o;
-        return Objects.equals(accountNumber, that.accountNumber) && Objects.equals(customer,
-                that.customer) && Objects.equals(balance, that.balance);
+        return this == o || (o instanceof BankAccount other &&
+                Objects.equals(accountNumber, other.accountNumber) &&
+                Objects.equals(customer, other.customer) &&
+                Objects.equals(balance, other.balance));
     }
 
     @Override

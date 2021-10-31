@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +23,6 @@ import static hzt.stream.collectors.BigDecimalCollectors.summarizingBigDecimal;
 import static hzt.stream.predicates.ComparingPredicates.greaterThan;
 import static hzt.stream.predicates.ComparingPredicates.greaterThanInt;
 import static hzt.stream.predicates.StringPredicates.contains;
-import static java.util.AbstractMap.SimpleEntry;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -240,15 +238,15 @@ class CollectorSamplesTest {
 
     @Test
     void testTeeing() {
-        final var setListSimpleEntry = Person.createTestPersonList().stream()
+        final var entry = Person.createTestPersonList().stream()
                 .collect(teeing(filtering(Person::isPlayingPiano,
                                 toUnmodifiableSet()),
                         mapping(Person::getAge, toUnmodifiableList()),
-                        SimpleEntry::new));
+                        Map::entry));
 
-        System.out.println(setListSimpleEntry);
-        assertFalse(setListSimpleEntry.getKey().isEmpty());
-        assertFalse(setListSimpleEntry.getValue().isEmpty());
+        System.out.println(entry);
+        assertFalse(entry.getKey().isEmpty());
+        assertFalse(entry.getValue().isEmpty());
     }
 
     @Test
@@ -259,11 +257,11 @@ class CollectorSamplesTest {
                 .collect(teeing(
                         filtering(by(Person::getAge, greaterThan(30)),
                                 teeing(counting(), summingLong(Person::getAge),
-                                        SimpleEntry::new)),
+                                        Map::entry)),
                         filtering(Person::isPlayingPiano,
                                 teeing(maxBy(comparing(Person::getAge)),
                                         minBy(comparing(Person::getAge)),
-                                        SimpleEntry::new)),
+                                        Map::entry)),
                         PersonStatistics::new));
 
         final var summaryStatistics = testPersonList.stream()
@@ -282,8 +280,8 @@ class CollectorSamplesTest {
         private final Person minAgePersonPlayingPiano;
         private final Person maxAgePersonPlayingPiano;
 
-        public PersonStatistics(SimpleEntry<Long, Long> simpleEntry1,
-                                SimpleEntry<Optional<Person>, Optional<Person>> simpleEntry2) {
+        public PersonStatistics(Map.Entry<Long, Long> simpleEntry1,
+                                Map.Entry<Optional<Person>, Optional<Person>> simpleEntry2) {
             this.nrOfPersonsOlderThan30 = simpleEntry1.getKey();
             this.agesSumPersonsOlderThan30 = simpleEntry1.getValue();
             this.minAgePersonPlayingPiano = simpleEntry2.getKey().orElse(null);
@@ -321,7 +319,7 @@ class CollectorSamplesTest {
                 .collect(teeing(
                         partitioningBy(Painting::isInMuseum, mapping(Painting::name, toList())),
                         summarizingLong(Painting::ageInYears),
-                        AbstractMap.SimpleEntry::new));
+                        Map::entry));
 
         final Map<Boolean, List<String>> paintingNameInMuseumMap = result.getKey();
         final LongSummaryStatistics paintingAgeSummaryStatistics = result.getValue();

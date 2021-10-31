@@ -8,17 +8,37 @@ import org.hzt.model.Painter;
 import org.hzt.model.Painting;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public final class TestSampleGenerator {
 
+    private static final Random RANDOM = new Random();
     private static final String FICTION = "Fiction";
+
+    private static final List<Function<Integer, Number>> TO_NUMBER_TYPE_FUNCTIONS = List.of(
+            Integer::byteValue,
+            Integer::shortValue,
+            Integer::valueOf,
+            Float::valueOf,
+            Long::valueOf,
+            Double::valueOf,
+            BigInteger::valueOf,
+            BigDecimal::valueOf,
+            AtomicInteger::new,
+            AtomicLong::new
+    );
 
     private TestSampleGenerator() {
     }
@@ -40,15 +60,22 @@ public final class TestSampleGenerator {
         vermeer.setDateOfDeath(LocalDate.of(1675, 12, 1));
         final Painter vanGogh = new Painter("Vincent", "van Gogh", LocalDate.of(1853, 3,20));
         vanGogh.setDateOfDeath(LocalDate.of(1890, 7, 29));
-        return List.of(
-                new Painting("Guernica", picasso, Year.of(1937), true),
-                new Painting("Les Demoiselles d'Avignon", picasso, Year.of(1907), true),
-                new Painting("Le Rêve", picasso, Year.of(1932), true),
-                new Painting("Meisje met de parel", vermeer, Year.of(1665), true),
-                new Painting("Het melkmeisje", vermeer, Year.of(1658), true),
-                new Painting("Meisje met de rode hoed", vermeer, Year.of(1665), true),
-                new Painting("Lentetuin, de pastorietuin te Nuenen in het voorjaar", vanGogh, Year.of(1884), false),
-                new Painting("De sterrennacht", vanGogh, Year.of(1889), true)
+
+        final Painting guernica = new Painting("Guernica", picasso, Year.of(1937), true);
+        final Painting lesDemoiselles = new Painting("Les Demoiselles d'Avignon", picasso, Year.of(1907), true);
+        final Painting le_rêve = new Painting("Le Rêve", picasso, Year.of(1932), true);
+        final Painting meisje_met_de_parel = new Painting("Meisje met de parel", vermeer, Year.of(1665), true);
+        final Painting het_melkmeisje = new Painting("Het melkmeisje", vermeer, Year.of(1658), true);
+        final Painting meisje_met_de_rode_hoed = new Painting("Meisje met de rode hoed", vermeer, Year.of(1665), true);
+        final Painting lenteTuin = new Painting("Lentetuin, de pastorietuin te Nuenen in het voorjaar", vanGogh, Year.of(1884), false);
+        final Painting de_sterrennacht = new Painting("De sterrennacht", vanGogh, Year.of(1889), true);
+
+        picasso.addPaintings(guernica, lesDemoiselles, le_rêve);
+        vermeer.addPaintings(meisje_met_de_parel, meisje_met_de_rode_hoed, het_melkmeisje);
+        vanGogh.addPaintings(lenteTuin, de_sterrennacht);
+
+        return List.of(guernica, lesDemoiselles, le_rêve, meisje_met_de_parel, het_melkmeisje,
+                meisje_met_de_rode_hoed, lenteTuin, de_sterrennacht
         );
     }
 
@@ -84,4 +111,23 @@ public final class TestSampleGenerator {
         return bankAccounts;
     }
 
+    public static List<Number> createRandomNumberTypeList(int amount) {
+        return IntStream.range(0, amount)
+                .mapToObj(TestSampleGenerator::toRandomNumberType)
+                .toList();
+    }
+
+    private static Number toRandomNumberType(int integer) {
+        return TO_NUMBER_TYPE_FUNCTIONS.get(RANDOM.nextInt(TO_NUMBER_TYPE_FUNCTIONS.size())).apply(integer);
+    }
+
+    public static List<Number> createNumberTypeList(int amount) {
+        return IntStream.range(0, amount)
+                .mapToObj(TestSampleGenerator::toNumberType)
+                .toList();
+    }
+
+    private static Number toNumberType(int integer) {
+        return TO_NUMBER_TYPE_FUNCTIONS.get(integer % TO_NUMBER_TYPE_FUNCTIONS.size()).apply(integer);
+    }
 }

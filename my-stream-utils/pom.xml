@@ -16,15 +16,32 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <annotations.version>22.0.0</annotations.version>
+        <test-data-generator.version>1.0-SNAPSHOT</test-data-generator.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.maven-test-project</groupId>
             <artifactId>test-data-generator</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${test-data-generator.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${annotations.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

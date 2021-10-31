@@ -5,7 +5,8 @@ import java.time.MonthDay;
 import java.time.Period;
 import java.time.Year;
 
-public record Painting(String name, Painter painter, Year yearOfCreation, boolean isInMuseum) {
+public record Painting(String name, Painter painter, Year yearOfCreation, boolean isInMuseum)
+        implements Comparable<Painting> {
 
     public Period age() {
         return Period.between(yearOfCreation.atMonthDay(MonthDay.now()), LocalDate.now());
@@ -17,5 +18,10 @@ public record Painting(String name, Painter painter, Year yearOfCreation, boolea
 
     public Year getYearOfCreation() {
         return yearOfCreation;
+    }
+
+    @Override
+    public int compareTo(Painting o) {
+        return name.compareTo(o.name);
     }
 }

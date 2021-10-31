@@ -18,14 +18,7 @@ public class Bic {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Bic bic = (Bic) o;
-        return Objects.equals(name, bic.name);
+        return this == o || (o instanceof Bic bic && Objects.equals(name, bic.name));
     }
 
     @Override

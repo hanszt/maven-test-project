@@ -3,9 +3,8 @@ package com.dnb.custom_annotations;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.time.LocalDate;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 
 import static java.util.stream.Collectors.*;
@@ -55,22 +54,11 @@ public class ObjectToJsonConverter {
         return "{" + jsonString + "}";
     }
 
-    private static SimpleEntry<String, String> toKeyValuePair(Object object, Field field) {
+    private static Map.Entry<String, String> toKeyValuePair(Object object, Field field) {
         final var key = field.getAnnotation(JsonElement.class).key();
         try {
-            final var o = field.get(object);
-            String value;
-            if (o instanceof String s) {
-                value = s;
-            } else if (o instanceof LocalDate localDate) {
-                value = localDate.toString();
-            } else {
-                throw new IllegalStateException("Field not of type string or LocalDate...");
-            }
-            if (key.isEmpty()) {
-                return new SimpleEntry<>(field.getName(), value);
-            }
-            return new SimpleEntry<>(key, value);
+            final var value = field.get(object);
+            return Map.entry(key.isEmpty() ? field.getName() : key, value.toString());
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }

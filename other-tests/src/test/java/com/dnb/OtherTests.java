@@ -15,12 +15,15 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -86,6 +89,40 @@ class OtherTests {
                 .map(Bic::getName)
                 .filter(Objects::nonNull)
                 .findAny();
+    }
+
+    @Test
+    void testOctalValues() {
+        // Integers starting with a zero are octal instead of decimal
+        final int OCTAL = 010;
+
+        final int[] expected = IntStream.rangeClosed(0, 64).toArray();
+        final int[] actual = IntStream.rangeClosed(00, 0100).toArray();
+
+        Arrays.stream(actual).forEach(System.out::println);
+
+        assertEquals(8, OCTAL);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    void testHexValues() {
+        final int[] expected = IntStream.rangeClosed(0, 256).toArray();
+        final int[] actual = IntStream.rangeClosed(0x0, 0x100).toArray();
+
+        Arrays.stream(actual).forEach(System.out::println);
+
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    void testBinaryValues() {
+        final int[] expected = IntStream.rangeClosed(0, 8).toArray();
+        final int[] actual = IntStream.rangeClosed(0b0, 0b1000).toArray();
+
+        Arrays.stream(actual).forEach(System.out::println);
+
+        assertArrayEquals(expected, actual);
     }
 
     @Test
@@ -311,31 +348,75 @@ class OtherTests {
         final var painting = TestSampleGenerator.createPaintingList().stream().findAny().orElseThrow();
         final var person = Person.createTestPersonList().stream().findAny().orElseThrow();
         List<Object> objects = List.of(painting, person, LocalDate.of(1989, 10, 18), new BigInteger("2000"));
+
         final var string = objects.stream()
                 .map(o -> o.getClass().getSimpleName())
                 .collect(Collectors.joining("\n"));
+
         System.out.println(string);
         assertTrue(string.contains("Painting"));
         assertTrue(string.contains("Person"));
     }
 
     @Test
-    void testObjectAsTypeContainerInStream() {
+    void testStreamOfAnonymousClassesCollectedToListOfTypeAnonymous() {
         Map<String, Painting> nameToPaintingMap = TestSampleGenerator.createPaintingList().stream()
                 .collect(Collectors.toUnmodifiableMap(Painting::name, Function.identity()));
-        nameToPaintingMap.entrySet().stream()
+
+        final var list = nameToPaintingMap.entrySet().stream()
                 .map(entry -> new Object() {
-                    private final String name = entry.getKey();
-                    private final Painting painting = entry.getValue();
-                }).filter(o -> o.name.contains("Picasso"))
-                .forEach(o -> System.out.println("Name: " +  o.name + " Painting: " + o.painting));
-        assertFalse(nameToPaintingMap.isEmpty());
+                    final String name = entry.getKey();
+                    final Painting painting = entry.getValue();
+
+                    boolean isInMuseumAndIsOlderThan100Years() {
+                        return painting.isInMuseum() && painting.ageInYears() > 100;
+                    }
+                })
+                .filter(a -> a.name.toLowerCase(Locale.ROOT).contains("meisje"))
+                .filter(a -> a.isInMuseumAndIsOlderThan100Years())
+                .toList();
+
+        list.forEach(anonymous -> System.out.println("Name: " + anonymous.name + " PaintingAge: " + anonymous.painting));
+
+        assertFalse(list.isEmpty());
+
+        final var anonymous = list.get(1);
+
+        assertTrue((anonymous.name.startsWith("M")));
+        assertTrue(anonymous.isInMuseumAndIsOlderThan100Years());
+    }
+
+    @Test
+    void testPuttingAllKindsOfObjectsInBoundedWildCardList() {
+        List<? super Comparable<?>> list = new ArrayList<>();
+        list.add(LocalDate.of(2021, Month.OCTOBER, 4));
+        list.add("Hello");
+        list.add("This is weird");
+        list.add(BigDecimal.valueOf(20));
+        list.add(new Person("", null, null));
+
+        list.forEach(System.out::println);
+
+        assertTrue(list.contains("Hello"));
+    }
+
+    @Test
+    void testModifyingUnderlingArrayViaArraysAsList() {
+        final Integer[] expected = {1, 4, 10, 7, 3, 8};
+        Integer[] actual = {1, 4, 5, 7, 3, 8};
+
+        final var integerList = Arrays.asList(actual);
+
+        // setting the value at index 2 of the created list to 10 also sets the value of the original array at index 2 to 10
+        integerList.set(2, 10);
+
+        assertArrayEquals(expected, actual);
     }
 
     @Test
     void testTypeWitnessNotNeededAnyMore() {
         //noinspection RedundantTypeArguments
-        Assertions.assertDoesNotThrow(() -> printStrings(Collections.<String>emptyList()));
+        assertDoesNotThrow(() -> printStrings(Collections.<String>emptyList()));
     }
 
     public void printStrings(List<String> strings) {

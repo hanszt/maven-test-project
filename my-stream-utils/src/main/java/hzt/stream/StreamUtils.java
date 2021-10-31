@@ -1,5 +1,9 @@
 package hzt.stream;
 
+import hzt.stream.utils.MyObjects;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,11 +28,12 @@ public final class StreamUtils {
 
     /**
      * This only works when input and output type are the same. Using a unary operator does not work. Interesting...
+     *
      * @param functions the functions that will be combined
-     * @param <T> the type for input and output
+     * @param <T>       the type for input and output
      * @return the new function that is a combination of the supplied functions
      * @see <a href="https://youtu.be/WN9kgdSVhDo?t=2529">
-     *     Design Patterns in the Light of Lambda Expressions. Venkat Subramaniam, Agile developer, inc.</a>
+     * Design Patterns in the Light of Lambda Expressions. Venkat Subramaniam, Agile developer, inc.</a>
      * @see java.util.function.Function#andThen(Function)
      */
     @SafeVarargs
@@ -51,13 +56,28 @@ public final class StreamUtils {
         return t -> after.apply(before.apply(t));
     }
 
+    public static <T, R> Function<T, Stream<R>> castIfInstance(Class<R> aClass) {
+        Objects.requireNonNull(aClass);
+        return t -> aClass.isInstance(t) ? Stream.of(aClass.cast(t)) : Stream.empty();
+    }
+
+    public static <T, R> BiConsumer<T, Consumer<R>> castIfInstanceOf(Class<R> aClass) {
+        Objects.requireNonNull(aClass);
+        return (t, consumer) -> {
+            if (aClass.isInstance(t)) {
+                consumer.accept(aClass.cast(t));
+            }
+        };
+    }
+
     /**
      * This only works when input and output type are the same. Using a unary operator does not work. Interesting...
+     *
      * @param functions the functions that will be composed
-     * @param <T> the type for input and output
+     * @param <T>       the type for input and output
      * @return the new function that is a composition of the supplied functions
      * @see <a href="https://youtu.be/WN9kgdSVhDo?t=2529">
-     *     Design Patterns in the Light of Lambda Expressions. Venkat Subramaniam, Agile developer, inc.</a>
+     * Design Patterns in the Light of Lambda Expressions. Venkat Subramaniam, Agile developer, inc.</a>
      * @see java.util.function.Function#compose(Function)
      */
     @SafeVarargs
@@ -110,15 +130,13 @@ public final class StreamUtils {
     /**
      * A function that first maps to some other type which can than be used to test with.
      *
-     *  @param mapper the mapper that is applied before testing the predicate
-     *  @param predicate the predicate to be tested
-     *  @param <T> the incoming type
-     *  @param <R> the type to test the predicate on
-     *  @return a predicate for the incoming type
-     *  @throws NullPointerException if the mapper or predicate is null
-     *
-     * @apiNote
-     * This allows for easy filtering by some nested object while maintaining the original object in the stream
+     * @param mapper    the mapper that is applied before testing the predicate
+     * @param predicate the predicate to be tested
+     * @param <T>       the incoming type
+     * @param <R>       the type to test the predicate on
+     * @return a predicate for the incoming type
+     * @throws NullPointerException if the mapper or predicate is null
+     * @apiNote This allows for easy filtering by some nested object while maintaining the original object in the stream
      * <p><b>Example:</b>
      * <pre>{@code
      * List<Book> filteredBookList = books.stream()
@@ -128,7 +146,7 @@ public final class StreamUtils {
      * }</pre>
      * It can help clean up code
      */
-    public static <T, R> Predicate<T> by(Function<T, R> mapper, Predicate<R> predicate) {
+    public static <T, R> Predicate<T> by(Function<? super T, ? extends R> mapper, Predicate<? super R> predicate) {
         Objects.requireNonNull(predicate);
         Objects.requireNonNull(mapper);
         return t -> {
@@ -137,7 +155,10 @@ public final class StreamUtils {
         };
     }
 
-    public static <T, U, R> Predicate<T> by(Function<T, U> toUMapper, Function<U, R> toRMapper, Predicate<R> predicate) {
+    public static <T, U, R> Predicate<T> by(
+            Function<? super T, ? extends U> toUMapper,
+            Function<? super U, ? extends R> toRMapper,
+            Predicate<? super R> predicate) {
         Objects.requireNonNull(predicate);
         Objects.requireNonNull(toUMapper);
         Objects.requireNonNull(toRMapper);
@@ -148,20 +169,35 @@ public final class StreamUtils {
         };
     }
 
+    public static <T, U, V, R> Predicate<T> by(
+            Function<? super T, ? extends U> toUMapper,
+            Function<? super U, ? extends V> toVMapper,
+            Function<? super V, ? extends R> toRMapper,
+            Predicate<? super R> predicate) {
+        MyObjects.requireAllNonNull(Object.class, toUMapper, toVMapper, toRMapper, predicate);
+        return t -> {
+            final U u = toUMapper.apply(t);
+            final V v = u != null ? toVMapper.apply(u) : null;
+            final R r = u != null ? toRMapper.apply(v) : null;
+            return r != null && predicate.test(r);
+        };
+    }
+
     /**
      * Allows for easier use of combiner functions 'and()' and 'or()' in the Predicate class
+     *
      * @param predicate the input predicate
-     * @param <T> the type
+     * @param <T>       the type
      * @return the input predicate
      * @throws NullPointerException if the predicate is null
-     * <p><b>Example:</b>
-     * <pre>{@code
-     *  List<Painting> filteredPaintings = paintings.stream()
-     *            .filter((by(Painting::isFromPicasso)
-     *            .or(Painting::isFromRembrandt))
-     *            .and(Painting::isInMuseum)))
-     *            .collect(Collectors.toUnmodifiableList());
-     * }</pre>
+     *                              <p><b>Example:</b>
+     *                              <pre>{@code
+     *                               List<Painting> filteredPaintings = paintings.stream()
+     *                                         .filter((by(Painting::isFromPicasso)
+     *                                               .or(Painting::isFromRembrandt))
+     *                                               .and(Painting::isInMuseum)))
+     *                                         .collect(Collectors.toUnmodifiableList());
+     *                              }</pre>
      * @see java.util.function.Predicate#and(Predicate)
      * @see java.util.function.Predicate#or(Predicate)
      */
@@ -170,12 +206,14 @@ public final class StreamUtils {
         return predicate;
     }
 
-    public static <T, R> Predicate<T> nonNull(Function<T, R> toRMapper) {
+    public static <T, R> Predicate<T> nonNull(Function<? super T, ? extends R> toRMapper) {
         Objects.requireNonNull(toRMapper);
         return t -> t != null && toRMapper.apply(t) != null;
     }
 
-    public static <T, U, R> Predicate<T> nonNull(Function<T, U> toUMapper, Function<U, R> toRMapper) {
+    public static <T, U, R> Predicate<T> nonNull(
+            Function<? super T, ? extends U> toUMapper,
+            Function<? super U, ? extends R> toRMapper) {
         Objects.requireNonNull(toUMapper);
         Objects.requireNonNull(toRMapper);
         return t -> {
@@ -185,7 +223,10 @@ public final class StreamUtils {
         };
     }
 
-    public static <T, U, V, R> Predicate<T> nonNull(Function<T, U> toUMapper, Function<U, V> toVMapper, Function<V, R> toRMapper) {
+    public static <T, U, V, R> Predicate<T> nonNull(
+            Function<? super T, ? extends U> toUMapper,
+            Function<? super U, ? extends V> toVMapper,
+            Function<? super V, ? extends R> toRMapper) {
         Objects.requireNonNull(toUMapper);
         Objects.requireNonNull(toVMapper);
         Objects.requireNonNull(toRMapper);
@@ -208,10 +249,10 @@ public final class StreamUtils {
     public static <T, R> BiConsumer<T, Consumer<R>> iterableNullSafeBy(Function<? super T, ? extends Iterable<R>> toIterableMapper) {
         Objects.requireNonNull(toIterableMapper);
         return (t, consumer) -> {
-             var iterable = t != null ? toIterableMapper.apply(t) : null;
-             if (iterable != null) {
-                 iterable.forEach(consumer);
-             }
+            var iterable = t != null ? toIterableMapper.apply(t) : null;
+            if (iterable != null) {
+                iterable.forEach(consumer);
+            }
         };
     }
 
@@ -316,17 +357,18 @@ public final class StreamUtils {
 
     /**
      * Allows for easier use of combiner functions in the Functions class
+     *
      * @param function the input function
-     * @param <T> the type
-     * @param <R> the outputtype
+     * @param <T>      the type
+     * @param <R>      the outputtype
      * @return the same as the input
      * @throws NullPointerException if the function is null
-     * <pre>{@code
-     *  List<LocalDate> datesOfBirth = paintings.stream()
-     *            .map(by(Painting::getPainter)
-     *            .andThen(Painter::getDateOfBirth)))
-     *            .collect(Collectors.toUnmodifiableList());
-     * }</pre>
+     *                              <pre>{@code
+     *                               List<LocalDate> datesOfBirth = paintings.stream()
+     *                                         .map(by(Painting::getPainter)
+     *                                         .andThen(Painter::getDateOfBirth)))
+     *                                         .collect(Collectors.toUnmodifiableList());
+     *                              }</pre>
      * @see java.util.function.Function#andThen(Function)
      * @see java.util.function.Function#compose(Function)
      */
@@ -337,18 +379,19 @@ public final class StreamUtils {
 
     /**
      * Allows for easier use of combiner functions in the Functions class
+     *
      * @param function the input function
-     * @param <T> input 1 type
-     * @param <U> input 2 type
-     * @param <R> the output type
+     * @param <T>      input 1 type
+     * @param <U>      input 2 type
+     * @param <R>      the output type
      * @return the same as the input
      * @throws NullPointerException if the function is null
-     * <pre>{@code
-     *  List<LocalDate> datesOfBirth = paintings.stream()
-     *            .map(by(Painting::getPainter)
-     *            .andThen(Painter::getDateOfBirth)))
-     *            .collect(Collectors.toUnmodifiableList());
-     * }</pre>
+     *                              <pre>{@code
+     *                               List<LocalDate> datesOfBirth = paintings.stream()
+     *                                         .map(by(Painting::getPainter)
+     *                                         .andThen(Painter::getDateOfBirth)))
+     *                                         .collect(Collectors.toUnmodifiableList());
+     *                              }</pre>
      * @see java.util.function.Function#andThen(Function)
      * @see java.util.function.Function#compose(Function)
      */
@@ -363,17 +406,34 @@ public final class StreamUtils {
     }
 
     //shared mutability?
-    public static <T, U, R> Stream<R> combineToStream(Iterable<T> iterable1, Iterable<U> iterable2, BiFunction<T, U, R> combiner) {
+    public static <T, U, R> Stream<R> combineToStream(
+            Iterable<? extends T> iterable1,
+            Iterable<? extends U> iterable2,
+            BiFunction<? super T, ? super U, ? extends R> combiner) {
         final var iterator1 = iterable1.iterator();
         final var iterator2 = iterable2.iterator();
         return Stream.iterate(0, i -> iterator1.hasNext() && iterator2.hasNext(), identity())
                 .map(i -> combiner.apply(iterator1.next(), iterator2.next()));
     }
 
-    public static <T, R> Consumer<T> transformAndThen(Function<T, R> mappingFunction, Consumer<R> consumer) {
+    public static <T> Stream<T> streamOf(Iterable<T> iterable) {
+        return iterable != null ? StreamSupport.stream(iterable.spliterator(), false) : Stream.empty();
+    }
+
+    public static <T> Stream<T> parallelStreamOf(Iterable<T> iterable) {
+        return iterable != null ? StreamSupport.stream(iterable.spliterator(), true) : Stream.empty();
+    }
+
+    public static <T, R> Consumer<T> transformAndThen(
+            Function<? super T, ? extends R> mappingFunction,
+            Consumer<? super R> consumer) {
+        Objects.requireNonNull(mappingFunction);
+        Objects.requireNonNull(consumer);
         return t -> consumer.accept(mappingFunction.apply(t));
     }
 
+    @NotNull
+    @Contract(pure = true)
     public static <T> UnaryOperator<T> identity() {
         return t -> t;
     }

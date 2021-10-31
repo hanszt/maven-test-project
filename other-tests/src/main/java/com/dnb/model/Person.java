@@ -9,9 +9,10 @@ import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.Period;
 import java.util.List;
+import java.util.Objects;
 
 @JsonSerializable
-public class Person {
+public class Person implements Comparable<Person> {
 
     public static final String ZUIDERVAART = "Zuidervaart";
     @JsonElement
@@ -21,11 +22,11 @@ public class Person {
     private String lastName;
 
     @JsonElement(key = "birthDate")
-    private LocalDate dateOfBirth;
+    private final LocalDate dateOfBirth;
 
     private String address;
 
-    private boolean playingPiano;
+    private final boolean playingPiano;
 
     public Person(String firstName, String lastName, LocalDate dateOfBirth, boolean playingPiano) {
         this.firstName = firstName;
@@ -56,16 +57,8 @@ public class Person {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public LocalDate getDateOfBirth() {
@@ -76,30 +69,12 @@ public class Person {
         return Period.between(dateOfBirth, LocalDate.now()).getYears();
     }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
     public String getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public boolean isPlayingPiano() {
         return playingPiano;
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", address='" + address + '\'' +
-                '}';
     }
 
     public static List<Person> createTestPersonList() {
@@ -111,5 +86,30 @@ public class Person {
                 new Person("Martijn", "Ruigrok", LocalDate.of(1940, 7, 3)),
                 new Person("Henk", ZUIDERVAART, LocalDate.of(1940, 6, 3), true),
                 new Person("Ben", "Bello", LocalDate.of(1970, 6, 3)));
+    }
+
+    @Override
+    public int compareTo(Person o) {
+        return this.lastName.compareTo(o.lastName);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj || (obj instanceof Person other && Objects.equals(this.lastName, other.lastName));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lastName);
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", address='" + address + '\'' +
+                '}';
     }
 }

@@ -16,11 +16,10 @@ class RemovingWhiteSpacesAndReturnsTest {
             "camt_004_CLM_ReturnAccount_bs100.xml",
             "camt_004_CLM_ReturnAccount_bs101.xml",
             "camt_004_CLM_ReturnAccount_RABO.xml", })
-    void removeSpacesFromLinesInTextFile(String fileName) throws IOException {
+    void testRemoveSpacesFromLinesInTextFile(String fileName) throws IOException {
         String result = removingWhiteSpacesAndReturns.removeSpacesFromLinesInTextFile(fileName);
         System.out.println(result);
         assertFalse(result.isBlank());
     }
-
 
 }

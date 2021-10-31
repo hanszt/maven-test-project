@@ -15,8 +15,8 @@ class SerializerTest {
         book.setDescription("will not be saved");
         book.setCopies(25);
 
-        Serializer.serialize(book);
-        Book deserializedBook = Serializer.deserialize();
+        Serializer.serialize(book, "serialization_test");
+        Book deserializedBook = Serializer.deserialize("serialization_test");
 
         assertEquals(expectedBookName, deserializedBook.getTitle());
         assertNull(deserializedBook.getDescription());

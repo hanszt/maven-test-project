@@ -190,12 +190,12 @@ class MyCollectorsTest {
 
     @Test
     void testBranchingToBigDecimalSummaryStatistics() {
-        final var sampleBankAccountList = TestSampleGenerator.createSampleBankAccountListContainingNulls();
+        final var sampleBankAccountListContainingNulls = TestSampleGenerator.createSampleBankAccountListContainingNulls();
 
-        final var expected = sampleBankAccountList.stream()
+        final var expected = sampleBankAccountListContainingNulls.stream()
                 .collect(BigDecimalCollectors.summarizingBigDecimal(BankAccount::getBalance));
 
-        final var actual = sampleBankAccountList.stream()
+        final var actual = sampleBankAccountListContainingNulls.stream()
                 .collect(branching(
                         counting(),
                         BigDecimalCollectors.summingBigDecimal(BankAccount::getBalance),
@@ -297,7 +297,6 @@ class MyCollectorsTest {
         List<BankAccount> actualBankaccountList = IntStream.range(0, NR_OF_ACCOUNTS)
                 .boxed()
                 .collect(multiMappingToList(MyCollectorsTest::toBankAccount));
-
 
         assertEquals(actualBankaccountList.size(), expectedBankAccounts.size());
         assertEquals(actualBankaccountList, expectedBankAccounts);

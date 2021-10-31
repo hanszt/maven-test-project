@@ -10,23 +10,20 @@ import java.io.ObjectOutputStream;
 
 public final class Serializer {
 
-    private static final String TEST_FILE_NAME = "serialization_test";
-
     private Serializer() {
     }
 
-    public static void serialize(Book book) throws IOException {
-        try (var file = new FileOutputStream(TEST_FILE_NAME)) {
-            var out = new ObjectOutputStream(file);
+    public static void serialize(Book book, String destinationFileName) throws IOException {
+        try (var fileOutputStream = new FileOutputStream(destinationFileName);
+             var out = new ObjectOutputStream(fileOutputStream)) {
             out.writeObject(book);
-            out.close();
         }
     }
 
-    public static Book deserialize() {
-        try (var file = new FileInputStream(TEST_FILE_NAME);
-              var in = new ObjectInputStream(file)) {
-            return (Book) in.readObject();
+    public static Book deserialize(String fileName) {
+        try (var fileInputStream = new FileInputStream(fileName);
+             var objectInputStream = new ObjectInputStream(fileInputStream)) {
+            return (Book) objectInputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new IllegalStateException(e);
         }

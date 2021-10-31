@@ -6,7 +6,6 @@ import org.hzt.model.Painter;
 import org.hzt.model.Painting;
 import org.junit.jupiter.api.Test;
 
-import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +46,7 @@ class EntryStreamUtilsTest {
         groupedByCategoryMap.entrySet().forEach(System.out::println);
 
         final var expectedMap = groupedByCategoryMap.entrySet().stream()
-                .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), Set.copyOf(e.getValue())))
+                .map(e -> Map.entry(e.getKey(), Set.copyOf(e.getValue())))
                 .filter(e -> e.getKey() != null && (e.getKey().startsWith("E") || e.getKey().startsWith("F")))
                 .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
                 .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));

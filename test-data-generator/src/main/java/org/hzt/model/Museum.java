@@ -4,11 +4,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
-public class Museum {
+public class Museum implements Comparable<Museum>, Iterable<Painting> {
 
     private final String name;
     private final LocalDate dateOfOpening;
@@ -52,11 +54,38 @@ public class Museum {
     }
 
     public void toDatesOfBirthPainters(Consumer<LocalDate> dateOfBirthConsumer) {
-        paintingList.stream()
+        toPainterDateOfBirthStream()
+                .forEach(dateOfBirthConsumer);
+    }
+
+    public Stream<LocalDate> toPainterDateOfBirthStream() {
+        return paintingList.stream()
                 .map(Painting::painter)
                 .map(Painter::getDateOfBirth)
-                .filter(Objects::nonNull)
-                .forEach(dateOfBirthConsumer);
+                .filter(Objects::nonNull);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this == o || (o instanceof Museum museum &&
+                Objects.equals(name, museum.name) &&
+                Objects.equals(dateOfOpening, museum.dateOfOpening) &&
+                Objects.equals(mostPopularPainting, museum.mostPopularPainting));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, dateOfOpening, mostPopularPainting);
+    }
+
+    @Override
+    public int compareTo(Museum o) {
+        return name.compareTo(o.getName());
+    }
+
+    @Override
+    public Iterator<Painting> iterator() {
+        return paintingList.iterator();
     }
 
     @Override

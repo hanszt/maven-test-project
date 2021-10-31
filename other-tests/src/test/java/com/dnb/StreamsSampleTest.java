@@ -15,7 +15,6 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.MonthDay;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -108,7 +107,7 @@ class StreamsSampleTest {
                 .map(String::valueOf)
                 .toList();
 
-        final var result = StreamsSample.returnListFromIterator(iterator)
+        final var result = StreamsSample.returnStreamFromIterator(iterator)
                 .map(String::valueOf)
                 .toList();
 
@@ -252,7 +251,7 @@ class StreamsSampleTest {
 
         final var expected = museumList.stream()
                 .collect(groupingBy(museum -> museum.getPaintingList().size(),
-                        flatMappingToList(StreamsSampleTest::toDatesOfBirthPainters)));
+                        flatMappingToList(Museum::toPainterDateOfBirthStream)));
 
         final var actual = museumList.stream()
                 .collect(groupingBy(museum -> museum.getPaintingList().size(),
@@ -261,12 +260,6 @@ class StreamsSampleTest {
         System.out.println(actual);
 
         assertEquals(expected, actual);
-    }
-
-    private static Stream<? extends LocalDate> toDatesOfBirthPainters(Museum museum) {
-        List<LocalDate> localDates = new ArrayList<>();
-        museum.toDatesOfBirthPainters(localDates::add);
-        return localDates.stream();
     }
 
 }

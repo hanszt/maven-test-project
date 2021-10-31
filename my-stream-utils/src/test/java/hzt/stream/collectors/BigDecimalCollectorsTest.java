@@ -66,13 +66,13 @@ class BigDecimalCollectorsTest {
         final var expected = bigDecimalStatistics.getStandardDeviation();
 
         final var standarDeviationBalances = sampleBankAccountList.stream()
-                .collect(standarDeviatingBigDecimal(BankAccount::getBalance));
+                .collect(standardDeviatingBigDecimal(BankAccount::getBalance));
 
         System.out.println("bigDecimalStatistics = " + bigDecimalStatistics);
         System.out.println("doubleStatistics = " + doubleStatistics);
 
         assertEquals(expected, standarDeviationBalances);
-        assertEquals(expectedStandardDeviationFromDouble, standarDeviationBalances.setScale(2, RoundingMode.HALF_UP));
+        assertEquals(expectedStandardDeviationFromDouble, standarDeviationBalances);
     }
 
     @Test
@@ -80,6 +80,11 @@ class BigDecimalCollectorsTest {
         final var sampleBankAccountList = TestSampleGenerator.createSampleBankAccountList();
         System.out.println("Sample bankaccountList:");
         sampleBankAccountList.forEach(System.out::println);
+
+        final var sumAsDouble = sampleBankAccountList.stream()
+                .map(BankAccount::getBalance)
+                .mapToDouble(BigDecimal::doubleValue)
+                .sum();
 
         final var bigDecimalSummaryStatistics = sampleBankAccountList.stream()
                 .collect(summarizingBigDecimal(BankAccount::getBalance));
@@ -91,6 +96,7 @@ class BigDecimalCollectorsTest {
 
         final var expected = bigDecimalSummaryStatistics.getSum();
         assertEquals(sum, expected);
+        assertEquals(sumAsDouble, sum.doubleValue());
     }
 
     @Test

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CollectionsTest {
@@ -15,6 +16,6 @@ class CollectionsTest {
         Map<String, String> map = new HashMap<>();
         map.putAll(Map.of("Key", "Value"));
         map.putAll(Collections.emptyMap());
-        assertTrue(map.size() == 1);
+        assertEquals(1, map.size());
     }
 }

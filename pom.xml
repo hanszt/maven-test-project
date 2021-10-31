@@ -21,27 +21,29 @@
 
     <properties>
         <java.version>17</java.version>
-        <!--plugins-->
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+        <coverage.target>50%</coverage.target>
         <!--        dependencies-->
+
         <!--        logging-->
-        <slf4j.version>1.7.32</slf4j.version>
         <log4j.version>2.14.1</log4j.version>
         <!--        test-->
-        <junit.jupiter.version>5.7.2</junit.jupiter.version>
-        <mockito.version>3.12.4</mockito.version>
+        <junit.jupiter.version>5.8.1</junit.jupiter.version>
+        <mockito.version>4.0.0</mockito.version>
         <awaitility.version>4.1.0</awaitility.version>
         <!--        utils-->
-        <commons-beanutils.version>20030211.134440</commons-beanutils.version>
-        <guava.version>30.1.1-jre</guava.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
+        <guava.version>31.0.1-jre</guava.version>
         <tomcat-embed-core.version>9.0.52</tomcat-embed-core.version>
         <!--        reactive-streams-->
         <reactive-streams-tck.version>1.0.3</reactive-streams-tck.version>
         <rxjava.version>3.1.1</rxjava.version>
-        <spring-boot-starter-webflux.version>2.5.4</spring-boot-starter-webflux.version>
+        <spring-boot-starter-webflux.version>2.5.5</spring-boot-starter-webflux.version>
         <scala.binary.version>2.13</scala.binary.version>
         <akka.version>2.6.16</akka.version>
+        <!--plugins-->
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -91,6 +93,7 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -109,6 +112,8 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
+            <!--            be careful updating this version-->
+            <!--suppress MavenPackageUpdate -->
             <version>${commons-beanutils.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
@@ -136,8 +141,33 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <!--                https://www.baeldung.com/jacoco -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -147,11 +177,13 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
             </plugin>
+
         </plugins>
 
     </build>

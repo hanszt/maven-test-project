@@ -1,8 +1,11 @@
 package hzt.stream.utils;
 
+import hzt.stream.StreamUtils;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public final class MyCollections {
@@ -20,5 +23,9 @@ public final class MyCollections {
             }
         }
         return common;
+    }
+
+    public static <E> List<E> listOfIterable(Iterable<E> iterable) {
+        return StreamUtils.streamOf(iterable).toList();
     }
 }

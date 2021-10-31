@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -19,18 +20,15 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static hzt.stream.StreamUtils.*;
-import static hzt.stream.predicates.StringPredicates.contains;
-import static hzt.stream.predicates.StringPredicates.containsNoneOf;
-import static hzt.stream.predicates.StringPredicates.hasEqualLength;
-import static hzt.stream.predicates.StringPredicates.startsWith;
+import static hzt.stream.predicates.DateTimePredicates.isBefore;
+import static hzt.stream.predicates.StringPredicates.*;
 import static java.util.Comparator.comparing;
-import static java.util.function.Predicate.isEqual;
-import static java.util.function.Predicate.not;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static java.util.function.Predicate.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class StreamUtilsTest {
+
+    public static final int AMOUNT = 10_000_000;
 
     /**
      * combineAll and composeAll have exactly the same effect
@@ -124,24 +122,30 @@ class StreamUtilsTest {
     @Test
     void testCombineComparators() {
         var bookList = TestSampleGenerator.createBookList();
+
         final var expected = bookList.stream()
                 .sorted(comparing(Book::getCategory).reversed().thenComparing(Book::getTitle))
                 .toList();
+
         final var actual = bookList.stream()
                 .sorted(sequential(comparing(Book::getCategory).reversed(), comparing(Book::getTitle)))
                 .toList();
+
         assertEquals(expected, actual);
     }
 
     @Test
     void testComparatorsThenComparing() {
         var bookList = TestSampleGenerator.createBookList();
+
         final var expected = bookList.stream()
                 .sorted(comparing(book -> book.getCategory() + book.getTitle()))
                 .toList();
+
         final var actual = bookList.stream()
                 .sorted(comparing(Book::getCategory).thenComparing(Book::getTitle))
                 .toList();
+
         assertEquals(expected, actual);
     }
 
@@ -150,25 +154,31 @@ class StreamUtilsTest {
         var books = TestSampleGenerator.createBookList();
         final var E = "e";
         final var A = "u";
+
         final var expected = books.stream()
                 .filter(book -> !(book.getTitle().contains(E) || book.getTitle().contains(A)))
                 .toList();
+
         final var filteredBookList = books.stream()
                 .filter(by(Book::getTitle, containsNoneOf(E, A)))
                 .toList();
+
         filteredBookList.forEach(System.out::println);
+
         assertEquals(expected, filteredBookList);
     }
 
     @Test
     void testCompose() {
         var books = TestSampleGenerator.createBookList();
+
         final var fieldListOfObjectClass = books.stream()
                 .map(function(Object::getClass)
                         .compose(Book::getCategory)
                         .andThen(Class::getDeclaredFields))
                 .flatMap(Arrays::stream)
                 .toList();
+
         fieldListOfObjectClass.forEach(System.out::println);
         assertFalse(fieldListOfObjectClass.isEmpty());
     }
@@ -176,24 +186,93 @@ class StreamUtilsTest {
     @Test
     void testChainingAPredicate() {
         var books = TestSampleGenerator.createBookList();
+
         final var filteredBookList = books.stream()
                 .filter(by(Book::hasCopies).or(Book::isAboutProgramming))
                 .toList();
+
         filteredBookList.forEach(System.out::println);
+
         assertEquals(2, filteredBookList.size());
     }
 
     @Test
     void testChainingMultipleBy() {
         var books = TestSampleGenerator.createBookList();
+
         final var expected = books.stream()
                 .filter(book -> book.getTitle().startsWith("t") && book.getCategory().contains("2"))
                 .toList();
+
         final var filteredBookList = books.stream()
                 .filter(by(Book::getTitle, startsWith("t")).and(by(Book::getCategory, contains("2"))))
                 .toList();
+
         filteredBookList.forEach(System.out::println);
         assertEquals(expected, filteredBookList);
+    }
+
+    @Test
+    void testCastIfInstanceUsingFlatMap() {
+        final BigDecimal bigDecimal = BigDecimal.valueOf(3);
+        List<Number> numbers = Arrays.asList(3D, 3, 4F, 5.4, 6, bigDecimal, null);
+
+        final var actual = numbers.stream()
+                .flatMap(castIfInstance(Double.class))
+                .toList();
+
+        assertEquals(List.of(3D, 5.4), actual);
+    }
+
+    @Test
+    void testCastIfInstanceUsingMapMulti() {
+        List<Number> numbers = Arrays.asList(3D, 3, 4F, 5.4, 6, BigDecimal.valueOf(3), null);
+
+        final List<Double> actual = numbers.stream()
+                .mapMulti(castIfInstanceOf(Double.class))
+                .toList();
+
+        assertEquals(List.of(3D, 5.4), actual);
+    }
+
+    @Test
+    void testNumberCastIfInstanceUsingFlatMap() {
+        List<Number> numbers = TestSampleGenerator.createRandomNumberTypeList(AMOUNT);
+
+        final var expected = numbers.stream()
+                .filter(Double.class::isInstance)
+                .map(Double.class::cast)
+                .toList();
+
+        final var actual = numbers.stream()
+                .flatMap(castIfInstance(Double.class))
+                .toList();
+
+        System.out.println("numbers.size() = " + numbers.size());
+        System.out.println("actual.size() = " + actual.size());
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testNumberCastIfInstanceUsingMultiMap() {
+        List<Number> numbers = TestSampleGenerator.createNumberTypeList(AMOUNT);
+
+        final var numberClass = Integer.class;
+
+        final var expected = numbers.stream()
+                .filter(numberClass::isInstance)
+                .map(numberClass::cast)
+                .toList();
+
+        final var actual = numbers.stream()
+                .mapMulti(castIfInstanceOf(numberClass))
+                .toList();
+
+        System.out.println("numbers.size() = " + numbers.size());
+        System.out.println("actual.size() = " + actual.size());
+
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -205,7 +284,7 @@ class StreamUtilsTest {
                 .map(BigDecimal::valueOf)
                 .toList();
         //act
-        List<BigDecimal> result = combineToStream(list1, list2, StreamUtilsTest::difference)
+        List<BigDecimal> result = StreamUtils.combineToStream(list1, list2, StreamUtilsTest::difference)
                 .map(BigDecimal::valueOf)
                 .map(bigDecimal -> bigDecimal.setScale(1, RoundingMode.HALF_UP))
                 .toList();
@@ -297,17 +376,17 @@ class StreamUtilsTest {
                 new Museum("", null, List.of(paintingContainingNulls)),
                 null);
 
-        final var museums = TestSampleGenerator.createMuseumList();
-        final var concatenatedList = Stream.concat(listContainingNestedNulls.stream(), museums.stream())
+        final var expected = TestSampleGenerator.createMuseumList();
+        final var containingNulls = Stream.concat(listContainingNestedNulls.stream(), expected.stream())
                 .toList();
 
-        System.out.println("concatenatedList = " + concatenatedList);
+        System.out.println("containingNulls = " + containingNulls);
 
-        final var containingNullsFilteredOutList = concatenatedList.stream()
+        final var actual = containingNulls.stream()
                 .filter(nonNull(Museum::getMostPopularPainting, Painting::painter, Painter::getDateOfBirth))
                 .toList();
 
-        assertEquals(museums, containingNullsFilteredOutList);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -353,7 +432,7 @@ class StreamUtilsTest {
                 .toList();
 
         final var listOfDayOfWeekBirthDateMostPopularPaintingPainters = concatenatedMuseumList.stream()
-                .flatMap(iterableNullSafe(Museum::getPaintingList))
+                .flatMap(StreamUtils::streamOf)
                 .flatMap(nullSafe(
                         Painting::painter,
                         Painter::getDateOfBirth,
@@ -381,7 +460,7 @@ class StreamUtilsTest {
                 .map(LocalDate::getDayOfWeek)
                 .toList();
 
-        final var listOfDayOfWeekBirthDateMostPopularPaintingPainters = concatenatedMuseumList.stream()
+        final var actual = concatenatedMuseumList.stream()
                 .flatMap(nullSafe(
                         Museum::getMostPopularPainting,
                         Painting::painter,
@@ -396,8 +475,8 @@ class StreamUtilsTest {
 
         System.out.println("expectedDaysOfWeek = " + expectedDaysOfWeek);
 
-        assertEquals(expectedDaysOfWeek, listOfDayOfWeekBirthDateMostPopularPaintingPainters);
-        assertEquals(expected, listOfDayOfWeekBirthDateMostPopularPaintingPainters);
+        assertEquals(expectedDaysOfWeek, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -446,6 +525,24 @@ class StreamUtilsTest {
         final var museums = TestSampleGenerator.createMuseumList();
         return Stream.concat(listContainingNestedNulls.stream(), museums.stream())
                 .toList();
+    }
+
+    @Test
+    void testStreamOfIterable() {
+        final Painter hans = new Painter("Hans", "Zuidervaart", LocalDate.of(1989, Month.OCTOBER, 18));
+        final Painting my_creation = new Painting("My creation at 5", hans, Year.of(1994), false);
+        final Painting my_other_creation = new Painting("My other creation at 7", hans, Year.of(1997), false);
+
+        hans.addPaintings(my_creation, my_other_creation);
+
+        final List<String> names = streamOf(hans)
+                .filter(by(Painting::yearOfCreation, isBefore(1995)))
+                .map(Painting::name)
+                .toList();
+
+        names.forEach(System.out::println);
+
+        assertEquals(1, names.size());
     }
 
 }

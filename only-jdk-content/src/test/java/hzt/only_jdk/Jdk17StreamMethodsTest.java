@@ -38,9 +38,15 @@ class Jdk17StreamMethodsTest {
                 .<LocalDate>mapMulti(Optional::ifPresent)
                 .toList();
 
+        final List<LocalDate> dates2 = paintingList.stream()
+                .map(Painting::painter)
+                .mapMulti(Painter::getDateOfDeathIfPresent)
+                .toList();
+
         System.out.println("dates = " + dates);
         //assert
         assertEquals(expectedDates, dates);
+        assertEquals(dates, dates2);
     }
 
     @Test

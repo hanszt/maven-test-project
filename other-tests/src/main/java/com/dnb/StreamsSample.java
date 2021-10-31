@@ -14,7 +14,7 @@ final class StreamsSample {
     private StreamsSample() {
     }
 
-    public static Stream<Integer> returnListFromIterator(Iterator<Integer> iterator) {
+    public static Stream<Integer> returnStreamFromIterator(Iterator<Integer> iterator) {
         Iterable<Integer> iterable = () -> iterator;
         return StreamSupport.stream(iterable.spliterator(), false);
     }

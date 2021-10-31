@@ -1,5 +1,7 @@
 package hzt.stream.predicates;
 
+import hzt.stream.StreamUtils;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
@@ -7,6 +9,11 @@ import java.util.function.Predicate;
 public final class CollectionPredicates {
 
     private CollectionPredicates() {
+    }
+
+    public static <E> Predicate<Collection<E>> containsAll(Iterable<E> other) {
+        return collection -> collection != null && other != null && StreamUtils.streamOf(other)
+                .allMatch(collection::contains);
     }
 
     public static <E> Predicate<Collection<E>> containsAll(Collection<E> other) {
@@ -18,8 +25,9 @@ public final class CollectionPredicates {
         return containsAll(List.of(values));
     }
 
-    public static <E> Predicate<Collection<E>> containsAny(Collection<E> other) {
-        return collection -> collection != null && other != null && other.stream().anyMatch(collection::contains);
+    public static <E> Predicate<Collection<E>> containsAny(Iterable<E> other) {
+        return collection -> collection != null && other != null && StreamUtils.streamOf(other)
+                .anyMatch(collection::contains);
     }
 
     @SafeVarargs
@@ -27,8 +35,9 @@ public final class CollectionPredicates {
         return containsAny(List.of(values));
     }
 
-    public static <E> Predicate<Collection<E>> containsNone(Collection<E> other) {
-        return collection -> collection != null && other != null && other.stream().noneMatch(collection::contains);
+    public static <E> Predicate<Collection<E>> containsNone(Iterable<E> other) {
+        return collection -> collection != null && other != null && StreamUtils.streamOf(other)
+                .noneMatch(collection::contains);
     }
 
     @SafeVarargs

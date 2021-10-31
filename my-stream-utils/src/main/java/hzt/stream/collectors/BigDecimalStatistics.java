@@ -43,9 +43,10 @@ public final class BigDecimalStatistics extends BigDecimalSummaryStatistics {
 
     public BigDecimal getStandardDeviation(int scale, RoundingMode roundingMode, MathContext mathContext) {
         final BigDecimal average = getAverage(scale, roundingMode);
-        return getCount() > 0 ?
+        final BigDecimal stdDeviation = getCount() > 0 ?
                 ((getSumOfSquare().divide(BigDecimal.valueOf(getCount()), scale, roundingMode))
-                        .subtract(average.multiply(average))).sqrt(mathContext) : BigDecimal.ZERO;
+                .subtract(average.multiply(average))).sqrt(mathContext) : BigDecimal.ZERO;
+        return stdDeviation.setScale(scale, roundingMode);
     }
 
     @Override

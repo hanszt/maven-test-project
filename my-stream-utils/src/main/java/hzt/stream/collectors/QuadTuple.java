@@ -33,16 +33,11 @@ public final class QuadTuple<R1, R2, R3, R4> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj instanceof QuadTuple<?, ?, ?, ?> that) {
-            return Objects.equals(this.first, that.first) &&
-                    Objects.equals(this.second, that.second) &&
-                    Objects.equals(this.third, that.third) &&
-                    Objects.equals(this.fourth, that.fourth);
-        }
-        return false;
+        return obj == this || (obj instanceof QuadTuple<?, ?, ?, ?> that &&
+                Objects.equals(this.first, that.first) &&
+                Objects.equals(this.second, that.second) &&
+                Objects.equals(this.third, that.third) &&
+                Objects.equals(this.fourth, that.fourth));
     }
 
     @Override
