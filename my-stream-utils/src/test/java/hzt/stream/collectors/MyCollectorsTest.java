@@ -285,7 +285,7 @@ class MyCollectorsTest {
 
     @Test
     void testMultiMappingLargeStream() {
-        final int NR_OF_ACCOUNTS = 5_000_000;
+        final int NR_OF_ACCOUNTS = 1_000_000;
 
         final List<BankAccount> expectedBankAccounts = IntStream.range(0, NR_OF_ACCOUNTS)
                 .boxed()

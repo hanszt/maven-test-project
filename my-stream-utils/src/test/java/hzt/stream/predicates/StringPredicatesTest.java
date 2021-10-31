@@ -8,7 +8,6 @@ import java.util.List;
 
 import static hzt.stream.StreamUtils.by;
 import static hzt.stream.predicates.StringPredicates.*;
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StringPredicatesTest {
@@ -90,13 +89,17 @@ class StringPredicatesTest {
     void testHasEqualLength() {
         final String NAME = "Meisje met de parel";
         final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
+
         final List<Painting> expected = paintingList.stream()
                 .filter(painting -> painting.name().length() == NAME.length())
-                .collect(toList());
+                .toList();
+
         final List<Painting> result = paintingList.stream()
                 .filter(by(Painting::name, hasEqualLength(NAME)))
-                .collect(toList());
+                .toList();
+
         result.forEach(System.out::println);
+
         assertEquals(expected, result);
     }
 
@@ -127,6 +130,7 @@ class StringPredicatesTest {
         final String HOED = "hoed";
         final String NON = "non";
         final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
+
         final List<Painting> expected = paintingList.stream()
                 .filter(painting -> painting.name().contains(EL) || painting.name().contains(HOED) || painting.name().contains(NON))
                 .toList();

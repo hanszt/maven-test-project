@@ -37,6 +37,7 @@ class StreamUtilsTest {
     void testHigherOrderFunctionCombinerAndComposerUsingColor() {
         //arrange
         final var originalColor = new Color(123, 32, 21);
+
         Function<Color, Color> combinedFilter = combine(
                 Color::brighter,
                 StreamUtilsTest::maxRed,
@@ -49,6 +50,7 @@ class StreamUtilsTest {
         //act
         final var colorByCombinedFilter = combinedFilter.apply(originalColor);
         final var colorByComposedFilter = composedFilter.apply(originalColor);
+
         System.out.println("originalColor = " + originalColor);
         System.out.println("colorByCombinedFilter = " + colorByCombinedFilter);
         System.out.println("colorByComposedFilter = " + colorByComposedFilter);
@@ -71,6 +73,7 @@ class StreamUtilsTest {
     @Test
     void testCombinePredicateUsingOrEvaluatesToTrue() {
         final var strings = new String[]{"hallo", "hoe", "gaat", "het", "met", "jou", "?"};
+
         assertEquals(strings.length, Stream.of(strings)
                 .filter(anyMatch(
                         contains("h"),
@@ -108,14 +111,18 @@ class StreamUtilsTest {
     @Test
     void testCombinePredicateUsingAndEvaluatesToFalse() {
         final var TEST = "Dit is één fout";
-        assertEquals(TEST, Stream.of(TEST, "?!", "Dan ", "is", "'t", "prima")
+
+        final String anyString = Stream.of(TEST, "?!", "Dan ", "is", "'t", "prima")
                 .filter(allMatch(
                         startsWith("D"),
                         contains("s"),
                         contains("é"),
                         not(contains("raar")),
                         hasEqualLength(TEST.length())))
-                .findAny().orElse(""));
+                .findAny()
+                .orElse("");
+
+        assertEquals(TEST, anyString);
         assertFalse(isEqual("Hallo").or(isEqual("Raar")).test("f"));
     }
 
@@ -180,6 +187,7 @@ class StreamUtilsTest {
                 .toList();
 
         fieldListOfObjectClass.forEach(System.out::println);
+
         assertFalse(fieldListOfObjectClass.isEmpty());
     }
 
@@ -209,6 +217,7 @@ class StreamUtilsTest {
                 .toList();
 
         filteredBookList.forEach(System.out::println);
+
         assertEquals(expected, filteredBookList);
     }
 
@@ -280,6 +289,7 @@ class StreamUtilsTest {
         //arrange
         List<Double> list1 = Arrays.asList(1.0d, 2.1d, 3.3d, 5.3);
         List<Double> list2 = Arrays.asList(0.1d, 0.2d, 4d);
+
         final var expected = Stream.of(.9, 1.9, -.7)
                 .map(BigDecimal::valueOf)
                 .toList();
@@ -297,6 +307,7 @@ class StreamUtilsTest {
         //arrange
         List<Double> list1 = Arrays.asList(1.0d, 2.1d, 3.3d, 5.3);
         List<Double> list2 = Arrays.asList(0.1d, 0.2d, 4d);
+
         final var expected = Stream.of(.9, 1.9, -.7)
                 .map(BigDecimal::valueOf)
                 .toList();
