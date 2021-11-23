@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.maven-test-project</groupId>
         <artifactId>maven-test-project</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.2</version>
     </parent>
 
     <artifactId>other-tests</artifactId>
@@ -22,13 +22,13 @@
         <dependency>
             <groupId>org.maven-test-project</groupId>
             <artifactId>my-stream-utils</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.maven-test-project</groupId>
             <artifactId>test-data-generator</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.2</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

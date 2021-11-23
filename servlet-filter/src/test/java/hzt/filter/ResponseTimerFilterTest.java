@@ -1,37 +1,35 @@
 package hzt.filter;
 
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.SessionTrackingMode;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.Part;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterRegistration;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletRegistration;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.SessionCookieConfig;
-import javax.servlet.SessionTrackingMode;
-import javax.servlet.descriptor.JspConfigDescriptor;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.Part;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Principal;
 import java.util.Collection;
@@ -47,10 +45,10 @@ class ResponseTimerFilterTest {
         System.out.println("Filter chain executed called via method reference");
     }
 
-    private static void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) {
+    private static void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) {
         System.out.println("Executing do filter via method reference...");
         try {
-            filterChain.doFilter(servletRequest, servletResponse);
+            filterChain.doFilter(request, response);
         } catch (IOException | ServletException e) {
             throw new IllegalStateException();
         }
@@ -61,12 +59,12 @@ class ResponseTimerFilterTest {
     void testDoFilter() throws ServletException, IOException {
         Filter lambdaFilter = ResponseTimerFilterTest::doFilter;
         ResponseTimerFilter filter = new ResponseTimerFilter();
-        final HttpServletRequest servletRequest = getHttpServletRequest();
-        final ServletResponse servletResponse = getServletResponse();
+        final var request = getHttpServletRequest();
+        final var response = getServletResponse();
 
-        lambdaFilter.doFilter(servletRequest, servletResponse, ResponseTimerFilterTest::executeFilterChain);
+        lambdaFilter.doFilter(request, response, ResponseTimerFilterTest::executeFilterChain);
         Assertions.assertThrows(NullPointerException.class, () ->
-                filter.doFilter(servletRequest, servletResponse, ResponseTimerFilterTest::executeFilterChain));
+                filter.doFilter(request, response, ResponseTimerFilterTest::executeFilterChain));
     }
 
     private ServletResponse getServletResponse() {
@@ -82,12 +80,12 @@ class ResponseTimerFilterTest {
             }
 
             @Override
-            public ServletOutputStream getOutputStream() throws IOException {
+            public ServletOutputStream getOutputStream(){
                 return null;
             }
 
             @Override
-            public PrintWriter getWriter() throws IOException {
+            public PrintWriter getWriter() {
                 return null;
             }
 
@@ -122,7 +120,7 @@ class ResponseTimerFilterTest {
             }
 
             @Override
-            public void flushBuffer() throws IOException {
+            public void flushBuffer() {
 
             }
 
@@ -286,32 +284,32 @@ class ResponseTimerFilterTest {
             }
 
             @Override
-            public boolean authenticate(HttpServletResponse httpServletResponse) throws IOException, ServletException {
+            public boolean authenticate(HttpServletResponse httpServletResponse) {
                 return false;
             }
 
             @Override
-            public void login(String s, String s1) throws ServletException {
+            public void login(String s, String s1)  {
 
             }
 
             @Override
-            public void logout() throws ServletException {
+            public void logout() {
 
             }
 
             @Override
-            public Collection<Part> getParts() throws IOException, ServletException {
+            public Collection<Part> getParts() {
                 return null;
             }
 
             @Override
-            public Part getPart(String s) throws IOException, ServletException {
+            public Part getPart(String s) {
                 return null;
             }
 
             @Override
-            public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) throws IOException, ServletException {
+            public <T extends HttpUpgradeHandler> T upgrade(Class<T> aClass) {
                 return null;
             }
 
@@ -331,7 +329,7 @@ class ResponseTimerFilterTest {
             }
 
             @Override
-            public void setCharacterEncoding(String s) throws UnsupportedEncodingException {
+            public void setCharacterEncoding(String s) {
 
             }
 
@@ -351,7 +349,7 @@ class ResponseTimerFilterTest {
             }
 
             @Override
-            public ServletInputStream getInputStream() throws IOException {
+            public ServletInputStream getInputStream() {
                 return null;
             }
 
@@ -396,7 +394,7 @@ class ResponseTimerFilterTest {
             }
 
             @Override
-            public BufferedReader getReader() throws IOException {
+            public BufferedReader getReader() {
                 return null;
             }
 
@@ -509,7 +507,7 @@ class ResponseTimerFilterTest {
                     }
 
                     @Override
-                    public URL getResource(String s) throws MalformedURLException {
+                    public URL getResource(String s) {
                         return null;
                     }
 
@@ -529,7 +527,7 @@ class ResponseTimerFilterTest {
                     }
 
                     @Override
-                    public Servlet getServlet(String s) throws ServletException {
+                    public Servlet getServlet(String s) {
                         return null;
                     }
 
@@ -629,7 +627,7 @@ class ResponseTimerFilterTest {
                     }
 
                     @Override
-                    public <T extends Servlet> T createServlet(Class<T> aClass) throws ServletException {
+                    public <T extends Servlet> T createServlet(Class<T> aClass) {
                         return null;
                     }
 
@@ -659,7 +657,7 @@ class ResponseTimerFilterTest {
                     }
 
                     @Override
-                    public <T extends Filter> T createFilter(Class<T> aClass) throws ServletException {
+                    public <T extends Filter> T createFilter(Class<T> aClass) {
                         return null;
                     }
 
@@ -709,7 +707,7 @@ class ResponseTimerFilterTest {
                     }
 
                     @Override
-                    public <T extends EventListener> T createListener(Class<T> aClass) throws ServletException {
+                    public <T extends EventListener> T createListener(Class<T> aClass) {
                         return null;
                     }
 

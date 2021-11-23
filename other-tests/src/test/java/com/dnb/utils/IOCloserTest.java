@@ -30,9 +30,9 @@ class IOCloserTest {
 
     @Test
     void testOneOfCloseMethodsThrowingException() {
-        ResourceNotImplementingClosable resource1 = new ResourceNotImplementingClosable("Resource 1");
-        ResourceNotImplementingClosable resource2 = new ResourceNotImplementingClosable("Resource 2");
-        ResourceNotImplementingClosable resource3 = new ResourceNotImplementingClosable("Resource 3");
+        var resource1 = new ResourceNotImplementingClosable("Resource 1");
+        var resource2 = new ResourceNotImplementingClosable("Resource 2");
+        var resource3 = new ResourceNotImplementingClosable("Resource 3");
         try (var ioCloser = new IOCloser()) {
             resource1.load();
             ioCloser.addCloseFunctions(resource1::close, resource2::closeThrowingException, resource3::close);

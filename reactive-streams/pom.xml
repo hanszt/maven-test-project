@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.maven-test-project</groupId>
         <artifactId>maven-test-project</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.2</version>
     </parent>
 
     <artifactId>reactive-streams</artifactId>

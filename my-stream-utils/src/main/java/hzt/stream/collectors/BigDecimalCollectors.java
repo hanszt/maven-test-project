@@ -75,6 +75,10 @@ public final class BigDecimalCollectors {
         return getBigDecimalStatisticsCollectorImpl(toBigDecimalMapper, BigDecimalStatistics::getStatistics, CH_ID);
     }
 
+    public static Collector<BigDecimal, BigDecimalStatistics, BigDecimalStatistics> toBigDecimalStatistics() {
+        return getBigDecimalStatisticsCollectorImpl(Function.identity(), BigDecimalStatistics::getStatistics, CH_ID);
+    }
+
     public static <T> Collector<T, BigDecimalStatistics, BigDecimal> standardDeviatingBigDecimal(
             Function<? super T, BigDecimal> toBigDecimalMapper) {
         return getBigDecimalStatisticsCollectorImpl(toBigDecimalMapper, BigDecimalStatistics::getStandardDeviation, CH_NOID);
@@ -84,6 +88,16 @@ public final class BigDecimalCollectors {
             Function<? super T, BigDecimal> toBigDecimalMapper, int scale, RoundingMode roundingMode) {
         return getBigDecimalStatisticsCollectorImpl(toBigDecimalMapper,
                 bigDecimalStatistics -> bigDecimalStatistics.getStandardDeviation(scale, roundingMode), CH_NOID);
+    }
+
+    public static Collector<BigDecimal, BigDecimalStatistics, BigDecimal> toStandardDeviation(int scale, RoundingMode roundingMode) {
+        return getBigDecimalStatisticsCollectorImpl(Function.identity(),
+                bigDecimalStatistics -> bigDecimalStatistics.getStandardDeviation(scale, roundingMode), CH_NOID);
+    }
+
+    public static Collector<BigDecimal, BigDecimalStatistics, BigDecimal> toStandardDeviation() {
+        return getBigDecimalStatisticsCollectorImpl(Function.identity(),
+                bigDecimalStatistics -> bigDecimalStatistics.getStandardDeviation(2, RoundingMode.HALF_UP), CH_NOID);
     }
 
     private static <T, R> CollectorImpl<T, BigDecimalSummaryStatistics, R> getBigDecimalSummaryStatisticsCollectorImpl(

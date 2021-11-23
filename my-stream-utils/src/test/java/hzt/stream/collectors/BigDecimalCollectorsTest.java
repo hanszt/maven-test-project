@@ -25,8 +25,8 @@ class BigDecimalCollectorsTest {
 
         assertEquals(BigDecimal.valueOf(46502.27), bigDecimalSummaryStatistics.getAverage());
         assertEquals(BigDecimal.valueOf(232511.34), bigDecimalSummaryStatistics.getSum());
-        assertEquals(BigDecimal.valueOf(-4323),bigDecimalSummaryStatistics.getMin());
-        assertEquals(BigDecimal.valueOf(234235.34),bigDecimalSummaryStatistics.getMax());
+        assertEquals(BigDecimal.valueOf(-4323), bigDecimalSummaryStatistics.getMin());
+        assertEquals(BigDecimal.valueOf(234235.34), bigDecimalSummaryStatistics.getMax());
         assertEquals(5, bigDecimalSummaryStatistics.getCount());
     }
 
@@ -40,7 +40,7 @@ class BigDecimalCollectorsTest {
                 .collect(summarizingBigDecimal(BankAccount::getBalance));
 
         final var average = sampleBankAccountList.stream()
-                        .collect(averagingBigDecimal(BankAccount::getBalance));
+                .collect(averagingBigDecimal(BankAccount::getBalance));
 
         System.out.println("average = " + average);
 
@@ -73,6 +73,27 @@ class BigDecimalCollectorsTest {
 
         assertEquals(expected, standarDeviationBalances);
         assertEquals(expectedStandardDeviationFromDouble, standarDeviationBalances);
+    }
+
+    @Test
+    void testStatisticsFromRandomGaussianDataset() {
+        var targetMean = BigDecimal.valueOf(3);
+        var targetStdDev = BigDecimal.valueOf(4);
+
+        final var statistics = TestSampleGenerator
+                .gaussianDoubles(100_000, targetMean.doubleValue(), targetStdDev.doubleValue())
+                .mapToObj(BigDecimal::valueOf)
+                .collect(BigDecimalCollectors.toBigDecimalStatistics());
+
+        System.out.println("statistics = " + statistics);
+
+        final var standardDeviation = statistics.getStandardDeviation()
+                .setScale(1, RoundingMode.HALF_UP);
+        final var average = statistics.getAverage()
+                .setScale(1, RoundingMode.HALF_UP);
+
+        assertEquals(targetStdDev.setScale(1, RoundingMode.HALF_UP), standardDeviation);
+        assertEquals(targetMean.setScale(1, RoundingMode.HALF_UP), average);
     }
 
     @Test

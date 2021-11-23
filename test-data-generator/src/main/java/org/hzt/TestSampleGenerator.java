@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 public final class TestSampleGenerator {
@@ -63,18 +64,18 @@ public final class TestSampleGenerator {
 
         final Painting guernica = new Painting("Guernica", picasso, Year.of(1937), true);
         final Painting lesDemoiselles = new Painting("Les Demoiselles d'Avignon", picasso, Year.of(1907), true);
-        final Painting le_rêve = new Painting("Le Rêve", picasso, Year.of(1932), true);
+        final Painting le_reve = new Painting("Le Rêve", picasso, Year.of(1932), true);
         final Painting meisje_met_de_parel = new Painting("Meisje met de parel", vermeer, Year.of(1665), true);
         final Painting het_melkmeisje = new Painting("Het melkmeisje", vermeer, Year.of(1658), true);
         final Painting meisje_met_de_rode_hoed = new Painting("Meisje met de rode hoed", vermeer, Year.of(1665), true);
         final Painting lenteTuin = new Painting("Lentetuin, de pastorietuin te Nuenen in het voorjaar", vanGogh, Year.of(1884), false);
         final Painting de_sterrennacht = new Painting("De sterrennacht", vanGogh, Year.of(1889), true);
 
-        picasso.addPaintings(guernica, lesDemoiselles, le_rêve);
+        picasso.addPaintings(guernica, lesDemoiselles, le_reve);
         vermeer.addPaintings(meisje_met_de_parel, meisje_met_de_rode_hoed, het_melkmeisje);
         vanGogh.addPaintings(lenteTuin, de_sterrennacht);
 
-        return List.of(guernica, lesDemoiselles, le_rêve, meisje_met_de_parel, het_melkmeisje,
+        return List.of(guernica, lesDemoiselles, le_reve, meisje_met_de_parel, het_melkmeisje,
                 meisje_met_de_rode_hoed, lenteTuin, de_sterrennacht
         );
     }
@@ -125,6 +126,11 @@ public final class TestSampleGenerator {
         return IntStream.range(0, amount)
                 .mapToObj(TestSampleGenerator::toNumberType)
                 .toList();
+    }
+
+    public static DoubleStream gaussianDoubles(int amount, double targetMean, double targetStdDev) {
+        return IntStream.range(0, amount)
+                .mapToDouble(i -> RANDOM.nextGaussian(targetMean, targetStdDev));
     }
 
     private static Number toNumberType(int integer) {

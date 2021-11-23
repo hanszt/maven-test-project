@@ -7,7 +7,7 @@
 
     <groupId>org.maven-test-project</groupId>
     <artifactId>maven-test-project</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.2</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -29,15 +29,14 @@
         <!--        test-->
         <junit.jupiter.version>5.8.1</junit.jupiter.version>
         <mockito.version>4.0.0</mockito.version>
-        <awaitility.version>4.1.0</awaitility.version>
+        <awaitility.version>4.1.1</awaitility.version>
         <!--        utils-->
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <guava.version>31.0.1-jre</guava.version>
-        <tomcat-embed-core.version>9.0.52</tomcat-embed-core.version>
         <!--        reactive-streams-->
         <reactive-streams-tck.version>1.0.3</reactive-streams-tck.version>
         <rxjava.version>3.1.1</rxjava.version>
-        <spring-boot-starter-webflux.version>2.5.5</spring-boot-starter-webflux.version>
+        <spring-boot-starter-webflux.version>2.5.6</spring-boot-starter-webflux.version>
         <scala.binary.version>2.13</scala.binary.version>
         <akka.version>2.6.16</akka.version>
         <!--plugins-->

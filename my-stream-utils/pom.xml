@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.maven-test-project</groupId>
         <artifactId>maven-test-project</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.2</version>
     </parent>
 
     <artifactId>my-stream-utils</artifactId>
@@ -17,7 +17,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <annotations.version>22.0.0</annotations.version>
-        <test-data-generator.version>1.0-SNAPSHOT</test-data-generator.version>
+        <test-data-generator.version>1.2</test-data-generator.version>
     </properties>
 
     <dependencies>
