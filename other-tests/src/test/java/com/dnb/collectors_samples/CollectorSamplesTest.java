@@ -331,7 +331,8 @@ class CollectorSamplesTest {
         paintingNameInMuseumMap.entrySet().forEach(System.out::println);
         //assert
         final List<String> titlesOfPaintingsNotInMuseum = paintingNameInMuseumMap.get(false);
-        assertEquals(363L, maxAgeYears);
+
+        assertEquals(paintingList.stream().mapToLong(Painting::ageInYears).max().orElseThrow(), maxAgeYears);
         assertEquals(expectedAverage, averageAgePainting);
         assertEquals(1, titlesOfPaintingsNotInMuseum.size());
         assertEquals("Lentetuin, de pastorietuin te Nuenen in het voorjaar", titlesOfPaintingsNotInMuseum.get(0));

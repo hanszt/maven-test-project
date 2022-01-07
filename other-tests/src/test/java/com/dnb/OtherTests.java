@@ -91,6 +91,7 @@ class OtherTests {
                 .findAny();
     }
 
+    @SuppressWarnings("OctalInteger")
     @Test
     void testOctalValues() {
         // Integers starting with a zero are octal instead of decimal

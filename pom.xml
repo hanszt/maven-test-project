@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.maven-test-project</groupId>
+    <groupId>org.hzt.utils</groupId>
     <artifactId>maven-test-project</artifactId>
     <version>1.2</version>
     <packaging>pom</packaging>
@@ -17,18 +17,20 @@
         <module>servlet-filter</module>
         <module>my-stream-utils</module>
         <module>test-data-generator</module>
+        <module>my-utils</module>
     </modules>
 
     <properties>
         <java.version>17</java.version>
         <coverage.target>50%</coverage.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--        dependencies-->
 
         <!--        logging-->
-        <log4j.version>2.14.1</log4j.version>
+        <log4j.version>2.17.0</log4j.version>
         <!--        test-->
-        <junit.jupiter.version>5.8.1</junit.jupiter.version>
-        <mockito.version>4.0.0</mockito.version>
+        <junit.jupiter.version>5.8.2</junit.jupiter.version>
+        <mockito.version>4.2.0</mockito.version>
         <awaitility.version>4.1.1</awaitility.version>
         <!--        utils-->
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
@@ -36,9 +38,11 @@
         <!--        reactive-streams-->
         <reactive-streams-tck.version>1.0.3</reactive-streams-tck.version>
         <rxjava.version>3.1.1</rxjava.version>
-        <spring-boot-starter-webflux.version>2.5.6</spring-boot-starter-webflux.version>
+        <spring-boot-starter-webflux.version>2.6.2</spring-boot-starter-webflux.version>
         <scala.binary.version>2.13</scala.binary.version>
         <akka.version>2.6.16</akka.version>
+        <org.hzt-utils.version>1.2</org.hzt-utils.version>
+        <annotations.version>22.0.0</annotations.version>
         <!--plugins-->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
@@ -60,6 +64,42 @@
                 <artifactId>rxjava</artifactId>
                 <version>${rxjava.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.hzt.utils</groupId>
+                <artifactId>test-data-generator</artifactId>
+                <version>${org.hzt-utils.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hzt.utils</groupId>
+                <artifactId>my-stream-utils</artifactId>
+                <version>${org.hzt-utils.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>${annotations.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <!--        apache dependencies-->
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <!--            be careful updating this version-->
+                <!--suppress MavenPackageUpdate -->
+                <version>${commons-beanutils.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-webflux</artifactId>
+                <version>${spring-boot-starter-webflux.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -73,6 +113,11 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
             <version>${log4j.version}</version>
         </dependency>
         <!-- TEST SCOPE DEPENDENCIES -->
@@ -107,35 +152,11 @@
             <version>${awaitility.version}</version>
             <scope>test</scope>
         </dependency>
-        <!--        apache dependencies-->
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <!--            be careful updating this version-->
-            <!--suppress MavenPackageUpdate -->
-            <version>${commons-beanutils.version}</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
-            <version>${spring-boot-starter-webflux.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 

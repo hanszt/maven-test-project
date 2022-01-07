@@ -6,11 +6,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>maven-test-project</artifactId>
         <groupId>org.hzt.utils</groupId>
+        <artifactId>maven-test-project</artifactId>
         <version>1.2</version>
     </parent>
 
-    <artifactId>test-data-generator</artifactId>
+    <artifactId>my-utils</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hzt.utils</groupId>
+            <artifactId>test-data-generator</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

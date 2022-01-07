@@ -6,32 +6,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.maven-test-project</groupId>
+        <groupId>org.hzt.utils</groupId>
         <artifactId>maven-test-project</artifactId>
         <version>1.2</version>
     </parent>
 
     <artifactId>my-stream-utils</artifactId>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <annotations.version>22.0.0</annotations.version>
-        <test-data-generator.version>1.2</test-data-generator.version>
-    </properties>
-
     <dependencies>
         <dependency>
-            <groupId>org.maven-test-project</groupId>
+            <groupId>org.hzt.utils</groupId>
             <artifactId>test-data-generator</artifactId>
-            <version>${test-data-generator.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>${annotations.version}</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

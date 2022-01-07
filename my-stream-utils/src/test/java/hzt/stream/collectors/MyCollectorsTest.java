@@ -58,7 +58,8 @@ class MyCollectorsTest {
         System.out.println(paintingSummary);
         //assert
         final List<String> titlesOfPaintingsNotInMuseum = paintingSummary.paintingInMuseumMap.get(false);
-        assertEquals(363L, maxAgeYears);
+        final var expectedMaxAge = paintingList.stream().mapToLong(Painting::ageInYears).max().orElseThrow();
+        assertEquals(expectedMaxAge, maxAgeYears);
         assertEquals(expectedAverage, averageAgePainting);
         assertEquals(1, titlesOfPaintingsNotInMuseum.size());
         assertEquals("Lentetuin, de pastorietuin te Nuenen in het voorjaar", titlesOfPaintingsNotInMuseum.get(0));
@@ -95,7 +96,8 @@ class MyCollectorsTest {
 
         //assert
         final List<String> titlesOfPaintingsNotInMuseum = result.first().get(false);
-        assertEquals(363L, maxAgeYears);
+        final var expectedMaxAge = paintingList.stream().mapToLong(Painting::ageInYears).max().orElseThrow();
+        assertEquals(expectedMaxAge, maxAgeYears);
         assertEquals(expectedAverage, averageAgePainting);
         assertEquals(1, titlesOfPaintingsNotInMuseum.size());
         assertEquals("Lentetuin, de pastorietuin te Nuenen in het voorjaar", titlesOfPaintingsNotInMuseum.get(0));
@@ -134,7 +136,8 @@ class MyCollectorsTest {
 
         //assert
         final List<String> titlesOfPaintingsNotInMuseum = result.first().get(false);
-        assertEquals(363L, maxAgeYears);
+        final var expectedMaxAge = paintingList.stream().mapToLong(Painting::ageInYears).max().orElseThrow();
+        assertEquals(expectedMaxAge, maxAgeYears);
         assertEquals(expectedAverage, averageAgePainting);
         assertEquals(1, titlesOfPaintingsNotInMuseum.size());
         assertEquals("Lentetuin, de pastorietuin te Nuenen in het voorjaar", titlesOfPaintingsNotInMuseum.get(0));
@@ -143,12 +146,13 @@ class MyCollectorsTest {
         assertEquals(8, result.fifth());
     }
 
-    private static record PaintingSummary(
+    private record PaintingSummary(
             Map<Boolean, List<String>> paintingInMuseumMap,
             LongSummaryStatistics paintingAgeSummaryStatistics,
             List<String> paintingNameList,
             Map<Painter, List<Painting>> groupedByPainter) {
 
+        @SuppressWarnings("unused")
         public PaintingSummary(Map<Boolean, List<String>> paintingInMuseumMap,
                                LongSummaryStatistics paintingAgeSummaryStatistics) {
             this(paintingInMuseumMap, paintingAgeSummaryStatistics, Collections.emptyList());
@@ -184,7 +188,8 @@ class MyCollectorsTest {
         System.out.println(result);
 
         //assert
-        assertEquals(363L, maxAgeYears);
+        final var expectedMaxAge = paintingList.stream().mapToLong(Painting::ageInYears).max().orElseThrow();
+        assertEquals(expectedMaxAge, maxAgeYears);
         assertEquals(expectedAverage, averageAgePainting);
     }
 
@@ -245,9 +250,6 @@ class MyCollectorsTest {
 
         final Set<String> intersection = stringLists.stream()
                 .collect(toIntersection());
-
-        final var grouping = stringLists.stream()
-                .collect(groupingBy(List::size));
 
         System.out.println("intersection = " + intersection);
 

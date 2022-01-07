@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.maven-test-project</groupId>
+        <groupId>org.hzt.utils</groupId>
         <artifactId>maven-test-project</artifactId>
         <version>1.2</version>
     </parent>
@@ -14,9 +14,7 @@
     <artifactId>servlet-filter</artifactId>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <tomcat-embed-core.version>10.0.12</tomcat-embed-core.version>
+        <tomcat-embed-core.version>10.0.14</tomcat-embed-core.version>
     </properties>
 
     <dependencies>
