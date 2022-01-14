@@ -25,33 +25,8 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@SuppressWarnings({"DuplicatedCode", "unused"})
 public final class MyCollectors {
-
-    public static final String MERGER = "merger";
-
-    public static final String DOWNSTREAM_1_SUPPLIER = "downstream1 supplier";
-    public static final String DOWNSTREAM_2_SUPPLIER = "downstream2 supplier";
-    public static final String DOWNSTREAM_3_SUPPLIER = "downstream3 supplier";
-    public static final String DOWNSTREAM_4_SUPPLIER = "downstream4 supplier";
-    public static final String DOWNSTREAM_5_SUPPLIER = "downstream5 supplier";
-
-    public static final String DOWNSTREAM_1_ACCUMULATOR = "downstream1 accumulator";
-    public static final String DOWNSTREAM_2_ACCUMULATOR = "downstream2 accumulator";
-    public static final String DOWNSTREAM_3_ACCUMULATOR = "downstream3 accumulator";
-    public static final String DOWNSTREAM_4_ACCUMULATOR = "downstream4 accumulator";
-    public static final String DOWNSTREAM_5_ACCUMULATOR = "downstream5 accumulator";
-
-    public static final String DOWNSTREAM_1_COMBINER = "downstream1 combiner";
-    public static final String DOWNSTREAM_2_COMBINER = "downstream2 combiner";
-    public static final String DOWNSTREAM_3_COMBINER = "downstream3 combiner";
-    public static final String DOWNSTREAM_4_COMBINER = "downstream4 combiner";
-    public static final String DOWNSTREAM_5_COMBINER = "downstream5 combiner";
-
-    public static final String DOWNSTREAM_1_FINISHER = "downstream1 finisher";
-    public static final String DOWNSTREAM_2_FINISHER = "downstream2 finisher";
-    public static final String DOWNSTREAM_3_FINISHER = "downstream3 finisher";
-    public static final String DOWNSTREAM_4_FINISHER = "downstream4 finisher";
-    public static final String DOWNSTREAM_5_FINISHER = "downstream5 finisher";
 
     private MyCollectors() {
     }
@@ -194,27 +169,23 @@ public final class MyCollectors {
                                   Collector<? super T, A2, R2> downstream2,
                                   Collector<? super T, A3, R3> downstream3,
                                   TriFunction<? super R1, ? super R2, ? super R3, R> merger) {
-        MyObjects.requireAllNonNull(Collector.class, downstream1, downstream2, downstream3);
-        Objects.requireNonNull(merger, MERGER);
+        MyObjects.requireAllNonNull(downstream1, downstream2, downstream3, merger);
 
-        Supplier<A1> c1Supplier = Objects.requireNonNull(downstream1.supplier(), DOWNSTREAM_1_SUPPLIER);
-        Supplier<A2> c2Supplier = Objects.requireNonNull(downstream2.supplier(), DOWNSTREAM_2_SUPPLIER);
-        Supplier<A3> c3Supplier = Objects.requireNonNull(downstream3.supplier(), DOWNSTREAM_3_SUPPLIER);
+        Supplier<A1> c1Supplier = Objects.requireNonNull(downstream1.supplier());
+        Supplier<A2> c2Supplier = Objects.requireNonNull(downstream2.supplier());
+        Supplier<A3> c3Supplier = Objects.requireNonNull(downstream3.supplier());
 
-        BiConsumer<A1, ? super T> c1Accumulator =
-                Objects.requireNonNull(downstream1.accumulator(), DOWNSTREAM_1_ACCUMULATOR);
-        BiConsumer<A2, ? super T> c2Accumulator =
-                Objects.requireNonNull(downstream2.accumulator(), DOWNSTREAM_2_ACCUMULATOR);
-        BiConsumer<A3, ? super T> c3Accumulator =
-                Objects.requireNonNull(downstream3.accumulator(), DOWNSTREAM_3_ACCUMULATOR);
+        BiConsumer<A1, ? super T> c1Accumulator = Objects.requireNonNull(downstream1.accumulator());
+        BiConsumer<A2, ? super T> c2Accumulator = Objects.requireNonNull(downstream2.accumulator());
+        BiConsumer<A3, ? super T> c3Accumulator = Objects.requireNonNull(downstream3.accumulator());
 
-        BinaryOperator<A1> c1Combiner = Objects.requireNonNull(downstream1.combiner(), DOWNSTREAM_1_COMBINER);
-        BinaryOperator<A2> c2Combiner = Objects.requireNonNull(downstream2.combiner(), DOWNSTREAM_2_COMBINER);
-        BinaryOperator<A3> c3Combiner = Objects.requireNonNull(downstream3.combiner(), DOWNSTREAM_3_COMBINER);
+        BinaryOperator<A1> c1Combiner = Objects.requireNonNull(downstream1.combiner());
+        BinaryOperator<A2> c2Combiner = Objects.requireNonNull(downstream2.combiner());
+        BinaryOperator<A3> c3Combiner = Objects.requireNonNull(downstream3.combiner());
 
-        Function<A1, R1> c1Finisher = Objects.requireNonNull(downstream1.finisher(), DOWNSTREAM_1_FINISHER);
-        Function<A2, R2> c2Finisher = Objects.requireNonNull(downstream2.finisher(), DOWNSTREAM_2_FINISHER);
-        Function<A3, R3> c3Finisher = Objects.requireNonNull(downstream3.finisher(), DOWNSTREAM_3_FINISHER);
+        Function<A1, R1> c1Finisher = Objects.requireNonNull(downstream1.finisher());
+        Function<A2, R2> c2Finisher = Objects.requireNonNull(downstream2.finisher());
+        Function<A3, R3> c3Finisher = Objects.requireNonNull(downstream3.finisher());
 
         class TriBox {
             private A1 left = c1Supplier.get();
@@ -303,32 +274,27 @@ public final class MyCollectors {
                                   Collector<? super T, A3, R3> downstream3,
                                   Collector<? super T, A4, R4> downstream4,
                                   QuadFunction<? super R1, ? super R2, ? super R3, ? super R4, R> merger) {
-        MyObjects.requireAllNonNull(Collector.class, downstream1, downstream2, downstream3, downstream4);
-        Objects.requireNonNull(merger, MERGER);
+        MyObjects.requireAllNonNull(downstream1, downstream2, downstream3, downstream4, merger);
 
-        Supplier<A1> c1Supplier = Objects.requireNonNull(downstream1.supplier(), DOWNSTREAM_1_SUPPLIER);
-        Supplier<A2> c2Supplier = Objects.requireNonNull(downstream2.supplier(), DOWNSTREAM_2_SUPPLIER);
-        Supplier<A3> c3Supplier = Objects.requireNonNull(downstream3.supplier(), DOWNSTREAM_3_SUPPLIER);
-        Supplier<A4> c4Supplier = Objects.requireNonNull(downstream4.supplier(), DOWNSTREAM_4_SUPPLIER);
+        Supplier<A1> c1Supplier = Objects.requireNonNull(downstream1.supplier());
+        Supplier<A2> c2Supplier = Objects.requireNonNull(downstream2.supplier());
+        Supplier<A3> c3Supplier = Objects.requireNonNull(downstream3.supplier());
+        Supplier<A4> c4Supplier = Objects.requireNonNull(downstream4.supplier());
 
-        BiConsumer<A1, ? super T> c1Accumulator =
-                Objects.requireNonNull(downstream1.accumulator(), DOWNSTREAM_1_ACCUMULATOR);
-        BiConsumer<A2, ? super T> c2Accumulator =
-                Objects.requireNonNull(downstream2.accumulator(), DOWNSTREAM_2_ACCUMULATOR);
-        BiConsumer<A3, ? super T> c3Accumulator =
-                Objects.requireNonNull(downstream3.accumulator(), DOWNSTREAM_3_ACCUMULATOR);
-        BiConsumer<A4, ? super T> c4Accumulator =
-                Objects.requireNonNull(downstream4.accumulator(), DOWNSTREAM_4_ACCUMULATOR);
+        BiConsumer<A1, ? super T> c1Accumulator = Objects.requireNonNull(downstream1.accumulator());
+        BiConsumer<A2, ? super T> c2Accumulator = Objects.requireNonNull(downstream2.accumulator());
+        BiConsumer<A3, ? super T> c3Accumulator = Objects.requireNonNull(downstream3.accumulator());
+        BiConsumer<A4, ? super T> c4Accumulator = Objects.requireNonNull(downstream4.accumulator());
 
-        BinaryOperator<A1> c1Combiner = Objects.requireNonNull(downstream1.combiner(), DOWNSTREAM_1_COMBINER);
-        BinaryOperator<A2> c2Combiner = Objects.requireNonNull(downstream2.combiner(), DOWNSTREAM_2_COMBINER);
-        BinaryOperator<A3> c3Combiner = Objects.requireNonNull(downstream3.combiner(), DOWNSTREAM_3_COMBINER);
-        BinaryOperator<A4> c4Combiner = Objects.requireNonNull(downstream4.combiner(), DOWNSTREAM_4_COMBINER);
+        BinaryOperator<A1> c1Combiner = Objects.requireNonNull(downstream1.combiner());
+        BinaryOperator<A2> c2Combiner = Objects.requireNonNull(downstream2.combiner());
+        BinaryOperator<A3> c3Combiner = Objects.requireNonNull(downstream3.combiner());
+        BinaryOperator<A4> c4Combiner = Objects.requireNonNull(downstream4.combiner());
 
-        Function<A1, R1> c1Finisher = Objects.requireNonNull(downstream1.finisher(), DOWNSTREAM_1_FINISHER);
-        Function<A2, R2> c2Finisher = Objects.requireNonNull(downstream2.finisher(), DOWNSTREAM_2_FINISHER);
-        Function<A3, R3> c3Finisher = Objects.requireNonNull(downstream3.finisher(), DOWNSTREAM_3_FINISHER);
-        Function<A4, R4> c4Finisher = Objects.requireNonNull(downstream4.finisher(), DOWNSTREAM_4_FINISHER);
+        Function<A1, R1> c1Finisher = Objects.requireNonNull(downstream1.finisher());
+        Function<A2, R2> c2Finisher = Objects.requireNonNull(downstream2.finisher());
+        Function<A3, R3> c3Finisher = Objects.requireNonNull(downstream3.finisher());
+        Function<A4, R4> c4Finisher = Objects.requireNonNull(downstream4.finisher());
 
         class QuadBox {
             private A1 left = c1Supplier.get();
@@ -426,37 +392,31 @@ public final class MyCollectors {
                                   Collector<? super T, A4, R4> downstream4,
                                   Collector<? super T, A5, R5> downstream5,
                                   QuintFunction<? super R1, ? super R2, ? super R3, ? super R4, ? super R5, R> merger) {
-        MyObjects.requireAllNonNull(Collector.class, downstream1, downstream2, downstream3, downstream4, downstream5);
-        Objects.requireNonNull(merger, MERGER);
+        MyObjects.requireAllNonNull(downstream1, downstream2, downstream3, downstream4, downstream5, merger);
 
-        Supplier<A1> c1Supplier = Objects.requireNonNull(downstream1.supplier(), DOWNSTREAM_1_SUPPLIER);
-        Supplier<A2> c2Supplier = Objects.requireNonNull(downstream2.supplier(), DOWNSTREAM_2_SUPPLIER);
-        Supplier<A3> c3Supplier = Objects.requireNonNull(downstream3.supplier(), DOWNSTREAM_3_SUPPLIER);
-        Supplier<A4> c4Supplier = Objects.requireNonNull(downstream4.supplier(), DOWNSTREAM_4_SUPPLIER);
-        Supplier<A5> c5Supplier = Objects.requireNonNull(downstream5.supplier(), DOWNSTREAM_5_SUPPLIER);
+        Supplier<A1> c1Supplier = Objects.requireNonNull(downstream1.supplier());
+        Supplier<A2> c2Supplier = Objects.requireNonNull(downstream2.supplier());
+        Supplier<A3> c3Supplier = Objects.requireNonNull(downstream3.supplier());
+        Supplier<A4> c4Supplier = Objects.requireNonNull(downstream4.supplier());
+        Supplier<A5> c5Supplier = Objects.requireNonNull(downstream5.supplier());
 
-        BiConsumer<A1, ? super T> c1Accumulator =
-                Objects.requireNonNull(downstream1.accumulator(), DOWNSTREAM_1_ACCUMULATOR);
-        BiConsumer<A2, ? super T> c2Accumulator =
-                Objects.requireNonNull(downstream2.accumulator(), DOWNSTREAM_2_ACCUMULATOR);
-        BiConsumer<A3, ? super T> c3Accumulator =
-                Objects.requireNonNull(downstream3.accumulator(), DOWNSTREAM_3_ACCUMULATOR);
-        BiConsumer<A4, ? super T> c4Accumulator =
-                Objects.requireNonNull(downstream4.accumulator(), DOWNSTREAM_4_ACCUMULATOR);
-        BiConsumer<A5, ? super T> c5Accumulator =
-                Objects.requireNonNull(downstream5.accumulator(), DOWNSTREAM_5_ACCUMULATOR);
+        BiConsumer<A1, ? super T> c1Accumulator = Objects.requireNonNull(downstream1.accumulator());
+        BiConsumer<A2, ? super T> c2Accumulator = Objects.requireNonNull(downstream2.accumulator());
+        BiConsumer<A3, ? super T> c3Accumulator = Objects.requireNonNull(downstream3.accumulator());
+        BiConsumer<A4, ? super T> c4Accumulator = Objects.requireNonNull(downstream4.accumulator());
+        BiConsumer<A5, ? super T> c5Accumulator = Objects.requireNonNull(downstream5.accumulator());
 
-        BinaryOperator<A1> c1Combiner = Objects.requireNonNull(downstream1.combiner(), DOWNSTREAM_1_COMBINER);
-        BinaryOperator<A2> c2Combiner = Objects.requireNonNull(downstream2.combiner(), DOWNSTREAM_2_COMBINER);
-        BinaryOperator<A3> c3Combiner = Objects.requireNonNull(downstream3.combiner(), DOWNSTREAM_3_COMBINER);
-        BinaryOperator<A4> c4Combiner = Objects.requireNonNull(downstream4.combiner(), DOWNSTREAM_4_COMBINER);
-        BinaryOperator<A5> c5Combiner = Objects.requireNonNull(downstream5.combiner(), DOWNSTREAM_5_COMBINER);
+        BinaryOperator<A1> c1Combiner = Objects.requireNonNull(downstream1.combiner());
+        BinaryOperator<A2> c2Combiner = Objects.requireNonNull(downstream2.combiner());
+        BinaryOperator<A3> c3Combiner = Objects.requireNonNull(downstream3.combiner());
+        BinaryOperator<A4> c4Combiner = Objects.requireNonNull(downstream4.combiner());
+        BinaryOperator<A5> c5Combiner = Objects.requireNonNull(downstream5.combiner());
 
-        Function<A1, R1> c1Finisher = Objects.requireNonNull(downstream1.finisher(), DOWNSTREAM_1_FINISHER);
-        Function<A2, R2> c2Finisher = Objects.requireNonNull(downstream2.finisher(), DOWNSTREAM_2_FINISHER);
-        Function<A3, R3> c3Finisher = Objects.requireNonNull(downstream3.finisher(), DOWNSTREAM_3_FINISHER);
-        Function<A4, R4> c4Finisher = Objects.requireNonNull(downstream4.finisher(), DOWNSTREAM_4_FINISHER);
-        Function<A5, R5> c5Finisher = Objects.requireNonNull(downstream5.finisher(), DOWNSTREAM_5_FINISHER);
+        Function<A1, R1> c1Finisher = Objects.requireNonNull(downstream1.finisher());
+        Function<A2, R2> c2Finisher = Objects.requireNonNull(downstream2.finisher());
+        Function<A3, R3> c3Finisher = Objects.requireNonNull(downstream3.finisher());
+        Function<A4, R4> c4Finisher = Objects.requireNonNull(downstream4.finisher());
+        Function<A5, R5> c5Finisher = Objects.requireNonNull(downstream5.finisher());
 
         class QuintBox {
             private A1 a1 = c1Supplier.get();

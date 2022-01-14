@@ -15,4 +15,18 @@ public final class MyObjects {
             counter++;
         }
     }
+
+    public static void requireAllNonNull(Object... objects) {
+        var exception = new IllegalArgumentException("Some objects where null");
+        int counter = 1;
+        for (Object object : objects) {
+            if (object == null) {
+                exception.addSuppressed(new NullPointerException("object " + counter + " is null"));
+            }
+            counter++;
+        }
+        if (exception.getSuppressed().length > 0) {
+            throw exception;
+        }
+    }
 }

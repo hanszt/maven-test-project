@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.given;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -74,5 +76,23 @@ class AsyncServiceTest {
         long timesFaster = durationSeq / durationParallel;
         System.out.println("timesFaster = " + timesFaster);
         assertTrue(durationSeq > durationParallel);
+    }
+
+    @Test
+    void whenAssertingTimeout_thenNotExceeded() {
+        var service = new AsyncService(true);
+        assertTimeout(Duration.ofSeconds(2), () -> addValues(service));
+    }
+
+    @Test
+    void whenAssertingTimeoutPreemptively_thenNotExceeded() {
+        var service = new AsyncService(true);
+        assertTimeoutPreemptively(Duration.ofSeconds(2), () -> addValues(service));
+    }
+
+    private void addValues(AsyncService service) {
+        service.addValue(3);
+        service.addValue(4, Duration.ofMillis(1900));
+        await().until(service::getValue, value -> value == 7);
     }
 }

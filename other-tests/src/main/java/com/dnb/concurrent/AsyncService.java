@@ -1,5 +1,9 @@
 package com.dnb.concurrent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.time.Duration;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
@@ -8,12 +12,21 @@ import java.util.stream.IntStream;
 
 public class AsyncService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncService.class);
     private static final int DELAY = 1000;
     private static final int INIT_DELAY = 2000;
 
     private final AtomicLong value = new AtomicLong(0);
     private final Executor executor = Executors.newFixedThreadPool(4);
-    private volatile boolean initialized = false;
+    private volatile boolean initialized;
+
+    AsyncService(boolean initialized) {
+        this.initialized = initialized;
+    }
+
+    AsyncService() {
+        this(false);
+    }
 
     void initialize() {
         executor.execute(() -> {
@@ -27,9 +40,13 @@ public class AsyncService {
     }
 
     void addValue(long val) {
+        addValue(val, Duration.ofMillis(DELAY));
+    }
+
+    void addValue(long val, Duration delay) {
         throwIfNotInitialized();
         executor.execute(() -> {
-            sleep(DELAY);
+            sleep(delay.toMillis());
             value.addAndGet(val);
         });
     }
@@ -39,7 +56,7 @@ public class AsyncService {
         return value.longValue();
     }
 
-    private static void sleep(int delay) {
+    private static void sleep(long delay) {
         try {
             Thread.sleep(delay);
         } catch (InterruptedException e) {
@@ -54,19 +71,19 @@ public class AsyncService {
     }
 
     void executeStreamCallingExpensiveMethodMock(int times) {
-        System.out.println("Sequential:");
+        LOGGER.info("Sequential:");
         IntStream.range(0, times)
                 .forEach(AsyncService::expensiveMethodMock);
     }
 
     void executeStreamInParallelCallingExpensiveMethodMock(int times) {
-        System.out.println("In parallel:");
+        LOGGER.info("In parallel:");
         IntStream.range(0, times)
                 .parallel()
                 .forEach(AsyncService::expensiveMethodMock);
     }
 
-    static long executeAsyncServiceAndTime(int times, IntConsumer consumer) {
+    static long executeAsyncServiceAndTime(@SuppressWarnings("SameParameterValue") int times, IntConsumer consumer) {
         long start = System.nanoTime();
         consumer.accept(times);
         return System.nanoTime() - start;
@@ -79,6 +96,6 @@ public class AsyncService {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        System.out.println("Dit is call " + i);
+        LOGGER.info("Dit is call nr {}", i);
     }
 }

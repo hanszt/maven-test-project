@@ -21,10 +21,13 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static hzt.stream.StreamUtils.nullSafe;
+import static hzt.stream.collectors.BigDecimalCollectors.*;
 import static hzt.stream.collectors.MyCollectors.*;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -33,7 +36,7 @@ class MyCollectorsTest {
     @Test
     void testBranchingPaintingDataToThreeValues() {
         //arrange
-        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
+        final var paintingList = TestSampleGenerator.createPaintingList();
         final double expectedAverage = paintingList.stream()
                 .mapToInt(Painting::ageInYears)
                 .average().orElse(0);
@@ -97,12 +100,15 @@ class MyCollectorsTest {
         //assert
         final List<String> titlesOfPaintingsNotInMuseum = result.first().get(false);
         final var expectedMaxAge = paintingList.stream().mapToLong(Painting::ageInYears).max().orElseThrow();
-        assertEquals(expectedMaxAge, maxAgeYears);
-        assertEquals(expectedAverage, averageAgePainting);
-        assertEquals(1, titlesOfPaintingsNotInMuseum.size());
-        assertEquals("Lentetuin, de pastorietuin te Nuenen in het voorjaar", titlesOfPaintingsNotInMuseum.get(0));
-        assertEquals(expectedPaintingNameList, result.third());
-        assertEquals(expectedGroupedByPainter, result.fourth());
+
+        assertAll(
+                () -> assertEquals(expectedMaxAge, maxAgeYears),
+                () -> assertEquals(expectedAverage, averageAgePainting),
+                () -> assertEquals(1, titlesOfPaintingsNotInMuseum.size()),
+                () -> assertEquals("Lentetuin, de pastorietuin te Nuenen in het voorjaar", titlesOfPaintingsNotInMuseum.get(0)),
+                () -> assertIterableEquals(expectedPaintingNameList, result.third()),
+                () -> assertEquals(expectedGroupedByPainter, result.fourth())
+        );
     }
 
     @Test
@@ -137,13 +143,15 @@ class MyCollectorsTest {
         //assert
         final List<String> titlesOfPaintingsNotInMuseum = result.first().get(false);
         final var expectedMaxAge = paintingList.stream().mapToLong(Painting::ageInYears).max().orElseThrow();
-        assertEquals(expectedMaxAge, maxAgeYears);
-        assertEquals(expectedAverage, averageAgePainting);
-        assertEquals(1, titlesOfPaintingsNotInMuseum.size());
-        assertEquals("Lentetuin, de pastorietuin te Nuenen in het voorjaar", titlesOfPaintingsNotInMuseum.get(0));
-        assertEquals(expectedPaintingNameList, result.third());
-        assertEquals(expectedGroupedByPainter, result.fourth());
-        assertEquals(8, result.fifth());
+        assertAll(
+                () -> assertEquals(expectedMaxAge, maxAgeYears),
+                () -> assertEquals(expectedAverage, averageAgePainting),
+                () -> assertEquals(1, titlesOfPaintingsNotInMuseum.size()),
+                () -> assertEquals("Lentetuin, de pastorietuin te Nuenen in het voorjaar", titlesOfPaintingsNotInMuseum.get(0)),
+                () -> assertEquals(expectedPaintingNameList, result.third()),
+                () -> assertEquals(expectedGroupedByPainter, result.fourth()),
+                () -> assertEquals(8, result.fifth())
+        );
     }
 
     private record PaintingSummary(
@@ -175,7 +183,7 @@ class MyCollectorsTest {
 
         var keyCollector = flatMapping(
                 nullSafe(Painting::painter, Painter::getDateOfBirth),
-        summarizingLong(LocalDate::getYear));
+                summarizingLong(LocalDate::getYear));
 
         //act
         final Map.Entry<LongSummaryStatistics, LongSummaryStatistics> result = paintingList.stream()
@@ -189,8 +197,10 @@ class MyCollectorsTest {
 
         //assert
         final var expectedMaxAge = paintingList.stream().mapToLong(Painting::ageInYears).max().orElseThrow();
-        assertEquals(expectedMaxAge, maxAgeYears);
-        assertEquals(expectedAverage, averageAgePainting);
+        assertAll(
+                () -> assertEquals(expectedMaxAge, maxAgeYears),
+                () -> assertEquals(expectedAverage, averageAgePainting)
+        );
     }
 
     @Test
@@ -198,21 +208,22 @@ class MyCollectorsTest {
         final var sampleBankAccountListContainingNulls = TestSampleGenerator.createSampleBankAccountListContainingNulls();
 
         final var expected = sampleBankAccountListContainingNulls.stream()
-                .collect(BigDecimalCollectors.summarizingBigDecimal(BankAccount::getBalance));
+                .collect(summarizingBigDecimal(BankAccount::getBalance));
 
         final var actual = sampleBankAccountListContainingNulls.stream()
                 .collect(branching(
                         counting(),
-                        BigDecimalCollectors.summingBigDecimal(BankAccount::getBalance),
-                        BigDecimalCollectors.toMinBigDecimal(BankAccount::getBalance),
-                        BigDecimalCollectors.toMaxBigDecimal(BankAccount::getBalance),
+                        summingBigDecimal(BankAccount::getBalance),
+                        toMinBigDecimal(BankAccount::getBalance),
+                        toMaxBigDecimal(BankAccount::getBalance),
                         BigDecimalSummaryStatistics::new
                 ));
-
-        assertNotEquals(expected.getAverage(), actual.getAverage());
-        assertNotEquals(expected.getCount(), actual.getCount());
-        assertEquals(expected.getMin(), actual.getMin());
-        assertEquals(expected.getMax(), actual.getMax());
+        assertAll(
+                () -> assertNotEquals(expected.getAverage(), actual.getAverage()),
+                () -> assertNotEquals(expected.getCount(), actual.getCount()),
+                () -> assertEquals(expected.getMin(), actual.getMin()),
+                () -> assertEquals(expected.getMax(), actual.getMax())
+        );
     }
 
     @Test
@@ -231,18 +242,20 @@ class MyCollectorsTest {
 
         System.out.println("summarizingAges = " + summarizingAges);
 
-        assertEquals(standardDeviationAge, summarizingAges.getStandardDeviation());
-        assertEquals(optionalAverage.orElseThrow(), summarizingAges.getAverage());
+        assertAll(
+                () -> assertEquals(standardDeviationAge, summarizingAges.getStandardDeviation()),
+                () -> assertEquals(optionalAverage.orElseThrow(), summarizingAges.getAverage())
+        );
     }
 
     @Test
     void testToIntersection() {
-        List<String> list1 = List.of("Hoi", "hoe", "het", "met", "jou", "lol");
-        List<String> list2 = List.of("Dit", "is", "een", "zin", "Hoi", "Papa", "lol");
-        List<String> list3 = List.of("Lalalala", "Nog meer", "zinnen", "Hoi", "Lief", "lol");
-        List<String> list4 = List.of("Hoi", "rere", "lol", "serse", "aweaw");
-        List<String> list5 = List.of("lol", "asdad", "wer", "werwe", "Hoi");
-        List<String> list6 = List.of("sdfsf", "", "awr", "awr", "Hoi", "lol");
+        final var list1 = List.of("Hoi", "hoe", "het", "met", "jou", "lol");
+        final var list2 = List.of("Dit", "is", "een", "zin", "Hoi", "Papa", "lol");
+        final var list3 = List.of("Lalalala", "Nog meer", "zinnen", "Hoi", "Lief", "lol");
+        final var list4 = List.of("Hoi", "rere", "lol", "serse", "aweaw");
+        final var list5 = List.of("lol", "asdad", "wer", "werwe", "Hoi");
+        final var list6 = List.of("sdfsf", "", "awr", "awr", "Hoi", "lol");
 
         List<List<String>> stringLists = List.of(list1, list2, list3, list4, list5, list6);
 
@@ -253,9 +266,11 @@ class MyCollectorsTest {
 
         System.out.println("intersection = " + intersection);
 
-        assertEquals(2, intersection.size());
-        assertTrue(intersection.containsAll(Set.of("Hoi", "lol")));
-        assertEquals(expectedIntersection, intersection);
+        assertAll(
+                () -> assertEquals(2, intersection.size()),
+                () -> assertTrue(intersection.containsAll(Set.of("Hoi", "lol"))),
+                () -> assertEquals(expectedIntersection, intersection)
+        );
     }
 
     @Test
@@ -274,7 +289,7 @@ class MyCollectorsTest {
         System.out.println();
 
         var expected = nameLists.stream()
-                            .collect(toIntersection());
+                .collect(toIntersection());
 
         var paintingNamesPresentInAllMuseums = museumList.stream()
                 .map(Museum::getPaintingList)
@@ -300,7 +315,6 @@ class MyCollectorsTest {
                 .boxed()
                 .collect(multiMappingToList(MyCollectorsTest::toBankAccount));
 
-        assertEquals(actualBankaccountList.size(), expectedBankAccounts.size());
         assertEquals(actualBankaccountList, expectedBankAccounts);
     }
 

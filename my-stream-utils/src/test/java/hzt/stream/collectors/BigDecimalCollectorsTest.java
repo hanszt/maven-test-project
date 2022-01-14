@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import static hzt.stream.collectors.BigDecimalCollectors.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BigDecimalCollectorsTest {
@@ -23,11 +24,13 @@ class BigDecimalCollectorsTest {
 
         System.out.println("bigDecimalSummaryStatistics = " + bigDecimalSummaryStatistics);
 
-        assertEquals(BigDecimal.valueOf(46502.27), bigDecimalSummaryStatistics.getAverage());
-        assertEquals(BigDecimal.valueOf(232511.34), bigDecimalSummaryStatistics.getSum());
-        assertEquals(BigDecimal.valueOf(-4323), bigDecimalSummaryStatistics.getMin());
-        assertEquals(BigDecimal.valueOf(234235.34), bigDecimalSummaryStatistics.getMax());
-        assertEquals(5, bigDecimalSummaryStatistics.getCount());
+        assertAll(
+                () -> assertEquals(BigDecimal.valueOf(46502.27), bigDecimalSummaryStatistics.getAverage()),
+                () -> assertEquals(BigDecimal.valueOf(232511.34), bigDecimalSummaryStatistics.getSum()),
+                () -> assertEquals(BigDecimal.valueOf(-4323), bigDecimalSummaryStatistics.getMin()),
+                () -> assertEquals(BigDecimal.valueOf(234235.34), bigDecimalSummaryStatistics.getMax()),
+                () -> assertEquals(5, bigDecimalSummaryStatistics.getCount())
+        );
     }
 
     @Test
@@ -71,8 +74,10 @@ class BigDecimalCollectorsTest {
         System.out.println("bigDecimalStatistics = " + bigDecimalStatistics);
         System.out.println("doubleStatistics = " + doubleStatistics);
 
-        assertEquals(expected, standarDeviationBalances);
-        assertEquals(expectedStandardDeviationFromDouble, standarDeviationBalances);
+        assertAll(
+                () -> assertEquals(expected, standarDeviationBalances),
+                () -> assertEquals(expectedStandardDeviationFromDouble, standarDeviationBalances)
+        );
     }
 
     @Test
@@ -92,8 +97,10 @@ class BigDecimalCollectorsTest {
         final var average = statistics.getAverage()
                 .setScale(1, RoundingMode.HALF_UP);
 
-        assertEquals(targetStdDev.setScale(1, RoundingMode.HALF_UP), standardDeviation);
-        assertEquals(targetMean.setScale(1, RoundingMode.HALF_UP), average);
+        assertAll(
+                () -> assertEquals(targetStdDev.setScale(1, RoundingMode.HALF_UP), standardDeviation),
+                () -> assertEquals(targetMean.setScale(1, RoundingMode.HALF_UP), average)
+        );
     }
 
     @Test
@@ -116,8 +123,11 @@ class BigDecimalCollectorsTest {
         System.out.println("sum = " + sum);
 
         final var expected = bigDecimalSummaryStatistics.getSum();
-        assertEquals(sum, expected);
-        assertEquals(sumAsDouble, sum.doubleValue());
+
+        assertAll(
+                () -> assertEquals(sum, expected),
+                () -> assertEquals(sumAsDouble, sum.doubleValue())
+        );
     }
 
     @Test

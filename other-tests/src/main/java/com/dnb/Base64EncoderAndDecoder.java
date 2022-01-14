@@ -1,7 +1,7 @@
 package com.dnb;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Base64;
 
@@ -9,7 +9,7 @@ import static java.util.stream.Collectors.*;
 
 public class Base64EncoderAndDecoder {
 
-    private static final Logger LOGGER = LogManager.getLogger(Base64EncoderAndDecoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Base64EncoderAndDecoder.class);
     private static final String KEY_BASE_64 = "V2Vsa29tMTIz";
 
     public static void main(String[] args) {
@@ -25,11 +25,11 @@ public class Base64EncoderAndDecoder {
     }
 
     String base64DecodeAndEncodeReturnDecoded(String keyBase64) {
-        LOGGER.info(() -> String.format("Original encoded: %s%n%n", keyBase64));
+        LOGGER.info("Original encoded: {}", keyBase64);
         String decodedKey = new String(Base64.getDecoder().decode(keyBase64));
-        LOGGER.info(() -> String.format("Base 64 decoded string: %s%n%n ", decodedKey));
+        LOGGER.info("Base 64 decoded string: {}", decodedKey);
         String encodedKey = Base64.getEncoder().encodeToString(decodedKey.getBytes());
-        LOGGER.info(() -> String.format("Base 64 encoded: %s%n%n", encodedKey));
+        LOGGER.info("Base 64 encoded: {}", encodedKey);
         return decodedKey;
     }
 

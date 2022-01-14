@@ -21,10 +21,17 @@ import java.util.stream.Stream;
 
 import static hzt.stream.StreamUtils.*;
 import static hzt.stream.predicates.DateTimePredicates.isBefore;
-import static hzt.stream.predicates.StringPredicates.*;
+import static hzt.stream.predicates.StringPredicates.contains;
+import static hzt.stream.predicates.StringPredicates.containsNoneOf;
+import static hzt.stream.predicates.StringPredicates.hasEqualLength;
+import static hzt.stream.predicates.StringPredicates.startsWith;
 import static java.util.Comparator.comparing;
-import static java.util.function.Predicate.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static java.util.function.Predicate.isEqual;
+import static java.util.function.Predicate.not;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StreamUtilsTest {
 
@@ -55,10 +62,13 @@ class StreamUtilsTest {
         System.out.println("colorByCombinedFilter = " + colorByCombinedFilter);
         System.out.println("colorByComposedFilter = " + colorByComposedFilter);
         //assert
-        assertEquals(colorByCombinedFilter, colorByComposedFilter);
-        assertEquals(0, colorByCombinedFilter.getBlue());
-        assertEquals(255, colorByCombinedFilter.getRed());
-        assertTrue(originalColor.getGreen() < colorByCombinedFilter.getGreen());
+        assertAll(
+                () -> assertEquals(colorByCombinedFilter, colorByComposedFilter),
+                () -> assertEquals(0, colorByCombinedFilter.getBlue()),
+                () -> assertEquals(255, colorByCombinedFilter.getRed()),
+                () -> assertTrue(originalColor.getGreen() < colorByCombinedFilter.getGreen())
+        );
+
     }
 
     private static Color maxRed(Color t) {
@@ -74,14 +84,15 @@ class StreamUtilsTest {
     void testCombinePredicateUsingOrEvaluatesToTrue() {
         final var strings = new String[]{"hallo", "hoe", "gaat", "het", "met", "jou", "?"};
 
-        assertEquals(strings.length, Stream.of(strings)
+        final var count = Stream.of(strings)
                 .filter(anyMatch(
                         contains("h"),
                         contains("e"),
                         contains("g"),
                         isEqual("jou"),
                         hasEqualLength(1)))
-                .count());
+                .count();
+        assertEquals(strings.length, count);
     }
 
     @Test
@@ -486,8 +497,10 @@ class StreamUtilsTest {
 
         System.out.println("expectedDaysOfWeek = " + expectedDaysOfWeek);
 
-        assertEquals(expectedDaysOfWeek, actual);
-        assertEquals(expected, actual);
+        assertAll(
+                () -> assertEquals(expectedDaysOfWeek, actual),
+                () -> assertEquals(expected, actual)
+        );
     }
 
     @Test
@@ -521,8 +534,10 @@ class StreamUtilsTest {
 
         System.out.println("expectedDaysOfWeek = " + expectedDaysOfWeek);
 
-        assertEquals(expectedDaysOfWeek, listOfDayOfWeekBirthDateMostPopularPaintingPainters);
-        assertEquals(expected, listOfDayOfWeekBirthDateMostPopularPaintingPainters);
+        assertAll(
+                () -> assertEquals(expectedDaysOfWeek, listOfDayOfWeekBirthDateMostPopularPaintingPainters),
+                () -> assertEquals(expected, listOfDayOfWeekBirthDateMostPopularPaintingPainters)
+        );
     }
 
     private List<Museum> getMuseumsContainingNulls() {

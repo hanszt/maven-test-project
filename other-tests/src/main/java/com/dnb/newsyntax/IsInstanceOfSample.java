@@ -1,32 +1,30 @@
 package com.dnb.newsyntax;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import static java.lang.System.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IsInstanceOfSample {
 
-    private static final Logger LOGGER = LogManager.getLogger(IsInstanceOfSample.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IsInstanceOfSample.class);
 
     public static void main(String[] args) {
         try {
             testIsInstanceTest();
         } catch (ClassNotFoundException e) {
-            LOGGER.error(e);
+            LOGGER.error("", e);
         }
     }
 
     private static void testIsInstanceTest() throws ClassNotFoundException {
         Animal animal = Math.random() < .5 ? new Dog() : new Cat();
-        out.println(animal);
+        LOGGER.info("{}", animal);
         if (isInstanceByClassname(animal, "com.dnb.newsyntax.Dog")) {
-            out.println("it's a dog");
+            LOGGER.info("it's a dog");
         } else {
-            out.println("It's a cat");
+            LOGGER.info("It's a cat");
         }
         if (animal instanceof Dog) {
-            out.println("It's a dog");
+            LOGGER.info("It's a dog");
         }
     }
 
@@ -35,6 +33,7 @@ public class IsInstanceOfSample {
     // string 'c'.
     // use isInstance() method when needed dynamically
     // Source: https://www.geeksforgeeks.org/instanceof-operator-vs-isinstance-method-in-java/
+    @SuppressWarnings("all")
     public static boolean isInstanceByClassname(Object obj, String classname) throws ClassNotFoundException {
         return Class.forName(classname).isInstance(obj);
     }
@@ -63,6 +62,7 @@ public class IsInstanceOfSample {
         }
     }
 
+    @SuppressWarnings("all")
     static sealed class Animal {
 
         private final int nrOfLegs;

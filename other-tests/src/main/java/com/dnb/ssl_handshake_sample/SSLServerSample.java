@@ -1,7 +1,7 @@
 package com.dnb.ssl_handshake_sample;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -14,7 +14,7 @@ import java.util.TimerTask;
 
 public class SSLServerSample {
 
-    private static final Logger LOGGER = LogManager.getLogger(SSLServerSample.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SSLServerSample.class);
     
     public static void main(String[] args) {
         var startTime = LocalDateTime.now();
@@ -37,7 +37,7 @@ public class SSLServerSample {
                 LOGGER.info("Request made");
             }
         } catch (IOException e) {
-            LOGGER.error(e);
+            LOGGER.error("", e);
         }
     }
 
@@ -53,6 +53,6 @@ public class SSLServerSample {
     }
 
     private static void shutDownServer(Duration duration) {
-        LOGGER.info(() -> "Timed server shutdown. Run duration: " + duration.toSeconds() + " seconds");
+        LOGGER.info("Timed server shutdown. Run duration: {} seconds", duration.toSeconds());
     }
 }

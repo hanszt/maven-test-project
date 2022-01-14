@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.dnb.ReflectionSample.PicassoFunctions.integerPropertyAccessor;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toUnmodifiableMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -30,11 +30,11 @@ class ReflectionSampleTest {
     void testWeirdBehaviourIntegerPropertyAccessor() {
         final var bic1 = new Bic("1", "1");
         List<Bic> bics = List.of(bic1, new Bic("2", "2"), new Bic("3", "hallo"));
-        //The map contains integer type keys but it's hash is created for the string type? Weird behaviour
+        //The map contains integer type keys, but its hash is created for the string type? Weird behaviour
         Map<Integer, Bic> integerToBicMap = bics.stream()
                 .collect(toUnmodifiableMap(integerPropertyAccessor("name"), bic -> bic));
         //weird outcome, map with keys of type integer gives a value back when lookup key is of type String
-        // but not when it it is of type integer!
+        // but not when it is of type integer!
         //So lets not use the integerPropertyAccessor function
         assertEquals(integerToBicMap.get("1"), bic1);
         assertNotEquals(integerToBicMap.get(1), bic1);
@@ -45,7 +45,13 @@ class ReflectionSampleTest {
     @Test
     void testThrowsExceptionWhenWrongPropertyName() {
         final var bic1 = new Bic("1", "");
-        assertThrows(IllegalStateException.class, () -> integerPropertyAccessor("bic.id").apply(bic1));
+        final var integerFunction = integerPropertyAccessor("bic.id");
+        assertThrows(IllegalStateException.class, () -> integerFunction.apply(bic1));
+    }
 
+    @Test
+    void testGetPackageVersionInfo() {
+        // null means not known
+        assertNull(getClass().getPackage().getImplementationVersion());
     }
 }

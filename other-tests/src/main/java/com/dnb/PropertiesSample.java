@@ -1,7 +1,7 @@
 package com.dnb;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -17,7 +17,7 @@ import static java.lang.System.out;
 
 public class PropertiesSample {
 
-    private static final Logger LOGGER = LogManager.getLogger(PropertiesSample.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesSample.class);
     private static final String PROP_FILE1_LOCATION = "./resources/testProject.properties";
     private static final String PROP_FILE2_LOCATION = "./resources/xml-properties.xml";
     private static final String PROP_NAME_QUEUE_MANAGER = "queue.manager";
@@ -48,25 +48,24 @@ public class PropertiesSample {
             properties2.list(out);
             enumerate(properties1);
         } catch (IOException e) {
-            LOGGER.error(e);
+            LOGGER.error("", e);
         }
-
 
     }
 
     private static void enumerate(Properties appProps) {
-        LOGGER.info("\nEnumeration of {}\n", appProps.toString());
+        LambdaLogging.logIfInfoEnabled(() -> String.format("%nEnumeration of %s%n", appProps.toString()));
         Enumeration<Object> valueEnumeration = appProps.elements();
         while (valueEnumeration.hasMoreElements()) {
-            LOGGER.info(valueEnumeration.nextElement());
+            LOGGER.info("Next element: {}", valueEnumeration.nextElement());
         }
 
         Enumeration<Object> keyEnumeration = appProps.keys();
         while (keyEnumeration.hasMoreElements()) {
-            LOGGER.info(keyEnumeration.nextElement());
+            LOGGER.info("Next element: {}", keyEnumeration.nextElement());
         }
 
         int size = appProps.size();
-        LOGGER.info(size);
+        LOGGER.info("Size: {}", size);
     }
 }

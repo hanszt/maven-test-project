@@ -10,6 +10,10 @@ public class IOCloser implements Closeable {
 
     private final Deque<Closeable> autoCloseables = new ArrayDeque<>();
 
+    public IOCloser(Closeable... closeFunctions) {
+        Stream.of(closeFunctions).forEach(this.autoCloseables::push);
+    }
+
     @Override
     public void close() throws IOException {
         var ioException = new IOException("Could not close all");

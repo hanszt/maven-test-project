@@ -1,7 +1,7 @@
 package com.dnb.concurrent;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("SameParameterValue")
 public class CompletableFutureSample {
 
-    private static final Logger LOGGER = LogManager.getLogger(CompletableFutureSample.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompletableFutureSample.class);
 
     CompletableFuture<Integer> integerSupplyingCompFuture() {
         return CompletableFuture.supplyAsync(CompletableFutureSample::computationallyIntensiveMethod)

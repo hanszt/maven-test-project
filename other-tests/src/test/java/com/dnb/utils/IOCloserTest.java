@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -11,28 +12,40 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class IOCloserTest {
 
     @Test
-    void testAutoCloser() {
-        ResourceNotImplementingClosable resource1 = new ResourceNotImplementingClosable("Resource 1");
-        ResourceNotImplementingClosable resource2 = new ResourceNotImplementingClosable("Resource 2");
-        ResourceNotImplementingClosable resource3 = new ResourceNotImplementingClosable("Resource 3");
-        try (var ioCloser = new IOCloser()) {
-            ioCloser.addCloseFunctions(resource1::close, resource2::close, resource3::close);
-            assertFalse(resource1.closed);
-            assertFalse(resource2.closed);
-            assertFalse(resource3.closed);
-        } catch (IOException e) {
-            e.printStackTrace();
+    void testAutoCloser() throws IOException {
+        final var resource1 = new ResourceNotImplementingClosable("Resource 1");
+        final var resource2 = new ResourceNotImplementingClosable("Resource 2");
+        final var resource3 = new ResourceNotImplementingClosable("Resource 3");
+        //noinspection unused
+        try (var ioCloser = new IOCloser(resource1::close, resource2::close, resource3::close)) {
+            assertAll(
+                    () -> assertFalse(resource1.closed),
+                    () -> assertFalse(resource2.closed),
+                    () -> assertFalse(resource3.closed)
+            );
         }
-        assertTrue(resource1.closed);
-        assertTrue(resource2.closed);
-        assertTrue(resource3.closed);
+        assertAll(
+                () -> assertTrue(resource1.closed),
+                () -> assertTrue(resource2.closed),
+                () -> assertTrue(resource3.closed)
+        );
+    }
+
+    @Test
+    void testCloser() {
+        //noinspection Convert2MethodRef
+        var closer = Closer.forResource(new ResourceNotImplementingClosable("Resource 1"), resource -> resource.close());
+        try (closer) {
+            assertFalse(closer.getResource().closed);
+        }
+        assertTrue(closer.getResource().closed);
     }
 
     @Test
     void testOneOfCloseMethodsThrowingException() {
-        var resource1 = new ResourceNotImplementingClosable("Resource 1");
-        var resource2 = new ResourceNotImplementingClosable("Resource 2");
-        var resource3 = new ResourceNotImplementingClosable("Resource 3");
+        final var resource1 = new ResourceNotImplementingClosable("Resource 1");
+        final var resource2 = new ResourceNotImplementingClosable("Resource 2");
+        final var resource3 = new ResourceNotImplementingClosable("Resource 3");
         try (var ioCloser = new IOCloser()) {
             resource1.load();
             ioCloser.addCloseFunctions(resource1::close, resource2::closeThrowingException, resource3::close);
@@ -41,9 +54,11 @@ class IOCloserTest {
             assertEquals("Could not close all", e.getMessage());
             e.printStackTrace();
         }
-        assertTrue(resource1.closed);
-        assertFalse(resource2.closed);
-        assertTrue(resource3.closed);
+        assertAll(
+                () -> assertTrue(resource1.closed),
+                () -> assertFalse(resource2.closed),
+                () -> assertTrue(resource3.closed)
+        );
     }
 
     private static class ResourceNotImplementingClosable {
@@ -70,4 +85,5 @@ class IOCloserTest {
             throw new IOException("Could not close " + name);
         }
     }
+
 }

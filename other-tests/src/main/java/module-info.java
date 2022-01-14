@@ -1,5 +1,5 @@
 open module other.tests {
-    requires org.apache.logging.log4j;
+    requires slf4j.api;
     requires commons.beanutils;
     requires my.stream.utils;
 }
