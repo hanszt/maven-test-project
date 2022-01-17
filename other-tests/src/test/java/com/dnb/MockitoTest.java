@@ -14,7 +14,7 @@ class MockitoTest {
     void testStub() {
         @SuppressWarnings("unchecked") LinkedList<String> mockedList = mock(LinkedList.class);
         when(mockedList.get(0)).thenReturn("first");
-        assertEquals("first", mockedList.get(0), "Testing a stub");
+        assertEquals("first", mockedList.get(0), "Testing first stub");
     }
 
 }

@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>org.hzt.utils</groupId>
-            <artifactId>my-stream-utils</artifactId>
+            <artifactId>my-utils</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hzt.utils</groupId>

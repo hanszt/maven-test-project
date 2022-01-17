@@ -33,7 +33,7 @@ class ReflectionSampleTest {
         //The map contains integer type keys, but its hash is created for the string type? Weird behaviour
         Map<Integer, Bic> integerToBicMap = bics.stream()
                 .collect(toUnmodifiableMap(integerPropertyAccessor("name"), bic -> bic));
-        //weird outcome, map with keys of type integer gives a value back when lookup key is of type String
+        //weird outcome, map with keys of type integer gives first value back when lookup key is of type String
         // but not when it is of type integer!
         //So lets not use the integerPropertyAccessor function
         assertEquals(integerToBicMap.get("1"), bic1);

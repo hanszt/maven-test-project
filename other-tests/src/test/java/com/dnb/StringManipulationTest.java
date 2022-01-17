@@ -20,9 +20,9 @@ class StringManipulationTest {
 
     @Test
     void testInvertString() {
-        String test = "This is a string that needs to be inverted";
+        String test = "This is first string that needs to be inverted";
         String inverted = new StringBuilder(test).reverse().toString();
-        assertEquals("detrevni eb ot sdeen taht gnirts a si sihT", inverted);
+        assertEquals("detrevni eb ot sdeen taht gnirts first si sihT", inverted);
     }
 
     @Test

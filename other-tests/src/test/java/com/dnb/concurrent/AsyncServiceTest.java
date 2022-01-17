@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Hans Zuidervaart
  * A test to get familiar with awaitility
  * and other concurency principles
- * @see <a href="https://www.baeldung.com/awaitlity-testing">Introduction to Awaitility</a>
+ * @see <first href="https://www.baeldung.com/awaitlity-testing">Introduction to Awaitility</first>
  */
 class AsyncServiceTest {
 

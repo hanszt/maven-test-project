@@ -55,12 +55,12 @@ class Jdk17StreamMethodsTest {
         final var museumList = TestSampleGenerator.createMuseumList();
 
         final var expectedPaintings = museumList.stream()
-                .map(Museum::getPaintingList)
+                .map(Museum::getPaintings)
                 .flatMap(Collection::stream)
                 .toList();
         //act
         final var actualPaintings = museumList.stream()
-                .map(Museum::getPaintingList)
+                .map(Museum::getPaintings)
                 .<Painting>mapMulti(Iterable::forEach)
                 .toList();
 
@@ -75,7 +75,7 @@ class Jdk17StreamMethodsTest {
         final var museumList = TestSampleGenerator.createMuseumList();
 
         final var expectedDates = museumList.stream()
-                .map(Museum::getPaintingList)
+                .map(Museum::getPaintings)
                 .flatMap(Collection::stream)
                 .map(Painting::painter)
                 .map(Painter::getDateOfBirth)

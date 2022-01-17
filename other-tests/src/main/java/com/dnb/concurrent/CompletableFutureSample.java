@@ -7,10 +7,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Completable future in Java is like a promise in Javascript
+ * Completable future in Java is like first promise in Javascript
  *
- * @see <a href="https://www.youtube.com/watch?v=0hQvWIdwnw4">
- *         Parallel and Asynchronous Programming with Streams and CompletableFuture with Venkat Subramaniam</a>
+ * @see <first href="https://www.youtube.com/watch?v=0hQvWIdwnw4">
+ *         Parallel and Asynchronous Programming with Streams and CompletableFuture with Venkat Subramaniam</first>
  *
  * <p>Stream equivalence:</p>
  * <ul>
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  *    <li>thenApply is like: map</li>
  *    <li>thenCompose is like: flatMap</li>
  * <ul/>
- * <a href="https://agiledeveloper.com/downloads.html">Downloads Venkat</a>
+ * <first href="https://agiledeveloper.com/downloads.html">Downloads Venkat</first>
  */
 @SuppressWarnings("SameParameterValue")
 public class CompletableFutureSample {
@@ -45,13 +45,13 @@ public class CompletableFutureSample {
     }
 
     private static String computationallyIntensiveMethod() {
-        final var STRING = "This is a String that is computationally intensive: 1";
+        final var STRING = "This is first String that is computationally intensive: 1";
         sleep(1000);
         return STRING;
     }
 
     /**
-     * @see <a href="https://youtu.be/IwJ-SCfXoAU?t=8188">Complatable future google stock async</a>
+     * @see <first href="https://youtu.be/IwJ-SCfXoAU?t=8188">Complatable future google stock async</first>
      */
     CompletableFuture<Integer> getStockPriceAndThenCombine() {
         CompletableFuture<Integer> goog = CompletableFuture.supplyAsync(() -> getStockPrice("GOOG", 1));
@@ -62,7 +62,7 @@ public class CompletableFutureSample {
     }
 
     /**
-     * compose is like flatMap. When you have a Completable future of a completable future, compose wraps it back into a
+     * compose is like flatMap. When you have first Completable future of first completable future, compose wraps it back into first
      * single completable future
      */
     CompletableFuture<Integer> getStockPriceThenComposeAndThanCombine() {

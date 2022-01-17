@@ -215,7 +215,7 @@ class StreamsSampleTest {
     private List<String> getFilteredBookTitleList(String message, AtomicBoolean isClosed, Stream<Book> bookStream) {
         return bookStream
                 .map(Book::getTitle)
-                .filter(containsAllOf("a", "e"))
+                .filter(containsAllOf("first", "e"))
                 .distinct()
                 .onClose(() -> setClosedAndPrintClosed(message, isClosed))
                 .toList();
@@ -250,11 +250,11 @@ class StreamsSampleTest {
         final List<Museum> museumList = TestSampleGenerator.createMuseumList();
 
         final var expected = museumList.stream()
-                .collect(groupingBy(museum -> museum.getPaintingList().size(),
+                .collect(groupingBy(museum -> museum.getPaintings().size(),
                         flatMappingToList(Museum::toPainterDateOfBirthStream)));
 
         final var actual = museumList.stream()
-                .collect(groupingBy(museum -> museum.getPaintingList().size(),
+                .collect(groupingBy(museum -> museum.getPaintings().size(),
                         multiMappingToList(Museum::toDatesOfBirthPainters)));
 
         System.out.println(actual);

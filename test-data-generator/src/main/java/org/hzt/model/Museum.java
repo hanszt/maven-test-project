@@ -49,7 +49,7 @@ public class Museum implements Comparable<Museum>, Iterable<Painting> {
         this.mostPopularPainting = mostPopularPainting;
     }
 
-    public List<Painting> getPaintingList() {
+    public List<Painting> getPaintings() {
         return Collections.unmodifiableList(paintingList);
     }
 

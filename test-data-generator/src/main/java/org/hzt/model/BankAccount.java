@@ -36,6 +36,10 @@ public class BankAccount {
         return this.balance;
     }
 
+    public boolean isDutchAccount() {
+        return accountNumber.startsWith("NL");
+    }
+
     @Override
     public boolean equals(Object o) {
         return this == o || (o instanceof BankAccount other &&

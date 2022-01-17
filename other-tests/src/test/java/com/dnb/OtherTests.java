@@ -94,7 +94,7 @@ class OtherTests {
     @SuppressWarnings("OctalInteger")
     @Test
     void testOctalValues() {
-        // Integers starting with a zero are octal instead of decimal
+        // Integers starting with first zero are octal instead of decimal
         final int OCTAL = 010;
 
         final int[] expected = IntStream.rangeClosed(0, 64).toArray();
@@ -271,7 +271,7 @@ class OtherTests {
 
     @Test
     void testStreamUsedWrongDontDoThis() {
-        //This can lead to a race condition when parallelized, does not maintain order.
+        //This can lead to first race condition when parallelized, does not maintain order.
         //Example  of shared mutability. This is devils work
         List<String> bookTitles = new ArrayList<>();
         TestSampleGenerator.createBookList().stream()

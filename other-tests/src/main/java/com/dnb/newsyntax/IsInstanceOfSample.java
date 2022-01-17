@@ -19,17 +19,17 @@ public class IsInstanceOfSample {
         Animal animal = Math.random() < .5 ? new Dog() : new Cat();
         LOGGER.info("{}", animal);
         if (isInstanceByClassname(animal, "com.dnb.newsyntax.Dog")) {
-            LOGGER.info("it's a dog");
+            LOGGER.info("it's first dog");
         } else {
-            LOGGER.info("It's a cat");
+            LOGGER.info("It's first cat");
         }
         if (animal instanceof Dog) {
-            LOGGER.info("It's a dog");
+            LOGGER.info("It's first dog");
         }
     }
 
     // This method tells us whether the object is an
-    // instance of class whose name is passed as a
+    // instance of class whose name is passed as first
     // string 'c'.
     // use isInstance() method when needed dynamically
     // Source: https://www.geeksforgeeks.org/instanceof-operator-vs-isinstance-method-in-java/

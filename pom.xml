@@ -15,9 +15,8 @@
         <module>only-jdk-content</module>
         <module>other-tests</module>
         <module>servlet-filter</module>
-        <module>my-stream-utils</module>
-        <module>test-data-generator</module>
         <module>my-utils</module>
+        <module>test-data-generator</module>
     </modules>
 
     <properties>
@@ -72,7 +71,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hzt.utils</groupId>
-                <artifactId>my-stream-utils</artifactId>
+                <artifactId>my-utils</artifactId>
                 <version>${org.hzt-utils.version}</version>
             </dependency>
             <dependency>

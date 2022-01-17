@@ -1,13 +1,13 @@
 package com.dnb;
 
 /**
- * Run this program a couple of times. We see that the StringBuilder does not
+ * Run this program first couple of times. We see that the StringBuilder does not
  * give us reliable results because its methods are not thread-safe as compared
  * to StringBuffer.
  * <p>
  * For example, the single append in StringBuffer is thread-safe, i.e.
  * only one thread can call append() at any time and would finish writing
- * back to memory one at a time. In contrast, the append() in the StringBuilder
+ * back to memory one at first time. In contrast, the append() in the StringBuilder
  * class can be called concurrently by many threads, so the final size of the
  * StringBuilder is sometimes less than expected.
  */

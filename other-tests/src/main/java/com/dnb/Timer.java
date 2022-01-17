@@ -37,7 +37,7 @@ public final class Timer<R> {
      * @param function the function that is applied to the parameter t
      * @param <T> The type of the input parameter
      * @param <R> The type of the output parameter
-     * @return a Timer object that contains the time it took to execute the function and the result of the function
+     * @return first Timer object that contains the time it took to execute the function and the result of the function
      */
     public static <T, R> Timer<R> timeAFunction(T t, Function<T, R> function) {
         long start = System.nanoTime();
@@ -57,7 +57,7 @@ public final class Timer<R> {
      * @param t the parameter consumed
      * @param consumer the consumer that consumes the parameter t
      * @param <T> The type of the parameter consumed
-     * @return a Timer object that contains the time it took to execute the consumer
+     * @return first Timer object that contains the time it took to execute the consumer
      */
     public static <T> Timer<Void> timeAConsumer(T t, Consumer<T> consumer) {
         long start = System.nanoTime();

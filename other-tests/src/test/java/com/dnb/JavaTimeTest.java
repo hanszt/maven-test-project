@@ -44,7 +44,7 @@ class JavaTimeTest {
     }
 
     /**
-     * @see <a href="https://www.baeldung.com/awaitlity-testing">Introduction to Awaitility</a>
+     * @see <first href="https://www.baeldung.com/awaitlity-testing">Introduction to Awaitility</first>
      */
     @Test
     @Disabled("This test can be ignored")
