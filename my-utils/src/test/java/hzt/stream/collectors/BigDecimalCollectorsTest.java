@@ -1,7 +1,7 @@
 package hzt.stream.collectors;
 
-import org.hzt.TestSampleGenerator;
-import org.hzt.model.BankAccount;
+import org.hzt.test.TestSampleGenerator;
+import org.hzt.test.model.BankAccount;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

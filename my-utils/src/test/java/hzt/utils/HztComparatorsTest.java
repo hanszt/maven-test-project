@@ -1,8 +1,7 @@
 package hzt.utils;
 
-import hzt.utils.HztComparators;
-import org.hzt.TestSampleGenerator;
-import org.hzt.model.Book;
+import org.hzt.test.TestSampleGenerator;
+import org.hzt.test.model.Book;
 import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;

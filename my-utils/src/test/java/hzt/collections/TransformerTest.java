@@ -1,13 +1,13 @@
 package hzt.collections;
 
 import hzt.stream.collectors.MyCollectors;
-import org.hzt.TestSampleGenerator;
-import org.hzt.model.BankAccount;
-import org.hzt.model.Book;
-import org.hzt.model.Customer;
-import org.hzt.model.Museum;
-import org.hzt.model.Painter;
-import org.hzt.model.Painting;
+import org.hzt.test.TestSampleGenerator;
+import org.hzt.test.model.BankAccount;
+import org.hzt.test.model.Book;
+import org.hzt.test.model.Customer;
+import org.hzt.test.model.Museum;
+import org.hzt.test.model.Painter;
+import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -16,6 +16,7 @@ import java.time.Period;
 import java.time.Year;
 import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
@@ -37,10 +38,11 @@ class TransformerTest {
 
     @Test
     void testFlatMapFilterAndMapToList() {
-        final var museumList = TestSampleGenerator.createMuseumList();
+        final var museumList = TestSampleGenerator.getMuseumList();
 
         final var expectedPainters = museumList.stream()
                 .flatMap(museum -> museum.getPaintings().stream())
+                .filter(Objects::nonNull)
                 .filter(Painting::isInMuseum)
                 .map(Painting::painter)
                 .toList();
@@ -55,7 +57,7 @@ class TransformerTest {
 
     @Test
     void testFilterAndMapToCollection() {
-        final var museumList = TestSampleGenerator.createMuseumList();
+        final var museumList = TestSampleGenerator.getMuseumList();
 
         final Deque<LocalDate> actualLocalDates = Transformer.of(museumList)
                 .filter(museum -> museum.getPaintings().size() > 3)
@@ -71,10 +73,11 @@ class TransformerTest {
 
     @Test
     void testToMappedSet() {
-        final var museumList = TestSampleGenerator.createMuseumList();
+        final var museumList = TestSampleGenerator.getMuseumList();
 
         final var expected = museumList.stream()
                 .map(Museum::getDateOfOpening)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableSet());
 
         final var actual = Transformer.of(museumList).toSetOf(Museum::getDateOfOpening);
@@ -84,11 +87,12 @@ class TransformerTest {
 
     @Test
     void testToMap() {
-        final var museumList = TestSampleGenerator.createMuseumList();
+        final var museumList = TestSampleGenerator.getMuseumList();
 
         final var actualMap = Transformer.of(museumList).toMapOf(Museum::getName, Museum::getPaintings);
 
         final var expectedMap = museumList.stream()
+                .filter(m -> m.getPaintings() != null && m.getName() != null)
                 .collect(toUnmodifiableMap(Museum::getName, Museum::getPaintings));
 
         assertEquals(expectedMap, actualMap);
@@ -173,7 +177,7 @@ class TransformerTest {
 
     @Test
     void testIntersectMuseumPaintings() {
-        final var museumList = TestSampleGenerator.createMuseumList();
+        final var museumList = TestSampleGenerator.getMuseumList();
 
         final var intersection = Transformer.of(museumList).intersectBy(Museum::getPaintings);
 
@@ -537,6 +541,21 @@ class TransformerTest {
                 .maxOf(Customer::getId);
 
        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testFlatMapToSet() {
+        var museumList = TestSampleGenerator.getMuseumList();
+
+        final var expected = museumList.stream()
+                .map(Museum::getPaintings)
+                .flatMap(Collection::stream)
+                .filter(Objects::nonNull)
+                .collect(toUnmodifiableSet());
+
+        final var actual = Transformer.of(museumList).flatMapToSetOf(Museum::getPaintings);
+
+        assertEquals(expected, actual);
     }
 
     private void printEvery10_000stElement(int i) {

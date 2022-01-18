@@ -66,7 +66,7 @@ public final class Transformer<T> implements Iterable<T> {
     }
 
     public static <T> Transformer<T> empty() {
-        return Transformer.of(() -> new Iterator<T>() {
+        return Transformer.of(() -> new Iterator<>() {
             @Override
             public boolean hasNext() {
                 return false;
@@ -74,7 +74,7 @@ public final class Transformer<T> implements Iterable<T> {
 
             @Override
             public T next() {
-                throw new NoSuchElementException();
+                throw noValuePresentException();
             }
         });
     }
@@ -870,7 +870,7 @@ public final class Transformer<T> implements Iterable<T> {
     }
 
     @NotNull
-    private static RuntimeException noValuePresentException() {
+    private static NoSuchElementException noValuePresentException() {
         return new NoSuchElementException("No value present");
     }
 

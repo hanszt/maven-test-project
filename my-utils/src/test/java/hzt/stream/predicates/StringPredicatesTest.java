@@ -1,7 +1,7 @@
 package hzt.stream.predicates;
 
-import org.hzt.TestSampleGenerator;
-import org.hzt.model.Painting;
+import org.hzt.test.TestSampleGenerator;
+import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

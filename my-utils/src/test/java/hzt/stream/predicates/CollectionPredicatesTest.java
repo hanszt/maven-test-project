@@ -2,9 +2,9 @@ package hzt.stream.predicates;
 
 import hzt.stream.StreamUtils;
 import hzt.collections.MyCollections;
-import org.hzt.TestSampleGenerator;
-import org.hzt.model.Painter;
-import org.hzt.model.Painting;
+import org.hzt.test.TestSampleGenerator;
+import org.hzt.test.model.Painter;
+import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

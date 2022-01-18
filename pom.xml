@@ -34,6 +34,7 @@
         <!--        utils-->
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <guava.version>31.0.1-jre</guava.version>
+        <streamex.version>0.8.1</streamex.version>
         <!--        reactive-streams-->
         <reactive-streams-tck.version>1.0.3</reactive-streams-tck.version>
         <rxjava.version>3.1.1</rxjava.version>
@@ -97,7 +98,16 @@
                         <groupId>org.apache.logging.log4j</groupId>
                         <artifactId>*</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>ch.qos.logback</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>one.util</groupId>
+                <artifactId>streamex</artifactId>
+                <version>${streamex.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

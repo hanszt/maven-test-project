@@ -1,16 +1,17 @@
 package hzt.utils;
 
 import hzt.stream.StreamUtils;
-import org.hzt.TestSampleGenerator;
-import org.hzt.model.Book;
-import org.hzt.model.Museum;
-import org.hzt.model.Painter;
-import org.hzt.model.Painting;
+import org.hzt.test.TestSampleGenerator;
+import org.hzt.test.model.Book;
+import org.hzt.test.model.Museum;
+import org.hzt.test.model.Painter;
+import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
@@ -399,7 +400,7 @@ class StreamUtilsTest {
                 new Museum("", null, List.of(paintingContainingNulls)),
                 null);
 
-        final var expected = TestSampleGenerator.createMuseumList();
+        final var expected = TestSampleGenerator.getMuseumList();
         final var containingNulls = Stream.concat(listContainingNestedNulls.stream(), expected.stream())
                 .toList();
 
@@ -492,6 +493,7 @@ class StreamUtilsTest {
                 .toList();
 
         final var expectedDaysOfWeek = List.of(
+                DayOfWeek.WEDNESDAY,
                 LocalDate.of(1632, Month.OCTOBER, 31).getDayOfWeek(),
                 LocalDate.of(1853, Month.MARCH, 20).getDayOfWeek(),
                 LocalDate.of(1881, Month.OCTOBER, 25).getDayOfWeek());
@@ -529,6 +531,7 @@ class StreamUtilsTest {
                 .toList();
 
         final var expectedDaysOfWeek = List.of(
+                DayOfWeek.WEDNESDAY,
                 LocalDate.of(1632, Month.OCTOBER, 31).getDayOfWeek(),
                 LocalDate.of(1853, Month.MARCH, 20).getDayOfWeek(),
                 LocalDate.of(1881, Month.OCTOBER, 25).getDayOfWeek());
@@ -549,7 +552,7 @@ class StreamUtilsTest {
                 new Museum("", null, List.of(paintingContainingNulls)),
                 null);
 
-        final var museums = TestSampleGenerator.createMuseumList();
+        final var museums = TestSampleGenerator.getMuseumList();
         return Stream.concat(listContainingNestedNulls.stream(), museums.stream())
                 .toList();
     }

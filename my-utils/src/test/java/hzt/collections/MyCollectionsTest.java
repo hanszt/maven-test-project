@@ -1,9 +1,9 @@
 package hzt.collections;
 
-import org.hzt.TestSampleGenerator;
-import org.hzt.model.Museum;
-import org.hzt.model.Painter;
-import org.hzt.model.Painting;
+import org.hzt.test.TestSampleGenerator;
+import org.hzt.test.model.Museum;
+import org.hzt.test.model.Painter;
+import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -51,7 +51,7 @@ class MyCollectionsTest {
 
     @Test
     void testIterableFilterMapWithLinesMatch() {
-        var museumList = TestSampleGenerator.createMuseumList();
+        var museumList = TestSampleGenerator.getMuseumList();
         final var painterNamesActual = MyCollections.distinct(MyCollections.filter(MyCollections.map(MyCollections.flatMap(MyCollections.map(museumList,
                                 Museum::getPaintings),
                                 Painting::painter),

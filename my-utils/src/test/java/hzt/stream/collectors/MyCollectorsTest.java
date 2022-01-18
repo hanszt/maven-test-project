@@ -1,12 +1,12 @@
 package hzt.stream.collectors;
 
 import hzt.collections.MyCollections;
-import org.hzt.TestSampleGenerator;
-import org.hzt.model.BankAccount;
-import org.hzt.model.Customer;
-import org.hzt.model.Museum;
-import org.hzt.model.Painter;
-import org.hzt.model.Painting;
+import org.hzt.test.TestSampleGenerator;
+import org.hzt.test.model.BankAccount;
+import org.hzt.test.model.Customer;
+import org.hzt.test.model.Museum;
+import org.hzt.test.model.Painter;
+import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -275,7 +275,7 @@ class MyCollectorsTest {
 
     @Test
     void testIntersectingBy() {
-        final List<Museum> museumList = TestSampleGenerator.createMuseumList();
+        final List<Museum> museumList = TestSampleGenerator.getMuseumList();
 
         final var nameLists = museumList.stream()
                 .<List<String>>mapMulti((museum, consumer) ->

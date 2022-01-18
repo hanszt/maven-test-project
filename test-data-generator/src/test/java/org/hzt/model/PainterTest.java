@@ -1,6 +1,8 @@
 package org.hzt.model;
 
-import org.hzt.TestSampleGenerator;
+import org.hzt.test.TestSampleGenerator;
+import org.hzt.test.model.Painter;
+import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

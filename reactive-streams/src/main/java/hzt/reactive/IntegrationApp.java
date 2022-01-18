@@ -1,13 +1,13 @@
 package hzt.reactive;
 
 import akka.actor.ActorSystem;
-import akka.stream.ActorMaterializer;
+import akka.stream.Materializer;
 import akka.stream.javadsl.Flow;
 import akka.stream.javadsl.JavaFlowSupport;
 import io.reactivex.rxjava3.core.Flowable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.reactivestreams.FlowAdapters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.adapter.JdkFlowAdapter;
 import reactor.core.publisher.Flux;
 
@@ -18,23 +18,22 @@ import java.util.concurrent.Flow.Publisher;
 /**
  *
  * Gluing different implementations of Reactive streams using the Reactive Streams api from java 9+
- * https://youtu.be/_stAxdjx8qk?t=2406
- * https://youtu.be/kG2SEcl1aMM?t=4487
+ * @see <a href="https://youtu.be/_stAxdjx8qk?t=2406">Reactive Streams in Java 9+, use external libs</a>
+ * @see <a href="https://youtu.be/kG2SEcl1aMM?t=4487">
+ *     Java Streams vs Reactive Streams: Which, When, How, and Why? by Venkat Subramaniam</a>
  */
 public class IntegrationApp {
 
-    private static final Logger LOGGER = LogManager.getLogger(IntegrationApp.class);
-
-    private static final ActorSystem actorSystem = ActorSystem.create();
-    private static final ActorMaterializer actorMaterializer = ActorMaterializer.create(actorSystem);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationApp.class);
 
     public static void main(String[] args) {
         var reactorPublisher = reactorPublisher();
         var akkaStreamsProcessor = akkaStreamProcessor();
         reactorPublisher.subscribe(akkaStreamsProcessor);
-        Flowable
+        final var disposable = Flowable
                 .fromPublisher(FlowAdapters.toProcessor(akkaStreamsProcessor))
-                .subscribe(LOGGER::info);
+                .subscribe(result -> LOGGER.info("{}", result));
+        LOGGER.info("Is disposed: {}", disposable.isDisposed());
     }
 
     private static Publisher<Long> reactorPublisher() {
@@ -44,9 +43,9 @@ public class IntegrationApp {
     }
 
     private static Processor<Long, Long> akkaStreamProcessor() {
-        var negatingFlow = Flow.of(Long.class)
-                .map(i -> -i);
-        return JavaFlowSupport.Flow.toProcessor(negatingFlow).run(actorMaterializer);
+        var negatingFlow = Flow.of(Long.class).map(i -> -i);
+        final var materializer = Materializer.createMaterializer(ActorSystem.create());
+        return JavaFlowSupport.Flow.toProcessor(negatingFlow).run(materializer);
     }
 
 }
