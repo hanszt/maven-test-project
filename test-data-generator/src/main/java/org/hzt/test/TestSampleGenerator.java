@@ -15,6 +15,7 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -82,7 +83,7 @@ public final class TestSampleGenerator {
         );
     }
 
-    public static List<Museum> getMuseumList() {
+    public static List<Museum> getMuseumListContainingNulls() {
         if (museums == null) {
             museums = createMuseumList();
         }
@@ -146,5 +147,11 @@ public final class TestSampleGenerator {
 
     private static Number toNumberType(int integer) {
         return TO_NUMBER_TYPE_FUNCTIONS.get(integer % TO_NUMBER_TYPE_FUNCTIONS.size()).apply(integer);
+    }
+
+    public static Map<String, Museum> createMuseumMap() {
+        return createMuseumList().stream()
+                .filter(e -> e.getName() != null)
+                .collect(Collectors.toUnmodifiableMap(Museum::getName, Function.identity()));
     }
 }

@@ -51,7 +51,7 @@ class MyCollectionsTest {
 
     @Test
     void testIterableFilterMapWithLinesMatch() {
-        var museumList = TestSampleGenerator.getMuseumList();
+        var museumList = TestSampleGenerator.getMuseumListContainingNulls();
         final var painterNamesActual = MyCollections.distinct(MyCollections.filter(MyCollections.map(MyCollections.flatMap(MyCollections.map(museumList,
                                 Museum::getPaintings),
                                 Painting::painter),

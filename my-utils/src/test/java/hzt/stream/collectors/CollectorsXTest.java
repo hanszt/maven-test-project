@@ -22,7 +22,7 @@ import java.util.stream.IntStream;
 
 import static hzt.stream.StreamUtils.nullSafe;
 import static hzt.stream.collectors.BigDecimalCollectors.*;
-import static hzt.stream.collectors.MyCollectors.*;
+import static hzt.stream.collectors.CollectorsX.*;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class MyCollectorsTest {
+class CollectorsXTest {
 
     @Test
     void testBranchingPaintingDataToThreeValues() {
@@ -231,10 +231,10 @@ class MyCollectorsTest {
         final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
 
         final double standardDeviationAge = paintingList.stream()
-                .collect(MyCollectors.standardDeviatingDouble(Painting::ageInYears));
+                .collect(CollectorsX.standardDeviatingDouble(Painting::ageInYears));
 
         final DoubleStatistics summarizingAges = paintingList.stream()
-                .collect(MyCollectors.toDoubleStatisticsBy(Painting::ageInYears));
+                .collect(CollectorsX.toDoubleStatisticsBy(Painting::ageInYears));
 
         OptionalDouble optionalAverage = paintingList.stream()
                 .mapToDouble(Painting::ageInYears)
@@ -275,7 +275,7 @@ class MyCollectorsTest {
 
     @Test
     void testIntersectingBy() {
-        final List<Museum> museumList = TestSampleGenerator.getMuseumList();
+        final List<Museum> museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
         final var nameLists = museumList.stream()
                 .<List<String>>mapMulti((museum, consumer) ->
@@ -306,14 +306,14 @@ class MyCollectorsTest {
 
         final List<BankAccount> expectedBankAccounts = IntStream.range(0, NR_OF_ACCOUNTS)
                 .boxed()
-                .mapMulti(MyCollectorsTest::toBankAccount)
+                .mapMulti(CollectorsXTest::toBankAccount)
                 .toList();
 
         System.out.println("bankAccounts.size() = " + expectedBankAccounts.size());
 
         List<BankAccount> actualBankaccountList = IntStream.range(0, NR_OF_ACCOUNTS)
                 .boxed()
-                .collect(multiMappingToList(MyCollectorsTest::toBankAccount));
+                .collect(multiMappingToList(CollectorsXTest::toBankAccount));
 
         assertEquals(actualBankaccountList, expectedBankAccounts);
     }

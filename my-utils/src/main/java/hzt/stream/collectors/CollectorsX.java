@@ -1,6 +1,7 @@
 package hzt.stream.collectors;
 
-import hzt.collections.Transformer;
+import hzt.collections.IterX;
+import hzt.collections.MapX;
 import hzt.stream.StreamUtils;
 import hzt.stream.function.QuadFunction;
 import hzt.stream.function.QuintFunction;
@@ -28,9 +29,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"DuplicatedCode", "unused"})
-public final class MyCollectors {
+public final class CollectorsX {
 
-    private MyCollectors() {
+    private CollectorsX() {
     }
 
     //Experimental. Runs faster into out of memory error than mapMulti method from Stream. No buffer implemented here
@@ -92,14 +93,33 @@ public final class MyCollectors {
         return Collectors.groupingBy(StreamUtils.function(classifierPart1).andThen(classifierPart2));
     }
 
-    public static <T> Collector<T, ?, Transformer<T>> toTransformer() {
-        return Collector.of(() -> new ArrayList<T>(), List::add, MyCollectors::accumulate, Transformer::of);
+    public static <T> Collector<T, ?, IterX<T>> toIterX() {
+        return Collector.of((Supplier<List<T>>) ArrayList::new, List::add, CollectorsX::accumulate, IterX::of);
     }
 
-    private static <T> ArrayList<T> accumulate(ArrayList<T> left, ArrayList<T> right) {
+    public static <T, R> Collector<T, ?, IterX<R>> toIterXOf(Function<T, R> mapper) {
+        return Collectors.mapping(mapper, toIterX());
+    }
+
+    private static <T> List<T> accumulate(List<T> left, List<T> right) {
         left.addAll(right);
         return left;
     }
+
+    public static <T, K, V> Collector<T, ?, MapX<K, V>> toMapX(Function<T, K> keyMapper, Function<T, V> valueMapper) {
+        return Collectors.collectingAndThen(Collectors.toUnmodifiableMap(keyMapper, valueMapper), MapX::of);
+    }
+
+    public static <T, K, V> Collector<T, ?, MapX<K, V>> toMapX(
+            Function<T, K> keyMapper, Function<T, V> valueMapper, BinaryOperator<V> mergeFunction) {
+        return Collectors.collectingAndThen(Collectors.toUnmodifiableMap(keyMapper, valueMapper, mergeFunction), MapX::of);
+    }
+
+    private static <K, V> Map<K, V> accumulateMap(Map<K, V> left, Map<K, V> right) {
+        left.putAll(right);
+        return left;
+    }
+
 
     public static <T, R1, R2> Collector<T, ?, Map.Entry<R1, R2>> teeingToEntry(
             Collector<? super T, ?, R1> downstream1,

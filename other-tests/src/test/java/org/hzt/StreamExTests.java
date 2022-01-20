@@ -16,7 +16,7 @@ class StreamExTests {
 
     @Test
     void testStreamExToFlatList() {
-        final var museumList = TestSampleGenerator.getMuseumList();
+        final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
         final var expected = museumList.stream()
                 .flatMap(m -> m.getPaintings().stream())
@@ -29,7 +29,7 @@ class StreamExTests {
 
     @Test
     void testGroupBy() {
-        final List<Museum> museumList = TestSampleGenerator.getMuseumList();
+        final List<Museum> museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
         final var expected = museumList.stream()
                 .flatMap(m -> m.getPaintings().stream())

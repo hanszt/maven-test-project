@@ -2,7 +2,7 @@ package org.hzt;
 
 import org.hzt.model.Payment;
 import org.hzt.model.Person;
-import hzt.stream.collectors.MyCollectors;
+import hzt.stream.collectors.CollectorsX;
 import org.hzt.test.model.Book;
 import org.hzt.test.model.Museum;
 import org.hzt.test.model.Painter;
@@ -28,9 +28,9 @@ import java.util.stream.Stream;
 
 import static hzt.stream.StreamUtils.by;
 import static hzt.stream.StreamUtils.function;
-import static hzt.stream.collectors.MyCollectors.flatMappingToList;
-import static hzt.stream.collectors.MyCollectors.mappingToSet;
-import static hzt.stream.collectors.MyCollectors.multiMappingToList;
+import static hzt.stream.collectors.CollectorsX.flatMappingToList;
+import static hzt.stream.collectors.CollectorsX.mappingToSet;
+import static hzt.stream.collectors.CollectorsX.multiMappingToList;
 import static hzt.stream.predicates.ComparingPredicates.greaterThan;
 import static hzt.stream.predicates.StringPredicates.containsAllOf;
 import static java.util.Map.Entry.comparingByKey;
@@ -244,7 +244,7 @@ class StreamsSampleTest {
         final Set<LocalDate> actual = paintingList.stream()
                 .map(Painting::painter)
                 .map(Painter::getDateOfDeath)
-                .collect(MyCollectors.multiMapping(Optional::ifPresent, toUnmodifiableSet()));
+                .collect(CollectorsX.multiMapping(Optional::ifPresent, toUnmodifiableSet()));
 
         System.out.println(actual);
         assertEquals(expected, actual);
@@ -252,7 +252,7 @@ class StreamsSampleTest {
 
     @Test
     void testMultiMappingMuseums() {
-        final List<Museum> museumList = TestSampleGenerator.getMuseumList();
+        final List<Museum> museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
         final var expected = museumList.stream()
                 .collect(groupingBy(museum -> museum.getPaintings().size(),

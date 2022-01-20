@@ -59,7 +59,7 @@ class BigDecimalCollectorsTest {
 
         final var doubleStatistics = sampleBankAccountList.stream()
                 .map(BankAccount::getBalance)
-                .collect(MyCollectors.toDoubleStatisticsBy(BigDecimal::doubleValue));
+                .collect(CollectorsX.toDoubleStatisticsBy(BigDecimal::doubleValue));
 
         final var expectedStandardDeviationFromDouble = BigDecimal.valueOf(doubleStatistics.getStandardDeviation())
                 .setScale(2, RoundingMode.HALF_UP);

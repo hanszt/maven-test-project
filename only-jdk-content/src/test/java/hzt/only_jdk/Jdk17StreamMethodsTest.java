@@ -52,7 +52,7 @@ class Jdk17StreamMethodsTest {
     @Test
     void testMapMultiForFlatMappingAStreamOfIterables() {
         //arrange
-        final var museumList = TestSampleGenerator.getMuseumList();
+        final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
         final var expectedPaintings = museumList.stream()
                 .map(Museum::getPaintings)
@@ -72,7 +72,7 @@ class Jdk17StreamMethodsTest {
     @Test
     void testMapMultiForMappingToOtherTypeUsingOtherStream() {
         //arrange
-        final var museumList = TestSampleGenerator.getMuseumList();
+        final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
         final var expectedDates = museumList.stream()
                 .map(Museum::getPaintings)

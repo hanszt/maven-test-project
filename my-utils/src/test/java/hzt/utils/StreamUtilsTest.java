@@ -400,7 +400,7 @@ class StreamUtilsTest {
                 new Museum("", null, List.of(paintingContainingNulls)),
                 null);
 
-        final var expected = TestSampleGenerator.getMuseumList();
+        final var expected = TestSampleGenerator.getMuseumListContainingNulls();
         final var containingNulls = Stream.concat(listContainingNestedNulls.stream(), expected.stream())
                 .toList();
 
@@ -552,7 +552,7 @@ class StreamUtilsTest {
                 new Museum("", null, List.of(paintingContainingNulls)),
                 null);
 
-        final var museums = TestSampleGenerator.getMuseumList();
+        final var museums = TestSampleGenerator.getMuseumListContainingNulls();
         return Stream.concat(listContainingNestedNulls.stream(), museums.stream())
                 .toList();
     }

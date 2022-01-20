@@ -22,6 +22,11 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
         </dependency>
+        <dependency>
+            <groupId>one.util</groupId>
+            <artifactId>streamex</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

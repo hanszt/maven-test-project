@@ -16,7 +16,7 @@ class MuseumTest {
 
     @Test
     void testIteratingOverPaintingsInMuseum() {
-        final List<Museum> museumList = TestSampleGenerator.getMuseumList();
+        final List<Museum> museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
         final Museum firstMuseum = museumList.stream()
                 .findFirst()
@@ -39,7 +39,7 @@ class MuseumTest {
 
     @Test
     void testCreatingPaintingStreamFromMuseumSpliterator() {
-        final List<Museum> museumList = TestSampleGenerator.getMuseumList();
+        final List<Museum> museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
         final Museum firstMuseum = museumList.stream()
                 .findFirst()

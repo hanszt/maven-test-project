@@ -1,17 +1,26 @@
 package hzt.collections;
 
+import hzt.stream.collectors.BigDecimalCollectors;
+import hzt.stream.collectors.BigDecimalSummaryStatistics;
+import hzt.stream.function.TriFunction;
+import hzt.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IntSummaryStatistics;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -19,12 +28,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
+import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
@@ -37,7 +49,7 @@ import java.util.stream.StreamSupport;
 
 /**
  * This is a convenience class to transform smaller iterables including collections or arrays to some other state.
- *
+ * <p>
  * Its use is very comparable to the streams api but with shorter syntax.
  * <p>
  * It is inspired by the functional methods provided for collections in Kotlin
@@ -46,74 +58,163 @@ import java.util.stream.StreamSupport;
  * For smaller collections < 100_000 elements, the performance is similar to streams
  * <p>
  * For larger collections, or when a lot of transformation are applied, streams are preferred.
- *
+ * <p>
  * For a Transformer, I suggest not to apply more than 3 subsequent transformations.
  *
  * @param <T> The Type of the Iterable in the Transform object
  * @author Hans Zuidervaart
  */
-@SuppressWarnings("ClassCanBeRecord")
-public final class Transformer<T> implements Iterable<T> {
+@SuppressWarnings({"ClassCanBeRecord", "unused"})
+public final class IterX<T> implements Iterable<T>, IndexedIterable<T>, Comparable<IterX<T>>  {
 
     private final Iterable<T> iterable;
 
-    private Transformer(@NotNull Iterable<T> iterable) {
+    private IterX(@NotNull Iterable<T> iterable) {
         this.iterable = iterable;
     }
 
-    public static <T> Transformer<T> of(Iterable<T> iterable) {
-        return new Transformer<>(iterable);
-    }
-
-    public static <T> Transformer<T> empty() {
-        return Transformer.of(() -> new Iterator<>() {
-            @Override
-            public boolean hasNext() {
-                return false;
-            }
-
-            @Override
-            public T next() {
-                throw noValuePresentException();
-            }
-        });
+    public static <T> IterX<T> of(Iterable<T> iterable) {
+        return new IterX<>(iterable);
     }
 
     @SafeVarargs
-    public static <T> Transformer<T> of(T... values) {
-        return Transformer.of(List.of(values));
+    public static <T> IterX<T> of(T... values) {
+        return IterX.of(List.of(values));
     }
 
-    public static Transformer<Integer> of(int... values) {
+    public static IterX<Integer> ofInts(int... values) {
         List<Integer> valueList = new ArrayList<>();
         for (var value : values) {
             valueList.add(value);
         }
-        return Transformer.of(valueList);
+        return IterX.of(valueList);
     }
 
-    public static Transformer<Long> of(long... values) {
+    public static IterX<Long> ofLongs(long... values) {
         List<Long> valueList = new ArrayList<>();
         for (var value : values) {
             valueList.add(value);
         }
-        return Transformer.of(valueList);
+        return IterX.of(valueList);
     }
 
-    public static Transformer<Double> of(double... values) {
+    public static IterX<Double> ofDoubles(double... values) {
         List<Double> valueList = new ArrayList<>();
-        for (var i : values) {
-            valueList.add(i);
+        for (var value : values) {
+            valueList.add(value);
         }
-        return Transformer.of(valueList);
+        return IterX.of(valueList);
     }
 
-    public <R> Transformer<R> map(Function<T, R> mapper) {
-        return Transformer.of(toCollectionOf(mapper, ArrayList::new));
+    public static IterX<Integer> range(int start, int end, IntPredicate predicate) {
+        List<Integer> valueList = new ArrayList<>();
+        for (int i = start; i < end; i++) {
+            if (predicate.test(i)) {
+                valueList.add(i);
+            }
+        }
+        return IterX.of(valueList);
     }
 
-    public <R> Transformer<R> mapNotNull(Function<T, R> mapper) {
-        return Transformer.of(toCollectionNotNullOf(mapper, ArrayList::new));
+    public static IterX<Integer> range(int start, int end) {
+        return range(start, end, i -> true);
+    }
+
+    public static IterX<Integer> rangeClosed(int start, int endInclusive, IntPredicate predicate) {
+        List<Integer> valueList = new ArrayList<>();
+        for (int i = start; i <= endInclusive; i++) {
+            if (predicate.test(i)) {
+                valueList.add(i);
+            }
+        }
+        return IterX.of(valueList);
+    }
+
+    public static IterX<Integer> rangeClosed(int start, int endInclusive) {
+        return rangeClosed(start, endInclusive, i -> true);
+    }
+
+    @SafeVarargs
+    public final IterX<T> plus(T first, T... others) {
+        return IterX.of(toMutableListPlus(first, others));
+    }
+
+    @SafeVarargs
+    public final List<T> toListPlus(T first, T... others) {
+        return List.copyOf(toMutableListPlus(first, others));
+    }
+
+    @SafeVarargs
+    public final Set<T> toSetPlus(T first, T... others) {
+        return Set.copyOf(toMutableListPlus(first, others));
+    }
+
+    @SafeVarargs
+    public final List<T> toMutableListPlus(T first, T... others) {
+        List<T> list = new ArrayList<>();
+        for (T t : this) {
+            list.add(t);
+        }
+        list.add(first);
+        if (others.length > 0) {
+            list.addAll(Arrays.asList(others));
+        }
+        return list;
+    }
+
+    public IterX<T> plus(Iterable<T> values) {
+        return IterX.of(toMutableListPlus(values));
+    }
+
+    public List<T> toListPlus(Iterable<T> values) {
+        return List.copyOf(toMutableListPlus(values));
+    }
+
+    public Set<T> toSetPlus(Iterable<T> values) {
+        return Set.copyOf(toMutableListPlus(values));
+    }
+
+    public List<T> toMutableListPlus(Iterable<T> values) {
+        List<T> list = new ArrayList<>();
+        for (T t : this) {
+            list.add(t);
+        }
+        for (T t : values) {
+            list.add(t);
+        }
+        return list;
+    }
+
+    public static <T> IterX<T> empty() {
+        return IterX.of(List.of());
+    }
+
+    public <R> IterX<R> map(Function<T, R> mapper) {
+        return IterX.of(mapTo(ArrayList::new, mapper));
+    }
+
+    public <R> List<R> mapIndexedToMutableList(BiFunction<Integer, T, R> mapper) {
+        return withIndex().mapTo(ArrayList::new, indexedValue -> mapper.apply(indexedValue.index(), indexedValue.value()));
+    }
+
+    public <R> List<R> mapIndexedToList(BiFunction<Integer, T, R> mapper) {
+        return List.copyOf(mapIndexedToMutableList(mapper));
+    }
+
+    public <R> IterX<R> mapIndexed(BiFunction<Integer, T, R> mapper) {
+        return IterX.of(mapIndexedToMutableList(mapper));
+    }
+
+    public <R> List<R> mapMultiToListOf(BiConsumer<? super T, ? super Consumer<R>> mapper) {
+        return stream().mapMulti(mapper).toList();
+    }
+
+    public <R> IterX<R> mapMulti(BiConsumer<? super T, ? super Consumer<R>> mapper) {
+        return IterX.of(mapMultiToListOf(mapper));
+    }
+
+    public <R> IterX<R> mapNotNull(Function<T, R> mapper) {
+        return IterX.of(toCollectionNotNullOf(mapper, ArrayList::new));
     }
 
     public <R> List<R> toListOf(Function<T, R> transform) {
@@ -125,7 +226,7 @@ public final class Transformer<T> implements Iterable<T> {
     }
 
     public <R> List<R> toMutableListOf(Function<T, R> transform) {
-        return toCollectionOf(transform, ArrayList::new);
+        return mapTo(ArrayList::new, transform);
     }
 
     public <R> List<R> toMutableListNotNullOf(Function<T, R> transform) {
@@ -133,14 +234,14 @@ public final class Transformer<T> implements Iterable<T> {
     }
 
     public <R> Set<R> toMutableSetOf(Function<T, R> transform) {
-        return toCollectionOf(transform, HashSet::new);
+        return mapTo(HashSet::new, transform);
     }
 
     public <R> Set<R> toMutableSetNotNullOf(Function<T, R> transform) {
         return toCollectionNotNullOf(transform, HashSet::new);
     }
 
-    public <R, C extends Collection<R>> C toCollectionOf(Function<T, R> mapper, Supplier<C> collectionFactory) {
+    public <R, C extends Collection<R>> C mapTo(Supplier<C> collectionFactory, Function<T, R> mapper) {
         C collection = collectionFactory.get();
         for (T t : iterable) {
             if (t != null) {
@@ -163,8 +264,16 @@ public final class Transformer<T> implements Iterable<T> {
         return collection;
     }
 
-    public Transformer<T> filter(Predicate<T> predicate) {
-        return Transformer.of(filterToCollection(predicate, new ArrayList<>()));
+    public IterX<T> filter(Predicate<T> predicate) {
+        return IterX.of(filterToCollection(predicate, new ArrayList<>()));
+    }
+
+    public List<T> filterIndexedToList(BiPredicate<Integer, T> predicate) {
+        return filterIndexedToCollection(ArrayList::new, predicate);
+    }
+
+    public IterX<T> filterIndexed(BiPredicate<Integer, T> predicate) {
+        return IterX.of(filterIndexedToList(predicate));
     }
 
     public List<T> filterToList(Predicate<T> predicate) {
@@ -192,7 +301,17 @@ public final class Transformer<T> implements Iterable<T> {
         return collection;
     }
 
-    public Transformer<T> filterNot(Predicate<T> predicate) {
+    public <C extends Collection<T>> C filterIndexedToCollection(Supplier<C> collectionFactory, BiPredicate<Integer, T> predicate) {
+        C collection = collectionFactory.get();
+        for (IndexedValue<T> item : IterX.of(iterable).withIndex()) {
+            if (item != null && predicate.test(item.index(), item.value())) {
+                collection.add(item.value());
+            }
+        }
+        return collection;
+    }
+
+    public IterX<T> filterNot(Predicate<T> predicate) {
         return filter(predicate.negate());
     }
 
@@ -204,8 +323,8 @@ public final class Transformer<T> implements Iterable<T> {
         return Set.copyOf(filterToMutableSet(predicate.negate()));
     }
 
-    public <R, C extends Collection<R>> Transformer<R> flatMap(@NotNull Function<T, C> mapper) {
-        return Transformer.of(flatMapToMutableListOf(mapper));
+    public <R, C extends Collection<R>> IterX<R> flatMap(@NotNull Function<T, C> mapper) {
+        return IterX.of(flatMapToMutableListOf(mapper));
     }
 
     public <R, C extends Collection<R>> List<R> flatMapToListOf(Function<T, C> mapper) {
@@ -229,18 +348,8 @@ public final class Transformer<T> implements Iterable<T> {
     }
 
     public <R, C extends Collection<R>> Set<R> flatMapToMutableSetOf(Function<T, C> mapper) {
-        final Set<R> set = new HashSet<>();
-        for (T t : iterable) {
-            if (t == null) {
-                continue;
-            }
-            for (R r : mapper.apply(t)) {
-                if (r != null) {
-                    set.add(r);
-                }
-            }
-        }
-        return set;
+        //noinspection unchecked
+        return (Set<R>) flatMapToCollectionOf(mapper, () -> (C) new HashSet<R>());
     }
 
     public <R, C extends Collection<R>> Set<R> flatMapToSetOf(Function<T, C> mapper) {
@@ -263,13 +372,13 @@ public final class Transformer<T> implements Iterable<T> {
     }
 
     public <R extends Comparable<R>> List<T> toListSortedBy(@NotNull Function<T, R> selector) {
-        final var list = toMutableList();
+        final var list = toMutableListOf(Function.identity());
         list.sort(Comparator.comparing(selector));
         return list;
     }
 
     public <R extends Comparable<R>> List<T> toListSortedDescendingBy(@NotNull Function<T, R> selector) {
-        final var list = toMutableList();
+        final var list = toMutableListOf(Function.identity());
         list.sort(Comparator.comparing(selector).reversed());
         return list;
     }
@@ -280,33 +389,21 @@ public final class Transformer<T> implements Iterable<T> {
         return list;
     }
 
-    public <R extends Comparable<R>> List<R> toDescendingSortedListOf(@NotNull  Function<T, R> selector) {
+    public <R extends Comparable<R>> List<R> toDescendingSortedListOf(@NotNull Function<T, R> selector) {
         final var list = toMutableListOf(selector);
         final Comparator<R> tComparator = Comparator.naturalOrder();
         list.sort(tComparator.reversed());
         return list;
     }
 
-    private List<T> toMutableList() {
-        return toCollection(ArrayList::new);
-    }
-
     public <R extends Comparable<R>> SortedSet<T> toSetSortedBy(Function<T, R> selector) {
         final SortedSet<T> sortedSet = new TreeSet<>(Comparator.comparing(selector));
-        sortedSet.addAll(toCollection(HashSet::new));
+        sortedSet.addAll(mapTo(HashSet::new, Function.identity()));
         return sortedSet;
     }
 
     public <R extends Comparable<R>> SortedSet<R> toSortedSetOf(Function<T, R> selector) {
         return new TreeSet<>(toMutableListOf(selector));
-    }
-
-    public <C extends Collection<T>> C toCollection(@NotNull Supplier<C> collectionFactory) {
-        return toCollectionOf(Function.identity(), collectionFactory);
-    }
-
-    public T[] toArray(@NotNull IntFunction<T[]> generator) {
-        return toMutableList().toArray(generator);
     }
 
     public <R> R[] mapToArray(@NotNull Function<T, R> mapper, @NotNull IntFunction<R[]> generator) {
@@ -315,7 +412,7 @@ public final class Transformer<T> implements Iterable<T> {
 
     public int[] toIntArray(@NotNull ToIntFunction<T> mapper) {
         int counter = 0;
-        int[] array = new int[countBy(t -> true)];
+        int[] array = new int[nonNullCount(t -> true)];
         for (T value : iterable) {
             if (value != null) {
                 final var anInt = mapper.applyAsInt(value);
@@ -328,7 +425,7 @@ public final class Transformer<T> implements Iterable<T> {
 
     public long[] toLongArray(@NotNull ToLongFunction<T> mapper) {
         int counter = 0;
-        long[] array = new long[countBy(t -> true)];
+        long[] array = new long[nonNullCount(t -> true)];
         for (T value : iterable) {
             if (value != null) {
                 final var t = mapper.applyAsLong(value);
@@ -341,7 +438,7 @@ public final class Transformer<T> implements Iterable<T> {
 
     public double[] toDoubleArray(@NotNull ToDoubleFunction<T> mapper) {
         int counter = 0;
-        double[] array = new double[countBy(t -> true)];
+        double[] array = new double[nonNullCount(t -> true)];
         for (T value : iterable) {
             if (value != null) {
                 final var t = mapper.applyAsDouble(value);
@@ -352,8 +449,28 @@ public final class Transformer<T> implements Iterable<T> {
         return array;
     }
 
-    public <K, V> Map<K, V> toMutableMap(@NotNull Function<T, K> keyMapper, @NotNull Function<T, V> valueMapper) {
-        Map<K, V> map = new HashMap<>();
+    public IntSummaryStatistics statsOf(ToIntFunction<T> mapper) {
+        return stream().mapToInt(mapper).summaryStatistics();
+    }
+
+    public LongSummaryStatistics statsOf(ToLongFunction<T> mapper) {
+        return stream().mapToLong(mapper).summaryStatistics();
+    }
+
+    public DoubleSummaryStatistics statsOf(ToDoubleFunction<T> mapper) {
+        return stream().mapToDouble(mapper).summaryStatistics();
+    }
+
+    public BigDecimalSummaryStatistics statsOf(Function<T, BigDecimal> mapper) {
+        return stream()
+                .filter(Objects::nonNull)
+                .map(mapper)
+                .filter(Objects::nonNull)
+                .collect(BigDecimalCollectors.summarizingBigDecimal());
+    }
+
+    public <K, V> MapX<K, V> toMutableMap(@NotNull Function<T, K> keyMapper, @NotNull Function<T, V> valueMapper) {
+        Map<K, V> map = new LinkedHashMap<>();
         for (T t : iterable) {
             if (t != null) {
                 final var key = keyMapper.apply(t);
@@ -362,30 +479,95 @@ public final class Transformer<T> implements Iterable<T> {
                 }
             }
         }
-        return map;
+        return MapX.of(map);
     }
 
-    public <K, V> Map<K, V> toMapOf(@NotNull Function<T, K> keyMapper, @NotNull Function<T, V> valueMapper) {
-        return Map.copyOf(toMutableMap(keyMapper, valueMapper));
+    public <K, V> MapX<K, V> toMap(@NotNull Function<T, K> keyMapper, @NotNull Function<T, V> valueMapper) {
+        return MapX.of(toMutableMap(keyMapper, valueMapper));
     }
 
-    public <R extends Comparable<R>> Transformer<T> sortedBy(@NotNull Function<T, R> selector) {
-        return Transformer.of(toListSortedBy(selector));
+    public List<T> getListOrElseCompute() {
+        return iterable instanceof List<T> list ? list : toListOf(Function.identity());
     }
 
-    public Transformer<T> sorted() {
-        return Transformer.of(stream().sorted().toList());
+    public Set<T> getSetOrElseCompute() {
+        return iterable instanceof Set<T> set ? set : toSetOf(Function.identity());
+    }
+
+    public List<T> getListOrElseThrow() {
+        if (iterable instanceof List<T> list) {
+            return list;
+        }
+        throw new IllegalArgumentException(iterable.getClass().getSimpleName() + " is not an instance of List");
+    }
+
+    public Set<T> getSetOrElseThrow() {
+        if (iterable instanceof Set<T> set) {
+            return set;
+        }
+        throw new IllegalArgumentException(iterable.getClass().getSimpleName() + " is not an instance of Set");
+    }
+
+    public <K> MapX<K, T> associateBy(@NotNull Function<T, K> keyMapper) {
+        return MapX.of(toMutableMap(keyMapper, Function.identity()));
+    }
+
+    public <V> MapX<T, V> associateWith(@NotNull Function<T, V> valueMapper) {
+        return MapX.of(toMutableMap(Function.identity(), valueMapper));
+    }
+
+    public <R extends Comparable<R>> IterX<T> sortedBy(@NotNull Function<T, R> selector) {
+        return IterX.of(toListSortedBy(selector));
+    }
+
+    public IterX<T> sorted() {
+        return IterX.of(stream().sorted().toList());
     }
 
     public Stream<T> stream() {
         return StreamSupport.stream(iterable.spliterator(), false);
     }
 
-    public Transformer<T> distinct() {
-        return Transformer.of(toCollection(LinkedHashSet::new));
+    public IterX<Integer> indices() {
+        return IterX.of(indexIterable(this::iterator));
     }
 
-    public <R> Transformer<T> distinctBy(Function<T, R> selector) {
+    private Iterable<Integer> indexIterable(Supplier<Iterator<T>> iteratorFactory) {
+        return () -> indexIterator(iteratorFactory.get());
+    }
+
+    private Iterator<Integer> indexIterator(Iterator<T> iterator) {
+        return new Iterator<>() {
+            private int index = 0;
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+            @Override
+            public Integer next() {
+                var prevIndex = index;
+                if (prevIndex < 0) {
+                    throw new IllegalStateException("indexed iterator index overflow");
+                }
+                iterator.next();
+                return index++;
+            }
+        };
+    }
+
+    public IterX<IndexedValue<T>> withIndex() {
+        return IterX.of(indexingIterable(this::iterator));
+    }
+
+    private Iterable<IndexedValue<T>> indexingIterable(Supplier<Iterator<T>> iteratorFactory) {
+        return this::indexedIterator;
+    }
+
+    public IterX<T> distinct() {
+        return IterX.of(mapTo(LinkedHashSet::new, Function.identity()));
+    }
+
+    public <R> List<T> distinctToListBy(Function<T, R> selector) {
         List<T> result = new ArrayList<>();
         Set<R> set = new HashSet<>();
         for (T t : iterable) {
@@ -396,13 +578,27 @@ public final class Transformer<T> implements Iterable<T> {
                 }
             }
         }
-        return Transformer.of(result);
+        return result;
     }
 
-    public int countBy(@NotNull Predicate<T> predicate) {
+    public <R> IterX<T> distinctBy(Function<T, R> selector) {
+        return IterX.of(distinctToListBy(selector));
+    }
+
+    public int nonNullCount(@NotNull Predicate<T> predicate) {
         var counter = 0;
         for (T t : iterable) {
             if (t != null && predicate.test(t)) {
+                counter++;
+            }
+        }
+        return counter;
+    }
+
+    public int count(@NotNull Predicate<T> predicate) {
+        var counter = 0;
+        for (T t : iterable) {
+            if (predicate.test(t)) {
                 counter++;
             }
         }
@@ -422,7 +618,7 @@ public final class Transformer<T> implements Iterable<T> {
         return counter;
     }
 
-    public long sumOf(@NotNull ToIntFunction<T> selector) {
+    public long sumOfInts(@NotNull ToIntFunction<T> selector) {
         long sum = 0;
         for (T t : iterable) {
             if (t != null) {
@@ -433,7 +629,7 @@ public final class Transformer<T> implements Iterable<T> {
         return sum;
     }
 
-    public int sumOf(@NotNull ToLongFunction<T> selector) {
+    public int sumOfLongs(@NotNull ToLongFunction<T> selector) {
         var sum = 0;
         for (T t : iterable) {
             if (t != null) {
@@ -444,7 +640,7 @@ public final class Transformer<T> implements Iterable<T> {
         return sum;
     }
 
-    public double sumOf(@NotNull ToDoubleFunction<T> selector) {
+    public double sumOfDoubles(@NotNull ToDoubleFunction<T> selector) {
         double sum = 0;
         for (T t : iterable) {
             if (t != null) {
@@ -538,7 +734,7 @@ public final class Transformer<T> implements Iterable<T> {
 
     @NotNull
     private <R extends Comparable<R>> Optional<T> compareBy(@NotNull Function<T, R> selector, @NotNull BiPredicate<R, R> biPredicate) {
-        final var iterator = iterable.iterator();
+        final var iterator = iterator();
         if (!iterator.hasNext()) {
             return Optional.empty();
         }
@@ -592,8 +788,8 @@ public final class Transformer<T> implements Iterable<T> {
     }
 
     @NotNull
-    public Transformer<T> onEach(@NotNull Consumer<T> consumer) {
-        iterable.forEach(consumer);
+    public IterX<T> onEach(@NotNull Consumer<T> consumer) {
+        forEach(consumer);
         return this;
     }
 
@@ -605,6 +801,24 @@ public final class Transformer<T> implements Iterable<T> {
             }
         }
         return accumulator;
+    }
+
+    public <R> R foldRight(@NotNull R initial, @NotNull BiFunction<T, R, R> operation) {
+        List<T> list = iterable instanceof List<T> current ? current : toListOf(Function.identity());
+        var accumulator = initial;
+        if (!list.isEmpty()) {
+            final var listIterator = list.listIterator();
+            while (listIterator.hasPrevious()) {
+                accumulator = operation.apply(listIterator.previous(), accumulator);
+            }
+        }
+        return accumulator;
+    }
+
+    private static void requireGreaterThanZero(int n) {
+        if (n < 0) {
+            throw new IllegalStateException("Requested element count $n is less than zero.");
+        }
     }
 
     public T reduce(@NotNull T initial, @NotNull BinaryOperator<T> operation) {
@@ -628,7 +842,7 @@ public final class Transformer<T> implements Iterable<T> {
     }
 
     public Optional<T> reduce(@NotNull BinaryOperator<T> operation) {
-        final var iterator = iterable.iterator();
+        final var iterator = iterator();
         return iterator.hasNext() ? Optional.of(reduce(iterator.next(), operation)) : Optional.empty();
     }
 
@@ -650,16 +864,16 @@ public final class Transformer<T> implements Iterable<T> {
         return collector.finisher().apply(result);
     }
 
-    public <K> Map<K, List<T>> groupBy(@NotNull Function<T, K> classifier) {
-        return groupMapping(classifier, Function.identity());
+    public <K> MapX<K, List<T>> groupBy(@NotNull Function<T, K> classifier) {
+        return MapX.of(groupMapping(classifier, Function.identity()));
     }
 
-    public <K, R> Map<K, List<R>> groupMapping(@NotNull Function<T, K> classifier, @NotNull Function<T, R> valueMapper) {
+    public <K, R> MapX<K, List<R>> groupMapping(@NotNull Function<T, K> classifier, @NotNull Function<T, R> valueMapper) {
         Map<K, List<R>> groupedMap = new HashMap<>();
         for (T t : iterable) {
             groupedMap.computeIfAbsent(classifier.apply(t), key -> new ArrayList<>()).add(valueMapper.apply(t));
         }
-        return groupedMap;
+        return MapX.of(groupedMap);
     }
 
     public Pair<List<T>, List<T>> partition(@NotNull Predicate<T> predicate) {
@@ -672,9 +886,9 @@ public final class Transformer<T> implements Iterable<T> {
             if (t != null) {
                 R r = resultMapper.apply(t);
                 if (predicate.test(t)) {
-                    pair.first.add(r);
+                    pair.first().add(r);
                 } else {
-                    pair.second.add(r);
+                    pair.second().add(r);
                 }
             }
         }
@@ -750,7 +964,7 @@ public final class Transformer<T> implements Iterable<T> {
     }
 
     public <R> R lastOf(@NotNull Function<T, R> mapper) {
-        final var iterator = iterable.iterator();
+        final var iterator = iterator();
         if (!iterator.hasNext()) {
             throw noValuePresentException();
         } else if (iterable instanceof List<T> list) {
@@ -765,7 +979,7 @@ public final class Transformer<T> implements Iterable<T> {
     }
 
     public Optional<T> findLast(@NotNull Predicate<T> predicate) {
-        final var iterator = iterable.iterator();
+        final var iterator = iterator();
         if (!iterator.hasNext()) {
             throw noValuePresentException();
         } else if (iterable instanceof List<T> list) {
@@ -776,7 +990,7 @@ public final class Transformer<T> implements Iterable<T> {
     }
 
     public <R> Optional<R> findLastOf(@NotNull Function<T, R> mapper) {
-        final var iterator = iterable.iterator();
+        final var iterator = iterator();
         if (!iterator.hasNext()) {
             return Optional.empty();
         } else if (iterable instanceof List<T> list) {
@@ -817,6 +1031,265 @@ public final class Transformer<T> implements Iterable<T> {
         return true;
     }
 
+    public <R> List<R> zipWithNextToListOf(BiFunction<T, T, R> function) {
+        final var iterator = iterator();
+        if (!iterator.hasNext()) {
+            return List.of();
+        }
+        final List<R> list = new ArrayList<>();
+        T current = iterator.next();
+        while (iterator.hasNext()) {
+            final var next = iterator.next();
+            list.add(function.apply(current, next));
+            current = next;
+        }
+        return list;
+    }
+
+    public <R> IterX<R> zipWithNext(BiFunction<T, T, R> function) {
+        return IterX.of(zipWithNextToListOf(function));
+    }
+
+    public <R> List<R> zipWithNext2ToListOf(TriFunction<T, T, T, R> function) {
+        final var iterator = iterator();
+        if (!iterator.hasNext()) {
+            return List.of();
+        }
+        final List<R> list = new ArrayList<>();
+        T current = iterator.next();
+        if (iterator.hasNext()) {
+            T next = iterator.next();
+            while (iterator.hasNext()) {
+                final var secondNext = iterator.next();
+                list.add(function.apply(current, next, secondNext));
+                current = next;
+                next = secondNext;
+            }
+        }
+        return list;
+    }
+
+    public <R> IterX<R> zipWithNext2(TriFunction<T, T, T, R> function) {
+        return IterX.of(zipWithNext2ToListOf(function));
+    }
+
+    public <A, R> List<R> zipToListWith(Iterable<A> otherIterable, BiFunction<T, A, R> function) {
+        final var otherIterator = otherIterable.iterator();
+        final var iterator = iterator();
+        final var resultListSize = Math.min(collectionSizeOrElse(10),
+                IterX.of(otherIterable).collectionSizeOrElse(10));
+
+        final List<R> list = new ArrayList<>(resultListSize);
+        while (iterator.hasNext() && otherIterator.hasNext()) {
+            final var next = iterator.next();
+            final var otherNext = otherIterator.next();
+            list.add(function.apply(next, otherNext));
+        }
+        return list;
+    }
+
+    public Set<T> union(Iterable<T> other) {
+        Set<T> union = new HashSet<>();
+        iterable.forEach(union::add);
+        other.forEach(union::add);
+        return union;
+    }
+
+    public <R> Set<R> union(Iterable<T> other, Function<T, R> mapper) {
+        Set<R> union = toMutableSetOf(mapper);
+        union.addAll(of(other).toSetOf(mapper));
+        return union;
+    }
+
+    public <A, R> IterX<R> zipWith(Iterable<A> iterable, BiFunction<T, A, R> function) {
+        return IterX.of(zipToListWith(iterable, function));
+    }
+
+    private int collectionSizeOrElse(@SuppressWarnings("SameParameterValue") int defaultSize) {
+        return iterable instanceof Collection<T> c ? c.size() : defaultSize;
+    }
+
+    private int collectionSizeOrElseGet(IntSupplier supplier) {
+        return iterable instanceof Collection<T> c ? c.size() : supplier.getAsInt();
+    }
+
+    public IterX<T> takeWhileInclusive(Predicate<T> predicate) {
+        return IterX.of(takeToListWhileInclusive(predicate));
+    }
+
+    public List<T> takeToListWhileInclusive(Predicate<T> predicate) {
+        List<T> list = new ArrayList<>();
+        for (T item : this) {
+            list.add(item);
+            if (!predicate.test(item)) {
+                break;
+            }
+        }
+        return list;
+    }
+
+    public IterX<T> takeWhile(Predicate<T> predicate) {
+        return IterX.of(takeToListWhile(predicate));
+    }
+
+    public List<T> takeToListWhile(Predicate<T> predicate) {
+        List<T> list = new ArrayList<>();
+        for (T item : this) {
+            if (!predicate.test(item)) {
+                break;
+            }
+            list.add(item);
+        }
+        return list;
+    }
+
+    public IterX<T> dropWhileExclusive(Predicate<T> predicate) {
+        return IterX.of(dropToListWhileExclusive(predicate));
+    }
+
+    public List<T> dropToListWhileExclusive(Predicate<T> predicate) {
+        return dropToListWhile(predicate, true);
+    }
+
+    private List<T> dropToListWhile(Predicate<T> predicate, boolean exclusive) {
+        var yielding = false;
+        List<T> list = new ArrayList<>();
+        for (T item : this) {
+            if (yielding) {
+                list.add(item);
+                continue;
+            }
+            if (!predicate.test(item)) {
+                if (!exclusive) {
+                    list.add(item);
+                }
+                yielding = true;
+            }
+        }
+        return list;
+    }
+
+    public IterX<T> dropWhile(Predicate<T> predicate) {
+        return IterX.of(dropToListWhile(predicate));
+    }
+
+    public List<T> dropToListWhile(Predicate<T> predicate) {
+        return  dropToListWhile(predicate, false);
+    }
+
+    public IterX<T> dropLastWhile(Predicate<T> predicate) {
+        return IterX.of(dropLastToListWhile(predicate));
+    }
+
+    public List<T> dropLastToListWhile(Predicate<T> predicate) {
+        List<T> list = iterable instanceof List<T> current ? current : toListOf(Function.identity());
+        if (list.isEmpty()) {
+            return List.of();
+        }
+        var iterator = list.listIterator();
+        while (iterator.hasPrevious()) {
+            if (!predicate.test(iterator.previous())) {
+                return takeToList(iterator.nextIndex() + 1);
+            }
+        }
+        return List.of();
+    }
+
+    public IterX<T> takeLastWhile(Predicate<T> predicate) {
+        return IterX.of(takeLastToListWhile(predicate));
+    }
+
+    public List<T> takeLastToListWhile(Predicate<T> predicate) {
+        List<T> input = iterable instanceof List<T> list ? list : toListOf(Function.identity());
+        if (input.isEmpty()) {
+            return List.of();
+        }
+        var iterator = input.listIterator(input.size());
+        while (iterator.hasPrevious()) {
+            if (!predicate.test(iterator.previous())) {
+                iterator.next();
+                var expectedSize = input.size() - iterator.nextIndex();
+                if (expectedSize == 0) {
+                    return List.of();
+                }
+                List<T> result = new ArrayList<>(expectedSize);
+                while (iterator.hasNext()) {
+                    result.add(iterator.next());
+                }
+                return List.copyOf(result);
+            }
+        }
+        return input;
+    }
+
+    public IterX<T> take(int n) {
+        return IterX.of(takeToList(n));
+    }
+
+    public List<T> takeToList(int n) {
+        requireGreaterThanZero(n);
+        if (n == 0) {
+            return List.of();
+        }
+        if (iterable instanceof Collection<T> c) {
+            if (n >= c.size()) {
+                return new ArrayList<>(c);
+            }
+            if (n == 1) {
+                return List.of(first());
+            }
+        }
+        int count = 0;
+        List<T> list = new ArrayList<>(n);
+        for (T item : iterable) {
+            list.add(item);
+            if (++count == n) {
+                break;
+            }
+        }
+        return List.copyOf(list);
+    }
+
+    public IterX<T> takeLast(int n) {
+        return IterX.of(takeLastToList(n));
+    }
+
+    public List<T> takeLastToList(int n) {
+        requireGreaterThanZero(n);
+        if (n == 0) {
+            return List.of();
+        }
+        List<T> list = iterable instanceof List<T> current ? current : toListOf(Function.identity());
+        int size = list.size();
+        if (n >= size) {
+            return list;
+        }
+        if (n == 1) {
+            return List.of(last());
+        }
+        List<T> resultList = new ArrayList<>(n);
+        for (int index = size - n; index < size; index++) {
+            resultList.add(list.get(index));
+        }
+        return resultList;
+    }
+
+    public IterX<T> skip(int count) {
+        return IterX.of(skipToList(count));
+    }
+
+    public List<T> skipToList(int n) {
+        return stream().skip(n).toList();
+    }
+
+    public IterX<T> limit(int bound) {
+        return IterX.of(limitToList(bound));
+    }
+
+    public List<T> limitToList(int bound) {
+        return stream().limit(bound).toList();
+    }
+
     public CharSequence joinToString() {
         return joinToStringBy(Object::toString);
     }
@@ -831,7 +1304,7 @@ public final class Transformer<T> implements Iterable<T> {
 
     public <R> CharSequence joinToStringBy(@NotNull Function<T, R> selector, CharSequence delimiter) {
         var sb = new StringBuilder();
-        Iterator<T> iterator = iterable.iterator();
+        Iterator<T> iterator = iterator();
         while (iterator.hasNext()) {
             final var string = selector.apply(iterator.next());
             sb.append(string).append(iterator.hasNext() ? delimiter : "");
@@ -846,6 +1319,33 @@ public final class Transformer<T> implements Iterable<T> {
     }
 
     @Override
+    public Iterator<IndexedValue<T>> indexedIterator() {
+        return new Iterator<>() {
+            private int index = 0;
+            private final Iterator<T> iterator = iterator();
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+            @Override
+            public IndexedValue<T> next() {
+                var prevIndex = index;
+                if (prevIndex < 0) {
+                    throw new IllegalStateException("indexed iterator index overflow");
+                }
+                return new IndexedValue<>(index++, iterator.next());
+            }
+        };
+    }
+
+    @Override
+    public int compareTo(@NotNull IterX<T> o) {
+        int thisSize = collectionSizeOrElseGet(() -> count(a -> true));
+        int otherSize = collectionSizeOrElseGet(() -> count(a -> true));
+        return thisSize - otherSize;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -853,8 +1353,8 @@ public final class Transformer<T> implements Iterable<T> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Transformer<?> transformer = (Transformer<?>) o;
-        return iterable.equals(transformer.iterable);
+        IterX<?> iterX = (IterX<?>) o;
+        return iterable.equals(iterX.iterable);
     }
 
     @Override
@@ -864,7 +1364,7 @@ public final class Transformer<T> implements Iterable<T> {
 
     @Override
     public String toString() {
-        return "IterX{" +
+        return "Transformer{" +
                 "iterable=" + iterable +
                 '}';
     }
@@ -902,8 +1402,5 @@ public final class Transformer<T> implements Iterable<T> {
             index--;
         }
         return Optional.empty();
-    }
-
-    public record Pair<A, B>(A first, B second) {
     }
 }

@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static hzt.stream.EntryStreamUtils.*;
-import static hzt.stream.collectors.MyCollectors.toUnmodifiableMap;
+import static hzt.stream.collectors.CollectorsX.toUnmodifiableMap;
 import static hzt.stream.predicates.StringPredicates.startsWithAnyOf;
 import static java.util.function.Predicate.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
