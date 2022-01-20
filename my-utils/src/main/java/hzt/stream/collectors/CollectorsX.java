@@ -1,6 +1,6 @@
 package hzt.stream.collectors;
 
-import hzt.collections.IterX;
+import hzt.collections.IterableX;
 import hzt.collections.MapX;
 import hzt.stream.StreamUtils;
 import hzt.stream.function.QuadFunction;
@@ -93,11 +93,11 @@ public final class CollectorsX {
         return Collectors.groupingBy(StreamUtils.function(classifierPart1).andThen(classifierPart2));
     }
 
-    public static <T> Collector<T, ?, IterX<T>> toIterX() {
-        return Collector.of((Supplier<List<T>>) ArrayList::new, List::add, CollectorsX::accumulate, IterX::of);
+    public static <T> Collector<T, ?, IterableX<T>> toIterX() {
+        return Collector.of((Supplier<List<T>>) ArrayList::new, List::add, CollectorsX::accumulate, IterableX::of);
     }
 
-    public static <T, R> Collector<T, ?, IterX<R>> toIterXOf(Function<T, R> mapper) {
+    public static <T, R> Collector<T, ?, IterableX<R>> toIterXOf(Function<T, R> mapper) {
         return Collectors.mapping(mapper, toIterX());
     }
 

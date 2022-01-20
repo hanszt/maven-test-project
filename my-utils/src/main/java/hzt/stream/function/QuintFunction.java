@@ -26,7 +26,7 @@ public interface QuintFunction<T, U, V, W, X, R> {
         return (T t, U u, V v, W w, X x) -> after.apply(apply(t, u, v, w, x));
     }
 
-    static <T, U, V, W, X, R> QuintFunction<T, U, V, W, X, R> asFunction(QuintFunction<T, U, V, W, X, R> function) {
+    static <T, U, V, W, X, R> QuintFunction<T, U, V, W, X, R> of(QuintFunction<T, U, V, W, X, R> function) {
         Objects.requireNonNull(function);
         return function;
     }

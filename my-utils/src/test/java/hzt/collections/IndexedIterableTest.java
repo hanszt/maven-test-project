@@ -13,7 +13,7 @@ class IndexedIterableTest {
     void testForEachIndexed() {
         List<IndexedValue<Integer>> list = new ArrayList<>();
 
-        IterX.rangeClosed(1, 100, this::isEven).forEachIndexedValue(list::add);
+        IterableX.rangeClosed(1, 100, this::isEven).forEachIndexedValue(list::add);
 
         System.out.println("list = " + list);
 

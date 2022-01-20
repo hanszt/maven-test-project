@@ -1,5 +1,6 @@
 package hzt.collections;
 
+import hzt.utils.Pair;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Museum;
 import org.hzt.test.model.Painting;
@@ -7,15 +8,13 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 class MapXTest {
 
@@ -32,26 +31,6 @@ class MapXTest {
         System.out.println("actual = " + actual);
 
         assertEquals(expected, actual);
-    }
-
-    @Test
-    void testCompareMapX() {
-        var museumList = TestSampleGenerator.createMuseumList();
-
-        final var expected = museumList.stream()
-                .sorted(Comparator.comparing(museum -> museum.getPaintings().size()))
-                .toList();
-
-        final var expected2 = IterX.of(museumList)
-                .toListSortedBy(museum -> museum.getPaintings().size());
-
-        final var museumsSortedByPaintingSize = IterX.of(museumList)
-                .toListSortedBy(museum -> IterX.of(museum).associateBy(Painting::name));
-
-        assertAll(
-                () -> assertEquals(expected, museumsSortedByPaintingSize),
-                () -> assertEquals(expected2, museumsSortedByPaintingSize)
-        );
     }
 
     @Test
@@ -79,7 +58,7 @@ class MapXTest {
 
         final var museumListContainingNulls = TestSampleGenerator.getMuseumListContainingNulls();
 
-        IterX.of(museumListContainingNulls).associateBy(Museum::getName).forEachIndexed(biConsumer);
+        IterableX.of(museumListContainingNulls).associateBy(Museum::getName).forEachIndexed(biConsumer);
 
         list.forEach(System.out::println);
 
@@ -110,17 +89,17 @@ class MapXTest {
 
         System.out.println("mapX = " + mapX);
 
-        assertSame(museumMap, mapX.toMap());
+        assertEquals(museumMap, mapX);
     }
 
     @Test
     void testComputeIfAbsent() {
-        final var museumMap = IterX.of(TestSampleGenerator.createMuseumList())
+        final var museumMap = IterableX.of(TestSampleGenerator.createMuseumList())
                 .associateBy(Museum::getName);
 
         var expected = museumMap.get("Van Gogh Museum");
 
-        final var mapX = MapX.of(museumMap);
+        final var mapX = MutableMapX.of(museumMap);
 
         final var van_gogh = mapX.computeIfAbsent("Van Gogh Museum", key -> {
             throw new IllegalStateException();
@@ -129,5 +108,27 @@ class MapXTest {
         System.out.println("van_gogh = " + van_gogh);
 
         assertEquals(expected, van_gogh);
+    }
+
+    @Test
+    void testMapXToList() {
+        final var museumMapX = MapX.of(TestSampleGenerator.createMuseumMap());
+
+        final var pairs = museumMapX.toListOf(Pair::ofEntry);
+
+        assertEquals(Set.of("Picasso Museum", "Van Gogh Museum", "Vermeer Museum"), pairs.toSetOf(Pair::first));
+    }
+
+    @Test
+    void testFlatMapToList() {
+        final var museumMapX = MapX.of(TestSampleGenerator.createMuseumMap());
+
+        final var pairs = museumMapX.flatMapToListOf(e -> e.getValue().getPaintings());
+
+        final var expected = "Meisje met de rode hoed";
+
+        final var actual = ListX.of(pairs).maxOf(Painting::name);
+
+        assertEquals(expected, actual);
     }
 }

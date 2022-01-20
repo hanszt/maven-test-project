@@ -26,7 +26,7 @@ public interface TriFunction<T, U, V, R> {
         return (T t, U u, V v) -> after.apply(apply(t, u, v));
     }
 
-    static <T, U, V, R> TriFunction<T, U, V, R> asFunction(TriFunction<T, U, V, R> function) {
+    static <T, U, V, R> TriFunction<T, U, V, R> of(TriFunction<T, U, V, R> function) {
         Objects.requireNonNull(function);
         return function;
     }

@@ -26,7 +26,7 @@ public interface QuadFunction<T, U, V, W, R> {
         return (T t, U u, V v, W w) -> after.apply(apply(t, u, v, w));
     }
 
-    static <T, U, V, W, R> QuadFunction<T, U, V, W, R> asFunction(QuadFunction<T, U, V, W, R> function) {
+    static <T, U, V, W, R> QuadFunction<T, U, V, W, R> of(QuadFunction<T, U, V, W, R> function) {
         Objects.requireNonNull(function);
         return function;
     }
