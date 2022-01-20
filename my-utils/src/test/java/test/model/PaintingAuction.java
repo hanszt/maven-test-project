@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class PaintingAuction implements Comparable<PaintingAuction>, IterableX<Painting> {
+public final class PaintingAuction implements Comparable<PaintingAuction>, IterableX<Painting> {
 
     private final String name;
     private final LocalDate dateOfOpening;

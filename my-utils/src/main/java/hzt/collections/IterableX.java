@@ -977,6 +977,11 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         throw noValuePresentException();
     }
 
+    @NotNull
+    default T firstNot(@NotNull Predicate<T> predicate) {
+        return first(predicate.negate());
+    }
+
     default <R> R firstOf(@NotNull Function<T, R> mapper) {
         for (T next : this) {
             if (next != null) {
@@ -1346,19 +1351,19 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return ListX.of(stream().limit(bound).toList());
     }
 
-    default CharSequence joinToString() {
+    default String joinToString() {
         return joinToStringBy(Object::toString);
     }
 
-    default CharSequence joinToString(CharSequence delimiter) {
+    default String joinToString(CharSequence delimiter) {
         return joinToStringBy(Object::toString, delimiter);
     }
 
-    default <R> CharSequence joinToStringBy(@NotNull Function<T, R> selector) {
+    default <R> String joinToStringBy(@NotNull Function<T, R> selector) {
         return joinToStringBy(selector, "");
     }
 
-    default <R> CharSequence joinToStringBy(@NotNull Function<T, R> selector, CharSequence delimiter) {
+    default <R> String joinToStringBy(@NotNull Function<T, R> selector, CharSequence delimiter) {
         final var sb = new StringBuilder();
         final var iterator = iterator();
         while (iterator.hasNext()) {

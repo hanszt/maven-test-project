@@ -9,4 +9,5 @@ open module my.utils {
     exports hzt.stream.function;
     exports hzt.collections;
     exports hzt.utils;
+    exports hzt.strings;
 }

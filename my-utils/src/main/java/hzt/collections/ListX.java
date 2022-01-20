@@ -1,5 +1,9 @@
 package hzt.collections;
 
+import hzt.strings.CharSequenceX;
+import hzt.strings.StringX;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -41,6 +45,10 @@ public sealed interface ListX<T> extends IterableX<T> permits MutableListX {
         return toMutableListOf(mapper);
     }
 
+    default ListX<StringX> toStringXList(Function<T, CharSequence> mapper) {
+        return map(s -> StringX.of(mapper.apply(s)));
+    }
+
     @Override
     default ListX<T> filterNot(Predicate<T> predicate) {
         return filterToList(predicate.negate());
@@ -59,9 +67,21 @@ public sealed interface ListX<T> extends IterableX<T> permits MutableListX {
 
     boolean isEmpty();
 
+    default boolean isNotEmpty() {
+        return !isEmpty();
+    }
+
     boolean contains(Object o);
 
+    default boolean containsNot(T t) {
+        return !contains(t);
+    }
+
     boolean containsAll(Collection<?> c);
+
+    default boolean containsNoneOf(Collection<?> collection) {
+        return !containsAll(collection);
+    }
 
     T get(int index);
 

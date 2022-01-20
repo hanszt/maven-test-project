@@ -29,6 +29,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -162,15 +163,16 @@ class IterableXTest {
     void testAuctionImplementingIterableX() {
         var auctions = IterXImplGenerator.createAuctions();
 
-        final var firstAuction = auctions.first();
+        final var auction = auctions.first();
 
-        final var expected = firstAuction.getPaintings().stream()
-                .filter(Painting::isInMuseum)
-                .findFirst();
+        final var expected = auction.getPaintings().stream()
+                .filter(Predicate.not(Painting::isInMuseum))
+                .findFirst()
+                .orElseThrow();
 
-        final var first = firstAuction.findFirst(Painting::isInMuseum);
+        final var firstPaintingNotInMuseum = auction.firstNot(Painting::isInMuseum);
 
-        assertEquals(first, expected);
+        assertEquals(firstPaintingNotInMuseum, expected);
     }
 
     @Test
