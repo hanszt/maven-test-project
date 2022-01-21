@@ -70,6 +70,7 @@ public final class LinkedHashSetX<E> implements MutableLinkedSetX<E> {
     @NotNull
     @Override
     public <T> T @NotNull [] toArray(@NotNull T @NotNull [] a) {
+        //noinspection SuspiciousToArrayCall
         return set.toArray(a);
     }
 
@@ -106,5 +107,10 @@ public final class LinkedHashSetX<E> implements MutableLinkedSetX<E> {
     @Override
     public void clear() {
         set.clear();
+    }
+
+    @Override
+    public boolean isNotEmpty() {
+        return !isEmpty();
     }
 }

@@ -30,7 +30,7 @@ class ListXTest {
                 .takeWhile(museum -> museum.getPaintings().size() < 3).toList();
 
         final var actual = ListX.of(museumList)
-                .takeToListWhile(museum -> museum.getPaintings().size() < 3).toMutableList();
+                .takeToListXWhile(museum -> museum.getPaintings().size() < 3).toMutableList();
 
         System.out.println("actual = " + actual);
 

@@ -40,7 +40,7 @@ public final class TreeSetX<E, R extends Comparable<R>> implements NavigableSetX
 
     @SafeVarargs
     TreeSetX(Function<E, R> selector, E first, E @NotNull ... others) {
-        var newSet = new TreeSet<E>(comparing(selector));
+        var newSet = new TreeSet<>(comparing(selector));
         newSet.add(first);
         Collections.addAll(newSet, others);
         this.navigableSet = newSet;
@@ -75,6 +75,7 @@ public final class TreeSetX<E, R extends Comparable<R>> implements NavigableSetX
     @NotNull
     @Override
     public <T> T @NotNull [] toArray(@NotNull T @NotNull [] a) {
+        //noinspection SuspiciousToArrayCall
         return navigableSet.toArray(a);
     }
 
@@ -225,5 +226,10 @@ public final class TreeSetX<E, R extends Comparable<R>> implements NavigableSetX
         return "TreeSetX{" +
                 "items=" + navigableSet +
                 '}';
+    }
+
+    @Override
+    public boolean isNotEmpty() {
+        return !navigableSet.isEmpty();
     }
 }

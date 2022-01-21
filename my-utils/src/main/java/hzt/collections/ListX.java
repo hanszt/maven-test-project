@@ -1,11 +1,13 @@
 package hzt.collections;
 
 import hzt.strings.StringX;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -15,7 +17,7 @@ import java.util.function.Predicate;
  *
  * @author Hans Zuidervaart
  */
-public sealed interface ListX<T> extends IterableX<T> permits MutableListX {
+public sealed interface ListX<T> extends CollectionX<T> permits MutableListX {
 
     static <T> ListX<T> of(Iterable<T> iterable) {
         return new ArrayListX<>(iterable);
@@ -30,8 +32,8 @@ public sealed interface ListX<T> extends IterableX<T> permits MutableListX {
     }
 
     @SafeVarargs
-    static <T> ListX<T> of(T first, T... values) {
-        return new ArrayListX<>(first).plus(Arrays.asList(values));
+    static <T> ListX<T> of(T... values) {
+        return new ArrayListX<>(values);
     }
 
     default MutableListX<T> toMutableList() {
@@ -40,6 +42,17 @@ public sealed interface ListX<T> extends IterableX<T> permits MutableListX {
 
     default List<T> toList() {
         return toListOf(Function.identity());
+    }
+
+    default SetX<T> toSetMutableSet() {
+        return toMutableSetOf(Function.identity());
+    }
+    default SetX<T> toSetX() {
+        return toMutableSetNotNullOf(Function.identity());
+    }
+
+    default Set<T> toSet() {
+        return Set.copyOf(toMutableSetNotNullOf(Function.identity()));
     }
 
     @Override
@@ -53,16 +66,55 @@ public sealed interface ListX<T> extends IterableX<T> permits MutableListX {
 
     @Override
     default ListX<T> filterNot(Predicate<T> predicate) {
-        return filterToList(predicate.negate());
+        return filterToListX(predicate.negate());
     }
 
     @Override
     default ListX<T> takeWhile(Predicate<T> predicate) {
-        return takeToListWhile(predicate);
+        return takeToListXWhile(predicate);
     }
 
     static <E> ListX<E> copyOf(Iterable<E> iterable) {
         return iterable instanceof ListX<E> listX ? listX : ListX.of(iterable);
+    }
+
+    default <R> R foldRight(@NotNull R initial, @NotNull BiFunction<T, R, R> operation) {
+        List<T> list = getListOrElseCompute();
+        var accumulator = initial;
+        if (!list.isEmpty()) {
+            final var listIterator = list.listIterator();
+            while (listIterator.hasNext()) {
+                listIterator.next();
+            }
+            while (listIterator.hasPrevious()) {
+                accumulator = operation.apply(listIterator.previous(), accumulator);
+            }
+        }
+        return accumulator;
+    }
+
+    default MutableListX<T> takeLastToMutableList(int n) {
+        IterableX.requireGreaterThanZero(n);
+        if (n == 0) {
+            return MutableListX.empty();
+        }
+        var list = getListOrElseCompute();
+        int size = list.size();
+        if (n >= size) {
+            return list;
+        }
+        if (n == 1) {
+            return MutableListX.of(last());
+        }
+        var resultList = MutableListX.<T>withInitCapacity(n);
+        for (int index = size - n; index < size; index++) {
+            resultList.add(list.get(index));
+        }
+        return resultList;
+    }
+
+    default IterableX<T> takeLast(int n) {
+        return IterableX.of(takeLastToMutableList(n));
     }
 
     int size();

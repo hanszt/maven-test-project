@@ -35,19 +35,20 @@ class NavigableMapXTest {
 
     @Test
     void testGetNavigableMapAssociatedWith() {
-        final var museumListContainingNulls = SetX.of(TestSampleGenerator.getMuseumListContainingNulls());
+        final var museumSetContainingNulls = MutableSetX
+                .of(TestSampleGenerator.getMuseumListContainingNulls());
 
-        final NavigableMap<Museum, String> expected = new TreeMap<>(museumListContainingNulls.stream()
+        final NavigableMap<Museum, String> expected = new TreeMap<>(museumSetContainingNulls.stream()
                 .filter(m -> m != null && m.getName() != null)
                 .collect(Collectors.toMap(Function.identity(), Museum::getName)));
 
-        final NavigableMapX<Museum, String> actual = museumListContainingNulls
+        final NavigableMapX<Museum, String> actual = museumSetContainingNulls
                 .notNullBy(Museum::getName)
                 .toNavigableMapAssociatedWith(Museum::getName);
 
-        final Museum pairs = actual.first().getKey();
+        final Museum firstMuseum = actual.first().getKey();
 
-        System.out.println("pairs = " + pairs);
+        System.out.println("firstMuseum = " + firstMuseum);
 
         assertAll(
                 () -> assertIterableEquals(actual.keySet(), expected.keySet()),

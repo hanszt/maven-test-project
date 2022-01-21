@@ -28,4 +28,11 @@ class StringXTest {
 
         assertEquals(expected, characterCounts);
     }
+
+    @Test
+    void testReplaceFirstChar() {
+        final var hallo = StringX.of("hallo")
+                .replaceFirstChar(c -> 'H').toString();
+        assertEquals("Hallo", hallo);
+    }
 }

@@ -329,13 +329,12 @@ class IterableXTest {
 
     @Test
     void testTakeWhile() {
-        final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
+        final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
         final var expected = museumList.stream()
                 .takeWhile(museum -> museum.getPaintings().size() < 3).toList();
 
-        final var actual = IterableX.of(museumList)
-                .takeToListWhile(museum -> museum.getPaintings().size() < 3);
+        final var actual = museumList.takeWhile(museum -> museum.getPaintings().size() < 3);
 
         System.out.println("actual = " + actual);
 
@@ -403,58 +402,95 @@ class IterableXTest {
 
     @Test
     void testToArray() {
-        final var paintings = TestSampleGenerator.createPaintingList();
+        final var paintings = MutableListX.of(TestSampleGenerator.createPaintingList());
 
         final var expected = paintings.stream().map(Painting::getYearOfCreation).toArray(Year[]::new);
 
-        final var actual = IterableX.of(paintings).mapToArray(Painting::getYearOfCreation, Year[]::new);
+        final var actual = paintings.toArrayOf(Painting::getYearOfCreation, Year[]::new);
 
         assertArrayEquals(expected, actual);
     }
 
     @Test
     void testIntersect() {
-        final var collections = List.of(
+        final var collections = ListX.of(
                 List.of(1, 2, 3, 4, 5, 7),
                 Set.of(2, 4, 5),
                 Set.of(4, 5, 6)
         );
 
-        final var intersect = IterableX.of(collections).intersectBy(Function.identity());
+        final var intersect = collections.intersectBy(Function.identity());
 
         assertEquals(Set.of(4, 5), intersect);
     }
 
     @Test
     void testIntersectMuseumPaintings() {
-        final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
+        final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
-        final var intersection = IterableX.of(museumList).intersectBy(Museum::getPaintings);
+        final var intersection = museumList.intersectBy(Museum::getPaintings);
 
         assertEquals(Set.of(), intersection);
     }
 
     @Test
-    void testFold() {
-        var list = TestSampleGenerator.createSampleBankAccountList();
-
-        final var actual = IterableX.of(list).fold(BigDecimal.ZERO, this::addAccountBalance);
+    void testSumBigDecimals() {
+        var list = ListX.of(TestSampleGenerator.createSampleBankAccountList());
 
         final var expected = list.stream()
                 .map(BankAccount::getBalance)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        final var actual = list.sumOfBigDecimals(BankAccount::getBalance);
+
         assertEquals(expected, actual);
     }
 
     @Test
-    void testFoldRightThrowsUnsupportedOperationExceptionWhenNotOfTypeList() {
-        var set = IterableX.of(TestSampleGenerator.createSampleBankAccountList()).toSetXOf(a -> a);
+    void testFold() {
+        final var integers = ListX.of(1, 3, 3, 4, 5, 2, 6).toSetX();
 
-        final var iterEx = IterableX.of(set);
-        final var bigDecimal = iterEx.foldRight(BigDecimal.ZERO, (b, a) -> a.add(b.getBalance()));
+        final var expectedSum = integers.stream()
+                .map(BigDecimal::valueOf)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        assertEquals(BigDecimal.ZERO, bigDecimal);
+        final var sum = integers
+                .fold(BigDecimal.ZERO, (bigDecimal, integer) -> bigDecimal.add(BigDecimal.valueOf(integer)));
+
+        System.out.println("sum = " + sum);
+
+        assertEquals(expectedSum, sum);
+    }
+
+    @Test
+    void testFoldRight() {
+        var list = ListX.of(TestSampleGenerator.createSampleBankAccountList());
+
+        list.forEach(System.out::println);
+
+        final var bigDecimal = list.foldRight(BigDecimal.ZERO, (b, a) -> a.add(b.getBalance()));
+
+        assertEquals(BigDecimal.valueOf(232511.34), bigDecimal);
+    }
+
+    @Test
+    void testListIteratorGetPreviousOnlyWorksBeforeWhenIsAtEnd() {
+        var li = List.of(22, 44, 88, 11 ,33);
+        var itr = li.listIterator();
+
+        assertFalse(itr.hasPrevious());
+
+        System.out.println("In actual order :");
+        while (itr.hasNext()) {
+            System.out.println(itr.next());
+        }
+
+        assertTrue(itr.hasPrevious());
+
+        System.out.println("In reverse order :");
+        while (itr.hasPrevious()) {
+            System.out.println(itr.previous());
+        }
     }
 
     @Test
@@ -463,7 +499,7 @@ class IterableXTest {
 
         final var expected = bankAccounts.stream().filter(BankAccount::isDutchAccount).count();
 
-        final var actual = IterableX.of(bankAccounts).notNullCount(BankAccount::isDutchAccount);
+        final var actual = IterableX.of(bankAccounts).countNotNullBy(BankAccount::isDutchAccount);
 
         System.out.println("actual = " + actual);
 
@@ -474,7 +510,7 @@ class IterableXTest {
     void testSumOf() {
         var list = TestSampleGenerator.createSampleBankAccountList();
 
-        final BigDecimal actual = IterableX.of(list).sumOf(BankAccount::getBalance);
+        final BigDecimal actual = IterableX.of(list).sumOfBigDecimals(BankAccount::getBalance);
 
         final var expected = list.stream()
                 .map(BankAccount::getBalance)
@@ -515,7 +551,7 @@ class IterableXTest {
     void testIterXOfIterable() {
         var list = TestSampleGenerator.createSampleBankAccountList();
 
-        final BigDecimal actual = IterableX.of(IterableX.of(list)).sumOf(BankAccount::getBalance);
+        final BigDecimal actual = IterableX.of(IterableX.of(list)).sumOfBigDecimals(BankAccount::getBalance);
 
         final var expected = list.stream()
                 .map(BankAccount::getBalance)
@@ -539,14 +575,14 @@ class IterableXTest {
     void testRange() {
         assertArrayEquals(
                 IntStream.range(5, 10).toArray(),
-                IterableX.range(5, 10).toIntArray(Integer::intValue));
+                IterableX.range(5, 10).toIntArrayOf(Integer::intValue));
     }
 
     @Test
     void testRangeClosed() {
         assertArrayEquals(
                 IntStream.rangeClosed(5, 10).toArray(),
-                IterableX.rangeClosed(5, 10).toIntArray(Integer::intValue));
+                IterableX.rangeClosed(5, 10).toIntArrayOf(Integer::intValue));
     }
 
     @Test
@@ -645,7 +681,7 @@ class IterableXTest {
                 .filter(not(Book::isAboutProgramming))
                 .collect(Collectors.toUnmodifiableSet());
 
-        final var actual = IterableX.of(bookList).toSetSkipping(Book::isAboutProgramming);
+        final var actual = IterableX.of(bookList).toSetXSkipping(Book::isAboutProgramming);
 
         System.out.println("actual = " + actual);
 
@@ -763,7 +799,8 @@ class IterableXTest {
 
     @Test
     void testMapNotNull() {
-        var bankAccounts = TestSampleGenerator.createSampleBankAccountListContainingNulls();
+        var bankAccounts = MutableListX
+                .of(TestSampleGenerator.createSampleBankAccountListContainingNulls());
 
         final var expected = bankAccounts.stream()
                 .map(BankAccount::getCustomer)
@@ -780,7 +817,7 @@ class IterableXTest {
                 .map(Customer::getId)
                 .orElseThrow();
 
-        final var actual = IterableX.of(bankAccounts)
+        final var actual = bankAccounts
                 .mapNotNull(BankAccount::getCustomer)
                 .maxOf(Customer::getId);
 
@@ -823,7 +860,7 @@ class IterableXTest {
 
     @Test
     void mapToStringX() {
-        final var bookList = TestSampleGenerator.createBookList();
+        final var bookList = ListX.of(TestSampleGenerator.createBookList());
 
         final var expected = bookList.stream()
                 .map(Book::getCategory)
@@ -832,7 +869,7 @@ class IterableXTest {
                 .toList();
 
 
-        final var actual = ListX.of(bookList)
+        final var actual = bookList
                 .mapToStringX(Book::getCategory)
                 .flatMapToMutableListOf(StringX::toMutableList);
 

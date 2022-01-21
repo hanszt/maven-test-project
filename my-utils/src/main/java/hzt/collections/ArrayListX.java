@@ -37,9 +37,8 @@ public final class ArrayListX<T> implements MutableListX<T> {
     }
 
     @SafeVarargs
-    ArrayListX(T first, T... values) {
+    ArrayListX(T... values) {
         final List<T> arrayList = new ArrayList<>(values.length + 1);
-        arrayList.add(first);
         arrayList.addAll(Arrays.asList(values));
         this.list = arrayList;
     }
@@ -79,6 +78,7 @@ public final class ArrayListX<T> implements MutableListX<T> {
     @NotNull
     @Override
     public <T1> T1 @NotNull [] toArray(@NotNull T1 @NotNull [] a) {
+        //noinspection SuspiciousToArrayCall
         return list.toArray(a);
     }
 

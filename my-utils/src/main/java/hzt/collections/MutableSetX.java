@@ -13,6 +13,10 @@ public sealed interface MutableSetX<E> extends Set<E>, SetX<E> permits HashSetX,
         return new HashSetX<>();
     }
 
+    static <E> MutableSetX<E> withInitCapacity(int capacity) {
+        return new HashSetX<>(capacity);
+    }
+
     static <E> MutableSetX<E> of(Set<E> set) {
         return new HashSetX<>(set);
     }
@@ -26,8 +30,8 @@ public sealed interface MutableSetX<E> extends Set<E>, SetX<E> permits HashSetX,
     }
 
     @SafeVarargs
-    static <E> MutableSetX<E> of(E first, E... others) {
-        return new HashSetX<>(first, others);
+    static <E> MutableSetX<E> of(E... values) {
+        return new HashSetX<>(values);
     }
 
     @NotNull
