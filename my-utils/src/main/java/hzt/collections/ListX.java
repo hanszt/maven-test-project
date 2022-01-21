@@ -1,9 +1,7 @@
 package hzt.collections;
 
-import hzt.strings.CharSequenceX;
 import hzt.strings.StringX;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +15,7 @@ import java.util.function.Predicate;
  *
  * @author Hans Zuidervaart
  */
-public sealed interface ListX<T> extends IterableX<T> permits MutableListX {
+public interface ListX<T> extends IterableX<T> {
 
     static <T> ListX<T> of(Iterable<T> iterable) {
         return new ArrayListX<>(iterable);
@@ -60,7 +58,7 @@ public sealed interface ListX<T> extends IterableX<T> permits MutableListX {
     }
 
     static <E> ListX<E> copyOf(Iterable<E> iterable) {
-        return iterable instanceof ListX<E> listX ? listX : ListX.of(iterable);
+        return iterable instanceof ListX ? (ListX<E>) iterable : ListX.of(iterable);
     }
 
     int size();

@@ -4,14 +4,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-public sealed interface SetX<T> extends IterableX<T> permits MutableSetX {
+public interface SetX<T> extends IterableX<T> {
 
     static <T> SetX<T> of(Iterable<T> iterable) {
         return new HashSetX<>(iterable);
     }
 
     static <T> SetX<T> copyOf(Iterable<T> iterable) {
-        return iterable instanceof SetX<T> set ? set : SetX.of(iterable);
+        return iterable instanceof SetX ? (SetX<T>) iterable : SetX.of(iterable);
     }
 
     int size();

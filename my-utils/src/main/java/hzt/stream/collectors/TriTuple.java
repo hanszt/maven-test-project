@@ -27,10 +27,10 @@ public final class TriTuple<R1, R2, R3> {
 
     @Override
     public boolean equals(Object obj) {
-        return obj == this || (obj instanceof TriTuple<?, ?, ?> other &&
-                Objects.equals(this.first, other.first) &&
-                Objects.equals(this.second, other.second) &&
-                Objects.equals(this.third, other.third));
+        return obj == this || (obj instanceof TriTuple &&
+                Objects.equals(this.first, ((TriTuple<?, ?, ?>) obj).first) &&
+                Objects.equals(this.second, ((TriTuple<?, ?, ?>) obj).second) &&
+                Objects.equals(this.third, ((TriTuple<?, ?, ?>) obj).third));
     }
 
     @Override

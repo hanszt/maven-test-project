@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.ThrowingSupplier;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BigDecimalSummaryStatisticsTest {
 
@@ -25,19 +25,5 @@ class BigDecimalSummaryStatisticsTest {
     @Test
     void testDoesNotThrow() {
         assertDoesNotThrow((ThrowingSupplier<BigDecimalSummaryStatistics>) BigDecimalSummaryStatistics::new);
-    }
-
-    @Test
-    void testUsingBigDecimalSummaryStatisticsListInMapMulti() {
-        final var summaryStatistics = new BigDecimalSummaryStatistics(4, BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.TEN);
-        final var bigDecimalSummaryStatisticsList = List.of(new BigDecimalSummaryStatistics(), summaryStatistics);
-
-        final var averages = bigDecimalSummaryStatisticsList.stream()
-                .<BigDecimal>mapMulti((statistics, consumer) -> consumer.accept(statistics.getAverage()))
-                .toList();
-
-        System.out.println(averages);
-
-        assertFalse(averages.isEmpty());
     }
 }

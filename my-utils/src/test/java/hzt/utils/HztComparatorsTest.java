@@ -5,6 +5,7 @@ import org.hzt.test.model.Book;
 import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,15 +16,15 @@ class HztComparatorsTest {
         final var bookList = TestSampleGenerator.createBookList();
         final var expectedAscending = bookList.stream()
                 .sorted(Comparator.comparing(Book::getCategory))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
         final var expectedDescending = bookList.stream()
                 .sorted(Comparator.comparing(Book::getCategory).reversed())
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
         assertEquals(expectedAscending, bookList.stream()
                 .sorted(HztComparators.comparing(Book::getCategory, true))
-                .toList());
+                .collect(Collectors.toUnmodifiableList()));
         assertEquals(expectedDescending, bookList.stream()
                 .sorted(HztComparators.comparing(Book::getCategory, false))
-                .toList());
+                .collect(Collectors.toUnmodifiableList()));
     }
 }

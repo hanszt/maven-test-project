@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public sealed interface MutableLinkedSetX<E> extends MutableSetX<E> permits LinkedHashSetX {
+public interface MutableLinkedSetX<E> extends MutableSetX<E> {
 
     static <E> MutableLinkedSetX<E> empty() {
         return new LinkedHashSetX<>();

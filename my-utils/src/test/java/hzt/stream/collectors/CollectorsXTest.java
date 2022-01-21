@@ -9,27 +9,29 @@ import org.hzt.test.model.Painter;
 import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.LongSummaryStatistics;
 import java.util.Map;
+import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-import static hzt.stream.StreamUtils.nullSafe;
-import static hzt.stream.collectors.BigDecimalCollectors.*;
+import static hzt.stream.collectors.BigDecimalCollectors.summarizingBigDecimal;
+import static hzt.stream.collectors.BigDecimalCollectors.summingBigDecimal;
+import static hzt.stream.collectors.BigDecimalCollectors.toMaxBigDecimal;
+import static hzt.stream.collectors.BigDecimalCollectors.toMinBigDecimal;
 import static hzt.stream.collectors.CollectorsX.*;
+import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.partitioningBy;
+import static java.util.stream.Collectors.summarizingLong;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CollectorsXTest {
 
@@ -42,7 +44,7 @@ class CollectorsXTest {
                 .average().orElse(0);
         final var expectedPaintingNameList = paintingList.stream()
                 .map(Painting::name)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
         //act
         final var paintingSummary = paintingList.stream()
                 .collect(branching(
@@ -79,7 +81,7 @@ class CollectorsXTest {
         final var expectedPaintingNameList = paintingList.stream()
                 .map(Painting::name)
                 .filter(s -> s.length() > 10)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
         final var expectedGroupedByPainter = paintingList.stream()
                 .collect(Collectors.groupingBy(Painting::painter));
 
@@ -121,7 +123,7 @@ class CollectorsXTest {
         final var expectedPaintingNameList = paintingList.stream()
                 .map(Painting::name)
                 .filter(s -> s.length() > 10)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
         final var expectedGroupedByPainter = paintingList.stream()
                 .collect(Collectors.groupingBy(Painting::painter));
 
@@ -154,11 +156,22 @@ class CollectorsXTest {
         );
     }
 
-    private record PaintingSummary(
-            Map<Boolean, List<String>> paintingInMuseumMap,
-            LongSummaryStatistics paintingAgeSummaryStatistics,
-            List<String> paintingNameList,
-            Map<Painter, List<Painting>> groupedByPainter) {
+    private static final class PaintingSummary {
+        private final Map<Boolean, List<String>> paintingInMuseumMap;
+        private final LongSummaryStatistics paintingAgeSummaryStatistics;
+        private final List<String> paintingNameList;
+        private final Map<Painter, List<Painting>> groupedByPainter;
+
+        private PaintingSummary(
+                Map<Boolean, List<String>> paintingInMuseumMap,
+                LongSummaryStatistics paintingAgeSummaryStatistics,
+                List<String> paintingNameList,
+                Map<Painter, List<Painting>> groupedByPainter) {
+            this.paintingInMuseumMap = paintingInMuseumMap;
+            this.paintingAgeSummaryStatistics = paintingAgeSummaryStatistics;
+            this.paintingNameList = paintingNameList;
+            this.groupedByPainter = groupedByPainter;
+        }
 
         @SuppressWarnings("unused")
         public PaintingSummary(Map<Boolean, List<String>> paintingInMuseumMap,
@@ -171,36 +184,48 @@ class CollectorsXTest {
                                List<String> paintingNameList) {
             this(paintingInMuseumMap, paintingAgeSummaryStatistics, paintingNameList, Collections.emptyMap());
         }
-    }
 
-    @Test
-    void testTeeingToEntry() {
-        //arrange
-        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
-        final double expectedAverage = paintingList.stream()
-                .mapToLong(Painting::ageInYears)
-                .average().orElse(0);
+        public Map<Boolean, List<String>> paintingInMuseumMap() {
+            return paintingInMuseumMap;
+        }
 
-        var keyCollector = flatMapping(
-                nullSafe(Painting::painter, Painter::getDateOfBirth),
-                summarizingLong(LocalDate::getYear));
+        public LongSummaryStatistics paintingAgeSummaryStatistics() {
+            return paintingAgeSummaryStatistics;
+        }
 
-        //act
-        final Map.Entry<LongSummaryStatistics, LongSummaryStatistics> result = paintingList.stream()
-                .collect(teeingToEntry(keyCollector, summarizingLong(Painting::ageInYears)));
+        public List<String> paintingNameList() {
+            return paintingNameList;
+        }
 
-        final LongSummaryStatistics paintingAgeSummaryStatistics = result.getValue();
-        final double averageAgePainting = paintingAgeSummaryStatistics.getAverage();
-        final long maxAgeYears = paintingAgeSummaryStatistics.getMax();
+        public Map<Painter, List<Painting>> groupedByPainter() {
+            return groupedByPainter;
+        }
 
-        System.out.println(result);
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (PaintingSummary) obj;
+            return Objects.equals(this.paintingInMuseumMap, that.paintingInMuseumMap) &&
+                    Objects.equals(this.paintingAgeSummaryStatistics, that.paintingAgeSummaryStatistics) &&
+                    Objects.equals(this.paintingNameList, that.paintingNameList) &&
+                    Objects.equals(this.groupedByPainter, that.groupedByPainter);
+        }
 
-        //assert
-        final var expectedMaxAge = paintingList.stream().mapToLong(Painting::ageInYears).max().orElseThrow();
-        assertAll(
-                () -> assertEquals(expectedMaxAge, maxAgeYears),
-                () -> assertEquals(expectedAverage, averageAgePainting)
-        );
+        @Override
+        public int hashCode() {
+            return Objects.hash(paintingInMuseumMap, paintingAgeSummaryStatistics, paintingNameList, groupedByPainter);
+        }
+
+        @Override
+        public String toString() {
+            return "PaintingSummary[" +
+                    "paintingInMuseumMap=" + paintingInMuseumMap + ", " +
+                    "paintingAgeSummaryStatistics=" + paintingAgeSummaryStatistics + ", " +
+                    "paintingNameList=" + paintingNameList + ", " +
+                    "groupedByPainter=" + groupedByPainter + ']';
+        }
+
     }
 
     @Test
@@ -277,27 +302,13 @@ class CollectorsXTest {
     void testIntersectingBy() {
         final List<Museum> museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
-        final var nameLists = museumList.stream()
-                .<List<String>>mapMulti((museum, consumer) ->
-                        consumer.accept(museum.getPaintings().stream()
-                                .map(Painting::name)
-                                .toList()))
-                .toList();
-
-        System.out.println("Name Lists");
-        nameLists.forEach(System.out::println);
-        System.out.println();
-
-        var expected = nameLists.stream()
-                .collect(toIntersection());
-
         var paintingNamesPresentInAllMuseums = museumList.stream()
                 .map(Museum::getPaintings)
                 .collect(intersectingBy(Painting::name));
 
         System.out.println("paintingNamesPresentInAllMuseums = " + paintingNamesPresentInAllMuseums);
 
-        assertEquals(expected, paintingNamesPresentInAllMuseums);
+        assertFalse(paintingNamesPresentInAllMuseums.isEmpty());
     }
 
     @Test
@@ -306,8 +317,8 @@ class CollectorsXTest {
 
         final List<BankAccount> expectedBankAccounts = IntStream.range(0, NR_OF_ACCOUNTS)
                 .boxed()
-                .mapMulti(CollectorsXTest::toBankAccount)
-                .toList();
+                .flatMap(CollectorsXTest::toBankAccount)
+                .collect(Collectors.toUnmodifiableList());
 
         System.out.println("bankAccounts.size() = " + expectedBankAccounts.size());
 
@@ -316,6 +327,12 @@ class CollectorsXTest {
                 .collect(multiMappingToList(CollectorsXTest::toBankAccount));
 
         assertEquals(actualBankaccountList, expectedBankAccounts);
+    }
+
+    private static Stream<BankAccount> toBankAccount(Integer value) {
+        final String accountNumber = String.valueOf(value);
+        return Stream.of(new BankAccount(accountNumber,
+                new Customer("cid" + accountNumber, "Name" + value * 2, Collections.emptyList())));
     }
 
     private static void toBankAccount(Integer value, Consumer<BankAccount> consumer) {

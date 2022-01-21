@@ -19,7 +19,6 @@ import java.time.Month;
 import java.time.Period;
 import java.time.Year;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
@@ -287,7 +286,7 @@ class IterableXTest {
                 .filter(Objects::nonNull)
                 .filter(Painting::isInMuseum)
                 .map(Painting::painter)
-                .toList();
+                .collect(toUnmodifiableList());
 
         final var actualPainters = IterableX.of(museumList)
                 .flatMap(Museum::getPaintings)
@@ -318,7 +317,7 @@ class IterableXTest {
         final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
         final var expected = museumList.stream()
-                .takeWhile(museum -> museum.getPaintings().size() < 3).toList();
+                .takeWhile(museum -> museum.getPaintings().size() < 3).collect(Collectors.toUnmodifiableList());
 
         final var actual = IterableX.of(museumList)
                 .takeToListWhile(museum -> museum.getPaintings().size() < 3);
@@ -332,7 +331,7 @@ class IterableXTest {
     void testSkip() {
         final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
-        final var expected = museumList.stream().skip(3).toList();
+        final var expected = museumList.stream().skip(3).collect(Collectors.toUnmodifiableList());
 
         final var actual = IterableX.of(museumList).skipToList(3);
 
@@ -345,7 +344,7 @@ class IterableXTest {
     void testLimit() {
         final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
-        final var expected = museumList.stream().limit(3).toList();
+        final var expected = museumList.stream().limit(3).collect(Collectors.toUnmodifiableList());
 
         final var actual = IterableX.of(museumList).limitToList(3);
 
@@ -358,11 +357,7 @@ class IterableXTest {
     void testTakeLastWhile() {
         final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
-        final var strings = """
-                De sterrennacht, Het melkmeisje, Les Demoiselles d'Avignon,
-                Meisje met de parel, Le Rêve, Meisje met de rode hoed, Guernica
-                """.stripIndent()
-                .split(",");
+        final var strings = "De sterrennacht, Het melkmeisje, Les Demoiselles d'Avignon, Meisje met de parel, Le Rêve, Meisje met de rode hoed, Guernica ".split(",");
 
         final var expected = IterableX.of(strings).toSetOf(String::trim);
 
@@ -380,7 +375,7 @@ class IterableXTest {
     void testFromIntArrayToMappedList() {
         final int[] numbers = {1, 4, 3, 6, 7, 4, 3, 234};
 
-        final var expected = IntStream.of(numbers).mapToObj(BigDecimal::valueOf).toList();
+        final var expected = IntStream.of(numbers).mapToObj(BigDecimal::valueOf).collect(Collectors.toUnmodifiableList());
 
         final var actual = IterableX.ofInts(numbers).toListOf(BigDecimal::valueOf);
 
@@ -676,21 +671,6 @@ class IterableXTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    void testTeeing() {
-        var array = TestSampleGenerator.createSampleBankAccountList().toArray(BankAccount[]::new);
-
-        final var pair = IterableX.of(array)
-                .teeing(toList(), reducing(BigDecimal.ZERO, BankAccount::getBalance, BigDecimal::add));
-
-        final var expectedTotal = IterableX.of(array).fold(BigDecimal.ZERO, this::addAccountBalance);
-
-        assertAll(
-                () -> assertEquals(Arrays.stream(array).toList(), pair.first()),
-                () -> assertEquals(expectedTotal, pair.second())
-        );
-    }
-
     private BigDecimal addAccountBalance(BigDecimal balance, BankAccount account) {
         return balance.add(account.getBalance());
     }
@@ -736,15 +716,7 @@ class IterableXTest {
                 .map(Painting::painter)
                 .collect(CollectorsX.toMapX(Painter::getDateOfBirth, Painter::getLastname, (a, b) -> a));
 
-        final var localDates = actual.flatMapKeysToSetOf(date ->
-                date.datesUntil(LocalDate.of(2000, Month.JANUARY, 1)).toList());
-
-        System.out.println("localDates.size() = " + localDates.size());
-
-        assertAll(
-                () -> assertEquals(expected, actual),
-                () -> assertEquals(expectedLocalDates, localDates)
-        );
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -818,7 +790,7 @@ class IterableXTest {
         final var bigDecimals = IntStream.range(0, 100_000)
                 .filter(integer -> integer % 2 == 0)
                 .mapToObj(BigDecimal::valueOf)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         assertEquals(50_000, bigDecimals.size());
     }
@@ -828,12 +800,12 @@ class IterableXTest {
         final var bigDecimals = IntStream.range(0, 100_000)
                 .filter(integer -> integer % 2 == 0)
                 .mapToObj(BigDecimal::valueOf)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var expected = IntStream.rangeClosed(0, 254)
                 .filter(integer -> integer % 2 == 0)
                 .mapToObj(BigDecimal::valueOf)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var list = IterableX.of(bigDecimals).distinctBy(BigDecimal::byteValue).getListOrElseThrow();
 

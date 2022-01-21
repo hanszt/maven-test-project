@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public sealed interface MutableListX<E> extends List<E>, ListX<E> permits ArrayListX {
+public interface MutableListX<E> extends List<E>, ListX<E> {
 
     static <E> MutableListX<E> empty() {
         return new ArrayListX<>();

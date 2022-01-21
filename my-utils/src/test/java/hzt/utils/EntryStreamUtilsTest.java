@@ -30,7 +30,7 @@ class EntryStreamUtilsTest {
         final var groupedByBookNameListAsString = groupedByCategoryMap.entrySet().stream()
                 .map(value(Set::copyOf))
                 .map(toSingle(EntryStreamUtilsTest::asString))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         groupedByBookNameListAsString.forEach(System.out::println);
 

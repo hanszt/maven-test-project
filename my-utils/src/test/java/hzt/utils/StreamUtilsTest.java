@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static hzt.stream.StreamUtils.*;
@@ -145,11 +146,11 @@ class StreamUtilsTest {
 
         final var expected = bookList.stream()
                 .sorted(comparing(Book::getCategory).reversed().thenComparing(Book::getTitle))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var actual = bookList.stream()
                 .sorted(sequential(comparing(Book::getCategory).reversed(), comparing(Book::getTitle)))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         assertEquals(expected, actual);
     }
@@ -160,11 +161,11 @@ class StreamUtilsTest {
 
         final var expected = bookList.stream()
                 .sorted(comparing(book -> book.getCategory() + book.getTitle()))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var actual = bookList.stream()
                 .sorted(comparing(Book::getCategory).thenComparing(Book::getTitle))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         assertEquals(expected, actual);
     }
@@ -177,11 +178,11 @@ class StreamUtilsTest {
 
         final var expected = books.stream()
                 .filter(book -> !(book.getTitle().contains(E) || book.getTitle().contains(A)))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var filteredBookList = books.stream()
                 .filter(by(Book::getTitle, containsNoneOf(E, A)))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         filteredBookList.forEach(System.out::println);
 
@@ -197,7 +198,7 @@ class StreamUtilsTest {
                         .compose(Book::getCategory)
                         .andThen(Class::getDeclaredFields))
                 .flatMap(Arrays::stream)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         fieldListOfObjectClass.forEach(System.out::println);
 
@@ -210,7 +211,7 @@ class StreamUtilsTest {
 
         final var filteredBookList = books.stream()
                 .filter(by(Book::hasCopies).or(Book::isAboutProgramming))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         filteredBookList.forEach(System.out::println);
 
@@ -223,11 +224,11 @@ class StreamUtilsTest {
 
         final var expected = books.stream()
                 .filter(book -> book.getTitle().startsWith("t") && book.getCategory().contains("2"))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var filteredBookList = books.stream()
                 .filter(by(Book::getTitle, startsWith("t")).and(by(Book::getCategory, contains("2"))))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         filteredBookList.forEach(System.out::println);
 
@@ -241,18 +242,7 @@ class StreamUtilsTest {
 
         final var actual = numbers.stream()
                 .flatMap(castIfInstance(Double.class))
-                .toList();
-
-        assertEquals(List.of(3D, 5.4), actual);
-    }
-
-    @Test
-    void testCastIfInstanceUsingMapMulti() {
-        List<Number> numbers = Arrays.asList(3D, 3, 4F, 5.4, 6, BigDecimal.valueOf(3), null);
-
-        final List<Double> actual = numbers.stream()
-                .mapMulti(castIfInstanceOf(Double.class))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         assertEquals(List.of(3D, 5.4), actual);
     }
@@ -264,32 +254,11 @@ class StreamUtilsTest {
         final var expected = numbers.stream()
                 .filter(Double.class::isInstance)
                 .map(Double.class::cast)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var actual = numbers.stream()
                 .flatMap(castIfInstance(Double.class))
-                .toList();
-
-        System.out.println("numbers.size() = " + numbers.size());
-        System.out.println("actual.size() = " + actual.size());
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void testNumberCastIfInstanceUsingMultiMap() {
-        List<Number> numbers = TestSampleGenerator.createNumberTypeList(AMOUNT);
-
-        final var numberClass = Integer.class;
-
-        final var expected = numbers.stream()
-                .filter(numberClass::isInstance)
-                .map(numberClass::cast)
-                .toList();
-
-        final var actual = numbers.stream()
-                .mapMulti(castIfInstanceOf(numberClass))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         System.out.println("numbers.size() = " + numbers.size());
         System.out.println("actual.size() = " + actual.size());
@@ -305,12 +274,12 @@ class StreamUtilsTest {
 
         final var expected = Stream.of(.9, 1.9, -.7)
                 .map(BigDecimal::valueOf)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
         //act
         List<BigDecimal> result = StreamUtils.combineToStream(list1, list2, StreamUtilsTest::difference)
                 .map(BigDecimal::valueOf)
                 .map(bigDecimal -> bigDecimal.setScale(1, RoundingMode.HALF_UP))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
         //assert
         assertEquals(expected, result);
     }
@@ -323,7 +292,7 @@ class StreamUtilsTest {
 
         final var expected = Stream.of(.9, 1.9, -.7)
                 .map(BigDecimal::valueOf)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
         //act
         combineToStream(list1, list2, biFunction(StreamUtilsTest::difference)
                 .andThen(BigDecimal::valueOf))
@@ -351,13 +320,13 @@ class StreamUtilsTest {
 
         final var paintingList = TestSampleGenerator.createPaintingList();
         final var concatenatedList = Stream.concat(listContainingNestedNulls.stream(), paintingList.stream())
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         System.out.println("concatenatedList = " + concatenatedList);
 
         final var paintings = concatenatedList.stream()
                 .filter(nonNull(Painting::painter))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         assertEquals(paintingList, paintings);
     }
@@ -368,13 +337,13 @@ class StreamUtilsTest {
 
         final var paintingList = TestSampleGenerator.createPaintingList();
         final var concatenatedList = Stream.concat(listContainingNestedNulls.stream(), paintingList.stream())
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         System.out.println("concatenatedList = " + concatenatedList);
 
         final var containingNullsFilteredOutList = concatenatedList.stream()
                 .filter(nonNull(Painting::painter, Painter::getDateOfBirth))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         assertEquals(paintingList, containingNullsFilteredOutList);
     }
@@ -402,13 +371,13 @@ class StreamUtilsTest {
 
         final var expected = TestSampleGenerator.getMuseumListContainingNulls();
         final var containingNulls = Stream.concat(listContainingNestedNulls.stream(), expected.stream())
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         System.out.println("containingNulls = " + containingNulls);
 
         final var actual = containingNulls.stream()
                 .filter(nonNull(Museum::getMostPopularPainting, Painting::painter, Painter::getDateOfBirth))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         assertEquals(expected, actual);
     }
@@ -419,7 +388,7 @@ class StreamUtilsTest {
         final var paintingList = TestSampleGenerator.createPaintingList();
 
         final var paintings = Stream.concat(paintingListContainingNestedNulls.stream(), paintingList.stream())
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         System.out.println("paintings = " + paintings);
 
@@ -429,11 +398,11 @@ class StreamUtilsTest {
                 .filter(Objects::nonNull)
                 .map(Painter::getDateOfBirth)
                 .filter(Objects::nonNull)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var painterDateOfBirthList = paintings.stream()
                 .flatMap(nullSafe(Painting::painter, Painter::getDateOfBirth))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         assertEquals(expected, painterDateOfBirthList);
     }
@@ -453,7 +422,7 @@ class StreamUtilsTest {
                 .map(Painter::getDateOfBirth)
                 .filter(Objects::nonNull)
                 .map(LocalDate::getDayOfWeek)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var listOfDayOfWeekBirthDateMostPopularPaintingPainters = concatenatedMuseumList.stream()
                 .flatMap(StreamUtils::streamOf)
@@ -461,7 +430,7 @@ class StreamUtilsTest {
                         Painting::painter,
                         Painter::getDateOfBirth,
                         LocalDate::getDayOfWeek))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         System.out.println("listOfDayOfWeekBirthDateMostPopularPaintingPainters = " + listOfDayOfWeekBirthDateMostPopularPaintingPainters);
 
@@ -482,7 +451,7 @@ class StreamUtilsTest {
                 .map(Painter::getDateOfBirth)
                 .filter(Objects::nonNull)
                 .map(LocalDate::getDayOfWeek)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var actual = concatenatedMuseumList.stream()
                 .flatMap(nullSafe(
@@ -490,7 +459,7 @@ class StreamUtilsTest {
                         Painting::painter,
                         Painter::getDateOfBirth,
                         LocalDate::getDayOfWeek))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var expectedDaysOfWeek = List.of(
                 DayOfWeek.WEDNESDAY,
@@ -520,15 +489,7 @@ class StreamUtilsTest {
                 .map(Painter::getDateOfBirth)
                 .filter(Objects::nonNull)
                 .map(LocalDate::getDayOfWeek)
-                .toList();
-
-        final var listOfDayOfWeekBirthDateMostPopularPaintingPainters = concatenatedMuseumList.stream()
-                .mapMulti(nullSafeBy(
-                        Museum::getMostPopularPainting,
-                        Painting::painter,
-                        Painter::getDateOfBirth,
-                        LocalDate::getDayOfWeek))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var expectedDaysOfWeek = List.of(
                 DayOfWeek.WEDNESDAY,
@@ -538,10 +499,7 @@ class StreamUtilsTest {
 
         System.out.println("expectedDaysOfWeek = " + expectedDaysOfWeek);
 
-        assertAll(
-                () -> assertEquals(expectedDaysOfWeek, listOfDayOfWeekBirthDateMostPopularPaintingPainters),
-                () -> assertEquals(expected, listOfDayOfWeekBirthDateMostPopularPaintingPainters)
-        );
+                assertEquals(expectedDaysOfWeek, expected);
     }
 
     private List<Museum> getMuseumsContainingNulls() {
@@ -554,7 +512,7 @@ class StreamUtilsTest {
 
         final var museums = TestSampleGenerator.getMuseumListContainingNulls();
         return Stream.concat(listContainingNestedNulls.stream(), museums.stream())
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
     }
 
     @Test
@@ -568,7 +526,7 @@ class StreamUtilsTest {
         final List<String> names = streamOf(hans)
                 .filter(by(Painting::yearOfCreation, isBefore(1995)))
                 .map(Painting::name)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         names.forEach(System.out::println);
 

@@ -22,7 +22,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.BinaryOperator;
@@ -215,14 +214,6 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
 
     default <R> IterableX<R> mapIndexed(BiFunction<Integer, T, R> mapper) {
         return mapIndexedToMutableList(mapper);
-    }
-
-    default <R> ListX<R> mapMultiToListOf(BiConsumer<? super T, ? super Consumer<R>> mapper) {
-        return ListX.of(stream().mapMulti(mapper).toList());
-    }
-
-    default <R> IterableX<R> mapMulti(BiConsumer<? super T, ? super Consumer<R>> mapper) {
-        return IterableX.of(mapMultiToListOf(mapper));
     }
 
     default <R> IterableX<R> mapNotNull(Function<T, R> mapper) {
@@ -521,30 +512,35 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default MutableListX<T> getMutableListOrElseCompute() {
-        return iterable() instanceof List<T> list ? MutableListX.of(list) : MutableListX.of(this);
+        final var iterable = iterable();
+        return iterable instanceof List ? MutableListX.of(((List<T>) iterable)) : MutableListX.of(this);
     }
 
     default MutableSetX<T> getMutableSetOrElseCompute() {
-        return iterable() instanceof Set<T> set ? MutableSetX.of(set) : MutableSetX.of(this);
+        final var iterable = iterable();
+        return iterable instanceof Set ? MutableSetX.of(((Set<T>) iterable)) : MutableSetX.of(this);
     }
 
     default List<T> getListOrElseThrow() {
-        if (iterable() instanceof List<T> list) {
-            return list;
+        final var iterable = iterable();
+        if (iterable instanceof List) {
+            return (List<T>) iterable;
         }
         throw new IllegalArgumentException(iterable().getClass().getSimpleName() + " is not an instance of List");
     }
 
     default MutableSetX<T> getSetOrElseThrow() {
-        if (iterable() instanceof Set<T> set) {
-            return MutableSetX.of(set);
+        final var iterable = iterable();
+        if (iterable instanceof Set) {
+            return MutableSetX.of(((Set<T>) iterable));
         }
         throw new IllegalArgumentException(iterable().getClass().getSimpleName() + " is not an instance of Set");
     }
 
     default MutableNavigableSetX<T> getNavigableSetOrElseThrow() {
-        if (iterable() instanceof NavigableSet<T> set) {
-            return MutableNavigableSetX.of(set);
+        final var iterable = iterable();
+        if (iterable instanceof NavigableSet) {
+            return MutableNavigableSetX.of((NavigableSet<T>) iterable);
         }
         throw new IllegalArgumentException(iterable().getClass().getSimpleName() + " is not an instance of NavigableSet");
     }
@@ -562,7 +558,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default IterableX<T> sorted() {
-        return IterableX.of(stream().sorted().toList());
+        return IterableX.of(stream().sorted().collect(Collectors.toList()));
     }
 
     default Stream<T> stream() {
@@ -898,18 +894,6 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return iterator.hasNext() ? Optional.of(reduce(iterator.next(), operation)) : Optional.empty();
     }
 
-    default <A1, R1, A2, R2> Pair<R1, R2> teeing(@NotNull Collector<T, A1, R1> downstream1,
-                                                @NotNull Collector<T, A2, R2> downStream2) {
-        return teeing(downstream1, downStream2, Pair::of);
-    }
-
-    default <A1, R1, A2, R2, R> R teeing(
-            @NotNull Collector<T, A1, R1> downstream1,
-            @NotNull Collector<T, A2, R2> downStream2,
-            @NotNull BiFunction<R1, R2, R> merger) {
-        return collect(Collectors.teeing(downstream1, downStream2, merger));
-    }
-
     default <A, R> R collect(@NotNull Collector<T, A, R> collector) {
         A result = collector.supplier().get();
         iterable().forEach(t -> collector.accumulator().accept(result, t));
@@ -1022,10 +1006,11 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
 
     default <R> R lastOf(@NotNull Function<T, R> mapper) {
         final var iterator = iterator();
+        final var iterable = iterable();
         if (!iterator.hasNext()) {
             throw noValuePresentException();
-        } else if (iterable() instanceof List<T> list) {
-            return findLastIfInstanceOfList(Objects::nonNull, list).map(mapper).orElseThrow();
+        } else if (iterable instanceof List) {
+            return findLastIfInstanceOfList(Objects::nonNull, (List<T>) iterable).map(mapper).orElseThrow();
         } else {
             return findLastIfUnknownIterable(Objects::nonNull, iterator).map(mapper).orElseThrow();
         }
@@ -1037,10 +1022,11 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
 
     default Optional<T> findLast(@NotNull Predicate<T> predicate) {
         final var iterator = iterator();
+        final var iterable = iterable();
         if (!iterator.hasNext()) {
             throw noValuePresentException();
-        } else if (iterable() instanceof List<T> list) {
-            return findLastIfInstanceOfList(predicate, list);
+        } else if (iterable instanceof List) {
+            return findLastIfInstanceOfList(predicate, ((List<T>) iterable));
         } else {
             return findLastIfUnknownIterable(predicate, iterator);
         }
@@ -1048,9 +1034,11 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
 
     default <R> Optional<R> findLastOf(@NotNull Function<T, R> mapper) {
         final var iterator = iterator();
+        final var iterable = iterable();
         if (!iterator.hasNext()) {
             return Optional.empty();
-        } else if (iterable() instanceof List<T> list) {
+        } else if (iterable instanceof List) {
+            List<T> list = (List<T>) iterable;
             return Optional.ofNullable(list.get(list.size() - 1)).map(mapper);
         } else {
             T result = iterator.next();
@@ -1164,11 +1152,12 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     private int collectionSizeOrElse(@SuppressWarnings("SameParameterValue") int defaultSize) {
-        return iterable() instanceof Collection<T> c ? c.size() : defaultSize;
+        return collectionSizeOrElseGet(() -> defaultSize);
     }
 
     private int collectionSizeOrElseGet(IntSupplier supplier) {
-        return iterable() instanceof Collection<T> c ? c.size() : supplier.getAsInt();
+        final var iterable = iterable();
+        return iterable instanceof Collection ? ((Collection<T>) iterable).size() : supplier.getAsInt();
     }
 
     default IterableX<T> takeWhileInclusive(Predicate<T> predicate) {
@@ -1292,7 +1281,9 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         if (n == 0) {
             return MutableListX.empty();
         }
-        if (iterable() instanceof Collection<T> c) {
+        final var iterable = iterable();
+        if (iterable instanceof Collection) {
+            var c = (Collection<T>) iterable;
             if (n >= c.size()) {
                 return MutableListX.of(c);
             }
@@ -1340,7 +1331,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default ListX<T> skipToList(int n) {
-        return ListX.of(stream().skip(n).toList());
+        return ListX.of(stream().skip(n).collect(Collectors.toUnmodifiableList()));
     }
 
     default IterableX<T> limit(int bound) {
@@ -1348,7 +1339,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default ListX<T> limitToList(int bound) {
-        return ListX.of(stream().limit(bound).toList());
+        return ListX.of(stream().limit(bound).collect(Collectors.toUnmodifiableList()));
     }
 
     default String joinToString() {

@@ -8,6 +8,7 @@ import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static hzt.stream.StreamUtils.by;
 import static hzt.stream.predicates.CollectionPredicates.*;
@@ -35,7 +36,7 @@ class CollectionPredicatesTest {
 
         final var paintings = paintingList.stream()
                 .filter(by(Painting::painter, MyCollections::listOfIterable, containsAll(firstPainter)))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         paintings.forEach(System.out::println);
 

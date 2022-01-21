@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public final class MyCollections {
 
@@ -32,7 +33,7 @@ public final class MyCollections {
     }
 
     public static <E> List<E> listOfIterable(Iterable<E> iterable) {
-        return StreamUtils.streamOf(iterable).toList();
+        return StreamUtils.streamOf(iterable).collect(Collectors.toUnmodifiableList());
     }
 
     /**

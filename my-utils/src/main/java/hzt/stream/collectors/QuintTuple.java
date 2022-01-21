@@ -40,12 +40,12 @@ public final class QuintTuple<R1, R2, R3, R4, R5> {
 
     @Override
     public boolean equals(Object obj) {
-        return obj == this || (obj instanceof QuintTuple<?, ?, ?, ?, ?> that &&
-                Objects.equals(this.first, that.first) &&
-                Objects.equals(this.second, that.second) &&
-                Objects.equals(this.third, that.third) &&
-                Objects.equals(this.fourth, that.fourth) &&
-                Objects.equals(this.fifth, that.fifth));
+        return obj == this || (obj instanceof QuintTuple &&
+                Objects.equals(this.first, ((QuintTuple<?, ?, ?, ?, ?>) obj).first) &&
+                Objects.equals(this.second, ((QuintTuple<?, ?, ?, ?, ?>) obj).second) &&
+                Objects.equals(this.third, ((QuintTuple<?, ?, ?, ?, ?>) obj).third) &&
+                Objects.equals(this.fourth, ((QuintTuple<?, ?, ?, ?, ?>) obj).fourth) &&
+                Objects.equals(this.fifth, ((QuintTuple<?, ?, ?, ?, ?>) obj).fifth));
     }
 
     @Override

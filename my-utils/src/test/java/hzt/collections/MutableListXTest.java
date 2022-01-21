@@ -5,6 +5,7 @@ import test.IterXImplGenerator;
 import test.model.PaintingAuction;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,13 +14,14 @@ class MutableListXTest {
 
     @Test
     void testMutableListX() {
-        final var museums = IterXImplGenerator.createAuctions().toMutableListX();
+        final var museums = IterXImplGenerator.createAuctions();
 
         final var expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)
-                .toList();
+                .filter(Objects::nonNull)
+                .collect(Collectors.toUnmodifiableList());
 
-        final var dates = museums.map(PaintingAuction::getDateOfOpening);
+        final var dates = museums.map(PaintingAuction::getDateOfOpening).toListX();
 
         assertEquals(expected, dates);
     }

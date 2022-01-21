@@ -5,6 +5,7 @@ import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static hzt.stream.StreamUtils.by;
 import static hzt.stream.predicates.StringPredicates.*;
@@ -20,11 +21,11 @@ class StringPredicatesTest {
 
         final List<Painting> expected = paintingList.stream()
                 .filter(painting -> painting.name().contains(O) || painting.name().contains(A))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final List<Painting> result = paintingList.stream()
                 .filter(by(Painting::name, containsAnyOf(O, A)))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         result.forEach(System.out::println);
         assertEquals(expected, result);
@@ -38,11 +39,11 @@ class StringPredicatesTest {
 
         final List<Painting> expected = paintingList.stream()
                 .filter(painting -> painting.name().equalsIgnoreCase(NAME1) || painting.name().equalsIgnoreCase(NAME2))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final List<Painting> result = paintingList.stream()
                 .filter(by(Painting::name, isEqualIgnoreCase(NAME1).or(isEqualIgnoreCase(NAME2))))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         result.forEach(System.out::println);
         assertEquals(expected, result);
@@ -56,11 +57,11 @@ class StringPredicatesTest {
 
         final List<Painting> expected = paintingList.stream()
                 .filter(painting -> painting.name().startsWith(LE) || painting.name().startsWith(ME))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final List<Painting> result = paintingList.stream()
                 .filter(by(Painting::name, startsWith(LE).or(startsWith(ME))))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         result.forEach(System.out::println);
         assertEquals(expected, result);
@@ -75,11 +76,11 @@ class StringPredicatesTest {
 
         final List<Painting> expected = paintingList.stream()
                 .filter(painting -> painting.name().endsWith(EL) || painting.name().endsWith(HOED) || painting.name().endsWith(NON))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final List<Painting> result = paintingList.stream()
                 .filter(by(Painting::name, endsWithAnyOf(EL, HOED, NON)))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         result.forEach(System.out::println);
         assertEquals(expected, result);
@@ -92,11 +93,11 @@ class StringPredicatesTest {
 
         final List<Painting> expected = paintingList.stream()
                 .filter(painting -> painting.name().length() == NAME.length())
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final List<Painting> result = paintingList.stream()
                 .filter(by(Painting::name, hasEqualLength(NAME)))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         result.forEach(System.out::println);
 
@@ -113,11 +114,11 @@ class StringPredicatesTest {
                     boolean containsDe = painting.name().contains("de");
                     boolean containsA = painting.name().contains("first");
                     return containsMeisje && containsDe && containsA;
-                }).toList();
+                }).collect(Collectors.toUnmodifiableList());
 
         final List<Painting> result = paintingList.stream()
                 .filter(by(Painting::name, containsAllOf("Meisje", "de", "first")))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         result.forEach(System.out::println);
         assertEquals(expected, result);
@@ -133,11 +134,11 @@ class StringPredicatesTest {
 
         final List<Painting> expected = paintingList.stream()
                 .filter(painting -> painting.name().contains(EL) || painting.name().contains(HOED) || painting.name().contains(NON))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
         //act
         final List<Painting> result = paintingList.stream()
                 .filter(by(Painting::name, containsAnyOf(EL, HOED, NON)))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         System.out.println("Input:");
         paintingList.forEach(System.out::println);
@@ -157,11 +158,11 @@ class StringPredicatesTest {
 
         final List<Painting> expected = paintingList.stream()
                 .filter(painting -> !(painting.name().contains(EL) || painting.name().contains(HOED) || painting.name().contains(NON)))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
         //act
         final List<Painting> result = paintingList.stream()
                 .filter(by(Painting::name, containsNoneOf(EL, HOED, NON)))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         System.out.println("Input:");
         paintingList.forEach(System.out::println);

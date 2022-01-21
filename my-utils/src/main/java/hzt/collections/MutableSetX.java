@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public sealed interface MutableSetX<E> extends Set<E>, SetX<E> permits HashSetX, MutableLinkedSetX, MutableNavigableSetX {
+public interface MutableSetX<E> extends Set<E>, SetX<E> {
 
     static <E> MutableSetX<E> empty() {
         return new HashSetX<>();

@@ -120,13 +120,6 @@ public final class CollectorsX {
         return left;
     }
 
-
-    public static <T, R1, R2> Collector<T, ?, Map.Entry<R1, R2>> teeingToEntry(
-            Collector<? super T, ?, R1> downstream1,
-            Collector<? super T, ?, R2> downstream2) {
-        return Collectors.teeing(downstream1, downstream2, Map::entry);
-    }
-
     public static <T> Collector<T, ?, DoubleStatistics> toDoubleStatisticsBy(ToDoubleFunction<? super T> toDoubleFunction) {
         Objects.requireNonNull(toDoubleFunction);
         return Collector.of(

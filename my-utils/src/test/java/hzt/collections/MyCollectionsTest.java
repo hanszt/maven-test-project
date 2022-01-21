@@ -42,7 +42,7 @@ class MyCollectionsTest {
         final var painters = paintings.stream()
                 .map(Painting::painter)
                 .filter(painter -> painter.getFirstName().startsWith("V"))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         painters.forEach(System.out::println);
 
@@ -64,7 +64,7 @@ class MyCollectionsTest {
                 .map(Painter::getFirstName)
                 .filter(name -> name.length() > 3)
                 .distinct()
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         painterNamesActual.forEach(System.out::println);
 

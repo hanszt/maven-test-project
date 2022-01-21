@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 public final class StringX implements CharSequenceX {
 
@@ -74,8 +75,7 @@ public final class StringX implements CharSequenceX {
 
     @Override
     public Iterable<Character> iterable() {
-
-        return stream().toList();
+        return stream().collect(Collectors.toUnmodifiableList());
     }
 
     @Override
