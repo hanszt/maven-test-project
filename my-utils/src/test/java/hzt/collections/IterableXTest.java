@@ -56,7 +56,7 @@ class IterableXTest {
 
     @Test
     void testFlatMapToSet() {
-        var museumList = TestSampleGenerator.getMuseumListContainingNulls();
+        var museumList = MutableListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
         final var expected = museumList.stream()
                 .map(Museum::getPaintings)
@@ -64,7 +64,7 @@ class IterableXTest {
                 .filter(Objects::nonNull)
                 .collect(toUnmodifiableSet());
 
-        final var actual = ListX.of(museumList).flatMapToSetOf(Museum::getPaintings);
+        final var actual = museumList.flatMapToSetXOf(Museum::getPaintings);
 
         final var streamX = StreamEx.of(museumList).flatMap(museum -> museum.getPaintings().stream()).toSet();
 
@@ -76,34 +76,34 @@ class IterableXTest {
 
     @Test
     void testToNonNullKeyMap() {
-        final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
+        final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
         final var expectedMap = museumList.stream()
                 .filter(m -> m.getName() != null)
                 .collect(toUnmodifiableMap(Museum::getName, Museum::getPaintings));
 
-        final var actualMap = ListX.of(museumList).toMapX(Museum::getName, Museum::getPaintings);
+        final var actualMap = museumList.toMapX(Museum::getName, Museum::getPaintings);
 
         assertEquals(expectedMap, actualMap);
     }
 
     @Test
     void testToNonNullKeyMapWithValues() {
-        final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
+        final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
         final var expectedMap = museumList.stream()
                 .collect(toUnmodifiableMap(Function.identity(), Museum::getMostPopularPainting));
 
-        final var actualMap = ListX.of(museumList).associateWith(Museum::getMostPopularPainting);
+        final var actualMap = museumList.associateWith(Museum::getMostPopularPainting);
 
         assertEquals(expectedMap, actualMap);
     }
 
     @Test
     void testWithIndicesZipWithNext2() {
-        final var museums = TestSampleGenerator.getMuseumListContainingNulls();
+        final var museums = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
-        final var sumsOfThree = ListX.of(museums)
+        final var sumsOfThree = museums
                 .flatMap(Museum::getPaintings)
                 .indices()
                 .zipWithNext2(IntStream::of)
@@ -116,9 +116,9 @@ class IterableXTest {
 
     @Test
     void testMapIndexed() {
-        final var museums = TestSampleGenerator.getMuseumListContainingNulls();
+        final var museums = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
-        final var sumsOfThree = ListX.of(museums)
+        final var sumsOfThree = museums
                 .mapIndexed((index, value) -> index)
                 .zipWithNext2(IntStream::of)
                 .toListXOf(IntStream::sum);
@@ -130,14 +130,14 @@ class IterableXTest {
 
     @Test
     void testMaxOf() {
-        var bankAccountList = TestSampleGenerator.createSampleBankAccountList();
+        var bankAccountList = ListX.of(TestSampleGenerator.createSampleBankAccountList());
 
         final var expected = bankAccountList.stream()
                 .max(Comparator.comparing(BankAccount::getBalance))
                 .map(BankAccount::getBalance)
                 .orElseThrow();
 
-        final var actual = ListX.of(bankAccountList).maxOf(BankAccount::getBalance);
+        final var actual = bankAccountList.maxOf(BankAccount::getBalance);
 
         System.out.println("actual = " + actual);
 
@@ -146,14 +146,14 @@ class IterableXTest {
 
     @Test
     void testMinOf() {
-        var list = TestSampleGenerator.createSampleBankAccountList();
+        var list = ListX.of(TestSampleGenerator.createSampleBankAccountList());
 
         final var expected = list.stream()
                 .min(Comparator.comparing(BankAccount::getBalance))
                 .map(BankAccount::getBalance)
                 .orElseThrow();
 
-        final var actual = ListX.of(list).minOf(BankAccount::getBalance);
+        final var actual = list.minOf(BankAccount::getBalance);
 
         System.out.println("actual = " + actual);
 
@@ -190,23 +190,23 @@ class IterableXTest {
 
     @Test
     void testMaxBy() {
-        var set = TestSampleGenerator.createSampleBankAccountList().stream()
-                .collect(Collectors.toUnmodifiableSet());
+        var set = ListX.of(TestSampleGenerator.createSampleBankAccountList().stream()
+                .collect(Collectors.toUnmodifiableSet()));
 
         final var expected = set.stream().max(Comparator.comparing(BankAccount::getBalance));
 
-        final var actual = ListX.of(set).maxBy(BankAccount::getBalance);
+        final var actual = set.maxBy(BankAccount::getBalance);
 
         assertEquals(expected, actual);
     }
 
     @Test
     void testGrouping() {
-        final var paintings = TestSampleGenerator.createPaintingList();
+        final var paintings = ListX.of(TestSampleGenerator.createPaintingList());
 
         final var expectedMap = paintings.stream().collect(groupingBy(Painting::painter));
 
-        final var actualMap = ListX.of(paintings).groupBy(Painting::painter);
+        final var actualMap = paintings.groupBy(Painting::painter);
 
         assertEquals(expectedMap, actualMap);
     }
@@ -243,12 +243,12 @@ class IterableXTest {
 
     @Test
     void testPartitioning() {
-        final var paintings = TestSampleGenerator.createPaintingList();
+        final var paintings = ListX.of(TestSampleGenerator.createPaintingList());
 
         final var expectedMap = paintings.stream()
                 .collect(partitioningBy(Painting::isInMuseum));
 
-        final var actualMap = ListX.of(paintings).partition(Painting::isInMuseum);
+        final var actualMap = paintings.partition(Painting::isInMuseum);
 
         assertAll(
                 () -> assertEquals(expectedMap.get(true), actualMap.first()),
@@ -258,11 +258,11 @@ class IterableXTest {
 
     @Test
     void testToSummaryStatistics() {
-        final var paintings = TestSampleGenerator.createPaintingList();
+        final var paintings = ListX.of(TestSampleGenerator.createPaintingList());
 
         final var expected = paintings.stream().mapToInt(Painting::ageInYears).summaryStatistics();
 
-        final var actual = ListX.of(paintings).statsOf(Painting::ageInYears);
+        final var actual = paintings.statsOf(Painting::ageInYears);
 
         assertAll(
                 () -> assertEquals(expected.getMin(), actual.getMin()),
@@ -275,13 +275,13 @@ class IterableXTest {
 
     @Test
     void testToBigDecimalSummaryStatistics() {
-        final var bankAccounts = TestSampleGenerator.createSampleBankAccountListContainingNulls();
+        final var bankAccounts = ListX.of(TestSampleGenerator.createSampleBankAccountListContainingNulls());
 
         final var expected = bankAccounts.stream()
                 .map(BankAccount::getBalance)
                 .collect(BigDecimalCollectors.summarizingBigDecimal());
 
-        final var actual = ListX.of(bankAccounts).statsOf(BankAccount::getBalance);
+        final var actual = bankAccounts.statsOf(BankAccount::getBalance);
 
         assertAll(
                 () -> assertEquals(expected.getMin(), actual.getMin()),
@@ -294,7 +294,7 @@ class IterableXTest {
 
     @Test
     void testFlatMapFiltersNullsFilterAndMapToList() {
-        final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
+        final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
         final var expectedPainters = museumList.stream()
                 .flatMap(museum -> museum.getPaintings().stream())
@@ -303,7 +303,7 @@ class IterableXTest {
                 .map(Painting::painter)
                 .toList();
 
-        final var actualPainters = ListX.of(museumList)
+        final var actualPainters = museumList
                 .flatMap(Museum::getPaintings)
                 .filter(Painting::isInMuseum)
                 .toListXOf(Painting::painter);
@@ -313,15 +313,15 @@ class IterableXTest {
 
     @Test
     void testFilterAndMapToCollection() {
-        final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
+        final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
         final Deque<LocalDate> expectedLocalDates = museumList.stream()
                 .filter(museum -> museum.getPaintings().size() > 3)
                 .map(Museum::getDateOfOpening)
                 .collect(toCollection(ArrayDeque::new));
 
-        final Deque<LocalDate> actualLocalDates = ListX.of(museumList)
-                .filter(museum -> museum.getPaintings().size() > 3)
+        final Deque<LocalDate> actualLocalDates = museumList
+                .filterBy(Museum::getPaintings, paintings -> paintings.size() > 3)
                 .mapTo(ArrayDeque::new, Museum::getDateOfOpening);
 
         assertIterableEquals(expectedLocalDates, actualLocalDates);
@@ -343,11 +343,11 @@ class IterableXTest {
 
     @Test
     void testSkip() {
-        final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
+        final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
         final var expected = museumList.stream().skip(3).toList();
 
-        final var actual = ListX.of(museumList).skipToList(3);
+        final var actual = museumList.skip(3);
 
         System.out.println("actual = " + actual);
 
@@ -356,11 +356,11 @@ class IterableXTest {
 
     @Test
     void testLimit() {
-        final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
+        final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
         final var expected = museumList.stream().limit(3).toList();
 
-        final var actual = ListX.of(museumList).limitToList(3);
+        final var actual = museumList.limit(3);
 
         System.out.println("actual = " + actual);
 
@@ -369,7 +369,7 @@ class IterableXTest {
 
     @Test
     void testTakeLastWhile() {
-        final var museumList = TestSampleGenerator.getMuseumListContainingNulls();
+        final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
         final var strings = """
                 De sterrennacht, Het melkmeisje, Les Demoiselles d'Avignon,
@@ -379,7 +379,7 @@ class IterableXTest {
 
         final var expected = ListX.of(strings).toSetXOf(String::trim);
 
-        final var actual = ListX.of(museumList)
+        final var actual = museumList
                 .flatMap(Museum::getPaintings)
                 .takeLastWhile(Painting::isInMuseum)
                 .toSetXOf(Painting::name);
@@ -395,7 +395,7 @@ class IterableXTest {
 
         final var expected = IntStream.of(numbers).mapToObj(BigDecimal::valueOf).toList();
 
-        final var actual = ListX.ofInts(numbers).toListXOf(BigDecimal::valueOf);
+        final var actual = ListX.ofInts(numbers).toListOf(BigDecimal::valueOf);
 
         assertIterableEquals(expected, actual);
     }
@@ -441,7 +441,7 @@ class IterableXTest {
                 .map(BankAccount::getBalance)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        final var actual = list.sumOfBigDecimals(BankAccount::getBalance);
+        final var actual = list.sumOf(BankAccount::getBalance);
 
         assertEquals(expected, actual);
     }
@@ -475,21 +475,21 @@ class IterableXTest {
 
     @Test
     void testListIteratorGetPreviousOnlyWorksBeforeWhenIsAtEnd() {
-        var li = List.of(22, 44, 88, 11 ,33);
-        var itr = li.listIterator();
+        var list = List.of(22, 44, 88, 11 ,33);
+        var listIterator = list.listIterator();
 
-        assertFalse(itr.hasPrevious());
+        assertFalse(listIterator.hasPrevious());
 
         System.out.println("In actual order :");
-        while (itr.hasNext()) {
-            System.out.println(itr.next());
+        while (listIterator.hasNext()) {
+            System.out.println(listIterator.next());
         }
 
-        assertTrue(itr.hasPrevious());
+        assertTrue(listIterator.hasPrevious());
 
         System.out.println("In reverse order :");
-        while (itr.hasPrevious()) {
-            System.out.println(itr.previous());
+        while (listIterator.hasPrevious()) {
+            System.out.println(listIterator.previous());
         }
     }
 
@@ -508,13 +508,13 @@ class IterableXTest {
 
     @Test
     void testSumOf() {
-        var list = TestSampleGenerator.createSampleBankAccountList();
-
-        final BigDecimal actual = ListX.of(list).sumOfBigDecimals(BankAccount::getBalance);
+        var list = ListX.of(TestSampleGenerator.createSampleBankAccountList());
 
         final var expected = list.stream()
                 .map(BankAccount::getBalance)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        final BigDecimal actual = list.sumOf(BankAccount::getBalance);
 
         System.out.println("actual = " + actual);
 
@@ -523,11 +523,11 @@ class IterableXTest {
 
     @Test
     void testSumOfInt() {
-        var list = TestSampleGenerator.createPaintingList();
-
-        final var actual = ListX.of(list).sumOfInts(Painting::ageInYears);
+        var list = ListX.of(TestSampleGenerator.createPaintingList());
 
         final var expected = list.stream().mapToInt(Painting::ageInYears).sum();
+
+        final var actual = list.sumOf(Painting::ageInYears);
 
         System.out.println("actual = " + actual);
 
@@ -536,11 +536,11 @@ class IterableXTest {
 
     @Test
     void testAverageOf() {
-        var list = TestSampleGenerator.createPaintingList();
+        var list = ListX.of(TestSampleGenerator.createPaintingList());
 
         final var expected = list.stream().mapToInt(Painting::ageInYears).average().orElseThrow();
 
-        final var actual = ListX.of(list).averageOfInts(Painting::ageInYears);
+        final var actual = list.averageOf(Painting::ageInYears);
 
         System.out.println("actual = " + actual);
 
@@ -549,13 +549,13 @@ class IterableXTest {
 
     @Test
     void testIterXOfIterable() {
-        var list = TestSampleGenerator.createSampleBankAccountList();
+        var listX = ListX.of(TestSampleGenerator.createSampleBankAccountList());
 
-        final BigDecimal actual = ListX.of(ListX.of(list)).sumOfBigDecimals(BankAccount::getBalance);
-
-        final var expected = list.stream()
+        final var expected = listX.stream()
                 .map(BankAccount::getBalance)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        final BigDecimal actual = ListX.of(listX).sumOf(BankAccount::getBalance);
 
         System.out.println("actual = " + actual);
 
@@ -597,9 +597,9 @@ class IterableXTest {
 
     @Test
     void testFirst() {
-        final var paintings = TestSampleGenerator.createPaintingList();
+        final var paintings = ListX.of(TestSampleGenerator.createPaintingList());
 
-        final var expected = ListX.of(paintings).first();
+        final var expected = paintings.first();
 
         final var actual = paintings.stream()
                 .findFirst()
@@ -610,9 +610,9 @@ class IterableXTest {
 
     @Test
     void testLast() {
-        final var paintings = TestSampleGenerator.createPaintingList();
+        final var paintings = ListX.of(TestSampleGenerator.createPaintingList());
 
-        final var expected = ListX.of(paintings).last();
+        final var expected = paintings.last();
 
         final var actual = paintings.get(paintings.size() - 1);
 
@@ -621,9 +621,9 @@ class IterableXTest {
 
     @Test
     void testFindLast() {
-        final var paintings = TestSampleGenerator.createPaintingList();
+        final var paintings = ListX.of(TestSampleGenerator.createPaintingList());
 
-        final var actual = ListX.of(paintings).findLast(not(Painting::isInMuseum));
+        final var actual = paintings.findLast(not(Painting::isInMuseum));
 
         System.out.println("actual = " + actual);
 
@@ -634,25 +634,25 @@ class IterableXTest {
 
     @Test
     void testAny() {
-        final var paintings = TestSampleGenerator.createPaintingList();
+        final var paintings = ListX.of(TestSampleGenerator.createPaintingList());
 
         final var expected = paintings.stream().anyMatch(Painting::isInMuseum);
 
-        final var actual = ListX.of(paintings).any(Painting::isInMuseum);
+        final var actual = paintings.any(Painting::isInMuseum);
 
         assertEquals(expected, actual);
     }
 
     @Test
     void testJoinToString() {
-        final var paintings = TestSampleGenerator.createPaintingList();
+        final var paintings = ListX.of(TestSampleGenerator.createPaintingList());
 
         final var expected = paintings.stream()
                 .map(Painting::age)
                 .map(Period::toString)
                 .collect(Collectors.joining(", "));
 
-        final var actual = ListX.of(paintings).joinToStringBy(Painting::age, ", ");
+        final var actual = paintings.joinToStringBy(Painting::age, ", ");
 
         System.out.println("actual = " + actual);
 
@@ -661,27 +661,27 @@ class IterableXTest {
 
     @Test
     void testToString() {
-        final var paintings = TestSampleGenerator.createPaintingList();
+        final var paintings = ListX.of(TestSampleGenerator.createPaintingList());
 
         final var expected = "ArrayListX{elements=[" +
                 "Painting[name=Lentetuin, de pastorietuin te Nuenen in het voorjaar, " +
                 "painter=Painter{firstName='Vincent', lastname='van Gogh', dateOfBirth=1853-03-20}, " +
                 "yearOfCreation=1884, isInMuseum=false]]}";
 
-        final var actual = ListX.of(paintings).filterNot(Painting::isInMuseum);
+        final var actual = paintings.filterNot(Painting::isInMuseum);
 
         assertEquals(expected, actual.toString());
     }
 
     @Test
     void testSkippingToSet() {
-        final var bookList = TestSampleGenerator.createBookList();
+        final var bookList = ListX.of(TestSampleGenerator.createBookList());
 
         final var expected = bookList.stream()
                 .filter(not(Book::isAboutProgramming))
                 .collect(Collectors.toUnmodifiableSet());
 
-        final var actual = ListX.of(bookList).toSetXSkipping(Book::isAboutProgramming);
+        final var actual = bookList.toSetXSkipping(Book::isAboutProgramming);
 
         System.out.println("actual = " + actual);
 
@@ -690,14 +690,14 @@ class IterableXTest {
 
     @Test
     void testCountingByNullableValue() {
-        final var bookList = TestSampleGenerator.createBookList();
+        final var bookList = ListX.of(TestSampleGenerator.createBookList());
 
         final var expected = bookList.stream()
                 .map(Book::getCategory)
                 .filter(Objects::nonNull)
                 .count();
 
-        final var actual = ListX.of(bookList).countNotNullOf(Book::getCategory);
+        final var actual = bookList.countNotNullOf(Book::getCategory);
 
         System.out.println("actual = " + actual);
 
@@ -706,22 +706,22 @@ class IterableXTest {
 
     @Test
     void testAll() {
-        final var paintings = TestSampleGenerator.createPaintingList();
+        final var paintings = ListX.of(TestSampleGenerator.createPaintingList());
 
         final var expected = paintings.stream().allMatch(Painting::isInMuseum);
 
-        final var actual = ListX.of(paintings).all(Painting::isInMuseum);
+        final var actual = paintings.all(Painting::isInMuseum);
 
         assertEquals(expected, actual);
     }
 
     @Test
     void testNone() {
-        final var paintings = TestSampleGenerator.createPaintingList();
+        final var paintings = ListX.of(TestSampleGenerator.createPaintingList());
 
         final var expected = paintings.stream().noneMatch(Painting::isInMuseum);
 
-        final var actual = ListX.of(paintings).none(Painting::isInMuseum);
+        final var actual = paintings.none(Painting::isInMuseum);
 
         assertEquals(expected, actual);
     }
@@ -747,7 +747,7 @@ class IterableXTest {
 
     @Test
     void testCollectingToIterX() {
-        var paintingList = TestSampleGenerator.createPaintingList();
+        var paintingList = ListX.of(TestSampleGenerator.createPaintingList());
 
         final var expected = paintingList.stream()
                 .map(Painting::painter)
@@ -760,7 +760,7 @@ class IterableXTest {
                 .collect(CollectorsX.toIterX())
                 .maxOf(Painter::getDateOfBirth);
 
-        final var maxWithFullTransformer = ListX.of(paintingList)
+        final var maxWithFullTransformer = paintingList
                 .mapNotNull(Painting::painter)
                 .maxOf(Painter::getDateOfBirth);
 
@@ -829,31 +829,31 @@ class IterableXTest {
 
     @Test
     void testZipWithNext() {
-        var museumList = TestSampleGenerator.createPaintingList();
+        var museumList = ListX.of(TestSampleGenerator.createPaintingList());
 
-        final var integers = ListX.of(museumList)
+        final var integers = museumList
                 .mapNotNull(Painting::name)
-                .zipWithNextToMutableListOf(String::compareTo);
+                .zipWithNextToListOf(String::compareTo);
 
         assertEquals(List.of(-5, 83, -1, 5, -5, 1, 8), integers);
     }
 
     @Test
     void testZipTwoCollections() {
-        var values = List.of(0, 1, 2, 3, 4, 5, 6, 7);
+        var values = ListX.of(0, 1, 2, 3, 4, 5, 6, 7);
         var others = List.of(6, 5, 4, 3, 2, 1, 0);
 
-        final var integers = ListX.of(values).zipToMutableListWith(others, Integer::compareTo);
+        final var integers = values.zipToListWith(others, Integer::compareTo);
 
         assertIterableEquals(List.of(-1, -1, -1, 0, 1, 1, 1), integers);
     }
 
     @Test
     void testToUnion() {
-        var values = List.of(0, 1, 2, 1, 3, 4, 5, 6, 7);
+        var values = ListX.of(0, 1, 2, 1, 3, 4, 5, 6, 7);
         var other = List.of(6, 5, 4, 3, 2, 1, 0);
 
-        final var union = ListX.of(values).union(other, String::valueOf);
+        final var union = values.union(other, String::valueOf);
 
         assertEquals(Set.of("0", "1", "2", "3", "4", "5", "6", "7"), union);
     }
@@ -896,17 +896,17 @@ class IterableXTest {
 
     @Test
     void testGetListOrElseThrow() {
-        final var bigDecimals = IntStream.range(0, 100_000)
+        final var bigDecimals = ListX.of(IntStream.range(0, 100_000)
                 .filter(integer -> integer % 2 == 0)
                 .mapToObj(BigDecimal::valueOf)
-                .toList();
+                .toList());
 
         final var expected = IntStream.rangeClosed(0, 254)
                 .filter(integer -> integer % 2 == 0)
                 .mapToObj(BigDecimal::valueOf)
                 .toList();
 
-        final var list = ListX.of(bigDecimals).distinctBy(BigDecimal::byteValue).getListOrElseThrow();
+        final var list = bigDecimals.distinctBy(BigDecimal::byteValue);
 
         System.out.println("list = " + list);
 

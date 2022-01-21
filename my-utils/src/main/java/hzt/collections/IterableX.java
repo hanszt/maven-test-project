@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
@@ -382,7 +381,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return (MutableSetX<R>) flatMapToCollectionOf(mapper, () -> (C) MutableSetX.<R>empty());
     }
 
-    default <R, C extends Collection<R>> SetX<R> flatMapToSetOf(Function<T, C> mapper) {
+    default <R, C extends Collection<R>> SetX<R> flatMapToSetXOf(Function<T, C> mapper) {
         return SetX.copyOf(flatMapToMutableSetOf(mapper));
     }
 
@@ -658,7 +657,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default <R> IterableX<T> distinctBy(Function<T, R> selector) {
-        return IterableX.of(distinctToMutableListBy(selector));
+        return distinctToMutableListBy(selector);
     }
 
     default int countNotNullBy(@NotNull Predicate<T> predicate) {
@@ -694,8 +693,8 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return counter;
     }
 
-    default long sumOfInts(@NotNull ToIntFunction<T> selector) {
-        long sum = 0;
+    default int sumOf(@NotNull ToIntFunction<T> selector) {
+        int sum = 0;
         for (T t : this) {
             if (t != null) {
                 final var value = selector.applyAsInt(t);
@@ -705,8 +704,8 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return sum;
     }
 
-    default int sumOfLongs(@NotNull ToLongFunction<T> selector) {
-        var sum = 0;
+    default long sumOf(@NotNull ToLongFunction<T> selector) {
+        long sum = 0;
         for (T t : this) {
             if (t != null) {
                 final var value = selector.applyAsLong(t);
@@ -716,7 +715,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return sum;
     }
 
-    default double sumOfDoubles(@NotNull ToDoubleFunction<T> selector) {
+    default double sumOf(@NotNull ToDoubleFunction<T> selector) {
         double sum = 0;
         for (T t : this) {
             if (t != null) {
@@ -727,7 +726,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return sum;
     }
 
-    default BigDecimal sumOfBigDecimals(@NotNull Function<T, BigDecimal> selector) {
+    default BigDecimal sumOf(@NotNull Function<T, BigDecimal> selector) {
         var sum = BigDecimal.ZERO;
         for (T t : this) {
             if (t != null) {
@@ -740,7 +739,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return sum;
     }
 
-    default double averageOfInts(@NotNull ToIntFunction<T> selector) {
+    default double averageOf(@NotNull ToIntFunction<T> selector) {
         double sum = 0;
         var counter = 0;
         for (T t : this) {
@@ -753,7 +752,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return (counter != 0) ? (sum / counter) : 0;
     }
 
-    default double averageOfLongs(@NotNull ToLongFunction<T> selector) {
+    default double averageOf(@NotNull ToLongFunction<T> selector) {
         double sum = 0;
         var counter = 0;
         for (T t : this) {
@@ -766,7 +765,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return (counter != 0) ? (sum / counter) : 0;
     }
 
-    default double averageOfDoubles(@NotNull ToDoubleFunction<T> selector) {
+    default double averageOf(@NotNull ToDoubleFunction<T> selector) {
         double sum = 0;
         var counter = 0;
         for (T t : this) {
@@ -779,11 +778,11 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return (counter != 0) ? (sum / counter) : 0;
     }
 
-    default BigDecimal averageOfBigDecimals(@NotNull Function<T, BigDecimal> selector) {
-        return averageOfBigDecimals(selector, 2, RoundingMode.HALF_UP);
+    default BigDecimal averageOf(@NotNull Function<T, BigDecimal> selector) {
+        return averageOf(selector, 2, RoundingMode.HALF_UP);
     }
 
-    default BigDecimal averageOfBigDecimals(@NotNull Function<T, BigDecimal> selector, int scale, @NotNull RoundingMode roundingMode) {
+    default BigDecimal averageOf(@NotNull Function<T, BigDecimal> selector, int scale, @NotNull RoundingMode roundingMode) {
         var sum = BigDecimal.ZERO;
         var counter = 0;
         for (T t : this) {
@@ -1127,6 +1126,14 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return list;
     }
 
+    default <R> ListX<R> zipWithNextToListXOf(BiFunction<T, T, R> function) {
+        return zipWithNextToMutableListOf(function);
+    }
+
+    default <R> List<R> zipWithNextToListOf(BiFunction<T, T, R> function) {
+        return List.copyOf(zipWithNextToMutableListOf(function));
+    }
+
     default <R> IterableX<R> zipWithNext(BiFunction<T, T, R> function) {
         return zipWithNextToMutableListOf(function);
     }
@@ -1167,6 +1174,14 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
             list.add(function.apply(next, otherNext));
         }
         return list;
+    }
+
+    default <A, R> ListX<R> zipToListXWith(Iterable<A> otherIterable, BiFunction<T, A, R> function) {
+        return zipToMutableListWith(otherIterable, function);
+    }
+
+    default <A, R> List<R> zipToListWith(Iterable<A> otherIterable, BiFunction<T, A, R> function) {
+        return List.copyOf(zipToMutableListWith(otherIterable, function));
     }
 
     default SetX<T> union(Iterable<T> other) {

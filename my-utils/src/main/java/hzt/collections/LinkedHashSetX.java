@@ -113,4 +113,9 @@ public final class LinkedHashSetX<E> implements MutableLinkedSetX<E> {
     public boolean isNotEmpty() {
         return !isEmpty();
     }
+
+    @Override
+    public boolean containsNot(E e) {
+        return !contains(e);
+    }
 }

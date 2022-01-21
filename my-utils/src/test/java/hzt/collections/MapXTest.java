@@ -44,7 +44,7 @@ class MapXTest {
 
         final var actual = MapX.of(museumMap)
                 .valuesToIterX(Museum::getDateOfOpening)
-                .sumOfInts(LocalDate::getDayOfMonth);
+                .sumOf(LocalDate::getDayOfMonth);
 
         System.out.println("actual = " + actual);
 

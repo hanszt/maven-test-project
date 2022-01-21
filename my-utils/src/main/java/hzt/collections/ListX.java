@@ -94,6 +94,11 @@ public sealed interface ListX<T> extends CollectionX<T> permits MutableListX {
     }
 
     @Override
+    default ListX<T> filter(Predicate<T> predicate) {
+        return filterToMutableList(predicate);
+    }
+
+    @Override
     default ListX<T> filterNot(Predicate<T> predicate) {
         return filterToListX(predicate.negate());
     }
@@ -146,6 +151,11 @@ public sealed interface ListX<T> extends CollectionX<T> permits MutableListX {
         return IterableX.of(takeLastToMutableList(n));
     }
 
+    @Override
+    default <R> ListX<T> distinctBy(Function<T, R> selector) {
+        return distinctToMutableListBy(selector);
+    }
+
     int size();
 
     boolean isEmpty();
@@ -156,6 +166,7 @@ public sealed interface ListX<T> extends CollectionX<T> permits MutableListX {
 
     boolean contains(Object o);
 
+    @Override
     default boolean containsNot(T t) {
         return !contains(t);
     }

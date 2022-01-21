@@ -232,4 +232,9 @@ public final class TreeSetX<E, R extends Comparable<R>> implements NavigableSetX
     public boolean isNotEmpty() {
         return !navigableSet.isEmpty();
     }
+
+    @Override
+    public boolean containsNot(E e) {
+        return !contains(e);
+    }
 }

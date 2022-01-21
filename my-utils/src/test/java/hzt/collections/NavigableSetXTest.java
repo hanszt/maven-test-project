@@ -34,7 +34,7 @@ class NavigableSetXTest {
         final var average = names
                 .onEachOf(String::length, lengthConsumer)
                 .filterBy(String::length, length -> length > 14)
-                .averageOfInts(String::length);
+                .averageOf(String::length);
 
         System.out.println("average = " + average);
 

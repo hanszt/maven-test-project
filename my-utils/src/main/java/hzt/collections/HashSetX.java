@@ -140,4 +140,9 @@ public final class HashSetX<E> implements MutableSetX<E> {
     public boolean isNotEmpty() {
         return !set.isEmpty();
     }
+
+    @Override
+    public boolean containsNot(E e) {
+        return !contains(e);
+    }
 }
