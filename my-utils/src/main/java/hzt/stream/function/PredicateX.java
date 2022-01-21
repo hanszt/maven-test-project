@@ -4,7 +4,7 @@ import java.util.function.Predicate;
 
 public interface PredicateX<T> extends Predicate<T> {
 
-    static <T> PredicateX<T> by(PredicateX<T> predicate) {
+    static <T> PredicateX<T> test(PredicateX<T> predicate) {
         return predicate;
     }
 

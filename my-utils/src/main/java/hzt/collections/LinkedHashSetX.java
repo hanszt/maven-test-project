@@ -107,6 +107,4 @@ public final class LinkedHashSetX<E> implements MutableLinkedSetX<E> {
     public void clear() {
         set.clear();
     }
-
-
 }

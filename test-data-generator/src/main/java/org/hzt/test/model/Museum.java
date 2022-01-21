@@ -82,6 +82,15 @@ public class Museum implements Comparable<Museum>, Iterable<Painting> {
 
     @Override
     public int compareTo(Museum o) {
+        if (name == null) {
+            return -1;
+        }
+        if (o == null) {
+            return 1;
+        }
+        if (o.getName() == null) {
+            return 1;
+        }
         return name.compareTo(o.getName());
     }
 

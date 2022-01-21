@@ -8,13 +8,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Function;
 
 import static java.util.Comparator.comparing;
 
-public final class TreeSetX<E, R extends Comparable<R>> implements MutableNavigableSetX<E> {
+public final class TreeSetX<E, R extends Comparable<R>> implements NavigableSetX<E> {
 
     private final NavigableSet<E> navigableSet;
 
@@ -200,5 +201,29 @@ public final class TreeSetX<E, R extends Comparable<R>> implements MutableNaviga
     @Override
     public SortedSet<E> tailSet(E fromElement) {
         return navigableSet.tailSet(fromElement);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TreeSetX<?, ?> treeSetX = (TreeSetX<?, ?>) o;
+        return navigableSet.equals(treeSetX.navigableSet);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(navigableSet);
+    }
+
+    @Override
+    public String toString() {
+        return "TreeSetX{" +
+                "items=" + navigableSet +
+                '}';
     }
 }

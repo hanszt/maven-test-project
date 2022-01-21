@@ -11,7 +11,7 @@ class ListXTest {
 
     @Test
     void testMutableListX() {
-        final var museums = IterXImplGenerator.createAuctions().toMutableListX();
+        final var museums = IterXImplGenerator.createAuctions().toMutableList();
 
         final var expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)
@@ -30,7 +30,7 @@ class ListXTest {
                 .takeWhile(museum -> museum.getPaintings().size() < 3).toList();
 
         final var actual = ListX.of(museumList)
-                .takeToListWhile(museum -> museum.getPaintings().size() < 3);
+                .takeToListWhile(museum -> museum.getPaintings().size() < 3).toMutableList();
 
         System.out.println("actual = " + actual);
 

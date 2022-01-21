@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
-class MutableNavigableSetXTest {
+class NavigableSetXTest {
 
     @Test
     void testGetNavigableSet() {
@@ -24,15 +24,17 @@ class MutableNavigableSetXTest {
                 .sorted()
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        final var names = museumListContainingNulls.toSortedSetOf(Museum::getName);
+        final var names = museumListContainingNulls.toNavigableSetOf(Museum::getName);
 
-        var list = MutableListX.empty();
+        var list = MutableListX.<Integer>empty();
+
+        final var lengthConsumer = ConsumerX.<Integer>accept(System.out::println)
+                .andThen(list::add);
 
         final var average = names
-                .onEachOf(String::length, ConsumerX.of(System.out::println)
-                        .andThen(list::add))
-                .filterNotNullToMutableListBy(String::length, l -> l > 14)
-                .averageOf(String::length);
+                .onEachOf(String::length, lengthConsumer)
+                .filterBy(String::length, length -> length > 14)
+                .averageOfInts(String::length);
 
         System.out.println("average = " + average);
 

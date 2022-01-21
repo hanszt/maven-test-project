@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 
 public interface ConsumerX<T> extends Consumer<T> {
 
-    static <T> ConsumerX<T> of(ConsumerX<T> consumer) {
+    static <T> ConsumerX<T> accept(ConsumerX<T> consumer) {
         return consumer;
     }
 }

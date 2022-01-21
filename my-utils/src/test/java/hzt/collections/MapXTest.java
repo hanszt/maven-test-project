@@ -114,16 +114,16 @@ class MapXTest {
     void testMapXToList() {
         final var museumMapX = MapX.of(TestSampleGenerator.createMuseumMap());
 
-        final var pairs = museumMapX.toListOf(Pair::ofEntry);
+        final var pairs = museumMapX.toListXOf(Pair::ofEntry);
 
-        assertEquals(Set.of("Picasso Museum", "Van Gogh Museum", "Vermeer Museum"), pairs.toSetOf(Pair::first));
+        assertEquals(Set.of("Picasso Museum", "Van Gogh Museum", "Vermeer Museum"), pairs.toSetXOf(Pair::first));
     }
 
     @Test
     void testFlatMapToList() {
         final var museumMapX = MapX.of(TestSampleGenerator.createMuseumMap());
 
-        final var pairs = museumMapX.flatMapToListOf(e -> e.getValue().getPaintings());
+        final var pairs = museumMapX.flatMapToListXOf(e -> e.getValue().getPaintings());
 
         final var expected = "Meisje met de rode hoed";
 

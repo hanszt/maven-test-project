@@ -4,7 +4,7 @@ import java.util.function.IntPredicate;
 
 public interface IntPredicateX extends IntPredicate {
 
-    static IntPredicateX by(IntPredicateX predicate) {
+    static IntPredicateX test(IntPredicateX predicate) {
         return predicate;
     }
 

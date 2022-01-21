@@ -1,9 +1,7 @@
 package hzt.collections;
 
-import hzt.strings.CharSequenceX;
 import hzt.strings.StringX;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -36,8 +34,12 @@ public sealed interface ListX<T> extends IterableX<T> permits MutableListX {
         return new ArrayListX<>(first).plus(Arrays.asList(values));
     }
 
-    default MutableListX<T> toMutableListX() {
+    default MutableListX<T> toMutableList() {
        return MutableListX.of(this);
+    }
+
+    default List<T> toList() {
+        return toListOf(Function.identity());
     }
 
     @Override

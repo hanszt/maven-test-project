@@ -172,7 +172,7 @@ public final class ArrayListX<T> implements MutableListX<T> {
 
     @Override
     public ListX<T> toListX() {
-        return toListOf(Function.identity());
+        return toListXOf(Function.identity());
     }
 
     @Override

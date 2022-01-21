@@ -3,6 +3,8 @@ package hzt.collections;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.function.Function;
 
 public sealed interface SetX<T> extends IterableX<T> permits MutableSetX {
 
@@ -14,6 +16,10 @@ public sealed interface SetX<T> extends IterableX<T> permits MutableSetX {
         return iterable instanceof SetX<T> set ? set : SetX.of(iterable);
     }
 
+    default Set<T> toSet() {
+        return toSetOf(Function.identity());
+    }
+
     int size();
 
     boolean contains(Object o);
@@ -21,6 +27,6 @@ public sealed interface SetX<T> extends IterableX<T> permits MutableSetX {
     boolean containsAll(@NotNull Collection<?> c);
 
     default MutableListX<T> toMutableList() {
-        return IterableX.super.getMutableListOrElseCompute();
+        return IterableX.super.getListOrElseCompute();
     }
 }

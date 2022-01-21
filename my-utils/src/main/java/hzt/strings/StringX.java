@@ -1,11 +1,17 @@
 package hzt.strings;
 
+import hzt.collections.IterableX;
+import hzt.collections.MutableListX;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.function.Function;
 
-public final class StringX implements CharSequenceX {
+public final class StringX implements CharSequence, IterableX<Character> {
 
     private final String string;
 
@@ -56,14 +62,18 @@ public final class StringX implements CharSequenceX {
         return new StringX(s, charset);
     }
 
+    public MutableListX<Character> toMutableList() {
+        return toMutableListOf(Function.identity());
+    }
+
     @Override
     public int length() {
-        return 0;
+        return string.length();
     }
 
     @Override
     public char charAt(int index) {
-        return 0;
+        return string.charAt(index);
     }
 
     @NotNull
@@ -74,14 +84,40 @@ public final class StringX implements CharSequenceX {
 
     @Override
     public Iterable<Character> iterable() {
+        return charIterable(string);
+    }
 
-        return stream().toList();
+    private Iterable<Character> charIterable(String string) {
+        final class CharIterable implements Iterable<Character> {
+
+            private int index = 0;
+            private final char[] charArray = string.toCharArray();
+            @NotNull
+            @Override
+            public Iterator<Character> iterator() {
+                return new Iterator<>() {
+
+                    @Override
+                    public boolean hasNext() {
+                        return index < charArray.length;
+                    }
+
+                    @Override
+                    public Character next() {
+                        int prevIndex = index;
+                        if (prevIndex >= charArray.length) {
+                            throw new NoSuchElementException();
+                        }
+                        return charArray[index++];
+                    }
+                };
+            }
+        }
+        return new CharIterable();
     }
 
     @Override
     public @NotNull String toString() {
-        return "StringX{" +
-                "string='" + string + '\'' +
-                '}';
+        return joinToString();
     }
 }

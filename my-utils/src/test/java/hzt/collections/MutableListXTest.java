@@ -13,7 +13,7 @@ class MutableListXTest {
 
     @Test
     void testMutableListX() {
-        final var museums = IterXImplGenerator.createAuctions().toMutableListX();
+        final var museums = IterXImplGenerator.createAuctions().toMutableList();
 
         final var expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)
@@ -26,7 +26,7 @@ class MutableListXTest {
 
     @Test
     void testListWithAll() {
-        final var museums = IterXImplGenerator.createAuctions().toMutableListX();
+        final var museums = IterXImplGenerator.createAuctions().toMutableList();
 
         final var expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)

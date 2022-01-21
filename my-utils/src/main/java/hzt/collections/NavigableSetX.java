@@ -8,26 +8,26 @@ import java.util.NavigableSet;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public sealed interface MutableNavigableSetX<E> extends NavigableSet<E>, MutableSetX<E> permits TreeSetX {
+public sealed interface NavigableSetX<E> extends NavigableSet<E>, MutableSetX<E> permits TreeSetX {
 
-    static <E, R extends Comparable<R>> MutableNavigableSetX<E> comparingBy(Function<E, R> selector) {
+    static <E, R extends Comparable<R>> NavigableSetX<E> comparingBy(Function<E, R> selector) {
         return new TreeSetX<>(selector);
     }
 
-    static <E> MutableNavigableSetX<E> of(NavigableSet<E> set) {
+    static <E> NavigableSetX<E> of(NavigableSet<E> set) {
         return new TreeSetX<>(set);
     }
 
-    static <E, R extends Comparable<R>> MutableNavigableSetX<E> of(Iterable<E> iterable, Function<? super E, ? extends R> selector) {
+    static <E, R extends Comparable<R>> NavigableSetX<E> of(Iterable<E> iterable, Function<? super E, ? extends R> selector) {
         return new TreeSetX<>(iterable, selector);
     }
 
-    static <E, R extends Comparable<R>> MutableNavigableSetX<E> of(Collection<E> collection, Function<? super E, ? extends R> selector) {
+    static <E, R extends Comparable<R>> NavigableSetX<E> of(Collection<E> collection, Function<? super E, ? extends R> selector) {
         return new TreeSetX<>(collection, selector);
     }
 
     @SafeVarargs
-    static <E, R extends Comparable<R>> MutableNavigableSetX<E> of(Function<E, R> selector, E first, E... others) {
+    static <E, R extends Comparable<R>> NavigableSetX<E> of(Function<E, R> selector, E first, E... others) {
         return new TreeSetX<>(selector, first, others);
     }
 
@@ -53,7 +53,7 @@ public sealed interface MutableNavigableSetX<E> extends NavigableSet<E>, Mutable
         return MutableSetX.super.last();
     }
 
-    default MutableNavigableSetX<E> toSet() {
+    default NavigableSetX<E> toNavigableSet() {
         return getNavigableSetOrElseThrow();
     }
 }
