@@ -19,6 +19,10 @@ import java.util.function.Predicate;
  */
 public sealed interface ListX<T> extends CollectionX<T> permits MutableListX {
 
+    static <T> ListX<T> empty() {
+        return new ArrayListX<>();
+    }
+
     static <T> ListX<T> of(Iterable<T> iterable) {
         return new ArrayListX<>(iterable);
     }
@@ -36,6 +40,30 @@ public sealed interface ListX<T> extends CollectionX<T> permits MutableListX {
         return new ArrayListX<>(values);
     }
 
+    static ListX<Integer> ofInts(int... values) {
+        var valueList = MutableListX.<Integer>empty();
+        for (var value : values) {
+            valueList.add(value);
+        }
+        return valueList;
+    }
+
+    static ListX<Long> ofLongs(long... values) {
+        var valueList = MutableListX.<Long>empty();
+        for (var value : values) {
+            valueList.add(value);
+        }
+        return valueList;
+    }
+
+    static ListX<Double> ofDoubles(double... values) {
+        var valueList = MutableListX.<Double>empty();
+        for (var value : values) {
+            valueList.add(value);
+        }
+        return valueList;
+    }
+
     default MutableListX<T> toMutableList() {
        return MutableListX.of(this);
     }
@@ -47,6 +75,7 @@ public sealed interface ListX<T> extends CollectionX<T> permits MutableListX {
     default SetX<T> toSetMutableSet() {
         return toMutableSetOf(Function.identity());
     }
+
     default SetX<T> toSetX() {
         return toMutableSetNotNullOf(Function.identity());
     }

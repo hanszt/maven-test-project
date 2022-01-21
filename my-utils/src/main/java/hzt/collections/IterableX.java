@@ -68,17 +68,6 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
 
     Iterable<T> iterable();
 
-    static <T> IterableX<T> empty() {
-        return MutableListX.empty();
-    }
-
-    @SafeVarargs
-    static <T> IterableX<T> of(T... values) {
-        var list = MutableListX.<T>empty();
-        Collections.addAll(list, values);
-        return of(list);
-    }
-
     @NotNull
     static <T> IterableX<T> of(Iterable<T> iterable) {
         final class IterableXImpl<R> implements IterableX<R> {
@@ -119,30 +108,6 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
             }
         }
         return new IterableXImpl<>(iterable);
-    }
-
-    static IterableX<Integer> ofInts(int... values) {
-        var valueList = MutableListX.<Integer>empty();
-        for (var value : values) {
-            valueList.add(value);
-        }
-        return valueList;
-    }
-
-    static IterableX<Long> ofLongs(long... values) {
-        var valueList = MutableListX.<Long>empty();
-        for (var value : values) {
-            valueList.add(value);
-        }
-        return valueList;
-    }
-
-    static IterableX<Double> ofDoubles(double... values) {
-        var valueList = MutableListX.<Double>empty();
-        for (var value : values) {
-            valueList.add(value);
-        }
-        return valueList;
     }
 
     static IterableX<Integer> range(int start, int end, IntPredicate predicate) {

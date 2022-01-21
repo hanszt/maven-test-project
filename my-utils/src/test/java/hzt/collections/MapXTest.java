@@ -58,7 +58,7 @@ class MapXTest {
 
         final var museumListContainingNulls = TestSampleGenerator.getMuseumListContainingNulls();
 
-        IterableX.of(museumListContainingNulls).associateBy(Museum::getName).forEachIndexed(biConsumer);
+        ListX.of(museumListContainingNulls).associateBy(Museum::getName).forEachIndexed(biConsumer);
 
         list.forEach(System.out::println);
 
@@ -94,7 +94,7 @@ class MapXTest {
 
     @Test
     void testComputeIfAbsent() {
-        final var museumMap = IterableX.of(TestSampleGenerator.createMuseumList())
+        final var museumMap = ListX.of(TestSampleGenerator.createMuseumList())
                 .associateBy(Museum::getName);
 
         var expected = museumMap.get("Van Gogh Museum");
