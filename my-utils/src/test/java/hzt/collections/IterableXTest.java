@@ -1,5 +1,6 @@
 package hzt.collections;
 
+import hzt.function.It;
 import hzt.stream.collectors.BigDecimalCollectors;
 import hzt.stream.collectors.CollectorsX;
 import hzt.strings.StringX;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -92,7 +92,7 @@ class IterableXTest {
         final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
         final var expectedMap = museumList.stream()
-                .collect(toUnmodifiableMap(Function.identity(), Museum::getMostPopularPainting));
+                .collect(toUnmodifiableMap(It::self, Museum::getMostPopularPainting));
 
         final var actualMap = museumList.associateWith(Museum::getMostPopularPainting);
 
@@ -419,7 +419,7 @@ class IterableXTest {
                 Set.of(4, 5, 6)
         );
 
-        final var intersect = collections.intersectBy(Function.identity());
+        final var intersect = collections.intersectBy(It::self);
 
         assertEquals(Set.of(4, 5), intersect);
     }
@@ -566,7 +566,7 @@ class IterableXTest {
     void testLargeTransform() {
         final var bigDecimals = IterableX.range(0, 100_000)
                 .filter(integer -> integer % 2 == 0)
-                .toDescendingSortedListOf(BigDecimal::valueOf);
+                .toDescendingSortedMutableListOf(BigDecimal::valueOf);
 
         assertEquals(50_000, bigDecimals.size());
     }
@@ -916,7 +916,7 @@ class IterableXTest {
     @Test
     void testCreateAnEmptyIterableX() {
         final var strings = ListX.<String>empty()
-                .toCollectionNotNullOf(ArrayDeque::new, Function.identity());
+                .toCollectionNotNullOf(ArrayDeque::new, It::self);
 
         assertTrue(strings.isEmpty());
     }

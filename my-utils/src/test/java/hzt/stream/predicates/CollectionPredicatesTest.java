@@ -1,7 +1,7 @@
 package hzt.stream.predicates;
 
-import hzt.stream.StreamUtils;
 import hzt.collections.MyCollections;
+import hzt.stream.StreamUtils;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Painter;
 import org.hzt.test.model.Painting;

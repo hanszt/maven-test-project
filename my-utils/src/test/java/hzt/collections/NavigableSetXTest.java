@@ -1,12 +1,13 @@
 package hzt.collections;
 
-import hzt.stream.function.ConsumerX;
+import hzt.function.It;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Museum;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -28,11 +29,10 @@ class NavigableSetXTest {
 
         var list = MutableListX.<Integer>empty();
 
-        final var lengthConsumer = ConsumerX.<Integer>accept(System.out::println)
-                .andThen(list::add);
-
         final var average = names
-                .onEachOf(String::length, lengthConsumer)
+                .onEachOf(String::length, It
+                        .<Consumer<Integer>>self(System.out::println)
+                        .andThen(list::add))
                 .filterBy(String::length, length -> length > 14)
                 .averageOf(String::length);
 

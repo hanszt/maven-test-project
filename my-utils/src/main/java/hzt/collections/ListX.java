@@ -1,5 +1,6 @@
 package hzt.collections;
 
+import hzt.function.It;
 import hzt.strings.StringX;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,6 +11,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 
 /**
  * This class represents an immutable non-null list. When a list of this interface is created, all null values are filtered out
@@ -69,19 +71,19 @@ public sealed interface ListX<T> extends CollectionX<T> permits MutableListX {
     }
 
     default List<T> toList() {
-        return toListOf(Function.identity());
+        return toListOf(It::self);
     }
 
     default SetX<T> toSetMutableSet() {
-        return toMutableSetOf(Function.identity());
+        return toMutableSetOf(It::self);
     }
 
     default SetX<T> toSetX() {
-        return toMutableSetNotNullOf(Function.identity());
+        return toMutableSetNotNullOf(It::self);
     }
 
     default Set<T> toSet() {
-        return Set.copyOf(toMutableSetNotNullOf(Function.identity()));
+        return Set.copyOf(toMutableSetNotNullOf(It::self));
     }
 
     @Override
@@ -155,6 +157,39 @@ public sealed interface ListX<T> extends CollectionX<T> permits MutableListX {
     default <R> ListX<T> distinctBy(Function<T, R> selector) {
         return distinctToMutableListBy(selector);
     }
+
+    default  int binarySearchTo(int toIndex, ToIntFunction<T> comparison) {
+        return binarySearch(0, toIndex, comparison);
+    }
+
+    default  int binarySearchFrom(int fromIndex, ToIntFunction<T> comparison) {
+        return binarySearch(fromIndex, size(), comparison);
+    }
+
+    default  int binarySearch(ToIntFunction<T> comparison) {
+        return binarySearch(0, size(), comparison);
+    }
+
+    /**
+     * Searches this list or its range for an element for which the given [comparison] function
+     * returns zero using the binary search algorithm.
+     *
+     * The list is expected to be sorted so that the signs of the [comparison] function's return values ascend on the list elements,
+     * i.e. negative values come before zero and zeroes come before positive values.
+     * Otherwise, the result is undefined.
+     *
+     * If the list contains multiple elements for which [comparison] returns zero, there is no guarantee which one will be found.
+     *
+     * @param comparison function that returns zero when called on the list element being searched.
+     * On the elements coming before the target element, the function must return negative values;
+     * on the elements coming after the target element, the function must return positive values.
+     *
+     * @return the index of the found element, if it is contained in the list within the specified range;
+     * otherwise, the inverted insertion point `(-insertion point - 1)`.
+     * The insertion point is defined as the index at which the element should be inserted,
+     * so that the list (or the specified subrange of list) still remains sorted.
+     */
+    int binarySearch(int fromIndex, int toIndex, ToIntFunction<T> comparison);
 
     int size();
 

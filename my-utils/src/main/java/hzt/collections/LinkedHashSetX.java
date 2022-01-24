@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public final class LinkedHashSetX<E> implements MutableLinkedSetX<E> {
+final class LinkedHashSetX<E> implements MutableLinkedSetX<E> {
 
     private final Set<E> set;
 

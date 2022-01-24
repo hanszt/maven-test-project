@@ -47,6 +47,7 @@
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <cyclops.version>10.4.0</cyclops.version>
     </properties>
 
     <dependencyManagement>
@@ -108,6 +109,12 @@
                 <groupId>one.util</groupId>
                 <artifactId>streamex</artifactId>
                 <version>${streamex.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.oath.cyclops</groupId>
+                <artifactId>cyclops</artifactId>
+                <version>${cyclops.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

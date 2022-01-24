@@ -1,14 +1,12 @@
 package hzt.collections;
 
-import hzt.utils.Pair;
+import hzt.function.It;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Museum;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -22,7 +20,7 @@ class NavigableMapXTest {
 
         final NavigableMap<String, Museum> expected = new TreeMap<>(museumListContainingNulls.stream()
                 .filter(m -> m != null && m.getName() != null)
-                .collect(Collectors.toMap(Museum::getName, Function.identity())));
+                .collect(Collectors.toMap(Museum::getName, It::self)));
 
         final var actual = museumListContainingNulls
                 .toNavigableMapAssociatedBy(Museum::getName);
@@ -40,7 +38,7 @@ class NavigableMapXTest {
 
         final NavigableMap<Museum, String> expected = new TreeMap<>(museumSetContainingNulls.stream()
                 .filter(m -> m != null && m.getName() != null)
-                .collect(Collectors.toMap(Function.identity(), Museum::getName)));
+                .collect(Collectors.toMap(It::self, Museum::getName)));
 
         final NavigableMapX<Museum, String> actual = museumSetContainingNulls
                 .notNullBy(Museum::getName)

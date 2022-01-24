@@ -14,7 +14,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
 
-public final class TreeMapX<K, V, R extends Comparable<R>> implements NavigableMapX<K, V> {
+final class TreeMapX<K, V, R extends Comparable<R>> implements NavigableMapX<K, V> {
 
     private final NavigableMap<K, V> map;
 

@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 import static java.util.Comparator.comparing;
 
-public final class TreeSetX<E, R extends Comparable<R>> implements NavigableSetX<E> {
+final class TreeSetX<E, R extends Comparable<R>> implements NavigableSetX<E> {
 
     private final NavigableSet<E> navigableSet;
 

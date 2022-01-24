@@ -1,5 +1,6 @@
 package hzt.collections;
 
+import hzt.function.It;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -8,9 +9,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
-public final class ArrayListX<T> implements MutableListX<T> {
+final class ArrayListX<T> implements MutableListX<T> {
 
     private final List<T> list;
 
@@ -47,6 +48,11 @@ public final class ArrayListX<T> implements MutableListX<T> {
         final List<T> arrayList = new ArrayList<>(1);
         arrayList.add(value);
         this.list = arrayList;
+    }
+
+    @Override
+    public int binarySearch(int fromIndex, int toIndex, ToIntFunction<T> comparison) {
+        return IterableHelper.binarySearch(size(), list::get, fromIndex, toIndex, comparison);
     }
 
     @Override
@@ -172,7 +178,7 @@ public final class ArrayListX<T> implements MutableListX<T> {
 
     @Override
     public ListX<T> toListX() {
-        return toListXOf(Function.identity());
+        return toListXOf(It::self);
     }
 
     @Override

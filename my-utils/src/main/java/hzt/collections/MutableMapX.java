@@ -1,5 +1,7 @@
 package hzt.collections;
 
+import hzt.function.It;
+
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -32,12 +34,12 @@ public interface MutableMapX<K, V> extends Map<K, V>, MapX<K, V> {
 
     @Override
     default <K1> MutableMapX<K1, V> mapKeys(Function<K, K1> keyMapper) {
-        return map(keyMapper, Function.identity());
+        return map(keyMapper, It::self);
     }
 
     @Override
     default <V1> MutableMapX<K, V1> mapValues(Function<V, V1> valueMapper) {
-        return map(Function.identity(), valueMapper);
+        return map(It::self, valueMapper);
     }
 
     @Override

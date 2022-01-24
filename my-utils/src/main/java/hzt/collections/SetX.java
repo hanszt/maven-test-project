@@ -1,11 +1,11 @@
 package hzt.collections;
 
+import hzt.function.It;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
-import java.util.function.Function;
 
 public sealed interface SetX<T> extends CollectionX<T> permits MutableSetX {
 
@@ -25,7 +25,7 @@ public sealed interface SetX<T> extends CollectionX<T> permits MutableSetX {
     }
 
     default Set<T> toSet() {
-        return toSetOf(Function.identity());
+        return toSetOf(It::self);
     }
 
     int size();

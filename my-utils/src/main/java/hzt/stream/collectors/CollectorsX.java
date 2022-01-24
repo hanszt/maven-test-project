@@ -3,9 +3,9 @@ package hzt.stream.collectors;
 import hzt.collections.IterableX;
 import hzt.collections.MapX;
 import hzt.stream.StreamUtils;
-import hzt.stream.function.QuadFunction;
-import hzt.stream.function.QuintFunction;
-import hzt.stream.function.TriFunction;
+import hzt.function.QuadFunction;
+import hzt.function.QuintFunction;
+import hzt.function.TriFunction;
 import hzt.utils.MyObjects;
 
 import java.util.ArrayList;

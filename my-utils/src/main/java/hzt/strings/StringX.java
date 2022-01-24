@@ -2,6 +2,7 @@ package hzt.strings;
 
 import hzt.collections.IterableX;
 import hzt.collections.MutableListX;
+import hzt.function.It;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
@@ -73,7 +74,7 @@ public final class StringX implements CharSequence, IterableX<Character> {
     }
 
     public MutableListX<Character> toMutableList() {
-        return toMutableListOf(Function.identity());
+        return toMutableListOf(It::self);
     }
 
     public StringX replaceFirstChar(UnaryOperator<Character> replacer) {

@@ -1,5 +1,7 @@
 package hzt.collections;
 
+import hzt.function.It;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -50,7 +52,7 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
     }
 
     default MapX<V, K> toInvertedMap() {
-        return toInvertedMapOf(Function.identity(), Function.identity());
+        return toInvertedMapOf(It::self, It::self);
     }
 
     default <R> ListX<R> toListOf(BiFunction<K, V, R> mapper) {

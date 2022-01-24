@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public final class HashSetX<E> implements MutableSetX<E> {
+final class HashSetX<E> implements MutableSetX<E> {
 
     private final Set<E> set;
 
