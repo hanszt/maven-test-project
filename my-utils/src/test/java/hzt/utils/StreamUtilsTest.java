@@ -320,6 +320,7 @@ class StreamUtilsTest {
 
         final var paintingList = TestSampleGenerator.createPaintingList();
         final var concatenatedList = Stream.concat(listContainingNestedNulls.stream(), paintingList.stream())
+                .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableList());
 
         System.out.println("concatenatedList = " + concatenatedList);
@@ -337,6 +338,7 @@ class StreamUtilsTest {
 
         final var paintingList = TestSampleGenerator.createPaintingList();
         final var concatenatedList = Stream.concat(listContainingNestedNulls.stream(), paintingList.stream())
+                .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableList());
 
         System.out.println("concatenatedList = " + concatenatedList);
@@ -371,6 +373,7 @@ class StreamUtilsTest {
 
         final var expected = TestSampleGenerator.getMuseumListContainingNulls();
         final var containingNulls = Stream.concat(listContainingNestedNulls.stream(), expected.stream())
+                .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableList());
 
         System.out.println("containingNulls = " + containingNulls);
@@ -388,6 +391,7 @@ class StreamUtilsTest {
         final var paintingList = TestSampleGenerator.createPaintingList();
 
         final var paintings = Stream.concat(paintingListContainingNestedNulls.stream(), paintingList.stream())
+                .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableList());
 
         System.out.println("paintings = " + paintings);
@@ -512,6 +516,7 @@ class StreamUtilsTest {
 
         final var museums = TestSampleGenerator.getMuseumListContainingNulls();
         return Stream.concat(listContainingNestedNulls.stream(), museums.stream())
+                .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableList());
     }
 

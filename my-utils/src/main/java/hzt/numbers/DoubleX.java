@@ -1,8 +1,5 @@
 package hzt.numbers;
 
-import java.lang.invoke.MethodHandles;
-import java.util.Optional;
-
 public final class DoubleX extends Number implements NumberX{
 
     private final Double aDouble;
@@ -141,14 +138,6 @@ public final class DoubleX extends Number implements NumberX{
 
     public static double min(double a, double b) {
         return Double.min(a, b);
-    }
-
-    public Optional<Double> describeConstable() {
-        return aDouble.describeConstable();
-    }
-
-    public Double resolveConstantDesc(MethodHandles.Lookup lookup) {
-        return aDouble.resolveConstantDesc(lookup);
     }
 
     public IntX toIntX() {

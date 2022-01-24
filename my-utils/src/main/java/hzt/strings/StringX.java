@@ -6,14 +6,11 @@ import hzt.function.It;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -124,7 +121,6 @@ public final class StringX implements CharSequence, IterableX<Character> {
         return string.length();
     }
 
-    @Override
     public boolean isEmpty() {
         return string.isEmpty();
     }
@@ -346,31 +342,9 @@ public final class StringX implements CharSequence, IterableX<Character> {
         return string.lines();
     }
 
-    public String indent(int n) {
-        return string.indent(n);
-    }
-
-    public String stripIndent() {
-        return string.stripIndent();
-    }
-
-    public String translateEscapes() {
-        return string.translateEscapes();
-    }
-
-    public <R> R transform(Function<? super String, ? extends R> f) {
-        return string.transform(f);
-    }
-
     @Override
     public @NotNull String toString() {
         return joinToString();
-    }
-
-    @NotNull
-    @Override
-    public Iterable<Character> iterable() {
-        return stream().collect(Collectors.toUnmodifiableList());
     }
 
     @NotNull
@@ -389,10 +363,6 @@ public final class StringX implements CharSequence, IterableX<Character> {
 
     public static String format(Locale l, @NotNull String format, Object... args) {
         return String.format(l, format, args);
-    }
-
-    public String formatted(Object... args) {
-        return string.formatted(args);
     }
 
     public static String valueOf(Object obj) {
@@ -445,14 +415,6 @@ public final class StringX implements CharSequence, IterableX<Character> {
 
     public String repeat(int count) {
         return string.repeat(count);
-    }
-
-    public Optional<String> describeConstable() {
-        return string.describeConstable();
-    }
-
-    public String resolveConstantDesc(MethodHandles.Lookup lookup) {
-        return string.resolveConstantDesc(lookup);
     }
 
     public static int compare(CharSequence cs1, CharSequence cs2) {

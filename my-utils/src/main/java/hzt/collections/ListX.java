@@ -4,7 +4,6 @@ import hzt.function.It;
 import hzt.strings.StringX;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
@@ -20,7 +19,11 @@ import java.util.function.ToIntFunction;
  *
  * @author Hans Zuidervaart
  */
-public interface ListX<T> extends IterableX<T> {
+public interface ListX<T> extends CollectionX<T> {
+
+    static <T> ListX<T> empty() {
+        return new ArrayListX<>();
+    }
 
     static <T> ListX<T> of(Iterable<T> iterable) {
         return new ArrayListX<>(iterable);

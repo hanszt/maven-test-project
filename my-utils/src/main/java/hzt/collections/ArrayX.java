@@ -3,7 +3,7 @@ package hzt.collections;
 import java.util.function.IntFunction;
 import java.util.function.ToIntFunction;
 
-public sealed interface ArrayX<E> extends IterableX<E> permits ArrayXImpl {
+public interface ArrayX<E> extends IterableX<E> {
 
     @SafeVarargs
     static <E> ArrayX<E> of(E... values) {

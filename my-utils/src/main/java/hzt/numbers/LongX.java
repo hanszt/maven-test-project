@@ -1,8 +1,6 @@
 package hzt.numbers;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Objects;
-import java.util.Optional;
 
 public final class LongX extends Number implements NumberX{
     
@@ -223,13 +221,5 @@ public final class LongX extends Number implements NumberX{
 
     public static long min(long a, long b) {
         return Long.min(a, b);
-    }
-
-    public Optional<Long> describeConstable() {
-        return aLong.describeConstable();
-    }
-
-    public Long resolveConstantDesc(MethodHandles.Lookup lookup) {
-        return aLong.resolveConstantDesc(lookup);
     }
 }

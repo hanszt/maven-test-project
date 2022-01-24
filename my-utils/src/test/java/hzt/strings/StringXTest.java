@@ -20,7 +20,7 @@ class StringXTest {
                 .collect(Collectors.groupingBy(Function.identity()))
                 .values().stream()
                 .map(List::size)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var characterCounts = StringX.of(hallo).group().valuesToListXOf(List::size).toList();
 

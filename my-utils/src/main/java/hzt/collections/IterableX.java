@@ -185,14 +185,6 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return mapIndexedToMutableList(mapper);
     }
 
-    default <R> ListX<R> mapMultiToListXOf(BiConsumer<? super T, ? super Consumer<R>> mapper) {
-        return ListX.of(stream().mapMulti(mapper).toList());
-    }
-
-    default <R> IterableX<R> mapMulti(BiConsumer<? super T, ? super Consumer<R>> mapper) {
-        return IterableX.of(mapMultiToListXOf(mapper));
-    }
-
     default <R> IterableX<R> mapNotNull(Function<T, R> mapper) {
         return IterableX.of(toCollectionNotNullOf(MutableListX::empty, mapper));
     }
@@ -518,18 +510,21 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default MutableListX<T> getListOrElseCompute() {
-        return iterable() instanceof List<T> list ? MutableListX.of(list) : MutableListX.of(this);
+        final var iterable = iterable();
+        return iterable instanceof List ? MutableListX.of((List<T>) iterable) : MutableListX.of(this);
     }
 
     default MutableSetX<T> geSetOrElseCompute() {
-        return iterable() instanceof Set<T> set ? MutableSetX.of(set) : MutableSetX.of(this);
+        final var iterable = iterable();
+        return iterable instanceof Set ? MutableSetX.of((Set<T>) iterable) : MutableSetX.of(this);
     }
 
     default MutableListX<T> getListOrElseThrow() {
-        if (iterable() instanceof List<T> list) {
-            return MutableListX.of(list);
+        final var iterable = iterable();
+        if (iterable instanceof List) {
+            return MutableListX.of((List<T>) iterable);
         }
-        throw new IllegalArgumentException(iterable().getClass().getSimpleName() + " is not an instance of List");
+        throw new IllegalArgumentException(iterable.getClass().getSimpleName() + " is not an instance of List");
     }
 
     default MutableSetX<T> getSetOrElseThrow() {
@@ -541,10 +536,11 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default NavigableSetX<T> getNavigableSetOrElseThrow() {
-        if (iterable() instanceof NavigableSet<T> set) {
-            return NavigableSetX.of(set);
+        final var iterable = iterable();
+        if (iterable instanceof NavigableSet) {
+            return NavigableSetX.of((NavigableSet<T>) iterable);
         }
-        throw new IllegalArgumentException(iterable().getClass().getSimpleName() + " is not an instance of NavigableSet");
+        throw new IllegalArgumentException(iterable.getClass().getSimpleName() + " is not an instance of NavigableSet");
     }
 
     default <K> MutableMapX<K, T> associateBy(@NotNull Function<T, K> keyMapper) {
@@ -569,7 +565,8 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
 
     @NotNull
     private static <R, K extends Comparable<K>> K asComparableOrThrow(R key) {
-        if (key instanceof Comparable<?> c) {
+        if (key instanceof Comparable) {
+            var c = (Comparable<?>) key;
             //noinspection unchecked
             return (K) c;
         } else {

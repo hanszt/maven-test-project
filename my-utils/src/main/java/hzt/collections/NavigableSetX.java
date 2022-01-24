@@ -8,7 +8,7 @@ import java.util.NavigableSet;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public interface MutableNavigableSetX<E> extends NavigableSet<E>, MutableSetX<E> {
+public interface NavigableSetX<E> extends NavigableSet<E>, MutableSetX<E> {
 
     static <E, R extends Comparable<R>> NavigableSetX<E> comparingBy(Function<E, R> selector) {
         return new TreeSetX<>(selector);

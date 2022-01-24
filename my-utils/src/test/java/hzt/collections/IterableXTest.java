@@ -838,7 +838,7 @@ class IterableXTest {
                 .map(Book::getCategory)
                 .flatMapToInt(String::chars)
                 .mapToObj(c -> (char) c)
-                .toList();
+                .collect(toUnmodifiableList());
 
 
         final var actual = bookList
@@ -871,7 +871,7 @@ class IterableXTest {
         final var bigDecimals = ListX.of(IntStream.range(0, 100_000)
                 .filter(integer -> integer % 2 == 0)
                 .mapToObj(BigDecimal::valueOf)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toUnmodifiableList()));
 
         final var expected = IntStream.rangeClosed(0, 254)
                 .filter(integer -> integer % 2 == 0)

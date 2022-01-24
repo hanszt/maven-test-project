@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
-public interface SetX<T> extends IterableX<T> {
+public interface SetX<T> extends CollectionX<T> {
 
     static <T> SetX<T> of(Iterable<T> iterable) {
         return new HashSetX<>(iterable);

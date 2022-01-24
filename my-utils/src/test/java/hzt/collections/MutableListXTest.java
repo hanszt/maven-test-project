@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 class MutableListXTest {
 
@@ -21,9 +22,9 @@ class MutableListXTest {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableList());
 
-        final var dates = museums.map(PaintingAuction::getDateOfOpening);
+        final var dates = museums.mapNotNull(PaintingAuction::getDateOfOpening);
 
-        assertEquals(expected, dates);
+        assertIterableEquals(expected, dates);
     }
 
     @Test
