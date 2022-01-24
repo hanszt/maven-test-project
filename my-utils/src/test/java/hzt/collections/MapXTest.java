@@ -44,7 +44,7 @@ class MapXTest {
 
         final var actual = MapX.of(museumMap)
                 .valuesToIterX(Museum::getDateOfOpening)
-                .sumOfInts(LocalDate::getDayOfMonth);
+                .sumOf(LocalDate::getDayOfMonth);
 
         System.out.println("actual = " + actual);
 
@@ -58,7 +58,7 @@ class MapXTest {
 
         final var museumListContainingNulls = TestSampleGenerator.getMuseumListContainingNulls();
 
-        IterableX.of(museumListContainingNulls).associateBy(Museum::getName).forEachIndexed(biConsumer);
+        ListX.of(museumListContainingNulls).associateBy(Museum::getName).forEachIndexed(biConsumer);
 
         list.forEach(System.out::println);
 
@@ -94,7 +94,7 @@ class MapXTest {
 
     @Test
     void testComputeIfAbsent() {
-        final var museumMap = IterableX.of(TestSampleGenerator.createMuseumList())
+        final var museumMap = ListX.of(TestSampleGenerator.createMuseumList())
                 .associateBy(Museum::getName);
 
         var expected = museumMap.get("Van Gogh Museum");
@@ -114,16 +114,16 @@ class MapXTest {
     void testMapXToList() {
         final var museumMapX = MapX.of(TestSampleGenerator.createMuseumMap());
 
-        final var pairs = museumMapX.toListOf(Pair::ofEntry);
+        final var pairs = museumMapX.toListXOf(Pair::ofEntry);
 
-        assertEquals(Set.of("Picasso Museum", "Van Gogh Museum", "Vermeer Museum"), pairs.toSetOf(Pair::first));
+        assertEquals(Set.of("Picasso Museum", "Van Gogh Museum", "Vermeer Museum"), pairs.toSetXOf(Pair::first));
     }
 
     @Test
     void testFlatMapToList() {
         final var museumMapX = MapX.of(TestSampleGenerator.createMuseumMap());
 
-        final var pairs = museumMapX.flatMapToListOf(e -> e.getValue().getPaintings());
+        final var pairs = museumMapX.flatMapToListXOf(e -> e.getValue().getPaintings());
 
         final var expected = "Meisje met de rode hoed";
 

@@ -1,5 +1,7 @@
 package hzt.collections;
 
+import hzt.function.It;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -15,6 +17,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
 
     static <K, V> MapX<K, V> of(Map<K, V> map) {
@@ -31,20 +34,11 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
         throw new UnsupportedOperationException();
     }
 
-    default <K1, V1> MapX<K1, V1> map(Function<K, K1> keyMapper, Function<V, V1> valueMapper) {
-        Map<K1, V1> resultMap = new HashMap<>();
-        for (Map.Entry<K, V> entry : this) {
-            K key = entry.getKey();
-            if (key != null) {
-                resultMap.put(keyMapper.apply(key), valueMapper.apply(entry.getValue()));
-            }
-        }
-        return MapX.of(resultMap);
-    }
+    <K1, V1> MapX<K1, V1> map(Function<K, K1> keyMapper, Function<V, V1> valueMapper);
 
-    default <K1> MapX<K1, V> mapKeys(Function<K, K1> keyMapper) {
-        return MapX.of(map(keyMapper, Function.identity()));
-    }
+    <K1> MapX<K1, V> mapKeys(Function<K, K1> keyMapper);
+
+    <V1> MapX<K, V1> mapValues(Function<V, V1> valueMapper);
 
     default <K1, V1> MapX<K1, V1> toInvertedMapOf(Function<K, V1> toValueMapper, Function<V, K1> toKeyMapper) {
         Map<K1, V1> resultMap = new HashMap<>();
@@ -58,27 +52,35 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
     }
 
     default MapX<V, K> toInvertedMap() {
-        return toInvertedMapOf(Function.identity(), Function.identity());
+        return toInvertedMapOf(It::self, It::self);
     }
 
     default <R> ListX<R> toListOf(BiFunction<K, V, R> mapper) {
-        return IterableX.of(this).toListOf(e -> mapper.apply(e.getKey(), e.getValue()));
+        return IterableX.of(this).toListXOf(e -> mapper.apply(e.getKey(), e.getValue()));
     }
 
-    default <R> ListX<R> valuesToListOf(Function<V, R> mapper) {
-        return IterableX.of(valueIterable(this::iterator)).toListOf(mapper);
+    default <R> MutableListX<R> valuesToMutableListOf(Function<V, R> mapper) {
+        return IterableX.of(valueIterable(this::iterator)).toMutableListOf(mapper);
+    }
+
+    default <R> ListX<R> valuesToListXOf(Function<V, R> mapper) {
+        return valuesToMutableListOf(mapper);
+    }
+
+    default <R> List<R> valuesToListOf(Function<V, R> mapper) {
+        return List.copyOf(valuesToMutableListOf(mapper));
     }
 
     default <R> SetX<R> toSetOf(BiFunction<K, V, R> mapper) {
-        return IterableX.of(this).toSetOf(e -> mapper.apply(e.getKey(), e.getValue()));
+        return IterableX.of(this).toSetXOf(e -> mapper.apply(e.getKey(), e.getValue()));
     }
 
     default <R> SetX<R> keysToSetOf(Function<K, R> mapper) {
-        return IterableX.of(keyIterable(this::iterator)).toSetOf(mapper);
+        return IterableX.of(keyIterable(this::iterator)).toSetXOf(mapper);
     }
 
     default <R> SetX<R> valuesToSetOf(Function<V, R> mapper) {
-        return IterableX.of(valueIterable(this::iterator)).toSetOf(mapper);
+        return IterableX.of(valueIterable(this::iterator)).toSetXOf(mapper);
     }
 
     default <R> IterableX<R> toIterXOf(BiFunction<K, V, R> mapper) {
@@ -94,7 +96,7 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
     }
 
     default <R> IterableX<R> valuesToIterX(Function<V, R> mapper) {
-        return IterableX.of(valuesToListOf(mapper));
+        return IterableX.of(valuesToListXOf(mapper));
     }
 
     default <R, C extends Collection<R>> C valuesTo(Supplier<C> collectionFactory, Function<V, R> mapper) {
@@ -218,6 +220,10 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
         return (((v = get(key)) != null) || containsKey(key))
                 ? v
                 : defaultValue;
+    }
+
+    default MutableMapX<K, V> toMutableMap() {
+        return MutableMapX.ofIterable(this);
     }
 
     default void forEach(BiConsumer<? super K, ? super V> action) {

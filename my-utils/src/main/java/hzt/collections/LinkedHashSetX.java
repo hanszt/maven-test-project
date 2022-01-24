@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public final class LinkedHashSetX<E> implements MutableLinkedSetX<E> {
+final class LinkedHashSetX<E> implements MutableLinkedSetX<E> {
 
     private final Set<E> set;
 
@@ -70,6 +70,7 @@ public final class LinkedHashSetX<E> implements MutableLinkedSetX<E> {
     @NotNull
     @Override
     public <T> T @NotNull [] toArray(@NotNull T @NotNull [] a) {
+        //noinspection SuspiciousToArrayCall
         return set.toArray(a);
     }
 
@@ -108,5 +109,13 @@ public final class LinkedHashSetX<E> implements MutableLinkedSetX<E> {
         set.clear();
     }
 
+    @Override
+    public boolean isNotEmpty() {
+        return !isEmpty();
+    }
 
+    @Override
+    public boolean containsNot(E e) {
+        return !contains(e);
+    }
 }

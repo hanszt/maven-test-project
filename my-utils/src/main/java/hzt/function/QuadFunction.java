@@ -1,12 +1,12 @@
-package hzt.stream.function;
+package hzt.function;
 
 import java.util.Objects;
 import java.util.function.Function;
 
 @FunctionalInterface
-public interface TriFunction<T, U, V, R> {
+public interface QuadFunction<T, U, V, W, R> {
 
-    R apply(T t, U u, V v);
+    R apply(T t, U u, V v, W a);
 
     /**
      * Returns first composed function that first applies this function to
@@ -14,19 +14,19 @@ public interface TriFunction<T, U, V, R> {
      * If evaluation of either function throws an exception, it is relayed to
      * the caller of the composed function.
      *
-     * @param <W> the type of output of the {@code after} function, and of the
+     * @param <X> the type of output of the {@code after} function, and of the
      *           composed function
      * @param after the function to apply after this function is applied
      * @return first composed function that first applies this function and then
      * applies the {@code after} function
      * @throws NullPointerException if after is null
      */
-    default <W> TriFunction<T, U, V, W> andThen(Function<? super R, ? extends W> after) {
+    default <X> QuadFunction<T, U, V, W, X> andThen(Function<? super R, ? extends X> after) {
         Objects.requireNonNull(after);
-        return (T t, U u, V v) -> after.apply(apply(t, u, v));
+        return (T t, U u, V v, W w) -> after.apply(apply(t, u, v, w));
     }
 
-    static <T, U, V, R> TriFunction<T, U, V, R> of(TriFunction<T, U, V, R> function) {
+    static <T, U, V, W, R> QuadFunction<T, U, V, W, R> of(QuadFunction<T, U, V, W, R> function) {
         Objects.requireNonNull(function);
         return function;
     }

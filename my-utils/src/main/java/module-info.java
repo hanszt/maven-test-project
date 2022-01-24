@@ -6,7 +6,7 @@ open module my.utils {
     exports hzt.stream;
     exports hzt.stream.predicates;
     exports hzt.stream.collectors;
-    exports hzt.stream.function;
+    exports hzt.function;
     exports hzt.collections;
     exports hzt.utils;
     exports hzt.strings;

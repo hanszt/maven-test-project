@@ -1,8 +1,11 @@
 package hzt.collections;
 
+import hzt.function.It;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 
 public interface SetX<T> extends IterableX<T> {
 
@@ -10,8 +13,19 @@ public interface SetX<T> extends IterableX<T> {
         return new HashSetX<>(iterable);
     }
 
+    @SafeVarargs
+    static <T> SetX<T> of(T... values) {
+        var resultSet = MutableSetX.of(values);
+        resultSet.addAll(Arrays.asList(values));
+        return resultSet;
+    }
+
     static <T> SetX<T> copyOf(Iterable<T> iterable) {
         return iterable instanceof SetX ? (SetX<T>) iterable : SetX.of(iterable);
+    }
+
+    default Set<T> toSet() {
+        return toSetOf(It::self);
     }
 
     int size();
@@ -21,6 +35,6 @@ public interface SetX<T> extends IterableX<T> {
     boolean containsAll(@NotNull Collection<?> c);
 
     default MutableListX<T> toMutableList() {
-        return IterableX.super.getMutableListOrElseCompute();
+        return CollectionX.super.getListOrElseCompute();
     }
 }

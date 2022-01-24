@@ -14,21 +14,21 @@ class MutableListXTest {
 
     @Test
     void testMutableListX() {
-        final var museums = IterXImplGenerator.createAuctions();
+        final var museums = IterXImplGenerator.createAuctions().toMutableList();
 
         final var expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableList());
 
-        final var dates = museums.map(PaintingAuction::getDateOfOpening).toListX();
+        final var dates = museums.map(PaintingAuction::getDateOfOpening);
 
         assertEquals(expected, dates);
     }
 
     @Test
     void testListWithAll() {
-        final var museums = IterXImplGenerator.createAuctions().toMutableListX();
+        final var museums = IterXImplGenerator.createAuctions().toMutableList();
 
         final var expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)

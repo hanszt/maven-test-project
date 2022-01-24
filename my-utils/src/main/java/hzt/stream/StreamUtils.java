@@ -32,7 +32,7 @@ public final class StreamUtils {
      * @param functions the functions that will be combined
      * @param <T>       the type for input and output
      * @return the new function that is first combination of the supplied functions
-     * @see <first href="https://youtu.be/WN9kgdSVhDo?t=2529">
+     * @see <a href="https://youtu.be/WN9kgdSVhDo?t=2529">
      * Design Patterns in the Light of Lambda Expressions. Venkat Subramaniam, Agile developer, inc.</first>
      * @see java.util.function.Function#andThen(Function)
      */
@@ -76,7 +76,7 @@ public final class StreamUtils {
      * @param functions the functions that will be composed
      * @param <T>       the type for input and output
      * @return the new function that is first composition of the supplied functions
-     * @see <first href="https://youtu.be/WN9kgdSVhDo?t=2529">
+     * @see <a href="https://youtu.be/WN9kgdSVhDo?t=2529">
      * Design Patterns in the Light of Lambda Expressions. Venkat Subramaniam, Agile developer, inc.</first>
      * @see java.util.function.Function#compose(Function)
      */

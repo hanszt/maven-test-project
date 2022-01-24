@@ -3,12 +3,11 @@ package hzt.collections;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public final class HashSetX<E> implements MutableSetX<E> {
+final class HashSetX<E> implements MutableSetX<E> {
 
     private final Set<E> set;
 
@@ -35,10 +34,13 @@ public final class HashSetX<E> implements MutableSetX<E> {
     }
 
     @SafeVarargs
-    HashSetX(E first, E @NotNull ... others) {
+    HashSetX(E @NotNull ... values) {
         var newSet = new HashSet<E>();
-        newSet.add(first);
-        Collections.addAll(newSet, others);
+        for (E item : values) {
+            if (!newSet.add(item)) {
+                throw new IllegalStateException("Duplicate elements in set. This is not allowed");
+            }
+        }
         this.set = newSet;
     }
 
@@ -71,6 +73,7 @@ public final class HashSetX<E> implements MutableSetX<E> {
     @NotNull
     @Override
     public <T> T @NotNull [] toArray(@NotNull T @NotNull [] a) {
+        //noinspection SuspiciousToArrayCall
         return set.toArray(a);
     }
 
@@ -131,5 +134,15 @@ public final class HashSetX<E> implements MutableSetX<E> {
         return "HashSetX{" +
                 "set=" + set +
                 '}';
+    }
+
+    @Override
+    public boolean isNotEmpty() {
+        return !set.isEmpty();
+    }
+
+    @Override
+    public boolean containsNot(E e) {
+        return !contains(e);
     }
 }

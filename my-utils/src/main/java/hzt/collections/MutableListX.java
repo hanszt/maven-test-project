@@ -32,8 +32,8 @@ public interface MutableListX<E> extends List<E>, ListX<E> {
     }
 
     @SafeVarargs
-    static <E> MutableListX<E> of(@NotNull E first, E... values) {
-        return new ArrayListX<>(first, values);
+    static <E> MutableListX<E> of(@NotNull E... values) {
+        return new ArrayListX<>(values);
     }
 
     @Override
@@ -56,6 +56,7 @@ public interface MutableListX<E> extends List<E>, ListX<E> {
         return filterToMutableList(predicate);
     }
 
+    @Override
     default <R> MutableListX<E> filterNotNullBy(Function<E, R> function, Predicate<R> predicate) {
         return filterNotNullToMutableListBy(function, predicate);
     }

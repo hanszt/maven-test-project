@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public final class HashMapX<K, V> implements MutableMapX<K, V> {
+final class HashMapX<K, V> implements MutableMapX<K, V> {
 
     private final Map<K, V> map;
 
