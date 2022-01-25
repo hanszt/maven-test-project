@@ -1,8 +1,10 @@
 package hzt.strings;
 
 import hzt.collections.IterableX;
+import hzt.collections.ListX;
 import hzt.collections.MutableListX;
 import hzt.function.It;
+import hzt.utils.ObjectX;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
@@ -14,11 +16,11 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
-public final class StringX implements CharSequence, IterableX<Character> {
+public final class StringX implements CharSequence, IterableX<Character>, ObjectX<StringX> {
 
     private final String string;
 
@@ -67,6 +69,14 @@ public final class StringX implements CharSequence, IterableX<Character> {
 
     public static StringX of(byte[] s, Charset charset) {
         return new StringX(s, charset);
+    }
+
+    public StringX plus(String s) {
+        return plus(StringX.of(s)).joinToStringX();
+    }
+
+    public StringX reversed() {
+        return StringX.of(new StringBuilder(string).reverse());
     }
 
     public MutableListX<Character> toListX() {
@@ -127,6 +137,10 @@ public final class StringX implements CharSequence, IterableX<Character> {
     @Override
     public boolean isEmpty() {
         return string.isEmpty();
+    }
+
+    public StringX ifEmpty(Supplier<String> stringSupplier) {
+        return isEmpty() ? StringX.of(stringSupplier.get()) : this;
     }
 
     @Override
@@ -318,32 +332,36 @@ public final class StringX implements CharSequence, IterableX<Character> {
         return string.toUpperCase(locale);
     }
 
-    public String toUpperCase() {
-        return string.toUpperCase();
+    public StringX toUpperCase() {
+        return StringX.of(string.toUpperCase());
     }
 
-    public String trim() {
-        return string.trim();
+    public StringX trim() {
+        return StringX.of(string.trim());
     }
 
-    public String strip() {
-        return string.strip();
+    public StringX strip() {
+        return StringX.of(string.strip());
     }
 
-    public String stripLeading() {
-        return string.stripLeading();
+    public StringX stripLeading() {
+        return StringX.of(string.stripLeading());
     }
 
-    public String stripTrailing() {
-        return string.stripTrailing();
+    public StringX stripTrailing() {
+        return StringX.of(string.stripTrailing());
     }
 
     public boolean isBlank() {
         return string.isBlank();
     }
 
-    public Stream<String> lines() {
-        return string.lines();
+    public StringX ifBlank(Supplier<String> stringSupplier) {
+        return isBlank() ? StringX.of(stringSupplier.get()) : this;
+    }
+
+    public ListX<StringX> lines() {
+        return ListX.of(string.lines().map(StringX::of).toList());
     }
 
     public String indent(int n) {
@@ -383,68 +401,68 @@ public final class StringX implements CharSequence, IterableX<Character> {
         return string.toCharArray();
     }
 
-    public static String format(@NotNull String format, Object... args) {
-        return String.format(format, args);
+    public static StringX format(@NotNull String format, Object... args) {
+        return StringX.of(String.format(format, args));
     }
 
-    public static String format(Locale l, @NotNull String format, Object... args) {
-        return String.format(l, format, args);
+    public static StringX format(Locale l, @NotNull String format, Object... args) {
+        return StringX.of(String.format(l, format, args));
     }
 
-    public String formatted(Object... args) {
-        return string.formatted(args);
+    public StringX formatted(Object... args) {
+        return StringX.of(string.formatted(args));
     }
 
-    public static String valueOf(Object obj) {
-        return String.valueOf(obj);
+    public static StringX valueOf(Object obj) {
+        return StringX.of(String.valueOf(obj));
     }
 
-    public static String valueOf(@NotNull char[] data) {
-        return String.valueOf(data);
+    public static StringX valueOf(@NotNull char[] data) {
+        return StringX.of(String.valueOf(data));
     }
 
-    public static String valueOf(@NotNull char[] data, int offset, int count) {
-        return String.valueOf(data, offset, count);
+    public static StringX valueOf(@NotNull char[] data, int offset, int count) {
+        return StringX.of(String.valueOf(data, offset, count));
     }
 
-    public static String copyValueOf(@NotNull char[] data, int offset, int count) {
-        return String.copyValueOf(data, offset, count);
+    public static StringX copyValueOf(@NotNull char[] data, int offset, int count) {
+        return StringX.of(String.copyValueOf(data, offset, count));
     }
 
-    public static String copyValueOf(@NotNull char[] data) {
-        return String.copyValueOf(data);
+    public static StringX copyValueOf(@NotNull char[] data) {
+        return StringX.of(String.copyValueOf(data));
     }
 
-    public static String valueOf(boolean b) {
-        return String.valueOf(b);
+    public static StringX valueOf(boolean b) {
+        return StringX.of(String.valueOf(b));
     }
 
-    public static String valueOf(char c) {
-        return String.valueOf(c);
+    public static StringX valueOf(char c) {
+        return StringX.of(String.valueOf(c));
     }
 
-    public static String valueOf(int i) {
-        return String.valueOf(i);
+    public static StringX valueOf(int i) {
+        return StringX.of(String.valueOf(i));
     }
 
-    public static String valueOf(long l) {
-        return String.valueOf(l);
+    public static StringX valueOf(long l) {
+        return StringX.of(String.valueOf(l));
     }
 
-    public static String valueOf(float f) {
-        return String.valueOf(f);
+    public static StringX valueOf(float f) {
+        return StringX.of(String.valueOf(f));
     }
 
-    public static String valueOf(double d) {
-        return String.valueOf(d);
+    public static StringX valueOf(double d) {
+        return StringX.of(String.valueOf(d));
     }
 
     public String intern() {
         return string.intern();
     }
 
-    public String repeat(int count) {
-        return string.repeat(count);
+    public StringX repeat(int count) {
+        return StringX.of(string.repeat(count));
     }
 
     public Optional<String> describeConstable() {
@@ -457,5 +475,10 @@ public final class StringX implements CharSequence, IterableX<Character> {
 
     public static int compare(CharSequence cs1, CharSequence cs2) {
         return CharSequence.compare(cs1, cs2);
+    }
+
+    @Override
+    public StringX get() {
+        return this;
     }
 }

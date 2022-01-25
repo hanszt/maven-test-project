@@ -1,6 +1,6 @@
 package hzt.stream.collectors;
 
-import hzt.collections.MyCollections;
+import hzt.utils.MyCollections;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.BankAccount;
 import org.hzt.test.model.Customer;
@@ -10,6 +10,7 @@ import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Collections;
 import java.util.List;
 import java.util.LongSummaryStatistics;
@@ -21,7 +22,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static hzt.stream.StreamUtils.nullSafe;
-import static hzt.stream.collectors.BigDecimalCollectors.*;
+import static hzt.stream.collectors.BigDecimalCollectors.summarizingBigDecimal;
+import static hzt.stream.collectors.BigDecimalCollectors.summingBigDecimal;
+import static hzt.stream.collectors.BigDecimalCollectors.toMaxBigDecimal;
+import static hzt.stream.collectors.BigDecimalCollectors.toMinBigDecimal;
 import static hzt.stream.collectors.CollectorsX.*;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.*;
@@ -277,25 +281,26 @@ class CollectorsXTest {
     void testIntersectingBy() {
         final List<Museum> museumList = TestSampleGenerator.getMuseumListContainingNulls();
 
-        final var nameLists = museumList.stream()
-                .<List<String>>mapMulti((museum, consumer) ->
+        final var milennia = museumList.stream()
+                .<List<Period>>mapMulti((museum, consumer) ->
                         consumer.accept(museum.getPaintings().stream()
-                                .map(Painting::name)
+                                .map(Painting::getMilleniumOfCreation)
                                 .toList()))
                 .toList();
 
+
         System.out.println("Name Lists");
-        nameLists.forEach(System.out::println);
+        milennia.forEach(System.out::println);
         System.out.println();
 
-        var expected = nameLists.stream()
+        var expected = milennia.stream()
                 .collect(toIntersection());
 
         var paintingNamesPresentInAllMuseums = museumList.stream()
                 .map(Museum::getPaintings)
-                .collect(intersectingBy(Painting::name));
+                .collect(intersectingBy(Painting::getMilleniumOfCreation));
 
-        System.out.println("paintingNamesPresentInAllMuseums = " + paintingNamesPresentInAllMuseums);
+        System.out.println("paintingMadeInPreviousMilleniumPresentInAllMuseums = " + paintingNamesPresentInAllMuseums);
 
         assertEquals(expected, paintingNamesPresentInAllMuseums);
     }

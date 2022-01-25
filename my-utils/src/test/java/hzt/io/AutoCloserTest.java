@@ -1,6 +1,5 @@
 package hzt.io;
 
-import hzt.io.AutoCloser;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

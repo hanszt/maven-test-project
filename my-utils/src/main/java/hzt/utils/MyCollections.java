@@ -1,4 +1,4 @@
-package hzt.collections;
+package hzt.utils;
 
 import hzt.stream.StreamUtils;
 import org.jetbrains.annotations.NotNull;

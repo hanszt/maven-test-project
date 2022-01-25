@@ -7,24 +7,28 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
-public sealed interface SetX<T> extends CollectionX<T> permits MutableSetX {
+public sealed interface SetX<E> extends CollectionX<E> permits MutableSetX {
 
-    static <T> SetX<T> of(Iterable<T> iterable) {
+    static <E> SetX<E> empty() {
+        return new HashSetX<>();
+    }
+
+    static <E> SetX<E> of(Iterable<E> iterable) {
         return new HashSetX<>(iterable);
     }
 
     @SafeVarargs
-    static <T> SetX<T> of(T... values) {
+    static <E> SetX<E> of(E... values) {
         var resultSet = MutableSetX.of(values);
         resultSet.addAll(Arrays.asList(values));
         return resultSet;
     }
 
-    static <T> SetX<T> copyOf(Iterable<T> iterable) {
-        return iterable instanceof SetX<T> set ? set : SetX.of(iterable);
+    static <E> SetX<E> copyOf(Iterable<E> iterable) {
+        return new HashSetX<>(iterable);
     }
 
-    default Set<T> toSet() {
+    default Set<E> toSet() {
         return toSetOf(It::self);
     }
 
@@ -34,7 +38,7 @@ public sealed interface SetX<T> extends CollectionX<T> permits MutableSetX {
 
     boolean containsAll(@NotNull Collection<?> c);
 
-    default MutableListX<T> toMutableList() {
+    default MutableListX<E> toMutableList() {
         return CollectionX.super.getListOrElseCompute();
     }
 }

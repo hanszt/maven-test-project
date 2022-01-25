@@ -15,16 +15,7 @@ import java.util.stream.Collectors;
 
 public final class IterXImplGenerator {
 
-    private static MutableListX<PaintingAuction> paintingAuctions;
-
     private IterXImplGenerator() {
-    }
-
-    public static MutableListX<PaintingAuction> getAuctionsContainingNulls() {
-        if (paintingAuctions == null) {
-            paintingAuctions = createAuctions();
-        }
-        return paintingAuctions;
     }
 
     public static MutableListX<PaintingAuction> createAuctions() {

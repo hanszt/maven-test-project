@@ -101,7 +101,7 @@ public final class TestSampleGenerator {
 
         final var painter = new Painter("Hans", "Zuidervaart", LocalDate.of(1989, 10 ,18));
         return List.of(
-                new Museum(null, null, List.of(new Painting("Test", painter, Year.of(2000), false))),
+                new Museum(null, null, List.of(new Painting("Test", painter, Year.of(1997), false))),
                 new Museum("Van Gogh Museum", LocalDate.of(1992, Month.APRIL, 2), vanGoghPaintings),
                 new Museum("Vermeer Museum", LocalDate.of(1940, Month.JANUARY, 23), vermeerPaintings),
                 new Museum("Picasso Museum", LocalDate.of(1965, Month.AUGUST, 4), picassoPaintings));

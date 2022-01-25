@@ -2,11 +2,9 @@ package hzt.collections;
 
 import hzt.function.It;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -141,24 +139,24 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
         return MapX.of(resultMap);
     }
 
-    default <R> List<R> flatMapKeysToMutableListOf(Function<K, Collection<R>> mapper) {
-        return (List<R>) flatMapKeysTo(ArrayList::new, mapper);
+    default <R> MutableListX<R> flatMapKeysToMutableListOf(Function<K, Collection<R>> mapper) {
+        return (MutableListX<R>) flatMapKeysTo(MutableListX::empty, mapper);
     }
 
-    default <R> List<R> flatMapKeysToListOf(Function<K, Collection<R>> mapper) {
-        return List.copyOf(flatMapKeysTo(ArrayList::new, mapper));
+    default <R> ListX<R> flatMapKeysToListXOf(Function<K, Collection<R>> mapper) {
+        return flatMapKeysToMutableListOf(mapper);
     }
 
-    default <R> Set<R> flatMapKeysToSetOf(Function<K, Collection<R>> mapper) {
-        return Set.copyOf(flatMapKeysTo(HashSet::new, mapper));
+    default <R> MutableSetX<R> flatMapKeysToMutableSetOf(Function<K, Collection<R>> mapper) {
+        return (MutableSetX<R>) flatMapKeysTo(MutableSetX::empty, mapper);
     }
 
-    default <R> List<R> flatMapValuesToMutableListOf(Function<V, Collection<R>> mapper) {
-        return (List<R>) flatMapValuesTo(ArrayList::new, mapper);
+    default <R> MutableListX<R> flatMapValuesToMutableListOf(Function<V, Collection<R>> mapper) {
+        return (MutableListX<R>) flatMapValuesTo(MutableListX::empty, mapper);
     }
 
     default  <R> List<R> flatMapValuesToListOf(Function<V, Collection<R>> mapper) {
-        return List.copyOf(flatMapValuesToMutableListOf(mapper));
+        return flatMapValuesToMutableListOf(mapper);
     }
 
     private Iterable<V> valueIterable(Supplier<Iterator<Map.Entry<K, V>>> iteratorFactory) {
@@ -223,7 +221,7 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
     }
 
     default MutableMapX<K, V> toMutableMap() {
-        return MutableMapX.ofIterable(this);
+        return MutableMapX.ofEntries(this);
     }
 
     default void forEach(BiConsumer<? super K, ? super V> action) {

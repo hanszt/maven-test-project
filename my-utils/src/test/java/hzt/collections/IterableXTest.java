@@ -34,6 +34,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static hzt.stream.collectors.CollectorsX.intersectingBy;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -419,18 +420,24 @@ class IterableXTest {
                 Set.of(4, 5, 6)
         );
 
-        final var intersect = collections.intersectBy(It::self);
+        final var intersect = collections.intersectionOf(It::self);
 
         assertEquals(Set.of(4, 5), intersect);
     }
 
     @Test
     void testIntersectMuseumPaintings() {
-        final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
+        final var museums = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
-        final var intersection = museumList.intersectBy(Museum::getPaintings);
+        var expected = museums.stream()
+                .map(Museum::getPaintings)
+                .collect(intersectingBy(Painting::getMilleniumOfCreation));
 
-        assertEquals(Set.of(), intersection);
+        final var intersection = museums.intersectionOf(Museum::getPaintings, Painting::getMilleniumOfCreation);
+
+        System.out.println("intersection = " + intersection);
+
+        assertEquals(expected, intersection);
     }
 
     @Test
@@ -786,7 +793,7 @@ class IterableXTest {
                 .map(Painting::painter)
                 .collect(CollectorsX.toMapX(Painter::getDateOfBirth, Painter::getLastname, (a, b) -> a));
 
-        final var localDates = actual.flatMapKeysToSetOf(date ->
+        final var localDates = actual.flatMapKeysToMutableSetOf(date ->
                 date.datesUntil(LocalDate.of(2000, Month.JANUARY, 1)).toList());
 
         System.out.println("localDates.size() = " + localDates.size());
@@ -895,7 +902,7 @@ class IterableXTest {
     }
 
     @Test
-    void testGetListOrElseThrow() {
+    void testDistinctBy() {
         final var bigDecimals = ListX.of(IntStream.range(0, 100_000)
                 .filter(integer -> integer % 2 == 0)
                 .mapToObj(BigDecimal::valueOf)
@@ -911,6 +918,16 @@ class IterableXTest {
         System.out.println("list = " + list);
 
         assertEquals(expected, list);
+    }
+
+    @Test
+    void castIfInstanceOf() {
+        final var integers = ListX.of(3.0, 2, 4, 3, BigDecimal.valueOf(10), 5L, 'a', "String")
+                .castIfInstanceOf(Integer.class);
+
+        System.out.println("integers = " + integers);
+
+        assertEquals(ListX.ofInts(2, 4, 3), integers);
     }
 
     @Test

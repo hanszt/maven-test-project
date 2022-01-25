@@ -43,4 +43,39 @@ class MutableListXTest {
         assertEquals(expected, dates);
     }
 
+    @Test
+    void testAlso() {
+        final var museums = IterXImplGenerator.createAuctions().toMutableList();
+
+        final var expected = museums.stream()
+                .map(PaintingAuction::getDateOfOpening)
+                .collect(Collectors.toList());
+        expected.add(LocalDate.MIN);
+
+        final var dates = museums
+                .map(PaintingAuction::getDateOfOpening)
+                .also(localDates -> localDates.add(LocalDate.MIN));
+
+        System.out.println("dates = " + dates);
+
+        assertEquals(expected, dates);
+    }
+
+    @Test
+    void testWhen() {
+        final var museums = IterXImplGenerator.createAuctions().toMutableList();
+
+        final var expected = museums.stream()
+                .map(PaintingAuction::getDateOfOpening)
+                .collect(Collectors.toList());
+
+        final var dates = museums
+                .map(PaintingAuction::getDateOfOpening)
+                .when(ListX::isEmpty, list -> list.add(LocalDate.MIN));
+
+        System.out.println("dates = " + dates);
+
+        assertEquals(expected, dates);
+    }
+
 }

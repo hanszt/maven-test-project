@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 public sealed interface NavigableSetX<E> extends NavigableSet<E>, MutableSetX<E> permits TreeSetX {
 
-    static <E, R extends Comparable<R>> NavigableSetX<E> comparingBy(Function<E, R> selector) {
+    static <E, R extends Comparable<R>> NavigableSetX<E> comparingBy(Function<? super E, ? extends R> selector) {
         return new TreeSetX<>(selector);
     }
 

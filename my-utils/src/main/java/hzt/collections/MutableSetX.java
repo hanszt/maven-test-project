@@ -1,5 +1,6 @@
 package hzt.collections;
 
+import hzt.utils.ObjectX;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -7,7 +8,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public sealed interface MutableSetX<E> extends Set<E>, SetX<E> permits HashSetX, MutableLinkedSetX, NavigableSetX {
+public sealed interface MutableSetX<E> extends Set<E>, SetX<E>, ObjectX<MutableSetX<E>>
+        permits HashSetX, MutableLinkedSetX, NavigableSetX {
 
     static <E> MutableSetX<E> empty() {
         return new HashSetX<>();
@@ -45,4 +47,8 @@ public sealed interface MutableSetX<E> extends Set<E>, SetX<E> permits HashSetX,
         return Set.super.stream();
     }
 
+    @Override
+    default MutableSetX<E> get() {
+        return this;
+    }
 }

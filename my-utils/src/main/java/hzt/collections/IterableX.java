@@ -61,7 +61,7 @@ import java.util.stream.StreamSupport;
  */
 @SuppressWarnings({"unused"})
 @FunctionalInterface
-public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
+public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
 
     Iterable<T> iterable();
 
@@ -238,27 +238,12 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return toCollectionNotNullOf(MutableSetX::empty, transform);
     }
 
-    default <R, C extends Collection<R>> C mapTo(Supplier<C> collectionFactory, Function<T, R> mapper) {
-        C collection = collectionFactory.get();
-        for (T t : this) {
-            if (t != null) {
-                collection.add(mapper.apply(t));
-            }
-        }
-        return collection;
+    default <R, C extends Collection<R>> C mapTo(Supplier<C> collectionFactory, Function<? super T, ? extends R> mapper) {
+        return mapFilteringToCollection(collectionFactory, Objects::nonNull, mapper, It.noFilter());
     }
 
     default <R, C extends Collection<R>> C toCollectionNotNullOf(Supplier<C> collectionFactory, Function<? super T, ? extends R> mapper) {
-        C collection = collectionFactory.get();
-        for (T t : this) {
-            if (t != null) {
-                final var r = mapper.apply(t);
-                if (r != null) {
-                    collection.add(r);
-                }
-            }
-        }
-        return collection;
+        return mapFilteringToCollection(collectionFactory, Objects::nonNull, mapper, Objects::nonNull);
     }
 
     default IterableX<T> filter(Predicate<T> predicate) {
@@ -307,11 +292,15 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default SetX<T> filterToSetX(Predicate<T> predicate) {
-        return SetX.copyOf(filterToMutableSet(predicate));
+        return filterToMutableSet(predicate);
     }
 
     default MutableListX<T> filterToMutableList(Predicate<T> predicate) {
         return filterToCollection(MutableListX::empty, predicate);
+    }
+
+    default <R> MutableListX<R> castToMutableListIfInstanceOf(Class<R> aClass) {
+        return castToCollectionIfInstanceOf(MutableListX::of, aClass);
     }
 
     default MutableSetX<T> filterToMutableSet(Predicate<T> predicate) {
@@ -319,13 +308,37 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default <C extends Collection<T>> C filterToCollection(Supplier<C> collectionFactory, Predicate<T> predicate) {
+        return mapFilteringToCollection(collectionFactory, predicate, It::self, It.noFilter());
+    }
+
+    default <R> IterableX<R> mapFiltering(Predicate<T> predicate, Function<T, R> mapper) {
+        return mapFiltering(predicate, mapper, It.noFilter());
+    }
+
+    default <R> IterableX<R> mapFiltering(Function<T, R> mapper, Predicate<R> resultFilter) {
+        return mapFiltering(It.noFilter(), mapper, resultFilter);
+    }
+
+    default <R> IterableX<R> mapFiltering(Predicate<T> predicate, Function<T, R> mapper, Predicate<R> resultFilter) {
+        return IterableX.of(mapFilteringToCollection(MutableListX::empty, predicate, mapper, resultFilter));
+    }
+
+    default <R, C extends Collection<R>> C mapFilteringToCollection(
+            Supplier<C> collectionFactory, Predicate<T> predicate, Function<? super T, ? extends R> mapper, Predicate<R> resultFilter) {
         C collection = collectionFactory.get();
         for (T t : this) {
             if (t != null && predicate.test(t)) {
-                collection.add(t);
+                final var r = mapper.apply(t);
+                if (resultFilter.test(r)) {
+                    collection.add(r);
+                }
             }
         }
         return collection;
+    }
+
+    default <R, C extends Collection<R>> C castToCollectionIfInstanceOf(Supplier<C> collectionFactory, Class<R> aClass) {
+        return mapFilteringToCollection(collectionFactory, aClass::isInstance, aClass::cast, It.noFilter());
     }
 
     default <C extends Collection<T>> C filterIndexedToCollection(Supplier<C> collectionFactory, BiPredicate<Integer, T> predicate) {
@@ -343,11 +356,11 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default ListX<T> toListXSkipping(Predicate<T> predicate) {
-        return ListX.copyOf(filterToMutableList(predicate.negate()));
+        return filterToMutableList(predicate.negate());
     }
 
     default SetX<T> toSetXSkipping(Predicate<T> predicate) {
-        return SetX.copyOf(filterToMutableSet(predicate.negate()));
+        return filterToMutableSet(predicate.negate());
     }
 
     default <R, C extends Collection<R>> IterableX<R> flatMap(@NotNull Function<T, C> mapper) {
@@ -380,7 +393,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default <R, C extends Collection<R>> SetX<R> flatMapToSetXOf(Function<T, C> mapper) {
-        return SetX.copyOf(flatMapToMutableSetOf(mapper));
+        return flatMapToMutableSetOf(mapper);
     }
 
     default <R, C extends Collection<R>> C flatMapToCollectionOf(Function<T, C> mapper, Supplier<C> collectionFactory) {
@@ -423,10 +436,10 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return list;
     }
 
-    default <R extends Comparable<R>> NavigableSetX<T> toSetSortedBy(Function<T, R> selector) {
+    default <R extends Comparable<R>> NavigableSetX<T> toSetSortedBy(Function<? super T, ? extends R> selector) {
         var navigableSetX = NavigableSetX.comparingBy(selector);
-        navigableSetX.addAll((Collection<? extends T>) mapTo(MutableSetX::empty, It::self));
-        return navigableSetX;
+        navigableSetX.addAll(this.<T, MutableSetX<T>>mapTo(MutableSetX::empty, It::self));
+        return (NavigableSetX<T>) navigableSetX;
     }
 
     default <R extends Comparable<R>> NavigableSetX<R> toNavigableSetOf(Function<? super T, ? extends R> selector) {
@@ -515,7 +528,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default <K, V> Map<K, V> toMap(@NotNull Function<T, K> keyMapper, @NotNull Function<T, V> valueMapper) {
-        return Map.copyOf(toMutableMap(keyMapper, valueMapper));
+        return toMutableMap(keyMapper, valueMapper);
     }
 
     default MutableListX<T> getListOrElseCompute() {
@@ -915,7 +928,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default <A1, R1, A2, R2> Pair<R1, R2> teeing(@NotNull Collector<T, A1, R1> downstream1,
-                                                @NotNull Collector<T, A2, R2> downStream2) {
+                                                 @NotNull Collector<T, A2, R2> downStream2) {
         return teeing(downstream1, downStream2, Pair::of);
     }
 
@@ -968,20 +981,27 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
         return Pair.of(pair.first().toListX(), pair.second().toListX());
     }
 
-    default <R, C extends Collection<R>> SetX<R> intersectBy(@NotNull Function<T, C> toCollectionMapper) {
-        var list = MutableListX.<Collection<R>>empty();
-        for (T t : this) {
-            list.add(toCollectionMapper.apply(t));
-        }
+    default <S, C extends Collection<S>, R> SetX<R> intersectionOf(
+            @NotNull Function<T, C> toCollectionMapper, Function<S, R> selector) {
         var common = MutableSetX.<R>empty();
-        final var iterator = list.iterator();
-        if (iterator.hasNext()) {
-            common.addAll(iterator.next());
-            while (iterator.hasNext()) {
-                common.retainAll(iterator.next());
+        for (T t : this) {
+            final var collection = toCollectionMapper.apply(t);
+            final var resultList = MutableListX.<R>empty();
+            for (S s : collection) {
+                final var r = selector.apply(s);
+                resultList.add(r);
+            }
+            if (common.isEmpty()) {
+                common.addAll(resultList);
+            } else {
+                common.retainAll(resultList);
             }
         }
         return common;
+    }
+
+    default <R, C extends Collection<R>> SetX<R> intersectionOf(@NotNull Function<T, C> toCollectionMapper) {
+        return intersectionOf(toCollectionMapper, It::self);
     }
 
     default T first() {
@@ -1129,7 +1149,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default <R> List<R> zipWithNextToListOf(BiFunction<T, T, R> function) {
-        return List.copyOf(zipWithNextToMutableListOf(function));
+        return zipWithNextToMutableListOf(function);
     }
 
     default <R> IterableX<R> zipWithNext(BiFunction<T, T, R> function) {
@@ -1179,7 +1199,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T>  {
     }
 
     default <A, R> List<R> zipToListWith(Iterable<A> otherIterable, BiFunction<T, A, R> function) {
-        return List.copyOf(zipToMutableListWith(otherIterable, function));
+        return zipToMutableListWith(otherIterable, function);
     }
 
     default SetX<T> union(Iterable<T> other) {

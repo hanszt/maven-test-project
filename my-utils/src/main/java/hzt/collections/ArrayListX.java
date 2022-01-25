@@ -61,6 +61,11 @@ final class ArrayListX<T> implements MutableListX<T> {
     }
 
     @Override
+    public int lastIndex() {
+        return size() - 1;
+    }
+
+    @Override
     public boolean isEmpty() {
         return list.isEmpty();
     }

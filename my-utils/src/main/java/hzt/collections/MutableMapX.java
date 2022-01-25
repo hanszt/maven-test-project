@@ -16,7 +16,7 @@ public interface MutableMapX<K, V> extends Map<K, V>, MapX<K, V> {
         return new HashMapX<>();
     }
 
-    static <K, V> MutableMapX<K, V> ofIterable(Iterable<Map.Entry<K, V>> entries) {
+    static <K, V> MutableMapX<K, V> ofEntries(Iterable<Map.Entry<K, V>> entries) {
         return new HashMapX<>(entries);
     }
 

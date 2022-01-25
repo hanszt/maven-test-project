@@ -1,11 +1,19 @@
 package hzt.collections;
 
 import org.hzt.test.TestSampleGenerator;
+import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 import test.IterXImplGenerator;
 import test.model.PaintingAuction;
 
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
+import java.util.function.Consumer;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ListXTest {
 
@@ -59,5 +67,26 @@ class ListXTest {
 
         assertEquals(3, indexInSortedList);
         assertEquals(3, insertionIndex);
+    }
+
+    @Test
+    void testToListYieldsUnModifiableList() {
+        var auction = IterXImplGenerator.createVanGoghAuction();
+        final var yearToAdd = Year.of(2000);
+
+        final var years = auction.toListOf(Painting::getYearOfCreation);
+
+        assertThrows(UnsupportedOperationException.class, () -> years.add(yearToAdd));
+    }
+
+    @Test
+    void testTakeLastYieldsWantedList() {
+        final var dates = IterableX.rangeClosed(100, 2000)
+                .<LocalDate>mapMultiToListXOf((v, c) -> c.accept(LocalDate.of(v, Month.APRIL, 2)))
+                .takeLast(20);
+
+        System.out.println("dates = " + dates);
+
+        assertEquals(20, dates.size());
     }
 }

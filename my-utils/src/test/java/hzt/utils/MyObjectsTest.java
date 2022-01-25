@@ -19,11 +19,16 @@ class MyObjectsTest {
         final int integer = 4;
         final double aDouble = 6.0;
 
-        Throwable throwable = assertThrows(NullPointerException.class, () -> MyObjects.requireAllNonNull(Number.class,
-                integer, BigInteger.valueOf(4), aDouble, null));
+        final var bigInteger = BigInteger.valueOf(4);
+        Throwable throwable = assertThrows(NullPointerException.class, () -> MyObjects
+                .requireAllNonNull(Number.class, integer, bigInteger, aDouble, null));
 
-        Throwable throwable2 = assertThrows(NullPointerException.class, () -> MyObjects.requireAllNonNull(Iterable.class,
-                new ArrayList<>(), new HashSet<>(), null, new ArrayDeque<>(), new TreeSet<>(), null));
+        final var treeSet = new TreeSet<>();
+        final var list = new ArrayList<>();
+        final var hashSet = new HashSet<>();
+        final var arrayDeque = new ArrayDeque<>();
+        Throwable throwable2 = assertThrows(NullPointerException.class, () -> MyObjects
+                .requireAllNonNull(Iterable.class, list, hashSet, null, arrayDeque, treeSet, null));
 
         assertEquals("Number 4 is null", throwable.getMessage());
         assertEquals("Iterable 3 is null", throwable2.getMessage());
@@ -34,8 +39,9 @@ class MyObjectsTest {
         final int integer = 4;
         final double aDouble = 6.0;
 
+        final var bigInteger = BigInteger.valueOf(4);
         Throwable throwable = assertThrows(IllegalArgumentException.class, () -> MyObjects.requireAllNonNull(
-                integer, BigInteger.valueOf(4), aDouble, null, "", null));
+                integer, bigInteger, aDouble, null, "", null));
 
         throwable.printStackTrace();
 

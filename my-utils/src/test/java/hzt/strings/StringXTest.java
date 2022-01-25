@@ -35,4 +35,10 @@ class StringXTest {
                 .replaceFirstChar(c -> 'H').toString();
         assertEquals("Hallo", hallo);
     }
+
+    @Test
+    void testStringXPlus() {
+        final var stringX = StringX.of("Hallo").plus("Raar");
+        assertEquals("HalloRaar", stringX.toString());
+    }
 }
