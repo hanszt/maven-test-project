@@ -49,7 +49,7 @@ public sealed interface MutableListX<E> extends List<E>, ListX<E>, ObjectX<Mutab
     }
 
     @Override
-    default <R> MutableListX<E> filterNotNullBy(Function<E, R> function, Predicate<R> predicate) {
+    default <R> MutableListX<E> filterNotNullBy(Function<? super E, ? extends R> function, Predicate<? super R> predicate) {
         return filterNotNullToMutableListBy(function, predicate);
     }
 
@@ -68,7 +68,7 @@ public sealed interface MutableListX<E> extends List<E>, ListX<E>, ObjectX<Mutab
     }
 
     @Override
-    default <R> MutableListX<R> mapFiltering(Function<E, R> mapper, Predicate<R> resultFilter) {
+    default <R> MutableListX<R> mapFiltering(Function<? super E, ? extends R> mapper, Predicate<R> resultFilter) {
         return mapFiltering(It.noFilter(), mapper, resultFilter);
     }
 
@@ -78,7 +78,7 @@ public sealed interface MutableListX<E> extends List<E>, ListX<E>, ObjectX<Mutab
     }
 
     @Override
-    default <R> MutableListX<R> mapFiltering(Predicate<E> predicate, Function<E, R> mapper, Predicate<R> resultFilter) {
+    default <R> MutableListX<R> mapFiltering(Predicate<E> predicate, Function<? super E, ? extends R> mapper, Predicate<R> resultFilter) {
         return mapFilteringToCollection(MutableListX::of, predicate, mapper, resultFilter);
     }
     /**

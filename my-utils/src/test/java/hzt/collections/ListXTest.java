@@ -3,13 +3,12 @@ package hzt.collections;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
-import test.IterXImplGenerator;
+import test.Generator;
 import test.model.PaintingAuction;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,7 +18,7 @@ class ListXTest {
 
     @Test
     void testMutableListX() {
-        final var museums = IterXImplGenerator.createAuctions().toMutableList();
+        final var museums = Generator.createAuctions().toMutableList();
 
         final var expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)
@@ -71,7 +70,7 @@ class ListXTest {
 
     @Test
     void testToListYieldsUnModifiableList() {
-        var auction = IterXImplGenerator.createVanGoghAuction();
+        var auction = Generator.createVanGoghAuction();
         final var yearToAdd = Year.of(2000);
 
         final var years = auction.toListOf(Painting::getYearOfCreation);
@@ -88,5 +87,14 @@ class ListXTest {
         System.out.println("dates = " + dates);
 
         assertEquals(20, dates.size());
+    }
+
+    @Test
+    void testRandomWithinBound() {
+        final var integers = ListX.of(1, 2, 3, 4, 5);
+        final var group = IterableX.iterate(integers::random, list -> list.size() < 10_000).group();
+
+        assertEquals(integers.size(), group.size());
+        group.values().forEach(list -> assertTrue(list.isNotEmpty()));
     }
 }

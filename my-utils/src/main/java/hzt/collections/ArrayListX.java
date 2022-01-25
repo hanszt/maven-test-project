@@ -9,9 +9,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
+import java.util.Random;
 import java.util.function.ToIntFunction;
 
 final class ArrayListX<T> implements MutableListX<T> {
+
+    private static final Random RANDOM = new Random();
 
     private final List<T> list;
 
@@ -48,6 +51,11 @@ final class ArrayListX<T> implements MutableListX<T> {
         final List<T> arrayList = new ArrayList<>(1);
         arrayList.add(value);
         this.list = arrayList;
+    }
+
+    @Override
+    public T random() {
+        return list.get(RANDOM.nextInt(list.size()));
     }
 
     @Override

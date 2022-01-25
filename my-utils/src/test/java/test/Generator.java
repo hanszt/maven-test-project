@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class IterXImplGenerator {
+public final class Generator {
 
-    private IterXImplGenerator() {
+    private Generator() {
     }
 
     public static MutableListX<PaintingAuction> createAuctions() {

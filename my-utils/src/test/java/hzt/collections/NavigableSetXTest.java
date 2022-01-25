@@ -5,6 +5,8 @@ import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Museum;
 import org.junit.jupiter.api.Test;
 
+import java.util.Comparator;
+import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.function.Consumer;
@@ -44,5 +46,21 @@ class NavigableSetXTest {
                 () -> assertIterableEquals(ListX.of(14, 15, 14), list),
                 () -> assertIterableEquals(names, expected)
         );
+    }
+
+    @Test
+    void testToSetSortedBy() {
+        final var museumListContainingNulls = SetX.of(TestSampleGenerator.getMuseumListContainingNulls());
+
+        final NavigableSet<Museum> expected = museumListContainingNulls.stream()
+                .filter(i -> i != null && i.getName() != null)
+                .sorted(Comparator.comparing(Museum::getName))
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        final var sortedMuseums = museumListContainingNulls.toSetSortedBy(Museum::getName);
+
+        sortedMuseums.forEach(System.out::println);
+
+        assertIterableEquals(sortedMuseums, expected);
     }
 }

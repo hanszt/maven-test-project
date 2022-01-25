@@ -1,14 +1,15 @@
 package hzt.stream.collectors;
 
-import hzt.collections.IterableX;
+import hzt.collections.ListX;
 import hzt.collections.MapX;
+import hzt.collections.MutableListX;
+import hzt.collections.SetX;
 import hzt.function.QuadFunction;
 import hzt.function.QuintFunction;
 import hzt.function.TriFunction;
 import hzt.stream.StreamUtils;
 import hzt.utils.MyObjects;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -93,15 +94,24 @@ public final class CollectorsX {
         return Collectors.groupingBy(StreamUtils.function(classifierPart1).andThen(classifierPart2));
     }
 
-    public static <T> Collector<T, ?, IterableX<T>> toIterX() {
-        return Collector.of((Supplier<List<T>>) ArrayList::new, List::add, CollectorsX::accumulate, IterableX::of);
+    public static <T> Collector<T, ?, ListX<T>> toListX() {
+        return Collector.of((Supplier<MutableListX<T>>) MutableListX::of, List::add, CollectorsX::accumulate, ListX::of);
     }
 
-    public static <T, R> Collector<T, ?, IterableX<R>> toIterXOf(Function<T, R> mapper) {
-        return Collectors.mapping(mapper, toIterX());
+    public static <T, R> Collector<T, ?, ListX<R>> toListXOf(Function<T, R> mapper) {
+        return Collectors.mapping(mapper, toListX());
     }
 
-    private static <T> List<T> accumulate(List<T> left, List<T> right) {
+    public static <T> Collector<T, ?, SetX<T>> toSetX() {
+        return Collector
+                .of((Supplier<MutableListX<T>>) MutableListX::of, List::add, CollectorsX::accumulate, SetX::of);
+    }
+
+    public static <T, R> Collector<T, ?, SetX<R>> toSetXOf(Function<T, R> mapper) {
+        return Collectors.mapping(mapper, toSetX());
+    }
+
+    private static <T> MutableListX<T> accumulate(MutableListX<T> left, MutableListX<T> right) {
         left.addAll(right);
         return left;
     }

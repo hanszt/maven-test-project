@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -79,7 +80,7 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
         return StringX.of(new StringBuilder(string).reverse());
     }
 
-    public MutableListX<Character> toListX() {
+    public ListX<Character> toListX() {
         return toMutableList();
     }
 
@@ -139,8 +140,8 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
         return string.isEmpty();
     }
 
-    public StringX ifEmpty(Supplier<String> stringSupplier) {
-        return isEmpty() ? StringX.of(stringSupplier.get()) : this;
+    public StringX ifEmpty(Supplier<String> defaultStringSupplier) {
+        return isEmpty() ? StringX.of(defaultStringSupplier.get()) : this;
     }
 
     @Override
@@ -181,8 +182,15 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
     }
 
     @Override
-    public boolean equals(Object anObject) {
-        return string.equals(anObject);
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        StringX that = (StringX) o;
+        return Objects.equals(string, that.string);
     }
 
     public boolean contentEquals(@NotNull StringBuffer sb) {
@@ -304,12 +312,12 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
         return string.replace(target, replacement);
     }
 
-    public String[] split(@NotNull String regex, int limit) {
-        return string.split(regex, limit);
+    public ListX<String> split(@NotNull String regex, int limit) {
+        return ListX.of(string.split(regex, limit));
     }
 
-    public String[] split(@NotNull String regex) {
-        return string.split(regex);
+    public ListX<String> split(@NotNull String regex) {
+        return ListX.of(string.split(regex));
     }
 
     public static String join(CharSequence delimiter, CharSequence... elements) {
@@ -356,8 +364,8 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
         return string.isBlank();
     }
 
-    public StringX ifBlank(Supplier<String> stringSupplier) {
-        return isBlank() ? StringX.of(stringSupplier.get()) : this;
+    public StringX ifBlank(Supplier<String> defaultStringSupplier) {
+        return isBlank() ? StringX.of(defaultStringSupplier.get()) : this;
     }
 
     public ListX<StringX> lines() {

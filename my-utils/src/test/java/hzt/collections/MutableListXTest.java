@@ -1,7 +1,7 @@
 package hzt.collections;
 
 import org.junit.jupiter.api.Test;
-import test.IterXImplGenerator;
+import test.Generator;
 import test.model.PaintingAuction;
 
 import java.time.LocalDate;
@@ -13,7 +13,7 @@ class MutableListXTest {
 
     @Test
     void testMutableListX() {
-        final var museums = IterXImplGenerator.createAuctions().toMutableList();
+        final var museums = Generator.createAuctions().toMutableList();
 
         final var expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)
@@ -26,7 +26,7 @@ class MutableListXTest {
 
     @Test
     void testListWithAll() {
-        final var museums = IterXImplGenerator.createAuctions().toMutableList();
+        final var museums = Generator.createAuctions().toMutableList();
 
         final var expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)
@@ -45,7 +45,7 @@ class MutableListXTest {
 
     @Test
     void testAlso() {
-        final var museums = IterXImplGenerator.createAuctions().toMutableList();
+        final var museums = Generator.createAuctions().toMutableList();
 
         final var expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)
@@ -63,7 +63,7 @@ class MutableListXTest {
 
     @Test
     void testWhen() {
-        final var museums = IterXImplGenerator.createAuctions().toMutableList();
+        final var museums = Generator.createAuctions().toMutableList();
 
         final var expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)

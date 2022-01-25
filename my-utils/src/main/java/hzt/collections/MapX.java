@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -203,11 +202,11 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
 
     V get(Object key);
 
-    Set<K> keySet();
+    MutableSetX<K> keySet();
 
-    Collection<V> values();
+    MutableListX<V> values();
 
-    Set<Map.Entry<K, V>> entrySet();
+    MutableSetX<Map.Entry<K, V>> entrySet();
 
     boolean equals(Object o);
 

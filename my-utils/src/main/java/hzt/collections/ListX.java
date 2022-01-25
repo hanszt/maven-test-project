@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -19,7 +20,7 @@ import java.util.function.ToIntFunction;
  * @param <E> the type of the elements
  * @author Hans Zuidervaart
  */
-public sealed interface ListX<E> extends CollectionX<E> permits MutableListX {
+public interface ListX<E> extends CollectionX<E> {
 
     static <E> ListX<E> empty() {
         return new ArrayListX<>();
@@ -40,6 +41,14 @@ public sealed interface ListX<E> extends CollectionX<E> permits MutableListX {
     @SafeVarargs
     static <E> ListX<E> of(E... values) {
         return new ArrayListX<>(values);
+    }
+
+    static ListX<Boolean> ofBools(boolean... values) {
+        var valueList = MutableListX.<Boolean>empty();
+        for (var value : values) {
+            valueList.add(value);
+        }
+        return valueList;
     }
 
     static ListX<Integer> ofInts(int... values) {
@@ -66,12 +75,13 @@ public sealed interface ListX<E> extends CollectionX<E> permits MutableListX {
         return valueList;
     }
 
+    @Override
     default <R> ListX<R> castIfInstanceOf(Class<R> aClass) {
         return castToMutableListIfInstanceOf(aClass);
     }
 
     @Override
-    default <R> ListX<R> mapFiltering(Function<E, R> mapper, Predicate<R> resultFilter) {
+    default <R> ListX<R> mapFiltering(Function<? super E, ? extends R> mapper, Predicate<R> resultFilter) {
         return mapFiltering(It.noFilter(), mapper, resultFilter);
     }
 
@@ -81,7 +91,7 @@ public sealed interface ListX<E> extends CollectionX<E> permits MutableListX {
     }
 
     @Override
-    default <R> ListX<R> mapFiltering(Predicate<E> predicate, Function<E, R> mapper, Predicate<R> resultFilter) {
+    default <R> ListX<R> mapFiltering(Predicate<E> predicate, Function<? super E, ? extends R> mapper, Predicate<R> resultFilter) {
         return mapFilteringToCollection(MutableListX::of, predicate, mapper, resultFilter);
     }
 
@@ -182,6 +192,12 @@ public sealed interface ListX<E> extends CollectionX<E> permits MutableListX {
     @Override
     default <R> ListX<E> distinctBy(Function<E, R> selector) {
         return distinctToMutableListBy(selector);
+    }
+
+    E random();
+
+    default E random(Random random) {
+        return get(random.nextInt(size()));
     }
 
     default int binarySearchTo(int toIndex, ToIntFunction<E> comparison) {

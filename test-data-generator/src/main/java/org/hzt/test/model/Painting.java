@@ -9,6 +9,10 @@ import java.time.Year;
 public record Painting(String name, Painter painter, Year yearOfCreation, boolean isInMuseum)
         implements Comparable<Painting> {
 
+    public static Painting of(String name) {
+        return new Painting(name, null, null, false);
+    }
+
     public Period age() {
         return Period.between(yearOfCreation.atMonthDay(MonthDay.now()), LocalDate.now());
     }

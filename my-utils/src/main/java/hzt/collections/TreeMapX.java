@@ -3,13 +3,11 @@ package hzt.collections;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -128,22 +126,19 @@ final class TreeMapX<K, V, R extends Comparable<R>> implements NavigableMapX<K, 
         return map.lastKey();
     }
 
-    @NotNull
     @Override
-    public Set<K> keySet() {
-        return map.keySet();
+    public @NotNull MutableSetX<K> keySet() {
+        return MutableSetX.of(map.keySet());
     }
 
-    @NotNull
     @Override
-    public Collection<V> values() {
-        return map.values();
+    public @NotNull MutableListX<V> values() {
+        return MutableListX.of(map.values());
     }
 
-    @NotNull
     @Override
-    public Set<Entry<K, V>> entrySet() {
-        return map.entrySet();
+    public @NotNull MutableSetX<Entry<K, V>> entrySet() {
+        return MutableSetX.of(map.entrySet());
     }
 
     @Override
