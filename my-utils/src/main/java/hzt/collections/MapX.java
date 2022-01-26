@@ -196,6 +196,10 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
 
     boolean isEmpty();
 
+    default boolean isNotEmpty() {
+        return !isEmpty();
+    }
+
     boolean containsKey(Object key);
 
     boolean containsValue(Object value);

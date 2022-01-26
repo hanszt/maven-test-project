@@ -1,9 +1,11 @@
 package hzt.collections;
 
+import hzt.utils.ObjectX;
+
 import java.util.function.IntFunction;
 import java.util.function.ToIntFunction;
 
-public sealed interface ArrayX<E> extends IterableX<E> permits ArrayXImpl {
+public sealed interface ArrayX<E> extends IterableX<E>, ObjectX<ArrayX<E>> permits ArrayXImpl {
 
     @SafeVarargs
     static <E> ArrayX<E> of(E... values) {
@@ -39,4 +41,9 @@ public sealed interface ArrayX<E> extends IterableX<E> permits ArrayXImpl {
     int binarySearch(int fromIndex, int toIndex, ToIntFunction<E> comparison);
 
     E[] toArray();
+
+    @Override
+    default ArrayX<E> get() {
+        return this;
+    }
 }

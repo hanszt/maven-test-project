@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
-public sealed interface SetX<E> extends CollectionX<E> permits MutableSetX {
+public sealed interface SetX<E> extends CollectionView<E> permits MutableSetX {
 
     static <E> SetX<E> empty() {
         return new HashSetX<>();
@@ -39,6 +39,6 @@ public sealed interface SetX<E> extends CollectionX<E> permits MutableSetX {
     boolean containsAll(@NotNull Collection<?> c);
 
     default MutableListX<E> toMutableList() {
-        return CollectionX.super.getListOrElseCompute();
+        return CollectionView.super.getListOrElseCompute();
     }
 }

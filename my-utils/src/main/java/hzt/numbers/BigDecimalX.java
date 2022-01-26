@@ -169,6 +169,14 @@ public final class BigDecimalX extends Number implements NumberX {
         return bigDecimal.compareTo(val);
     }
 
+    public BigDecimal min(BigDecimal val) {
+        return bigDecimal.min(val);
+    }
+
+    public BigDecimal max(BigDecimal val) {
+        return bigDecimal.max(val);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -179,14 +187,6 @@ public final class BigDecimalX extends Number implements NumberX {
         }
         BigDecimalX that = (BigDecimalX) o;
         return bigDecimal.equals(that.bigDecimal);
-    }
-
-    public BigDecimal min(BigDecimal val) {
-        return bigDecimal.min(val);
-    }
-
-    public BigDecimal max(BigDecimal val) {
-        return bigDecimal.max(val);
     }
 
     @Override

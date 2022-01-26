@@ -69,9 +69,18 @@ class MutableListXTest {
                 .map(PaintingAuction::getDateOfOpening)
                 .collect(Collectors.toList());
 
+        if (expected.isEmpty()) {
+            expected.add(LocalDate.MIN);
+        } else {
+            expected.remove(0);
+        }
+
         final var dates = museums
                 .map(PaintingAuction::getDateOfOpening)
-                .when(ListX::isEmpty, list -> list.add(LocalDate.MIN));
+                .when(ListX::isNotEmpty, list -> list.remove(0))
+                .when(list -> list.size() > 3, list -> list.add(LocalDate.MIN))
+                .takeIf(ListX::isNotEmpty)
+                .orElseThrow();
 
         System.out.println("dates = " + dates);
 

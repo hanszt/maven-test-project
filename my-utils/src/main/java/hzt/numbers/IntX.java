@@ -1,9 +1,12 @@
 package hzt.numbers;
 
+import hzt.utils.ObjectX;
+
 import java.lang.invoke.MethodHandles;
+import java.util.Objects;
 import java.util.Optional;
 
-public final class IntX extends Number implements NumberX {
+public final class IntX extends Number implements NumberX, ObjectX<IntX> {
 
     private final Integer integer;
 
@@ -89,8 +92,8 @@ public final class IntX extends Number implements NumberX {
         return new IntX(i);
     }
 
-    public Integer get() {
-        return integer;
+    public IntX get() {
+        return this;
     }
 
     @Override
@@ -119,17 +122,20 @@ public final class IntX extends Number implements NumberX {
     }
 
     @Override
-    public int hashCode() {
-        return integer.hashCode();
-    }
-
-    public static int hashCode(int value) {
-        return Integer.hashCode(value);
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        IntX intX = (IntX) o;
+        return Objects.equals(integer, intX.integer);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return integer.equals(obj);
+    public int hashCode() {
+        return Objects.hash(integer);
     }
 
     public static Integer getInteger(String nm) {

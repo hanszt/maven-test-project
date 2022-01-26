@@ -10,4 +10,5 @@ open module my.utils {
     exports hzt.collections;
     exports hzt.utils;
     exports hzt.strings;
+    exports hzt.numbers;
 }

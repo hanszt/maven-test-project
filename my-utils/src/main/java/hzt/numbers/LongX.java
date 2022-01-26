@@ -1,10 +1,12 @@
 package hzt.numbers;
 
+import hzt.utils.ObjectX;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.Optional;
 
-public final class LongX extends Number implements NumberX{
+public final class LongX extends Number implements NumberX, ObjectX<LongX> {
     
     private final Long aLong;
 
@@ -231,5 +233,10 @@ public final class LongX extends Number implements NumberX{
 
     public Long resolveConstantDesc(MethodHandles.Lookup lookup) {
         return aLong.resolveConstantDesc(lookup);
+    }
+
+    @Override
+    public LongX get() {
+        return this;
     }
 }

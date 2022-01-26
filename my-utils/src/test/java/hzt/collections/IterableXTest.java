@@ -579,7 +579,7 @@ class IterableXTest {
 
         final var expected = list.stream().mapToInt(Painting::ageInYears).sum();
 
-        final var actual = list.sumOf(Painting::ageInYears);
+        final var actual = list.sumOfInts(Painting::ageInYears);
 
         System.out.println("actual = " + actual);
 
@@ -592,7 +592,7 @@ class IterableXTest {
 
         final var expected = list.stream().mapToInt(Painting::ageInYears).average().orElseThrow();
 
-        final var actual = list.averageOf(Painting::ageInYears);
+        final var actual = list.averageOfInts(Painting::ageInYears);
 
         System.out.println("actual = " + actual);
 

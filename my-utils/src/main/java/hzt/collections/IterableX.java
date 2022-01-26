@@ -327,7 +327,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         return mapFilteringToCollection(collectionFactory, predicate, It::self, It.noFilter());
     }
 
-    default <R> IterableX<R> mapFiltering(Predicate<T> predicate, Function<T, R> mapper) {
+    default <R> IterableX<R> filterMapping(Predicate<T> predicate, Function<T, R> mapper) {
         return mapFiltering(predicate, mapper, It.noFilter());
     }
 
@@ -379,15 +379,15 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         return filterToMutableSet(predicate.negate());
     }
 
-    default <R, C extends Collection<R>> IterableX<R> flatMap(@NotNull Function<T, C> mapper) {
+    default <R, I extends Iterable<R>> IterableX<R> flatMap(@NotNull Function<T, I> mapper) {
         return IterableX.of(flatMapToMutableListOf(mapper));
     }
 
-    default <R, C extends Collection<R>> ListX<R> flatMapToListXOf(Function<T, C> mapper) {
+    default <R, I extends Iterable<R>> ListX<R> flatMapToListXOf(Function<T, I> mapper) {
         return flatMapToMutableListOf(mapper);
     }
 
-    default <R, C extends Collection<R>> MutableListX<R> flatMapToMutableListOf(@NotNull Function<T, C> mapper) {
+    default <R, I extends Iterable<R>> MutableListX<R> flatMapToMutableListOf(@NotNull Function<T, I> mapper) {
         final var list = MutableListX.<R>empty();
         for (T t : this) {
             final var c = mapper.apply(t);
@@ -403,16 +403,16 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         return list;
     }
 
-    default <R, C extends Collection<R>> MutableSetX<R> flatMapToMutableSetOf(Function<T, C> mapper) {
-        //noinspection unchecked
-        return (MutableSetX<R>) flatMapToCollectionOf(mapper, () -> (C) MutableSetX.<R>empty());
+    default <R, I extends Iterable<R>> MutableSetX<R> flatMapToMutableSetOf(Function<T, I> mapper) {
+        return flatMapToCollectionOf(mapper, MutableSetX::empty);
     }
 
-    default <R, C extends Collection<R>> SetX<R> flatMapToSetXOf(Function<T, C> mapper) {
+    default <R, I extends Iterable<R>> SetX<R> flatMapToSetXOf(Function<T, I> mapper) {
         return flatMapToMutableSetOf(mapper);
     }
 
-    default <R, C extends Collection<R>> C flatMapToCollectionOf(Function<T, C> mapper, Supplier<C> collectionFactory) {
+    default <R, C extends Collection<R>, I extends Iterable<R>> C flatMapToCollectionOf(
+            Function<T, I> mapper, Supplier<C> collectionFactory) {
         C collection = collectionFactory.get();
         for (T t : this) {
             if (t == null) {
@@ -719,7 +719,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         return counter;
     }
 
-    default int sumOf(@NotNull ToIntFunction<T> selector) {
+    default int sumOfInts(@NotNull ToIntFunction<T> selector) {
         int sum = 0;
         for (T t : this) {
             if (t != null) {
@@ -730,7 +730,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         return sum;
     }
 
-    default long sumOf(@NotNull ToLongFunction<T> selector) {
+    default long sumOfLongs(@NotNull ToLongFunction<T> selector) {
         long sum = 0;
         for (T t : this) {
             if (t != null) {
@@ -765,7 +765,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         return sum;
     }
 
-    default double averageOf(@NotNull ToIntFunction<T> selector) {
+    default double averageOfInts(@NotNull ToIntFunction<T> selector) {
         double sum = 0;
         var counter = 0;
         for (T t : this) {
@@ -778,7 +778,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         return (counter != 0) ? (sum / counter) : 0;
     }
 
-    default double averageOf(@NotNull ToLongFunction<T> selector) {
+    default double averageOfLongs(@NotNull ToLongFunction<T> selector) {
         double sum = 0;
         var counter = 0;
         for (T t : this) {

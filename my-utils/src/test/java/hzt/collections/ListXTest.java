@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -50,7 +51,7 @@ class ListXTest {
 
         int valueToSearchFor = 2;
 
-        final var indexInSortedList = sortedList.binarySearch(i -> i - valueToSearchFor);
+        final var indexInSortedList = sortedList.binarySearch(value -> value.compareTo(valueToSearchFor));
 
         assertEquals(3, indexInSortedList);
     }
@@ -64,8 +65,10 @@ class ListXTest {
         // the inverted insertion point (-insertion point - 1)
         final var insertionIndex = -invertedInsertionPoint - 1;
 
-        assertEquals(3, indexInSortedList);
-        assertEquals(3, insertionIndex);
+        assertAll(
+                () -> assertEquals(3, indexInSortedList),
+                () -> assertEquals(3, insertionIndex)
+        );
     }
 
     @Test
@@ -94,7 +97,26 @@ class ListXTest {
         final var integers = ListX.of(1, 2, 3, 4, 5);
         final var group = IterableX.iterate(integers::random, list -> list.size() < 10_000).group();
 
-        assertEquals(integers.size(), group.size());
-        group.values().forEach(list -> assertTrue(list.isNotEmpty()));
+        assertAll(
+                () -> assertEquals(integers.size(), group.size()),
+                () -> group.values().forEach(list -> assertTrue(list.isNotEmpty()))
+        );
+    }
+
+    @Test
+    void buildList() {
+        final var strings = ListX.build(this::getStringList);
+
+        assertAll(
+                () -> assertEquals(101, strings.size()),
+                () -> assertTrue(strings.contains("Hallo"))
+        );
+    }
+
+    private void getStringList(MutableListX<String> list) {
+        for (int i = 0; i < 100; i++) {
+            list.add(String.valueOf(i));
+        }
+        list.add(1, "Hallo");
     }
 }

@@ -10,6 +10,7 @@ import java.util.ListIterator;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -20,7 +21,7 @@ import java.util.function.ToIntFunction;
  * @param <E> the type of the elements
  * @author Hans Zuidervaart
  */
-public interface ListX<E> extends CollectionX<E> {
+public interface ListX<E> extends CollectionView<E> {
 
     static <E> ListX<E> empty() {
         return new ArrayListX<>();
@@ -75,6 +76,12 @@ public interface ListX<E> extends CollectionX<E> {
         return valueList;
     }
 
+    static <E> ListX<E> build(Consumer<MutableListX<E>> listXConsumer) {
+        var list = MutableListX.<E>empty();
+        listXConsumer.accept(list);
+        return list;
+    }
+
     @Override
     default <R> ListX<R> castIfInstanceOf(Class<R> aClass) {
         return castToMutableListIfInstanceOf(aClass);
@@ -86,7 +93,7 @@ public interface ListX<E> extends CollectionX<E> {
     }
 
     @Override
-    default <R> ListX<R> mapFiltering(Predicate<E> predicate, Function<E, R> mapper) {
+    default <R> ListX<R> filterMapping(Predicate<E> predicate, Function<E, R> mapper) {
         return mapFiltering(predicate, mapper, It.noFilter());
     }
 

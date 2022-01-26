@@ -73,7 +73,7 @@ public sealed interface MutableListX<E> extends List<E>, ListX<E>, ObjectX<Mutab
     }
 
     @Override
-    default <R> MutableListX<R> mapFiltering(Predicate<E> predicate, Function<E, R> mapper) {
+    default <R> MutableListX<R> filterMapping(Predicate<E> predicate, Function<E, R> mapper) {
         return mapFiltering(predicate, mapper, It.noFilter());
     }
 

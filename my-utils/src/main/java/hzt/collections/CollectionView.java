@@ -1,6 +1,6 @@
 package hzt.collections;
 
-public interface CollectionX<T> extends IterableX<T> {
+public interface CollectionView<T> extends IterableX<T> {
 
     boolean isNotEmpty();
 

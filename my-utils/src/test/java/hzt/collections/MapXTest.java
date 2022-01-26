@@ -1,10 +1,13 @@
 package hzt.collections;
 
+import hzt.strings.StringX;
 import hzt.utils.Pair;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Museum;
 import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,6 +18,8 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MapXTest {
 
@@ -44,7 +49,7 @@ class MapXTest {
 
         final var actual = MapX.of(museumMap)
                 .valuesToIterX(Museum::getDateOfOpening)
-                .sumOf(LocalDate::getDayOfMonth);
+                .sumOfInts(LocalDate::getDayOfMonth);
 
         System.out.println("actual = " + actual);
 

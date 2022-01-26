@@ -8,7 +8,8 @@ import java.util.NavigableMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public sealed interface NavigableMapX<K, V> extends NavigableMap<K, V>, MutableMapX<K, V> permits TreeMapX {
+public sealed interface NavigableMapX<K, V> extends NavigableMap<K, V>, MutableMapX<K, V>
+        permits TreeMapX {
 
     static <K, V, R extends Comparable<R>> NavigableMapX<K, V> comparingByKey(Function<K, R> selector) {
         return new TreeMapX<>(selector);

@@ -3,19 +3,19 @@ package hzt.strings;
 import hzt.collections.IterableX;
 import hzt.collections.ListX;
 import hzt.collections.MutableListX;
+import hzt.collections.MutableMapX;
 import hzt.function.It;
+import hzt.numbers.IntX;
 import hzt.utils.ObjectX;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -270,12 +270,12 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
         return string.lastIndexOf(str, fromIndex);
     }
 
-    public String substring(int beginIndex) {
-        return string.substring(beginIndex);
+    public StringX substring(int beginIndex) {
+        return StringX.of(string.substring(beginIndex));
     }
 
-    public String substring(int beginIndex, int endIndex) {
-        return string.substring(beginIndex, endIndex);
+    public StringX substring(int beginIndex, int endIndex) {
+        return StringX.of(string.substring(beginIndex, endIndex));
     }
 
     @NotNull
@@ -284,12 +284,12 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
         return string.subSequence(start, end);
     }
 
-    public String concat(@NotNull String str) {
-        return string.concat(str);
+    public StringX concat(@NotNull String str) {
+        return StringX.of(string.concat(str));
     }
 
-    public String replace(char oldChar, char newChar) {
-        return string.replace(oldChar, newChar);
+    public StringX replace(char oldChar, char newChar) {
+        return StringX.of(string.replace(oldChar, newChar));
     }
 
     public boolean matches(@NotNull String regex) {
@@ -300,16 +300,16 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
         return string.contains(s);
     }
 
-    public String replaceFirst(@NotNull String regex, @NotNull String replacement) {
-        return string.replaceFirst(regex, replacement);
+    public StringX replaceFirst(@NotNull String regex, @NotNull String replacement) {
+        return StringX.of(string.replaceFirst(regex, replacement));
     }
 
-    public String replaceAll(@NotNull String regex, @NotNull String replacement) {
-        return string.replaceAll(regex, replacement);
+    public StringX replaceAll(@NotNull String regex, @NotNull String replacement) {
+        return StringX.of(string.replaceAll(regex, replacement));
     }
 
-    public String replace(@NotNull CharSequence target, @NotNull CharSequence replacement) {
-        return string.replace(target, replacement);
+    public StringX replace(@NotNull CharSequence target, @NotNull CharSequence replacement) {
+        return StringX.of(string.replace(target, replacement));
     }
 
     public ListX<String> split(@NotNull String regex, int limit) {
@@ -320,24 +320,35 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
         return ListX.of(string.split(regex));
     }
 
-    public static String join(CharSequence delimiter, CharSequence... elements) {
-        return String.join(delimiter, elements);
+    public static StringX join(CharSequence delimiter, CharSequence... elements) {
+        return StringX.of(String.join(delimiter, elements));
     }
 
-    public static String join(CharSequence delimiter, Iterable<? extends CharSequence> elements) {
-        return String.join(delimiter, elements);
+    public static StringX join(CharSequence delimiter, Iterable<? extends CharSequence> elements) {
+        return StringX.of(String.join(delimiter, elements));
     }
 
-    public String toLowerCase(@NotNull Locale locale) {
-        return string.toLowerCase(locale);
+    public StringX toLowerCase(@NotNull Locale locale) {
+        return StringX.of(string.toLowerCase(locale));
     }
 
-    public String toLowerCase() {
-        return string.toLowerCase();
+    public StringX toLowerCase() {
+        return StringX.of(string.toLowerCase());
     }
 
-    public String toUpperCase(@NotNull Locale locale) {
-        return string.toUpperCase(locale);
+    public boolean isAnagramOf(String other) {
+        final var group1 = groupedCharacters(this);
+        final var group2 = groupedCharacters(StringX.of(other));
+        return group1.equals(group2);
+    }
+
+    private static MutableMapX<Character, MutableListX<Character>> groupedCharacters(StringX s1) {
+        final var trimmedAndNoSpaces = s1.trim().replace(" ", "").toLowerCase();
+        return trimmedAndNoSpaces.group();
+    }
+
+    public StringX toUpperCase(@NotNull Locale locale) {
+        return StringX.of(string.toUpperCase(locale));
     }
 
     public StringX toUpperCase() {
@@ -372,20 +383,28 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
         return ListX.of(string.lines().map(StringX::of).toList());
     }
 
-    public String indent(int n) {
-        return string.indent(n);
+    public StringX indent(int n) {
+        return StringX.of(string.indent(n));
     }
 
-    public String stripIndent() {
-        return string.stripIndent();
+    public StringX stripIndent() {
+        return StringX.of(string.stripIndent());
     }
 
-    public String translateEscapes() {
-        return string.translateEscapes();
+    public StringX translateEscapes() {
+        return StringX.of(string.translateEscapes());
     }
 
     public <R> R transform(Function<? super String, ? extends R> f) {
         return string.transform(f);
+    }
+
+    public IntX toIntX(int radix) {
+       return IntX.of(Integer.parseInt(string, radix));
+    }
+
+    public IntX toIntX() {
+        return toIntX(10);
     }
 
     @Override
@@ -465,20 +484,8 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
         return StringX.of(String.valueOf(d));
     }
 
-    public String intern() {
-        return string.intern();
-    }
-
     public StringX repeat(int count) {
         return StringX.of(string.repeat(count));
-    }
-
-    public Optional<String> describeConstable() {
-        return string.describeConstable();
-    }
-
-    public String resolveConstantDesc(MethodHandles.Lookup lookup) {
-        return string.resolveConstantDesc(lookup);
     }
 
     public static int compare(CharSequence cs1, CharSequence cs2) {
