@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
@@ -378,26 +377,6 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
         return isBlank() ? StringX.of(defaultStringSupplier.get()) : this;
     }
 
-    public ListX<StringX> lines() {
-        return ListX.of(string.lines().map(StringX::of).toList());
-    }
-
-    public StringX indent(int n) {
-        return StringX.of(string.indent(n));
-    }
-
-    public StringX stripIndent() {
-        return StringX.of(string.stripIndent());
-    }
-
-    public StringX translateEscapes() {
-        return StringX.of(string.translateEscapes());
-    }
-
-    public <R> R transform(Function<? super String, ? extends R> f) {
-        return string.transform(f);
-    }
-
     public IntX toIntX(int radix) {
        return IntX.of(Integer.parseInt(string, radix));
     }
@@ -427,10 +406,6 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
 
     public static StringX format(Locale l, @NotNull String format, Object... args) {
         return StringX.of(String.format(l, format, args));
-    }
-
-    public StringX formatted(Object... args) {
-        return StringX.of(string.formatted(args));
     }
 
     public static StringX valueOf(Object obj) {

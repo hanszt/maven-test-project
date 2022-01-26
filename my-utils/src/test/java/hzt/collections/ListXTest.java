@@ -6,6 +6,12 @@ import org.junit.jupiter.api.Test;
 import test.Generator;
 import test.model.PaintingAuction;
 
+import java.time.LocalDate;
+import java.time.Year;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -75,17 +81,6 @@ class ListXTest {
         final var years = auction.toListOf(Painting::getYearOfCreation);
 
         assertThrows(UnsupportedOperationException.class, () -> years.add(yearToAdd));
-    }
-
-    @Test
-    void testTakeLastYieldsWantedList() {
-        final var dates = IterableX.rangeClosed(100, 2000)
-                .<LocalDate>mapMultiToListXOf((v, c) -> c.accept(LocalDate.of(v, Month.APRIL, 2)))
-                .takeLast(20);
-
-        System.out.println("dates = " + dates);
-
-        assertEquals(20, dates.size());
     }
 
     @Test

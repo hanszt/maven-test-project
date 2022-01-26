@@ -21,7 +21,7 @@ import java.util.function.ToIntFunction;
  * @param <E> the type of the elements
  * @author Hans Zuidervaart
  */
-public interface ListX<T> extends CollectionX<T> {
+public interface ListX<E> extends CollectionView<E> {
 
     static <E> ListX<E> empty() {
         return new ArrayListX<>();

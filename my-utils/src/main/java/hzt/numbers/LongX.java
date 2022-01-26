@@ -2,7 +2,6 @@ package hzt.numbers;
 
 import hzt.utils.ObjectX;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 public final class LongX extends Number implements NumberX, ObjectX<LongX> {
@@ -224,5 +223,10 @@ public final class LongX extends Number implements NumberX, ObjectX<LongX> {
 
     public static long min(long a, long b) {
         return Long.min(a, b);
+    }
+
+    @Override
+    public LongX get() {
+        return this;
     }
 }

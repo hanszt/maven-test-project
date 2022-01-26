@@ -948,7 +948,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
             @NotNull Collector<T, A1, R1> downstream1,
             @NotNull Collector<T, A2, R2> downStream2,
             @NotNull BiFunction<R1, R2, R> merger) {
-        return collect(Collectors.teeing(downstream1, downStream2, merger));
+        return collect(CollectorsX.teeing(downstream1, downStream2, merger));
     }
 
     default <A1, R1, A2, R2, A3, R3, R> Triple<R1, R2, R3> branching(

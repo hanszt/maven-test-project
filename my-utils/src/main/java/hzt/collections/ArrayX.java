@@ -5,7 +5,7 @@ import hzt.utils.ObjectX;
 import java.util.function.IntFunction;
 import java.util.function.ToIntFunction;
 
-public interface ArrayX<E> extends IterableX<E> {
+public interface ArrayX<E> extends IterableX<E>, ObjectX<ArrayX<E>> {
 
     @SafeVarargs
     static <E> ArrayX<E> of(E... values) {

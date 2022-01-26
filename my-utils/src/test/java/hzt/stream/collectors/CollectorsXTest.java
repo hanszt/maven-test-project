@@ -14,11 +14,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.LongSummaryStatistics;
 import java.util.Map;
+import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static hzt.stream.collectors.BigDecimalCollectors.summarizingBigDecimal;
 import static hzt.stream.collectors.BigDecimalCollectors.summingBigDecimal;
@@ -32,11 +34,7 @@ import static hzt.stream.collectors.BigDecimalCollectors.toMinBigDecimal;
 import static hzt.stream.collectors.CollectorsX.*;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CollectorsXTest {
 

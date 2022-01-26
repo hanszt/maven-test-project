@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
-public interface SetX<T> extends CollectionX<T> {
+public interface SetX<E> extends CollectionView<E> {
 
     static <E> SetX<E> empty() {
         return new HashSetX<>();
