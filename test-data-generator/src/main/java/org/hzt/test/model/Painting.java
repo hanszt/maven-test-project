@@ -1,5 +1,6 @@
 package org.hzt.test.model;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.Period;
@@ -20,6 +21,10 @@ public final class Painting
         this.isInMuseum = isInMuseum;
     }
 
+    public static Painting of(String name) {
+        return new Painting(name, null, null, false);
+    }
+
     public Period age() {
         return Period.between(yearOfCreation.atMonthDay(MonthDay.now()), LocalDate.now());
     }
@@ -30,6 +35,16 @@ public final class Painting
 
     public Year getYearOfCreation() {
         return yearOfCreation;
+    }
+
+    public Period getMilleniumOfCreation() {
+        if (yearOfCreation.isAfter(Year.of(1000)) && yearOfCreation.isBefore(Year.of(2000))) {
+            return Period.between(LocalDate.of(1000, 1, 1), LocalDate.of(1999, 12, 31));
+        } else if (yearOfCreation.isBefore(Year.of(1000))) {
+            return Period.between(LocalDate.of(0, 1, 1), LocalDate.of(999, 12, 31));
+        } else {
+            return Period.between(LocalDate.of(2000, 1, 1), LocalDate.now(Clock.systemDefaultZone()));
+        }
     }
 
     @Override

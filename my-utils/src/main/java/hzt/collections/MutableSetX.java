@@ -1,5 +1,6 @@
 package hzt.collections;
 
+import hzt.utils.ObjectX;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -45,4 +46,8 @@ public interface MutableSetX<E> extends Set<E>, SetX<E> {
         return Set.super.stream();
     }
 
+    @Override
+    default MutableSetX<E> get() {
+        return this;
+    }
 }

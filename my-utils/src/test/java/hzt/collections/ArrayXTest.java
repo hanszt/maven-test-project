@@ -36,7 +36,7 @@ class ArrayXTest {
 
         array.forEach(System.out::println);
 
-        final var sum = array.sumOf(It::asLong);
+        final var sum = array.sumOfLongs(It::asLong);
 
         System.out.println("sum = " + sum);
 

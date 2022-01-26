@@ -2,7 +2,7 @@ package hzt.collections;
 
 import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
-import test.IterXImplGenerator;
+import test.Generator;
 
 import java.time.Year;
 
@@ -12,7 +12,7 @@ class SetXTest {
 
     @Test
     void testToSetYieldsUnModifiableSet() {
-        var auction = IterXImplGenerator.createVanGoghAuction();
+        var auction = Generator.createVanGoghAuction();
         final var yearToAdd = Year.of(2000);
 
         final var years = auction.toSetOf(Painting::getYearOfCreation);

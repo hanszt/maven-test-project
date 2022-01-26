@@ -9,22 +9,26 @@ import java.util.Set;
 
 public interface SetX<T> extends CollectionX<T> {
 
-    static <T> SetX<T> of(Iterable<T> iterable) {
+    static <E> SetX<E> empty() {
+        return new HashSetX<>();
+    }
+
+    static <E> SetX<E> of(Iterable<E> iterable) {
         return new HashSetX<>(iterable);
     }
 
     @SafeVarargs
-    static <T> SetX<T> of(T... values) {
+    static <E> SetX<E> of(E... values) {
         var resultSet = MutableSetX.of(values);
         resultSet.addAll(Arrays.asList(values));
         return resultSet;
     }
 
-    static <T> SetX<T> copyOf(Iterable<T> iterable) {
-        return iterable instanceof SetX ? (SetX<T>) iterable : SetX.of(iterable);
+    static <E> SetX<E> copyOf(Iterable<E> iterable) {
+        return new HashSetX<>(iterable);
     }
 
-    default Set<T> toSet() {
+    default Set<E> toSet() {
         return toSetOf(It::self);
     }
 
@@ -34,7 +38,7 @@ public interface SetX<T> extends CollectionX<T> {
 
     boolean containsAll(@NotNull Collection<?> c);
 
-    default MutableListX<T> toMutableList() {
-        return CollectionX.super.getListOrElseCompute();
+    default MutableListX<E> toMutableList() {
+        return CollectionView.super.getListOrElseCompute();
     }
 }

@@ -1,12 +1,13 @@
 package hzt.collections;
 
 import hzt.function.It;
+import hzt.utils.ObjectX;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public interface MutableMapX<K, V> extends Map<K, V>, MapX<K, V> {
+public interface MutableMapX<K, V> extends Map<K, V>, MapX<K, V>, ObjectX<MutableMapX<K, V>> {
 
     static <K, V> MutableMapX<K, V> of(Map<K, V> map) {
         return new HashMapX<>(map);
@@ -16,7 +17,7 @@ public interface MutableMapX<K, V> extends Map<K, V>, MapX<K, V> {
         return new HashMapX<>();
     }
 
-    static <K, V> MutableMapX<K, V> ofIterable(Iterable<Map.Entry<K, V>> entries) {
+    static <K, V> MutableMapX<K, V> ofEntries(Iterable<Map.Entry<K, V>> entries) {
         return new HashMapX<>(entries);
     }
 
@@ -50,5 +51,10 @@ public interface MutableMapX<K, V> extends Map<K, V>, MapX<K, V> {
     @Override
     default void forEach(BiConsumer<? super K, ? super V> action) {
         Map.super.forEach(action);
+    }
+
+    @Override
+    default MutableMapX<K, V> get() {
+        return this;
     }
 }

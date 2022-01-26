@@ -1,8 +1,11 @@
 package hzt.numbers;
 
+import hzt.utils.ObjectX;
+
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
-public final class LongX extends Number implements NumberX{
+public final class LongX extends Number implements NumberX, ObjectX<LongX> {
     
     private final Long aLong;
 

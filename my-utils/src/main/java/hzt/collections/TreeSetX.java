@@ -19,7 +19,7 @@ final class TreeSetX<E, R extends Comparable<R>> implements NavigableSetX<E> {
 
     private final NavigableSet<E> navigableSet;
 
-    TreeSetX(Function<E, R> selector) {
+    TreeSetX(Function<? super E, ? extends R> selector) {
         this.navigableSet = new TreeSet<>(comparing(selector));
     }
 
@@ -230,7 +230,7 @@ final class TreeSetX<E, R extends Comparable<R>> implements NavigableSetX<E> {
 
     @Override
     public boolean isNotEmpty() {
-        return !navigableSet.isEmpty();
+        return !isEmpty();
     }
 
     @Override

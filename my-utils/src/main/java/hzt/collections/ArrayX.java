@@ -1,5 +1,7 @@
 package hzt.collections;
 
+import hzt.utils.ObjectX;
+
 import java.util.function.IntFunction;
 import java.util.function.ToIntFunction;
 
@@ -39,4 +41,9 @@ public interface ArrayX<E> extends IterableX<E> {
     int binarySearch(int fromIndex, int toIndex, ToIntFunction<E> comparison);
 
     E[] toArray();
+
+    @Override
+    default ArrayX<E> get() {
+        return this;
+    }
 }

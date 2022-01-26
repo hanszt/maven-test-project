@@ -13,18 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class IterXImplGenerator {
+public final class Generator {
 
-    private static MutableListX<PaintingAuction> paintingAuctions;
-
-    private IterXImplGenerator() {
-    }
-
-    public static MutableListX<PaintingAuction> getAuctionsContainingNulls() {
-        if (paintingAuctions == null) {
-            paintingAuctions = createAuctions();
-        }
-        return paintingAuctions;
+    private Generator() {
     }
 
     public static MutableListX<PaintingAuction> createAuctions() {

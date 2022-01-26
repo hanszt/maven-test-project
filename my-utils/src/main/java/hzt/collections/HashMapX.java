@@ -3,12 +3,10 @@ package hzt.collections;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 final class HashMapX<K, V> implements MutableMapX<K, V> {
 
@@ -26,13 +24,6 @@ final class HashMapX<K, V> implements MutableMapX<K, V> {
         Map<K, V> newMap = new HashMap<>();
         for (var entry : iterable) {
             newMap.put(entry.getKey(), entry.getValue());
-        }
-        this.map = newMap;
-    }
-    HashMapX(Set<K> set) {
-        Map<K, V> newMap = new HashMap<>();
-        for (var value : set) {
-            newMap.put(value, null);
         }
         this.map = newMap;
     }
@@ -83,22 +74,19 @@ final class HashMapX<K, V> implements MutableMapX<K, V> {
         map.clear();
     }
 
-    @NotNull
     @Override
-    public Set<K> keySet() {
-        return map.keySet();
+    public @NotNull MutableSetX<K> keySet() {
+        return MutableSetX.of(map.keySet());
     }
 
-    @NotNull
     @Override
-    public Collection<V> values() {
-        return map.values();
+    public @NotNull MutableListX<V> values() {
+        return MutableListX.of(map.values());
     }
 
-    @NotNull
     @Override
-    public Set<Map.Entry<K, V>> entrySet() {
-        return map.entrySet();
+    public @NotNull MutableSetX<Entry<K, V>> entrySet() {
+        return MutableSetX.of(map.entrySet());
     }
 
     @Override

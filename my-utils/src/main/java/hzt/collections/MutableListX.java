@@ -1,5 +1,7 @@
 package hzt.collections;
 
+import hzt.function.It;
+import hzt.utils.ObjectX;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -37,16 +39,6 @@ public interface MutableListX<E> extends List<E>, ListX<E> {
     }
 
     @Override
-    default MutableListX<E> plus(@NotNull Iterable<E> values) {
-        return toMutableListPlus(values);
-    }
-
-    @Override
-    default MutableListX<E> plus(E value) {
-        return toMutableListPlus(value);
-    }
-
-    @Override
     default <R> MutableListX<R> map(Function<E, R> mapper) {
         return toMutableListOf(mapper);
     }
@@ -57,7 +49,7 @@ public interface MutableListX<E> extends List<E>, ListX<E> {
     }
 
     @Override
-    default <R> MutableListX<E> filterNotNullBy(Function<E, R> function, Predicate<R> predicate) {
+    default <R> MutableListX<E> filterNotNullBy(Function<? super E, ? extends R> function, Predicate<? super R> predicate) {
         return filterNotNullToMutableListBy(function, predicate);
     }
 
@@ -70,6 +62,25 @@ public interface MutableListX<E> extends List<E>, ListX<E> {
         return takeToMutableListWhile(predicate);
     }
 
+    @Override
+    default <R> MutableListX<R> castIfInstanceOf(Class<R> aClass) {
+        return castToMutableListIfInstanceOf(aClass);
+    }
+
+    @Override
+    default <R> MutableListX<R> mapFiltering(Function<? super E, ? extends R> mapper, Predicate<R> resultFilter) {
+        return mapFiltering(It.noFilter(), mapper, resultFilter);
+    }
+
+    @Override
+    default <R> MutableListX<R> filterMapping(Predicate<E> predicate, Function<E, R> mapper) {
+        return mapFiltering(predicate, mapper, It.noFilter());
+    }
+
+    @Override
+    default <R> MutableListX<R> mapFiltering(Predicate<E> predicate, Function<? super E, ? extends R> mapper, Predicate<R> resultFilter) {
+        return mapFilteringToCollection(MutableListX::of, predicate, mapper, resultFilter);
+    }
     /**
      * Returns an iterator over the elements in this list in proper sequence.
      *
@@ -89,4 +100,9 @@ public interface MutableListX<E> extends List<E>, ListX<E> {
     ListX<E> toListX();
 
     MutableListX<E> subList(int fromIndex, int toIndex);
+
+    @Override
+    default MutableListX<E> get() {
+        return this;
+    }
 }

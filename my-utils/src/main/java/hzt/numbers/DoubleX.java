@@ -1,6 +1,11 @@
 package hzt.numbers;
 
-public final class DoubleX extends Number implements NumberX{
+import hzt.utils.ObjectX;
+
+import java.lang.invoke.MethodHandles;
+import java.util.Optional;
+
+public final class DoubleX extends Number implements NumberX, ObjectX<DoubleX> {
 
     private final Double aDouble;
 
@@ -142,5 +147,10 @@ public final class DoubleX extends Number implements NumberX{
 
     public IntX toIntX() {
         return IntX.of(intValue());
+    }
+
+    @Override
+    public DoubleX get() {
+        return this;
     }
 }

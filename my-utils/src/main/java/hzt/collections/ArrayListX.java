@@ -9,9 +9,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
+import java.util.Random;
 import java.util.function.ToIntFunction;
 
 final class ArrayListX<T> implements MutableListX<T> {
+
+    private static final Random RANDOM = new Random();
 
     private final List<T> list;
 
@@ -51,6 +54,11 @@ final class ArrayListX<T> implements MutableListX<T> {
     }
 
     @Override
+    public T random() {
+        return list.get(RANDOM.nextInt(list.size()));
+    }
+
+    @Override
     public int binarySearch(int fromIndex, int toIndex, ToIntFunction<T> comparison) {
         return IterableHelper.binarySearch(size(), list::get, fromIndex, toIndex, comparison);
     }
@@ -58,6 +66,11 @@ final class ArrayListX<T> implements MutableListX<T> {
     @Override
     public int size() {
         return list.size();
+    }
+
+    @Override
+    public int lastIndex() {
+        return size() - 1;
     }
 
     @Override

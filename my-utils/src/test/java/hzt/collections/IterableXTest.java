@@ -13,7 +13,7 @@ import org.hzt.test.model.Museum;
 import org.hzt.test.model.Painter;
 import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
-import test.IterXImplGenerator;
+import test.Generator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,6 +33,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static hzt.stream.collectors.CollectorsX.branching;
+import static hzt.stream.collectors.CollectorsX.intersectingBy;
+import static hzt.stream.collectors.CollectorsX.mappingToList;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -161,7 +164,7 @@ class IterableXTest {
 
     @Test
     void testAuctionImplementingIterableX() {
-        var auctions = IterXImplGenerator.createAuctions();
+        var auctions = Generator.createAuctions();
 
         final var auction = auctions.first();
 
@@ -341,6 +344,23 @@ class IterableXTest {
     }
 
     @Test
+    void testTakeWhileInclusive() {
+        var list = ListX.of(1, 2, 10, 4, 5, 10, 6, 5, 3, 5, 6);
+
+        list.forEach(System.out::println);
+
+        final var takeWhileInclusive = list.takeWhileInclusive(i -> i != 5);
+        final var takeWhile = list.takeWhile(i -> i != 5);
+
+        System.out.println("integers = " + takeWhileInclusive);
+
+        assertAll(
+                () -> assertIterableEquals(List.of(1, 2, 10, 4, 5), takeWhileInclusive),
+                () -> assertIterableEquals(List.of(1, 2, 10, 4), takeWhile)
+        );
+    }
+
+    @Test
     void testSkip() {
         final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
@@ -414,18 +434,24 @@ class IterableXTest {
                 Set.of(4, 5, 6)
         );
 
-        final var intersect = collections.intersectBy(It::self);
+        final var intersect = collections.intersectionOf(It::self);
 
         assertEquals(Set.of(4, 5), intersect);
     }
 
     @Test
     void testIntersectMuseumPaintings() {
-        final var museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
+        final var museums = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
-        final var intersection = museumList.intersectBy(Museum::getPaintings);
+        var expected = museums.stream()
+                .map(Museum::getPaintings)
+                .collect(intersectingBy(Painting::getMilleniumOfCreation));
 
-        assertEquals(Set.of(), intersection);
+        final var intersection = museums.intersectionOf(Museum::getPaintings, Painting::getMilleniumOfCreation);
+
+        System.out.println("intersection = " + intersection);
+
+        assertEquals(expected, intersection);
     }
 
     @Test
@@ -469,8 +495,34 @@ class IterableXTest {
     }
 
     @Test
+    void testDropLastWhile() {
+        var list = ListX.of(1, 2, 10, 4, 5, 10, 6, 5, 3, 5, 6);
+
+        list.forEach(System.out::println);
+
+        final var integers = list.dropLastToMutableListWhile(i -> i != 10);
+
+        System.out.println("integers = " + integers);
+
+        assertEquals(List.of(1, 2, 10, 4, 5, 10), integers);
+    }
+
+    @Test
+    void testDropWhile() {
+        var list = ListX.of(1, 2, 10, 4, 5, 10, 6, 5, 3, 5, 6);
+
+        list.forEach(System.out::println);
+
+        final var integers = list.dropWhile(i -> i != 5);
+
+        System.out.println("integers = " + integers);
+
+        assertIterableEquals(List.of(5, 10, 6, 5, 3, 5, 6), integers);
+    }
+
+    @Test
     void testListIteratorGetPreviousOnlyWorksBeforeWhenIsAtEnd() {
-        var list = List.of(22, 44, 88, 11 ,33);
+        var list = List.of(22, 44, 88, 11, 33);
         var listIterator = list.listIterator();
 
         assertFalse(listIterator.hasPrevious());
@@ -522,7 +574,7 @@ class IterableXTest {
 
         final var expected = list.stream().mapToInt(Painting::ageInYears).sum();
 
-        final var actual = list.sumOf(Painting::ageInYears);
+        final var actual = list.sumOfInts(Painting::ageInYears);
 
         System.out.println("actual = " + actual);
 
@@ -535,7 +587,7 @@ class IterableXTest {
 
         final var expected = list.stream().mapToInt(Painting::ageInYears).average().orElseThrow();
 
-        final var actual = list.averageOf(Painting::ageInYears);
+        final var actual = list.averageOfInts(Painting::ageInYears);
 
         System.out.println("actual = " + actual);
 
@@ -737,7 +789,7 @@ class IterableXTest {
 
         final var max = paintingList.stream()
                 .map(Painting::painter)
-                .collect(CollectorsX.toIterX())
+                .collect(CollectorsX.toListX())
                 .maxOf(Painter::getDateOfBirth);
 
         final var maxWithFullTransformer = paintingList
@@ -867,7 +919,7 @@ class IterableXTest {
     }
 
     @Test
-    void testGetListOrElseThrow() {
+    void testDistinctBy() {
         final var bigDecimals = ListX.of(IntStream.range(0, 100_000)
                 .filter(integer -> integer % 2 == 0)
                 .mapToObj(BigDecimal::valueOf)
@@ -883,6 +935,17 @@ class IterableXTest {
         System.out.println("list = " + list);
 
         assertEquals(expected, list);
+    }
+
+    @Test
+    void castIfInstanceOf() {
+        final var list = ListX.of(3.0, 2, 4, 3, BigDecimal.valueOf(10), 5L, 'a', "String");
+
+        final var integers = list.castIfInstanceOf(Integer.class);
+
+        System.out.println("integers = " + integers);
+
+        assertEquals(ListX.ofInts(2, 4, 3), integers);
     }
 
     @Test
@@ -912,5 +975,32 @@ class IterableXTest {
                 throw new NoSuchElementException();
             }
         });
+    }
+
+    @Test
+    void testBranchingPaintingDataToThreeValues() {
+        //arrange
+        final var paintingList = ListX.of(TestSampleGenerator.createPaintingList());
+
+        final var expected = paintingList.stream()
+                .collect(branching(
+                        partitioningBy(Painting::isInMuseum, mappingToList(Painting::painter)),
+                        summarizingInt(Painting::ageInYears),
+                        mappingToList(Painting::name)));
+
+        final var actual = paintingList.branching(
+                partitioningBy(Painting::isInMuseum, mappingToList(Painting::painter)),
+                summarizingInt(Painting::ageInYears),
+                mappingToList(Painting::name));
+
+        final var expectedStats = expected.second();
+        final var actualStats = actual.second();
+
+        assertAll(
+                () -> assertEquals(expected.first(), actual.first()),
+                () -> assertEquals(expectedStats.getAverage(), actualStats.getAverage()),
+                () -> assertEquals(expectedStats.getMax(), actualStats.getMax()),
+                () -> assertEquals(expected.third(), actual.third())
+        );
     }
 }

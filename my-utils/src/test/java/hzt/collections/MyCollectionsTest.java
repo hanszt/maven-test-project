@@ -1,5 +1,6 @@
 package hzt.collections;
 
+import hzt.utils.MyCollections;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Museum;
 import org.hzt.test.model.Painter;

@@ -7,10 +7,14 @@ public final class Triple<A, B, C> {
     private final B second;
     private final C third;
 
-    public Triple(A first, B second, C third) {
+    private Triple(A first, B second, C third) {
         this.first = first;
         this.second = second;
         this.third = third;
+    }
+
+    public static <A, B, C> Triple<A, B, C> of(A a, B b, C c) {
+        return new Triple<>(a, b, c);
     }
 
     public A first() {
@@ -27,9 +31,14 @@ public final class Triple<A, B, C> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (Triple) obj;
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        //noinspection unchecked
+        var that = (Triple<A, B, C>) obj;
         return Objects.equals(this.first, that.first) &&
                 Objects.equals(this.second, that.second) &&
                 Objects.equals(this.third, that.third);
