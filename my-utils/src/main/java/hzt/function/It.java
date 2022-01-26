@@ -15,7 +15,7 @@ public final class It {
      * It can be used to return itself as method reference
      * <pre>{@code
      *                final var museumMap = museumList.stream()
-     *                 .collect(toUnmodifiableMap(It::self, Museum::getMostPopularPainting));
+     *                 .collect(toMap(It::self, Museum::getMostPopularPainting));
      *
      * }</pre>
      * <p>

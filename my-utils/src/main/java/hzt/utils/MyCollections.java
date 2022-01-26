@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -33,7 +34,7 @@ public final class MyCollections {
     }
 
     public static <E> List<E> listOfIterable(Iterable<E> iterable) {
-        return StreamUtils.streamOf(iterable).collect(Collectors.toUnmodifiableList());
+        return StreamUtils.streamOf(iterable).collect(Collectors.toList());
     }
 
     /**
@@ -65,7 +66,7 @@ public final class MyCollections {
 
     public static <T, R> List<R> flatMap(@NotNull Iterable<Iterable<T>> iterables, @NotNull Function<T, R> mapper) {
         List<R> resultList = new ArrayList<>();
-        for (var iterable : iterables) {
+        for (Iterable<T> iterable : iterables) {
             for (T t : iterable) {
                 resultList.add(mapper.apply(t));
             }
@@ -76,6 +77,6 @@ public final class MyCollections {
     public static <T> List<T> distinct(@NotNull Iterable<T> iterable) {
         Set<T> set = new LinkedHashSet<>();
         iterable.forEach(set::add);
-        return List.copyOf(set);
+        return Collections.unmodifiableList(new ArrayList<>(set));
     }
 }

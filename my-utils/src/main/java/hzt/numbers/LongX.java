@@ -48,20 +48,12 @@ public final class LongX extends Number implements NumberX, ObjectX<LongX> {
         return Long.parseLong(s, radix);
     }
 
-    public static long parseLong(CharSequence s, int beginIndex, int endIndex, int radix) throws NumberFormatException {
-        return Long.parseLong(s, beginIndex, endIndex, radix);
-    }
-
     public static long parseLong(String s) throws NumberFormatException {
         return Long.parseLong(s);
     }
 
     public static long parseUnsignedLong(String s, int radix) throws NumberFormatException {
         return Long.parseUnsignedLong(s, radix);
-    }
-
-    public static long parseUnsignedLong(CharSequence s, int beginIndex, int endIndex, int radix) throws NumberFormatException {
-        return Long.parseUnsignedLong(s, beginIndex, endIndex, radix);
     }
 
     public static long parseUnsignedLong(String s) throws NumberFormatException {

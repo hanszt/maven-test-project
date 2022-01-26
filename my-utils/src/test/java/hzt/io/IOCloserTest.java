@@ -1,7 +1,5 @@
 package hzt.io;
 
-import hzt.io.Closer;
-import hzt.io.IOCloser;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -15,11 +13,11 @@ class IOCloserTest {
 
     @Test
     void testAutoCloser() throws IOException {
-        final var resource1 = new ResourceNotImplementingClosable("Resource 1");
-        final var resource2 = new ResourceNotImplementingClosable("Resource 2");
-        final var resource3 = new ResourceNotImplementingClosable("Resource 3");
+        final ResourceNotImplementingClosable resource1 = new ResourceNotImplementingClosable("Resource 1");
+        final ResourceNotImplementingClosable resource2 = new ResourceNotImplementingClosable("Resource 2");
+        final ResourceNotImplementingClosable resource3 = new ResourceNotImplementingClosable("Resource 3");
         //noinspection unused
-        try (var ioCloser = new IOCloser(resource1::close, resource2::close, resource3::close)) {
+        try (IOCloser ioCloser = new IOCloser(resource1::close, resource2::close, resource3::close)) {
             assertAll(
                     () -> assertFalse(resource1.closed),
                     () -> assertFalse(resource2.closed),
@@ -36,19 +34,19 @@ class IOCloserTest {
     @Test
     void testCloser() {
         //noinspection Convert2MethodRef
-        var closer = Closer.forResource(new ResourceNotImplementingClosable("Resource 1"), resource -> resource.close());
-        try (closer) {
+
+        try (Closer<ResourceNotImplementingClosable> closer = Closer
+                .forResource(new ResourceNotImplementingClosable("Resource 1"), resource -> resource.close())) {
             assertFalse(closer.getResource().closed);
         }
-        assertTrue(closer.getResource().closed);
     }
 
     @Test
     void testOneOfCloseMethodsThrowingException() {
-        final var resource1 = new ResourceNotImplementingClosable("Resource 1");
-        final var resource2 = new ResourceNotImplementingClosable("Resource 2");
-        final var resource3 = new ResourceNotImplementingClosable("Resource 3");
-        try (var ioCloser = new IOCloser()) {
+        final ResourceNotImplementingClosable resource1 = new ResourceNotImplementingClosable("Resource 1");
+        final ResourceNotImplementingClosable resource2 = new ResourceNotImplementingClosable("Resource 2");
+        final ResourceNotImplementingClosable resource3 = new ResourceNotImplementingClosable("Resource 3");
+        try (IOCloser ioCloser = new IOCloser()) {
             resource1.load();
             ioCloser.addCloseFunctions(resource1::close, resource2::closeThrowingException, resource3::close);
 

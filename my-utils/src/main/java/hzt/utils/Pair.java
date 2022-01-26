@@ -32,7 +32,7 @@ public final class Pair<A, B> {
         if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
-        var that = (Pair<? ,?>) obj;
+        Pair<A, B> that = (Pair<A ,B>) obj;
         return Objects.equals(this.first, that.first) &&
                 Objects.equals(this.second, that.second);
     }

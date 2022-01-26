@@ -45,39 +45,39 @@ public interface ListX<E> extends CollectionView<E> {
     }
 
     static ListX<Boolean> ofBools(boolean... values) {
-        var valueList = MutableListX.<Boolean>empty();
-        for (var value : values) {
+        MutableListX<Boolean> valueList = MutableListX.<Boolean>empty();
+        for (boolean value : values) {
             valueList.add(value);
         }
         return valueList;
     }
 
     static ListX<Integer> ofInts(int... values) {
-        var valueList = MutableListX.<Integer>empty();
-        for (var value : values) {
+        MutableListX<Integer> valueList = MutableListX.empty();
+        for (int value : values) {
             valueList.add(value);
         }
         return valueList;
     }
 
     static ListX<Long> ofLongs(long... values) {
-        var valueList = MutableListX.<Long>empty();
-        for (var value : values) {
+        MutableListX<Long> valueList = MutableListX.<Long>empty();
+        for (long value : values) {
             valueList.add(value);
         }
         return valueList;
     }
 
     static ListX<Double> ofDoubles(double... values) {
-        var valueList = MutableListX.<Double>empty();
-        for (var value : values) {
+        MutableListX<Double> valueList = MutableListX.<Double>empty();
+        for (double value : values) {
             valueList.add(value);
         }
         return valueList;
     }
 
     static <E> ListX<E> build(Consumer<MutableListX<E>> listXConsumer) {
-        var list = MutableListX.<E>empty();
+        MutableListX<E> list = MutableListX.empty();
         listXConsumer.accept(list);
         return list;
     }
@@ -162,9 +162,9 @@ public interface ListX<E> extends CollectionView<E> {
 
     default <R> R foldRight(@NotNull R initial, @NotNull BiFunction<E, R, R> operation) {
         ListX<E> list = getListOrElseCompute();
-        var accumulator = initial;
+        R accumulator = initial;
         if (list.isNotEmpty()) {
-            final var listIterator = list.listIterator(list.size());
+            final ListIterator<E> listIterator = list.listIterator(list.size());
             while (listIterator.hasPrevious()) {
                 accumulator = operation.apply(listIterator.previous(), accumulator);
             }
@@ -177,7 +177,7 @@ public interface ListX<E> extends CollectionView<E> {
         if (n == 0) {
             return MutableListX.empty();
         }
-        var list = getListOrElseCompute();
+        MutableListX<E> list = getListOrElseCompute();
         int size = list.size();
         if (n >= size) {
             return list;
@@ -185,7 +185,7 @@ public interface ListX<E> extends CollectionView<E> {
         if (n == 1) {
             return MutableListX.of(last());
         }
-        var resultList = MutableListX.<E>withInitCapacity(n);
+        MutableListX<E> resultList = MutableListX.<E>withInitCapacity(n);
         for (int index = size - n; index < size; index++) {
             resultList.add(list.get(index));
         }

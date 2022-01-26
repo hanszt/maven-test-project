@@ -19,19 +19,19 @@ class NavigableSetXTest {
 
     @Test
     void testGetNavigableSet() {
-        final var museumListContainingNulls = SetX.of(TestSampleGenerator.getMuseumListContainingNulls());
+        final SetX<Museum> museumListContainingNulls = SetX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
-        final var expected = museumListContainingNulls.stream()
+        final TreeSet<String> expected = museumListContainingNulls.stream()
                 .map(Museum::getName)
                 .filter(Objects::nonNull)
                 .sorted()
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        final var names = museumListContainingNulls.toNavigableSetOf(Museum::getName);
+        final NavigableSetX<String> names = museumListContainingNulls.toNavigableSetOf(Museum::getName);
 
-        var list = MutableListX.<Integer>empty();
+        MutableListX<Integer> list = MutableListX.<Integer>empty();
 
-        final var average = names
+        final double average = names
                 .onEachOf(String::length, It
                         .<Consumer<Integer>>self(System.out::println)
                         .andThen(list::add))
@@ -50,14 +50,14 @@ class NavigableSetXTest {
 
     @Test
     void testToSetSortedBy() {
-        final var museumListContainingNulls = SetX.of(TestSampleGenerator.getMuseumListContainingNulls());
+        final SetX<Museum> museumListContainingNulls = SetX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
         final NavigableSet<Museum> expected = museumListContainingNulls.stream()
                 .filter(i -> i != null && i.getName() != null)
                 .sorted(Comparator.comparing(Museum::getName))
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        final var sortedMuseums = museumListContainingNulls.toSetSortedBy(Museum::getName);
+        final NavigableSetX<Museum> sortedMuseums = museumListContainingNulls.toSetSortedBy(Museum::getName);
 
         sortedMuseums.forEach(System.out::println);
 

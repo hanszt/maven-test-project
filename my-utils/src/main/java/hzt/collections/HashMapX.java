@@ -22,7 +22,7 @@ final class HashMapX<K, V> implements MutableMapX<K, V> {
 
     HashMapX(Iterable<Entry<K, V>> iterable) {
         Map<K, V> newMap = new HashMap<>();
-        for (var entry : iterable) {
+        for (Map.Entry<K, V> entry : iterable) {
             newMap.put(entry.getKey(), entry.getValue());
         }
         this.map = newMap;

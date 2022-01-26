@@ -2,6 +2,7 @@ package hzt.strings;
 
 import hzt.collections.IterableX;
 import hzt.collections.ListX;
+import hzt.collections.MapX;
 import hzt.collections.MutableListX;
 import hzt.collections.MutableMapX;
 import hzt.function.It;
@@ -88,7 +89,7 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
     }
 
     public StringX replaceFirstChar(UnaryOperator<Character> replacer) {
-        var charArray = toCharArray();
+        char[] charArray = toCharArray();
         if (charArray.length > 0) {
             charArray[0] = replacer.apply(charArray[0]);
         }
@@ -108,7 +109,7 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
             @NotNull
             @Override
             public Iterator<Character> iterator() {
-                return new Iterator<>() {
+                return new Iterator<Character>() {
 
                     @Override
                     public boolean hasNext() {
@@ -335,13 +336,13 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
     }
 
     public boolean isAnagramOf(String other) {
-        final var group1 = groupedCharacters(this);
-        final var group2 = groupedCharacters(StringX.of(other));
+        final MapX<Character, MutableListX<Character>> group1 = groupedCharacters(this);
+        final MapX<Character, MutableListX<Character>> group2 = groupedCharacters(StringX.of(other));
         return group1.equals(group2);
     }
 
     private static MutableMapX<Character, MutableListX<Character>> groupedCharacters(StringX s1) {
-        final var trimmedAndNoSpaces = s1.trim().replace(" ", "").toLowerCase();
+        final StringX trimmedAndNoSpaces = s1.trim().replace(" ", "").toLowerCase();
         return trimmedAndNoSpaces.group();
     }
 
@@ -355,26 +356,6 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
 
     public StringX trim() {
         return StringX.of(string.trim());
-    }
-
-    public StringX strip() {
-        return StringX.of(string.strip());
-    }
-
-    public StringX stripLeading() {
-        return StringX.of(string.stripLeading());
-    }
-
-    public StringX stripTrailing() {
-        return StringX.of(string.stripTrailing());
-    }
-
-    public boolean isBlank() {
-        return string.isBlank();
-    }
-
-    public StringX ifBlank(Supplier<String> defaultStringSupplier) {
-        return isBlank() ? StringX.of(defaultStringSupplier.get()) : this;
     }
 
     public IntX toIntX(int radix) {
@@ -450,14 +431,6 @@ public final class StringX implements CharSequence, IterableX<Character>, Object
 
     public static StringX valueOf(double d) {
         return StringX.of(String.valueOf(d));
-    }
-
-    public StringX repeat(int count) {
-        return StringX.of(string.repeat(count));
-    }
-
-    public static int compare(CharSequence cs1, CharSequence cs2) {
-        return CharSequence.compare(cs1, cs2);
     }
 
     @Override

@@ -12,18 +12,18 @@ class ArrayXTest {
 
     @Test
     void testArrayX() {
-        var array = ArrayX.of(1, 3, 4, 5, 3);
+        ArrayX<Integer> array = ArrayX.of(1, 3, 4, 5, 3);
 
         assertTrue(array.all(Objects::nonNull));
     }
 
     @Test
     void testArrayGroupBy() {
-        var array = ArrayX.of("hallo", "raar", "gedoe", "moe", "stom");
+        ArrayX<String> array = ArrayX.of("hallo", "raar", "gedoe", "moe", "stom");
 
         array.forEach(System.out::println);
 
-        final var group = array.groupBy(String::length);
+        final MutableMapX<Integer, MutableListX<String>> group = array.groupBy(String::length);
 
         System.out.println("group = " + group);
 
@@ -32,11 +32,11 @@ class ArrayXTest {
 
     @Test
     void testArraySum() {
-        var array = ArrayX.of(40, ArrayXTest::fib);
+        ArrayX<Long> array = ArrayX.of(40, ArrayXTest::fib);
 
         array.forEach(System.out::println);
 
-        final var sum = array.sumOfLongs(It::asLong);
+        final long sum = array.sumOfLongs(It::asLong);
 
         System.out.println("sum = " + sum);
 

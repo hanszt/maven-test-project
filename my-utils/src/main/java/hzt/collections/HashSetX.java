@@ -28,14 +28,14 @@ final class HashSetX<E> implements MutableSetX<E> {
     }
 
     HashSetX(Iterable<E> iterable) {
-        var newSet = new HashSet<E>();
+        Set<E> newSet = new HashSet<>();
         iterable.forEach(newSet::add);
         this.set = newSet;
     }
 
     @SafeVarargs
     HashSetX(E @NotNull ... values) {
-        var newSet = new HashSet<E>();
+        Set<E> newSet = new HashSet<>();
         for (E item : values) {
             if (!newSet.add(item)) {
                 throw new IllegalStateException("Duplicate elements in set. This is not allowed");

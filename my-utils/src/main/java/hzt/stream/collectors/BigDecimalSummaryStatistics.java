@@ -2,7 +2,6 @@ package hzt.stream.collectors;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public class BigDecimalSummaryStatistics implements Consumer<BigDecimal> {
@@ -26,9 +25,9 @@ public class BigDecimalSummaryStatistics implements Consumer<BigDecimal> {
             throw new IllegalArgumentException("Minimum greater than maximum");
         }
         this.count = count;
-        this.sum = Objects.requireNonNullElse(sum, BigDecimal.ZERO);
-        this.min = Objects.requireNonNullElse(min, INIT_MIN_VALUE);
-        this.max = Objects.requireNonNullElse(max, INIT_MAX_VALUE);
+        this.sum = sum != null ? sum : BigDecimal.ZERO;
+        this.min = min;
+        this.max = max != null ? max :  INIT_MAX_VALUE;
     }
 
     @Override
@@ -50,7 +49,7 @@ public class BigDecimalSummaryStatistics implements Consumer<BigDecimal> {
     }
 
     public BigDecimal getAverage() {
-        final var SCALE = 2;
+        final int SCALE = 2;
         return getAverage(SCALE);
     }
 

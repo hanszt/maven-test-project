@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -41,7 +42,7 @@ public final class PaintingAuction implements Comparable<PaintingAuction>, Itera
     public Painting getOldestPainting() {
         return paintingList.stream()
                 .min(Comparator.comparing(Painting::getYearOfCreation))
-                .orElseThrow();
+                .orElseThrow(NoSuchElementException::new);
     }
 
     public Painting getMostPopularPainting() {

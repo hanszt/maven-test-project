@@ -1,5 +1,6 @@
 package hzt.stream;
 
+import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -23,7 +24,7 @@ public final class EntryStreamUtils {
             Function<? super K, ? extends K1> keyToValueMapper, Function<? super V, ? extends V1> valueToKeyMapper) {
         Objects.requireNonNull(keyToValueMapper);
         Objects.requireNonNull(valueToKeyMapper);
-        return entry -> Map.entry(
+        return entry -> new AbstractMap.SimpleEntry<>(
                 valueToKeyMapper.apply(entry.getValue()),
                 keyToValueMapper.apply(entry.getKey()));
     }
@@ -36,19 +37,19 @@ public final class EntryStreamUtils {
             Function<? super K, ? extends R1> keyMapper, Function<? super V, ? extends R2> valueMapper) {
         Objects.requireNonNull(keyMapper);
         Objects.requireNonNull(valueMapper);
-        return entry -> Map.entry(
+        return entry -> new AbstractMap.SimpleEntry<>(
                 keyMapper.apply(entry.getKey()),
                 valueMapper.apply(entry.getValue()));
     }
 
     public static <K, V, R> Function<Map.Entry<K, V>, Map.Entry<R, V>> key(Function<? super K, ? extends R> keyMapper) {
         Objects.requireNonNull(keyMapper);
-        return entry -> Map.entry(keyMapper.apply(entry.getKey()), entry.getValue());
+        return entry -> new AbstractMap.SimpleEntry<>(keyMapper.apply(entry.getKey()), entry.getValue());
     }
 
     public static <K, V, R> Function<Map.Entry<K, V>, Map.Entry<K, R>> value(Function<? super V, ? extends R> valueMapper) {
         Objects.requireNonNull(valueMapper);
-        return entry -> Map.entry(entry.getKey(), valueMapper.apply(entry.getValue()));
+        return entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), valueMapper.apply(entry.getValue()));
     }
 
     public static <K, V> Predicate<Map.Entry<K, V>> byKey(Predicate<? super K> keyPredicate) {

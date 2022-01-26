@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static hzt.stream.StreamUtils.by;
@@ -22,7 +23,7 @@ class MyFileUtilsTest {
 
     @Test
     void testFindFilesWithDuplicateContent() {
-        final var filesWithDuplicateContent = MyFileUtils.findFilesWithDuplicateContent(
+        final Map<String, List<Path>> filesWithDuplicateContent = MyFileUtils.findFilesWithDuplicateContent(
                 Paths.get(""),
                 containsNonOf(".git", "target", "sonarlint", ".iml"));
         assertTrue(filesWithDuplicateContent.isEmpty(), () -> errorMessage(filesWithDuplicateContent.values()));

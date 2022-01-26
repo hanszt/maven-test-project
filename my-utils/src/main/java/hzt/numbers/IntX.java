@@ -2,9 +2,7 @@ package hzt.numbers;
 
 import hzt.utils.ObjectX;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Objects;
-import java.util.Optional;
 
 public final class IntX extends Number implements NumberX, ObjectX<IntX> {
 
@@ -46,20 +44,12 @@ public final class IntX extends Number implements NumberX, ObjectX<IntX> {
         return Integer.parseInt(s, radix);
     }
 
-    public static int parseInt(CharSequence s, int beginIndex, int endIndex, int radix) throws NumberFormatException {
-        return Integer.parseInt(s, beginIndex, endIndex, radix);
-    }
-
     public static int parseInt(String s) throws NumberFormatException {
         return Integer.parseInt(s);
     }
 
     public static int parseUnsignedInt(String s, int radix) throws NumberFormatException {
         return Integer.parseUnsignedInt(s, radix);
-    }
-
-    public static int parseUnsignedInt(CharSequence s, int beginIndex, int endIndex, int radix) throws NumberFormatException {
-        return Integer.parseUnsignedInt(s, beginIndex, endIndex, radix);
     }
 
     public static int parseUnsignedInt(String s) throws NumberFormatException {

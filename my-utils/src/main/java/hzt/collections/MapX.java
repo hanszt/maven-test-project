@@ -3,6 +3,7 @@ package hzt.collections;
 import hzt.function.It;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -57,7 +58,20 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
     }
 
     default <R> MutableListX<R> valuesToMutableListOf(Function<V, R> mapper) {
-        return IterableX.of(valueIterable(this::iterator)).toMutableListOf(mapper);
+        return IterableX.of(() -> {
+            Iterator<Map.Entry<K, V>> iterator = iterator();
+            return new Iterator<V>() {
+                @Override
+                public boolean hasNext() {
+                    return iterator.hasNext();
+                }
+
+                @Override
+                public V next() {
+                    return iterator.next().getValue();
+                }
+            };
+        }).toMutableListOf(mapper);
     }
 
     default <R> ListX<R> valuesToListXOf(Function<V, R> mapper) {
@@ -65,7 +79,7 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
     }
 
     default <R> List<R> valuesToListOf(Function<V, R> mapper) {
-        return List.copyOf(valuesToMutableListOf(mapper));
+        return Collections.unmodifiableList(valuesToMutableListOf(mapper));
     }
 
     default <R> SetX<R> toSetOf(BiFunction<K, V, R> mapper) {
@@ -73,11 +87,37 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
     }
 
     default <R> SetX<R> keysToSetOf(Function<K, R> mapper) {
-        return IterableX.of(keyIterable(this::iterator)).toSetXOf(mapper);
+        return IterableX.of(() -> {
+            Iterator<Map.Entry<K, V>> iterator = ((Supplier<Iterator<Map.Entry<K, V>>>) this::iterator).get();
+            return new Iterator<K>() {
+                @Override
+                public boolean hasNext() {
+                    return iterator.hasNext();
+                }
+
+                @Override
+                public K next() {
+                    return iterator.next().getKey();
+                }
+            };
+        }).toSetXOf(mapper);
     }
 
     default <R> SetX<R> valuesToSetOf(Function<V, R> mapper) {
-        return IterableX.of(valueIterable(this::iterator)).toSetXOf(mapper);
+        return IterableX.of(() -> {
+            Iterator<Map.Entry<K, V>> iterator = ((Supplier<Iterator<Map.Entry<K, V>>>) this::iterator).get();
+            return new Iterator<V>() {
+                @Override
+                public boolean hasNext() {
+                    return iterator.hasNext();
+                }
+
+                @Override
+                public V next() {
+                    return iterator.next().getValue();
+                }
+            };
+        }).toSetXOf(mapper);
     }
 
     default <R> IterableX<R> toIterXOf(BiFunction<K, V, R> mapper) {
@@ -97,13 +137,26 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
     }
 
     default <R, C extends Collection<R>> C valuesTo(Supplier<C> collectionFactory, Function<V, R> mapper) {
-        return IterableX.of(valueIterable(this::iterator)).mapTo(collectionFactory, mapper);
+        return IterableX.of(() -> {
+            Iterator<Map.Entry<K, V>> iterator = ((Supplier<Iterator<Map.Entry<K, V>>>) this::iterator).get();
+            return new Iterator<V>() {
+                @Override
+                public boolean hasNext() {
+                    return iterator.hasNext();
+                }
+
+                @Override
+                public V next() {
+                    return iterator.next().getValue();
+                }
+            };
+        }).mapTo(collectionFactory, mapper);
     }
 
     default <R, C extends Collection<R>> C flatMapTo(Supplier<C> collectionFactory, Function<Map.Entry<K, V>, C> mapper) {
         C destination = collectionFactory.get();
-        for (var e : this) {
-            var collection = mapper.apply(e);
+        for (Map.Entry<K, V> e : this) {
+            C collection = mapper.apply(e);
             destination.addAll(collection);
         }
         return destination;
@@ -111,8 +164,21 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
 
     default <R, C extends Collection<R>> C flatMapValuesTo(Supplier<C> collectionFactory, Function<V, C> mapper) {
         C destination = collectionFactory.get();
-        for (var e : valueIterable(this::iterator)) {
-            var collection = mapper.apply(e);
+        for (V e : (Iterable<V>) () -> {
+            Iterator<Map.Entry<K, V>> iterator = iterator();
+            return new Iterator<V>() {
+                @Override
+                public boolean hasNext() {
+                    return iterator.hasNext();
+                }
+
+                @Override
+                public V next() {
+                    return iterator.next().getValue();
+                }
+            };
+        }) {
+            C collection = mapper.apply(e);
             destination.addAll(collection);
         }
         return destination;
@@ -120,8 +186,21 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
 
     default <R, C extends Collection<R>> C flatMapKeysTo(Supplier<C> collectionFactory, Function<K, C> mapper) {
         C destination = collectionFactory.get();
-        for (var e : keyIterable(this::iterator)) {
-            var collection = mapper.apply(e);
+        for (K e : (Iterable<K>) () -> {
+            Iterator<Map.Entry<K, V>> iterator = iterator();
+            return new Iterator<K>() {
+                @Override
+                public boolean hasNext() {
+                    return iterator.hasNext();
+                }
+
+                @Override
+                public K next() {
+                    return iterator.next().getKey();
+                }
+            };
+        }) {
+            C collection = mapper.apply(e);
             destination.addAll(collection);
         }
         return destination;
@@ -129,9 +208,9 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
 
     default <R, C extends Collection<R>> MapX<K, R> flatMapValues(Function<V, C> mapper) {
         Map<K, R> resultMap = new HashMap<>();
-        for (var e : this) {
-            var collection = mapper.apply(e.getValue());
-            for (var v : collection) {
+        for (Map.Entry<K, V> e : this) {
+            C collection = mapper.apply(e.getValue());
+            for (R v : collection) {
                 resultMap.put(e.getKey(), v);
             }
         }
@@ -156,40 +235,6 @@ public interface MapX<K, V> extends IterableX<Map.Entry<K, V>> {
 
     default  <R> List<R> flatMapValuesToListOf(Function<V, Collection<R>> mapper) {
         return flatMapValuesToMutableListOf(mapper);
-    }
-
-    private Iterable<V> valueIterable(Supplier<Iterator<Map.Entry<K, V>>> iteratorFactory) {
-        return () -> valueIterator(iteratorFactory.get());
-    }
-
-    private Iterator<V> valueIterator(Iterator<Map.Entry<K, V>> iterator) {
-        return new Iterator<>() {
-            @Override
-            public boolean hasNext() {
-                return iterator.hasNext();
-            }
-            @Override
-            public V next() {
-                return iterator.next().getValue();
-            }
-        };
-    }
-
-    private Iterable<K> keyIterable(Supplier<Iterator<Map.Entry<K, V>>> iteratorFactory) {
-        return () -> keyIterator(iteratorFactory.get());
-    }
-
-    private Iterator<K> keyIterator(Iterator<Map.Entry<K, V>> iterator) {
-        return new Iterator<>() {
-            @Override
-            public boolean hasNext() {
-                return iterator.hasNext();
-            }
-            @Override
-            public K next() {
-                return iterator.next().getKey();
-            }
-        };
     }
 
     int size();

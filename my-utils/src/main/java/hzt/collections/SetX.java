@@ -19,7 +19,7 @@ public interface SetX<E> extends CollectionView<E> {
 
     @SafeVarargs
     static <E> SetX<E> of(E... values) {
-        var resultSet = MutableSetX.of(values);
+        MutableSetX<E> resultSet = MutableSetX.of(values);
         resultSet.addAll(Arrays.asList(values));
         return resultSet;
     }

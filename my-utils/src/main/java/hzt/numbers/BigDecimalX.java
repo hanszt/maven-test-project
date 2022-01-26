@@ -89,10 +89,6 @@ public final class BigDecimalX extends Number implements NumberX {
         return bigDecimal.divideAndRemainder(divisor, mc);
     }
 
-    public BigDecimal sqrt(MathContext mc) {
-        return bigDecimal.sqrt(mc);
-    }
-
     public BigDecimal pow(int n) {
         return bigDecimal.pow(n);
     }

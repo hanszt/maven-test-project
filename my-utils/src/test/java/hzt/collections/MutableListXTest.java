@@ -5,6 +5,8 @@ import test.Generator;
 import test.model.PaintingAuction;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -15,31 +17,31 @@ class MutableListXTest {
 
     @Test
     void testMutableListX() {
-        final var museums = Generator.createAuctions().toMutableList();
+        final MutableListX<PaintingAuction> museums = Generator.createAuctions().toMutableList();
 
-        final var expected = museums.stream()
+        final List<LocalDate> expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var dates = museums.mapNotNull(PaintingAuction::getDateOfOpening);
+        final IterableX<LocalDate> dates = museums.mapNotNull(PaintingAuction::getDateOfOpening);
 
         assertIterableEquals(expected, dates);
     }
 
     @Test
     void testListWithAll() {
-        final var museums = Generator.createAuctions().toMutableList();
+        final MutableListX<PaintingAuction> museums = Generator.createAuctions().toMutableList();
 
-        final var expected = museums.stream()
+        final List<LocalDate> expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)
                 .collect(Collectors.toList());
-        expected.add(LocalDate.EPOCH);
+        expected.add(LocalDate.MIN);
         expected.add(LocalDate.MAX);
 
-        final var dates = museums
+        final ListX<LocalDate> dates = museums
                 .map(PaintingAuction::getDateOfOpening)
-                .plus(ListX.of(LocalDate.EPOCH, LocalDate.MAX));
+                .plus(ListX.of(LocalDate.MIN, LocalDate.MAX));
 
         System.out.println("dates = " + dates);
 
@@ -48,14 +50,14 @@ class MutableListXTest {
 
     @Test
     void testAlso() {
-        final var museums = Generator.createAuctions().toMutableList();
+        final MutableListX<PaintingAuction> museums = Generator.createAuctions().toMutableList();
 
-        final var expected = museums.stream()
+        final List<LocalDate> expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)
                 .collect(Collectors.toList());
         expected.add(LocalDate.MIN);
 
-        final var dates = museums
+        final MutableListX<LocalDate> dates = museums
                 .map(PaintingAuction::getDateOfOpening)
                 .also(localDates -> localDates.add(LocalDate.MIN));
 
@@ -66,9 +68,9 @@ class MutableListXTest {
 
     @Test
     void testWhen() {
-        final var museums = Generator.createAuctions().toMutableList();
+        final MutableListX<PaintingAuction> museums = Generator.createAuctions().toMutableList();
 
-        final var expected = museums.stream()
+        final List<LocalDate> expected = museums.stream()
                 .map(PaintingAuction::getDateOfOpening)
                 .collect(Collectors.toList());
 
@@ -78,12 +80,12 @@ class MutableListXTest {
             expected.remove(0);
         }
 
-        final var dates = museums
+        final MutableListX<LocalDate> dates = museums
                 .map(PaintingAuction::getDateOfOpening)
                 .when(ListX::isNotEmpty, list -> list.remove(0))
                 .when(list -> list.size() > 3, list -> list.add(LocalDate.MIN))
                 .takeIf(ListX::isNotEmpty)
-                .orElseThrow();
+                .orElseThrow(NoSuchElementException::new);
 
         System.out.println("dates = " + dates);
 

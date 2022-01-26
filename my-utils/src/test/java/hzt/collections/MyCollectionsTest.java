@@ -7,7 +7,11 @@ import org.hzt.test.model.Painter;
 import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,31 +23,31 @@ class MyCollectionsTest {
 
     @Test
     void testIntersect() {
-        final var collections = List.of(List.of(1, 2, 3, 4, 5, 7), Set.of(2, 4, 5), Set.of(4, 5, 6));
-        final var intersect = MyCollections.intersect(collections);
+        final List<Collection<Integer>> collections = Arrays.asList(Arrays.asList(1, 2, 3, 4, 5, 7), Arrays.asList(2, 4, 5), Arrays.asList(4, 5, 6));
+        final Set<Integer> intersect = MyCollections.intersect(collections);
 
-        assertEquals(Set.of(4, 5), intersect);
+        assertEquals(new HashSet<>(Arrays.asList(4, 5)), intersect);
     }
 
     @Test
     void testCollect() {
-        var list = TestSampleGenerator.createPaintingList();
-        final var expected = list.stream().collect(Collectors.groupingBy(Painting::painter));
-        final var actual = MyCollections.collect(list, Collectors.groupingBy(Painting::painter));
+        List<Painting> list = TestSampleGenerator.createPaintingList();
+        final Map<Painter, List<Painting>> expected = list.stream().collect(Collectors.groupingBy(Painting::painter));
+        final Map<Painter, List<Painting>> actual = MyCollections.collect(list, Collectors.groupingBy(Painting::painter));
 
         assertEquals(expected, actual);
     }
 
     @Test
     void testPipelineIterables() {
-        var paintings = TestSampleGenerator.createPaintingList();
-        final var painterList = MyCollections.filter(
+        List<Painting> paintings = TestSampleGenerator.createPaintingList();
+        final List<Painter> painterList = MyCollections.filter(
                 MyCollections.map(paintings, Painting::painter), painter -> painter.getFirstName().startsWith("V"));
 
-        final var painters = paintings.stream()
+        final List<Painter> painters = paintings.stream()
                 .map(Painting::painter)
                 .filter(painter -> painter.getFirstName().startsWith("V"))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         painters.forEach(System.out::println);
 
@@ -52,20 +56,20 @@ class MyCollectionsTest {
 
     @Test
     void testIterableFilterMapWithLinesMatch() {
-        var museumList = TestSampleGenerator.getMuseumListContainingNulls();
-        final var painterNamesActual = MyCollections.distinct(MyCollections.filter(MyCollections.map(MyCollections.flatMap(MyCollections.map(museumList,
+        List<Museum> museumList = TestSampleGenerator.getMuseumListContainingNulls();
+        final List<String> painterNamesActual = MyCollections.distinct(MyCollections.filter(MyCollections.map(MyCollections.flatMap(MyCollections.map(museumList,
                                 Museum::getPaintings),
                                 Painting::painter),
                         Painter::getFirstName),
                 name -> name.length() > 3));
 
-        final var painterNamesExpected = museumList.stream()
+        final List<String> painterNamesExpected = museumList.stream()
                 .flatMap(museum -> museum.getPaintings().stream())
                 .map(Painting::painter)
                 .map(Painter::getFirstName)
                 .filter(name -> name.length() > 3)
                 .distinct()
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         painterNamesActual.forEach(System.out::println);
 

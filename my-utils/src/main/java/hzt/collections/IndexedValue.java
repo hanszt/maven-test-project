@@ -21,9 +21,13 @@ public final class IndexedValue<T> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (IndexedValue) obj;
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        IndexedValue<T> that = (IndexedValue<T>) obj;
         return this.index == that.index &&
                 Objects.equals(this.value, that.value);
     }

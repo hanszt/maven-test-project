@@ -16,7 +16,7 @@ public class IOCloser implements Closeable {
 
     @Override
     public void close() throws IOException {
-        var ioException = new IOException("Could not close all");
+        IOException ioException = new IOException("Could not close all");
         for (Closeable closeable : autoCloseables) {
             try {
                 closeable.close();

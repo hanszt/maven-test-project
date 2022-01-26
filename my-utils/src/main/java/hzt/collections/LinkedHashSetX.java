@@ -28,14 +28,14 @@ final class LinkedHashSetX<E> implements MutableLinkedSetX<E> {
     }
 
     LinkedHashSetX(Iterable<E> iterable) {
-        var newSet = new LinkedHashSet<E>();
+        Set<E> newSet = new LinkedHashSet<>();
         iterable.forEach(newSet::add);
         this.set = newSet;
     }
 
     @SafeVarargs
     LinkedHashSetX(E first, E @NotNull ... others) {
-        var newSet = new LinkedHashSet<E>();
+        Set<E> newSet = new LinkedHashSet<>();
         newSet.add(first);
         Collections.addAll(newSet, others);
         this.set = newSet;

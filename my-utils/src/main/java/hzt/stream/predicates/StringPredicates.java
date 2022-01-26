@@ -42,7 +42,7 @@ public final class StringPredicates {
 
     public static <T> Predicate<T> contains(String string, Function<T, String> toStringMapper) {
         return t -> {
-            final var mappedString = toStringMapper.apply(t);
+            final String mappedString = toStringMapper.apply(t);
             return mappedString != null && mappedString.contains(string);
         };
     }
@@ -52,7 +52,7 @@ public final class StringPredicates {
     }
 
     public static Predicate<String> containsAllOf(Collection<String> strings) {
-        return containsAllOf(strings.toArray(String[]::new));
+        return containsAllOf(strings.toArray(new String[0]));
     }
 
     public static Predicate<String> containsAnyOf(String... strings) {
@@ -60,7 +60,7 @@ public final class StringPredicates {
     }
 
     public static Predicate<String> containsAnyOf(Collection<String> strings) {
-        return containsAnyOf(strings.toArray(String[]::new));
+        return containsAnyOf(strings.toArray(new String[0]));
     }
 
     public static Predicate<String> containsNoneOf(String... strings) {
@@ -68,7 +68,7 @@ public final class StringPredicates {
     }
 
     public static Predicate<String> containsNoneOf(Collection<String> strings) {
-        return containsNoneOf(strings.toArray(String[]::new));
+        return containsNoneOf(strings.toArray(new String[0]));
     }
 
     public static Predicate<String> doesntContain(String other) {

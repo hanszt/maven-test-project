@@ -142,7 +142,7 @@ public final class StreamUtils {
      * List<Book> filteredBookList = books.stream()
      *          .filter(by(Book::getAuthor, contains("first")
      *          .or(startsWith("j"))))
-     *          .collect(Collectors.toUnmodifiableList());
+     *          .collect(Collectors.toList());
      * }</pre>
      * It can help clean up code
      */
@@ -196,7 +196,7 @@ public final class StreamUtils {
      *                                         .filter((by(Painting::isFromPicasso)
      *                                               .or(Painting::isFromRembrandt))
      *                                               .and(Painting::isInMuseum)))
-     *                                         .collect(Collectors.toUnmodifiableList());
+     *                                         .collect(Collectors.toList());
      *                              }</pre>
      * @see java.util.function.Predicate#and(Predicate)
      * @see java.util.function.Predicate#or(Predicate)
@@ -249,7 +249,7 @@ public final class StreamUtils {
     public static <T, R> BiConsumer<T, Consumer<R>> iterableNullSafeBy(Function<? super T, ? extends Iterable<R>> toIterableMapper) {
         Objects.requireNonNull(toIterableMapper);
         return (t, consumer) -> {
-            var iterable = t != null ? toIterableMapper.apply(t) : null;
+            Iterable<R> iterable = t != null ? toIterableMapper.apply(t) : null;
             if (iterable != null) {
                 iterable.forEach(consumer);
             }
@@ -258,7 +258,7 @@ public final class StreamUtils {
 
     public static <T, R> Function<T, Stream<R>> nullSafe(Function<? super T, ? extends R> mapper) {
         Objects.requireNonNull(mapper);
-        return t -> Stream.ofNullable(t != null ? mapper.apply(t) : null);
+        return t -> t != null ? Stream.of(mapper.apply(t)) : Stream.empty();
     }
 
     public static <T, U, R> Function<T, Stream<R>> nullSafe(
@@ -269,7 +269,7 @@ public final class StreamUtils {
         return t -> {
             final U u = t != null ? toUMapper.apply(t) : null;
             final R r = u != null ? toRMapper.apply(u) : null;
-            return Stream.ofNullable(r);
+            return r != null ? Stream.of(r) : Stream.empty();
         };
     }
 
@@ -284,7 +284,7 @@ public final class StreamUtils {
             final U u = t != null ? toUMapper.apply(t) : null;
             final V v = u != null ? toVMapper.apply(u) : null;
             final R r = v != null ? toRMapper.apply(v) : null;
-            return Stream.ofNullable(r);
+            return r != null ? Stream.of(r) : Stream.empty();
         };
     }
 
@@ -302,7 +302,7 @@ public final class StreamUtils {
             final V v = u != null ? toVMapper.apply(u) : null;
             final W w = v != null ? toWMapper.apply(v) : null;
             final R r = w != null ? toRMapper.apply(w) : null;
-            return Stream.ofNullable(r);
+            return r != null ? Stream.of(r) : Stream.empty();
         };
     }
 
@@ -367,7 +367,7 @@ public final class StreamUtils {
      *                               List<LocalDate> datesOfBirth = paintings.stream()
      *                                         .map(by(Painting::getPainter)
      *                                         .andThen(Painter::getDateOfBirth)))
-     *                                         .collect(Collectors.toUnmodifiableList());
+     *                                         .collect(Collectors.toList());
      *                              }</pre>
      * @see java.util.function.Function#andThen(Function)
      * @see java.util.function.Function#compose(Function)
@@ -390,7 +390,7 @@ public final class StreamUtils {
      *                               List<LocalDate> datesOfBirth = paintings.stream()
      *                                         .map(by(Painting::getPainter)
      *                                         .andThen(Painter::getDateOfBirth)))
-     *                                         .collect(Collectors.toUnmodifiableList());
+     *                                         .collect(Collectors.toList());
      *                              }</pre>
      * @see java.util.function.Function#andThen(Function)
      * @see java.util.function.Function#compose(Function)
@@ -403,17 +403,6 @@ public final class StreamUtils {
     public static <T> Consumer<T> first(Consumer<T> consumer) {
         Objects.requireNonNull(consumer);
         return consumer;
-    }
-
-    //shared mutability?
-    public static <T, U, R> Stream<R> combineToStream(
-            Iterable<? extends T> iterable1,
-            Iterable<? extends U> iterable2,
-            BiFunction<? super T, ? super U, ? extends R> combiner) {
-        final var iterator1 = iterable1.iterator();
-        final var iterator2 = iterable2.iterator();
-        return Stream.iterate(0, i -> iterator1.hasNext() && iterator2.hasNext(), identity())
-                .map(i -> combiner.apply(iterator1.next(), iterator2.next()));
     }
 
     public static <T> Stream<T> streamOf(Iterable<T> iterable) {

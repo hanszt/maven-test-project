@@ -24,7 +24,6 @@ import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collector;
@@ -50,45 +49,8 @@ public final class CollectorsX {
                 downstream.finisher(),
                 downstream.characteristics());
     }
-
-    public static <K, V> Collector<Map.Entry<K, V>, ?, Map<K, V>> toUnmodifiableMap() {
-        return Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue);
-    }
-
     public static <K, V> Collector<Map.Entry<K, V>, ?, Map<K, V>> toMap() {
         return Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue);
-    }
-
-    public static <T> Collector<T, ?, List<T>> filteringToList(Predicate<? super T> predicate) {
-        return Collectors.filtering(predicate, Collectors.toUnmodifiableList());
-    }
-
-    public static <T, R> Collector<T, ?, List<R>> mappingToList(Function<? super T, ? extends R> mapper) {
-        return Collectors.mapping(mapper, Collectors.toUnmodifiableList());
-    }
-
-    public static <T, R> Collector<T, ?, List<R>> multiMappingToList(BiConsumer<? super T, ? super Consumer<R>> mapper) {
-        return multiMapping(mapper, Collectors.toUnmodifiableList());
-    }
-
-    public static <T, R> Collector<T, ?, List<R>> flatMappingToList(Function<? super T, ? extends Stream<? extends R>> mapper) {
-        return Collectors.flatMapping(mapper, Collectors.toUnmodifiableList());
-    }
-
-    public static <T> Collector<T, ?, Set<T>> filteringToSet(Predicate<? super T> predicate) {
-        return Collectors.filtering(predicate, Collectors.toUnmodifiableSet());
-    }
-
-    public static <T, R> Collector<T, ?, Set<R>> mappingToSet(Function<? super T, ? extends R> mapper) {
-        return Collectors.mapping(mapper, Collectors.toUnmodifiableSet());
-    }
-
-    public static <T, R> Collector<T, ?, Set<R>> multiMappingToSet(BiConsumer<? super T, ? super Consumer<R>> mapper) {
-        return multiMapping(mapper, Collectors.toUnmodifiableSet());
-    }
-
-    public static <T, R> Collector<T, ?, Set<R>> flatMappingToSet(Function<? super T, ? extends Stream<? extends R>> mapper) {
-        return Collectors.flatMapping(mapper, Collectors.toUnmodifiableSet());
     }
 
     public static <T, A, K> Collector<T, ?, Map<K, List<T>>> groupingBy(Function<? super T, ? extends A> classifierPart1,
@@ -119,12 +81,12 @@ public final class CollectorsX {
     }
 
     public static <T, K, V> Collector<T, ?, MapX<K, V>> toMapX(Function<T, K> keyMapper, Function<T, V> valueMapper) {
-        return Collectors.collectingAndThen(Collectors.toUnmodifiableMap(keyMapper, valueMapper), MapX::of);
+        return Collectors.collectingAndThen(Collectors.toMap(keyMapper, valueMapper), MapX::of);
     }
 
     public static <T, K, V> Collector<T, ?, MapX<K, V>> toMapX(
             Function<T, K> keyMapper, Function<T, V> valueMapper, BinaryOperator<V> mergeFunction) {
-        return Collectors.collectingAndThen(Collectors.toUnmodifiableMap(keyMapper, valueMapper, mergeFunction), MapX::of);
+        return Collectors.collectingAndThen(Collectors.toMap(keyMapper, valueMapper, mergeFunction), MapX::of);
     }
 
     private static <K, V> Map<K, V> accumulateMap(Map<K, V> left, Map<K, V> right) {
@@ -618,7 +580,7 @@ public final class CollectorsX {
             void accept(S collection) {
                 final Set<? extends R> set = collection.stream()
                         .map(toTestValMapper)
-                        .collect(Collectors.toUnmodifiableSet());
+                        .collect(Collectors.toSet());
                 if (result == null) {
                     result = new HashSet<>(set);
                 } else {

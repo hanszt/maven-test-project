@@ -22,7 +22,7 @@ public interface ObjectX<T> extends Supplier<T> {
     }
 
     default T also(Consumer<T> block) {
-        final var t = get();
+        final T t = get();
         block.accept(t);
         return t;
     }

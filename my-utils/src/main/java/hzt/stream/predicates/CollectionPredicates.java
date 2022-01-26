@@ -2,8 +2,8 @@ package hzt.stream.predicates;
 
 import hzt.stream.StreamUtils;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Predicate;
 
 public final class CollectionPredicates {
@@ -22,7 +22,7 @@ public final class CollectionPredicates {
 
     @SafeVarargs
     public static <E> Predicate<Collection<E>> containsAll(E... values) {
-        return containsAll(List.of(values));
+        return containsAll(Arrays.asList(values));
     }
 
     public static <E> Predicate<Collection<E>> containsAny(Iterable<E> other) {
@@ -32,7 +32,7 @@ public final class CollectionPredicates {
 
     @SafeVarargs
     public static <E> Predicate<Collection<E>> containsAny(E... values) {
-        return containsAny(List.of(values));
+        return containsAny(Arrays.asList(values));
     }
 
     public static <E> Predicate<Collection<E>> containsNone(Iterable<E> other) {
@@ -42,6 +42,6 @@ public final class CollectionPredicates {
 
     @SafeVarargs
     public static <E> Predicate<Collection<E>> containsNone(E... values) {
-        return containsNone(List.of(values));
+        return containsNone(Arrays.asList(values));
     }
 }

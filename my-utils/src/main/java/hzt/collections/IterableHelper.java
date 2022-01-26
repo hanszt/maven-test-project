@@ -13,13 +13,13 @@ final class IterableHelper {
             int size, IntFunction<T> midValExtractor, int fromIndex, int toIndex, ToIntFunction<T> comparison) {
         rangeCheck(size, fromIndex, toIndex);
 
-        var low = fromIndex;
-        var high = toIndex - 1;
+        int low = fromIndex;
+        int high = toIndex - 1;
 
         while (low <= high) {
-            final var mid = (low + high) >>> 1;
-            final var midVal = midValExtractor.apply(mid);
-            final var cmp = comparison.applyAsInt(midVal);
+            final int mid = (low + high) >>> 1;
+            final T midVal = midValExtractor.apply(mid);
+            final int cmp = comparison.applyAsInt(midVal);
 
             if (cmp < 0) {
                 low = mid + 1;
@@ -36,13 +36,13 @@ final class IterableHelper {
             int size, IntUnaryOperator midValExtractor, int fromIndex, int toIndex, IntUnaryOperator comparison) {
         rangeCheck(size, fromIndex, toIndex);
 
-        var low = fromIndex;
-        var high = toIndex - 1;
+        int low = fromIndex;
+        int high = toIndex - 1;
 
         while (low <= high) {
-            final var mid = (low + high) >>> 1;
-            final var midVal = midValExtractor.applyAsInt(mid);
-            final var cmp = comparison.applyAsInt(midVal);
+            final int mid = (low + high) >>> 1;
+            final int midVal = midValExtractor.applyAsInt(mid);
+            final int cmp = comparison.applyAsInt(midVal);
 
             if (cmp < 0) {
                 low = mid + 1;

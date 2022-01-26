@@ -17,7 +17,7 @@ public final class MyObjects {
     }
 
     public static void requireAllNonNull(Object... objects) {
-        var exception = new IllegalArgumentException("Some objects where null");
+        RuntimeException exception = new IllegalArgumentException("Some objects where null");
         int counter = 1;
         for (Object object : objects) {
             if (object == null) {

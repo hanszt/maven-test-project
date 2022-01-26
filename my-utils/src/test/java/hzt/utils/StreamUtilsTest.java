@@ -9,8 +9,8 @@ import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
@@ -30,7 +30,6 @@ import static hzt.stream.predicates.StringPredicates.hasEqualLength;
 import static hzt.stream.predicates.StringPredicates.startsWith;
 import static java.util.Comparator.comparing;
 import static java.util.function.Predicate.isEqual;
-import static java.util.function.Predicate.not;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -46,7 +45,7 @@ class StreamUtilsTest {
     @Test
     void testHigherOrderFunctionCombinerAndComposerUsingColor() {
         //arrange
-        final var originalColor = new Color(123, 32, 21);
+        final Color originalColor = new Color(123, 32, 21);
 
         Function<Color, Color> combinedFilter = combine(
                 Color::brighter,
@@ -58,8 +57,8 @@ class StreamUtilsTest {
                 StreamUtilsTest::maxRed,
                 StreamUtilsTest::removeBlue);
         //act
-        final var colorByCombinedFilter = combinedFilter.apply(originalColor);
-        final var colorByComposedFilter = composedFilter.apply(originalColor);
+        final Color colorByCombinedFilter = combinedFilter.apply(originalColor);
+        final Color colorByComposedFilter = composedFilter.apply(originalColor);
 
         System.out.println("originalColor = " + originalColor);
         System.out.println("colorByCombinedFilter = " + colorByCombinedFilter);
@@ -75,7 +74,7 @@ class StreamUtilsTest {
     }
 
     private static Color maxRed(Color t) {
-        final var MAX_RGB = 255;
+        final int MAX_RGB = 255;
         return new Color(MAX_RGB, t.getGreen(), t.getBlue());
     }
 
@@ -85,9 +84,9 @@ class StreamUtilsTest {
 
     @Test
     void testCombinePredicateUsingOrEvaluatesToTrue() {
-        final var strings = new String[]{"hallo", "hoe", "gaat", "het", "met", "jou", "?"};
+        final String[] strings = new String[]{"hallo", "hoe", "gaat", "het", "met", "jou", "?"};
 
-        final var count = Stream.of(strings)
+        final long count = Stream.of(strings)
                 .filter(anyMatch(
                         contains("h"),
                         contains("e"),
@@ -124,14 +123,14 @@ class StreamUtilsTest {
 
     @Test
     void testCombinePredicateUsingAndEvaluatesToFalse() {
-        final var TEST = "Dit is één fout";
+        final String TEST = "Dit is één fout";
 
         final String anyString = Stream.of(TEST, "?!", "Dan ", "is", "'t", "prima")
                 .filter(allMatch(
                         startsWith("D"),
                         contains("s"),
                         contains("é"),
-                        not(contains("raar")),
+                        e -> !e.contains("raar"),
                         hasEqualLength(TEST.length())))
                 .findAny()
                 .orElse("");
@@ -142,47 +141,47 @@ class StreamUtilsTest {
 
     @Test
     void testCombineComparators() {
-        var bookList = TestSampleGenerator.createBookList();
+        List<Book> bookList = TestSampleGenerator.createBookList();
 
-        final var expected = bookList.stream()
+        final List<Book> expected = bookList.stream()
                 .sorted(comparing(Book::getCategory).reversed().thenComparing(Book::getTitle))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var actual = bookList.stream()
+        final List<Book> actual = bookList.stream()
                 .sorted(sequential(comparing(Book::getCategory).reversed(), comparing(Book::getTitle)))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         assertEquals(expected, actual);
     }
 
     @Test
     void testComparatorsThenComparing() {
-        var bookList = TestSampleGenerator.createBookList();
+        List<Book> bookList = TestSampleGenerator.createBookList();
 
-        final var expected = bookList.stream()
+        final List<Book> expected = bookList.stream()
                 .sorted(comparing(book -> book.getCategory() + book.getTitle()))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var actual = bookList.stream()
+        final List<Book> actual = bookList.stream()
                 .sorted(comparing(Book::getCategory).thenComparing(Book::getTitle))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         assertEquals(expected, actual);
     }
 
     @Test
     void testMappingBeforeFiltering() {
-        var books = TestSampleGenerator.createBookList();
-        final var E = "e";
-        final var A = "u";
+        List<Book> books = TestSampleGenerator.createBookList();
+        final String E = "e";
+        final String A = "u";
 
-        final var expected = books.stream()
+        final List<Book> expected = books.stream()
                 .filter(book -> !(book.getTitle().contains(E) || book.getTitle().contains(A)))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var filteredBookList = books.stream()
+        final List<Book> filteredBookList = books.stream()
                 .filter(by(Book::getTitle, containsNoneOf(E, A)))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         filteredBookList.forEach(System.out::println);
 
@@ -191,14 +190,14 @@ class StreamUtilsTest {
 
     @Test
     void testCompose() {
-        var books = TestSampleGenerator.createBookList();
+        List<Book> books = TestSampleGenerator.createBookList();
 
-        final var fieldListOfObjectClass = books.stream()
+        final List<Field> fieldListOfObjectClass = books.stream()
                 .map(function(Object::getClass)
                         .compose(Book::getCategory)
                         .andThen(Class::getDeclaredFields))
                 .flatMap(Arrays::stream)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         fieldListOfObjectClass.forEach(System.out::println);
 
@@ -207,11 +206,11 @@ class StreamUtilsTest {
 
     @Test
     void testChainingAPredicate() {
-        var books = TestSampleGenerator.createBookList();
+        List<Book> books = TestSampleGenerator.createBookList();
 
-        final var filteredBookList = books.stream()
+        final List<Book> filteredBookList = books.stream()
                 .filter(by(Book::hasCopies).or(Book::isAboutProgramming))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         filteredBookList.forEach(System.out::println);
 
@@ -220,15 +219,15 @@ class StreamUtilsTest {
 
     @Test
     void testChainingMultipleBy() {
-        var books = TestSampleGenerator.createBookList();
+        List<Book> books = TestSampleGenerator.createBookList();
 
-        final var expected = books.stream()
+        final List<Book> expected = books.stream()
                 .filter(book -> book.getTitle().startsWith("t") && book.getCategory().contains("2"))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var filteredBookList = books.stream()
+        final List<Book> filteredBookList = books.stream()
                 .filter(by(Book::getTitle, startsWith("t")).and(by(Book::getCategory, contains("2"))))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         filteredBookList.forEach(System.out::println);
 
@@ -240,25 +239,25 @@ class StreamUtilsTest {
         final BigDecimal bigDecimal = BigDecimal.valueOf(3);
         List<Number> numbers = Arrays.asList(3D, 3, 4F, 5.4, 6, bigDecimal, null);
 
-        final var actual = numbers.stream()
+        final List<Double> actual = numbers.stream()
                 .flatMap(castIfInstance(Double.class))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        assertEquals(List.of(3D, 5.4), actual);
+        assertEquals(Arrays.asList(3D, 5.4), actual);
     }
 
     @Test
     void testNumberCastIfInstanceUsingFlatMap() {
         List<Number> numbers = TestSampleGenerator.createRandomNumberTypeList(AMOUNT);
 
-        final var expected = numbers.stream()
+        final List<Double> expected = numbers.stream()
                 .filter(Double.class::isInstance)
                 .map(Double.class::cast)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var actual = numbers.stream()
+        final List<Double> actual = numbers.stream()
                 .flatMap(castIfInstance(Double.class))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         System.out.println("numbers.size() = " + numbers.size());
         System.out.println("actual.size() = " + actual.size());
@@ -267,45 +266,9 @@ class StreamUtilsTest {
     }
 
     @Test
-    void testBiFunctionChainingAndThenUseCaseCalculateDifferenceElementsAtSameIndexAndThenConvertToBigDecimal() {
-        //arrange
-        List<Double> list1 = Arrays.asList(1.0d, 2.1d, 3.3d, 5.3);
-        List<Double> list2 = Arrays.asList(0.1d, 0.2d, 4d);
-
-        final var expected = Stream.of(.9, 1.9, -.7)
-                .map(BigDecimal::valueOf)
-                .collect(Collectors.toUnmodifiableList());
-        //act
-        List<BigDecimal> result = StreamUtils.combineToStream(list1, list2, StreamUtilsTest::difference)
-                .map(BigDecimal::valueOf)
-                .map(bigDecimal -> bigDecimal.setScale(1, RoundingMode.HALF_UP))
-                .collect(Collectors.toUnmodifiableList());
-        //assert
-        assertEquals(expected, result);
-    }
-
-    @Test
-    void testComposedConsumer() {
-        //arrange
-        List<Double> list1 = Arrays.asList(1.0d, 2.1d, 3.3d, 5.3);
-        List<Double> list2 = Arrays.asList(0.1d, 0.2d, 4d);
-
-        final var expected = Stream.of(.9, 1.9, -.7)
-                .map(BigDecimal::valueOf)
-                .collect(Collectors.toUnmodifiableList());
-        //act
-        combineToStream(list1, list2, biFunction(StreamUtilsTest::difference)
-                .andThen(BigDecimal::valueOf))
-                .map(bigDecimal -> bigDecimal.setScale(1, RoundingMode.HALF_UP))
-                .forEach(first(System.out::println).andThen(System.out::println));
-        //assert
-        assertFalse(expected.isEmpty());
-    }
-
-    @Test
     void testMappedConsumer() {
         //arrange
-        final var bookList = TestSampleGenerator.createBookList();
+        final List<Book> bookList = TestSampleGenerator.createBookList();
         //act
         bookList.forEach(transformAndThen(Book::getCategory, System.out::println));
         //assert
@@ -314,38 +277,38 @@ class StreamUtilsTest {
 
     @Test
     void testNestedNonNullCheck() {
-        var listContainingNestedNulls = Arrays.asList(
+        List<Painting> listContainingNestedNulls = Arrays.asList(
                 new Painting("", null, null, false),
                 null);
 
-        final var paintingList = TestSampleGenerator.createPaintingList();
-        final var concatenatedList = Stream.concat(listContainingNestedNulls.stream(), paintingList.stream())
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
+        final List<Painting> concatenatedList = Stream.concat(listContainingNestedNulls.stream(), paintingList.stream())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         System.out.println("concatenatedList = " + concatenatedList);
 
-        final var paintings = concatenatedList.stream()
+        final List<Painting> paintings = concatenatedList.stream()
                 .filter(nonNull(Painting::painter))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         assertEquals(paintingList, paintings);
     }
 
     @Test
     void testNestedTwoLevelsDeepNonNullCheck() {
-        var listContainingNestedNulls = getPaintingListContainingNestedNulls();
+        List<Painting> listContainingNestedNulls = getPaintingListContainingNestedNulls();
 
-        final var paintingList = TestSampleGenerator.createPaintingList();
-        final var concatenatedList = Stream.concat(listContainingNestedNulls.stream(), paintingList.stream())
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
+        final List<Painting> concatenatedList = Stream.concat(listContainingNestedNulls.stream(), paintingList.stream())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         System.out.println("concatenatedList = " + concatenatedList);
 
-        final var containingNullsFilteredOutList = concatenatedList.stream()
+        final List<Painting> containingNullsFilteredOutList = concatenatedList.stream()
                 .filter(nonNull(Painting::painter, Painter::getDateOfBirth))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         assertEquals(paintingList, containingNullsFilteredOutList);
     }
@@ -358,55 +321,51 @@ class StreamUtilsTest {
                 null);
     }
 
-    private static double difference(double aDouble, double anotherDouble) {
-        return aDouble - anotherDouble;
-    }
-
     @Test
     void testNestedThreeLevelsDeepNonNullCheck() {
-        var paintingContainingNulls = new Painting("", new Painter("Hans", "Knipedol", null),
+        Painting paintingContainingNulls = new Painting("", new Painter("Hans", "Knipedol", null),
                 null, false);
 
-        var listContainingNestedNulls = Arrays.asList(
-                new Museum("", null, List.of(paintingContainingNulls)),
+        List<Museum> listContainingNestedNulls = Arrays.asList(
+                new Museum("", null, Arrays.asList(paintingContainingNulls)),
                 null);
 
-        final var expected = TestSampleGenerator.getMuseumListContainingNulls();
-        final var containingNulls = Stream.concat(listContainingNestedNulls.stream(), expected.stream())
+        final List<Museum> expected = TestSampleGenerator.getMuseumListContainingNulls();
+        final List<Museum> containingNulls = Stream.concat(listContainingNestedNulls.stream(), expected.stream())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         System.out.println("containingNulls = " + containingNulls);
 
-        final var actual = containingNulls.stream()
+        final List<Museum> actual = containingNulls.stream()
                 .filter(nonNull(Museum::getMostPopularPainting, Painting::painter, Painter::getDateOfBirth))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         assertEquals(expected, actual);
     }
 
     @Test
     void testMapTwoLevelsDeepNullSafe() {
-        final var paintingListContainingNestedNulls = getPaintingListContainingNestedNulls();
-        final var paintingList = TestSampleGenerator.createPaintingList();
+        final List<Painting> paintingListContainingNestedNulls = getPaintingListContainingNestedNulls();
+        final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
 
-        final var paintings = Stream.concat(paintingListContainingNestedNulls.stream(), paintingList.stream())
+        final List<Painting> paintings = Stream.concat(paintingListContainingNestedNulls.stream(), paintingList.stream())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         System.out.println("paintings = " + paintings);
 
-        final var expected = paintings.stream()
+        final List<LocalDate> expected = paintings.stream()
                 .filter(Objects::nonNull)
                 .map(Painting::painter)
                 .filter(Objects::nonNull)
                 .map(Painter::getDateOfBirth)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var painterDateOfBirthList = paintings.stream()
+        final List<LocalDate> painterDateOfBirthList = paintings.stream()
                 .flatMap(nullSafe(Painting::painter, Painter::getDateOfBirth))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         assertEquals(expected, painterDateOfBirthList);
     }
@@ -417,7 +376,7 @@ class StreamUtilsTest {
 
         System.out.println("concatenatedList = " + concatenatedMuseumList);
 
-        final var expected = concatenatedMuseumList.stream()
+        final List<DayOfWeek> expected = concatenatedMuseumList.stream()
                 .filter(Objects::nonNull)
                 .flatMap(museum -> museum.getPaintings().stream())
                 .filter(Objects::nonNull)
@@ -426,15 +385,15 @@ class StreamUtilsTest {
                 .map(Painter::getDateOfBirth)
                 .filter(Objects::nonNull)
                 .map(LocalDate::getDayOfWeek)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var listOfDayOfWeekBirthDateMostPopularPaintingPainters = concatenatedMuseumList.stream()
+        final List<DayOfWeek> listOfDayOfWeekBirthDateMostPopularPaintingPainters = concatenatedMuseumList.stream()
                 .flatMap(StreamUtils::streamOf)
                 .flatMap(nullSafe(
                         Painting::painter,
                         Painter::getDateOfBirth,
                         LocalDate::getDayOfWeek))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         System.out.println("listOfDayOfWeekBirthDateMostPopularPaintingPainters = " + listOfDayOfWeekBirthDateMostPopularPaintingPainters);
 
@@ -447,7 +406,7 @@ class StreamUtilsTest {
 
         System.out.println("concatenatedList = " + concatenatedMuseumList);
 
-        final var expected = concatenatedMuseumList.stream()
+        final List<DayOfWeek> expected = concatenatedMuseumList.stream()
                 .filter(Objects::nonNull)
                 .map(Museum::getMostPopularPainting)
                 .map(Painting::painter)
@@ -455,17 +414,17 @@ class StreamUtilsTest {
                 .map(Painter::getDateOfBirth)
                 .filter(Objects::nonNull)
                 .map(LocalDate::getDayOfWeek)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var actual = concatenatedMuseumList.stream()
+        final List<DayOfWeek> actual = concatenatedMuseumList.stream()
                 .flatMap(nullSafe(
                         Museum::getMostPopularPainting,
                         Painting::painter,
                         Painter::getDateOfBirth,
                         LocalDate::getDayOfWeek))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var expectedDaysOfWeek = List.of(
+        final List<DayOfWeek> expectedDaysOfWeek = Arrays.asList(
                 DayOfWeek.WEDNESDAY,
                 LocalDate.of(1632, Month.OCTOBER, 31).getDayOfWeek(),
                 LocalDate.of(1853, Month.MARCH, 20).getDayOfWeek(),
@@ -485,7 +444,7 @@ class StreamUtilsTest {
 
         System.out.println("concatenatedList = " + concatenatedMuseumList);
 
-        final var expected = concatenatedMuseumList.stream()
+        final List<DayOfWeek> expected = concatenatedMuseumList.stream()
                 .filter(Objects::nonNull)
                 .map(Museum::getMostPopularPainting)
                 .map(Painting::painter)
@@ -493,9 +452,9 @@ class StreamUtilsTest {
                 .map(Painter::getDateOfBirth)
                 .filter(Objects::nonNull)
                 .map(LocalDate::getDayOfWeek)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var expectedDaysOfWeek = List.of(
+        final List<DayOfWeek> expectedDaysOfWeek = Arrays.asList(
                 DayOfWeek.WEDNESDAY,
                 LocalDate.of(1632, Month.OCTOBER, 31).getDayOfWeek(),
                 LocalDate.of(1853, Month.MARCH, 20).getDayOfWeek(),
@@ -507,17 +466,17 @@ class StreamUtilsTest {
     }
 
     private List<Museum> getMuseumsContainingNulls() {
-        var paintingContainingNulls = new Painting("", new Painter("Hans", "Knipedol", null),
+        Painting paintingContainingNulls = new Painting("", new Painter("Hans", "Knipedol", null),
                 null, false);
 
-        var listContainingNestedNulls = Arrays.asList(
-                new Museum("", null, List.of(paintingContainingNulls)),
+        List<Museum> listContainingNestedNulls = Arrays.asList(
+                new Museum("", null, Arrays.asList(paintingContainingNulls)),
                 null);
 
-        final var museums = TestSampleGenerator.getMuseumListContainingNulls();
+        final List<Museum> museums = TestSampleGenerator.getMuseumListContainingNulls();
         return Stream.concat(listContainingNestedNulls.stream(), museums.stream())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
     }
 
     @Test
@@ -531,7 +490,7 @@ class StreamUtilsTest {
         final List<String> names = streamOf(hans)
                 .filter(by(Painting::yearOfCreation, isBefore(1995)))
                 .map(Painting::name)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         names.forEach(System.out::println);
 

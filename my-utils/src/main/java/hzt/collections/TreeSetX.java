@@ -33,14 +33,14 @@ final class TreeSetX<E, R extends Comparable<R>> implements NavigableSetX<E> {
     }
 
     TreeSetX(Iterable<E> iterable, Function<? super E, ? extends R> selector) {
-        var newSet = new TreeSet<E>(comparing(selector));
+        TreeSet<E> newSet = new TreeSet<E>(comparing(selector));
         iterable.forEach(newSet::add);
         this.navigableSet = newSet;
     }
 
     @SafeVarargs
     TreeSetX(Function<E, R> selector, E first, E @NotNull ... others) {
-        var newSet = new TreeSet<>(comparing(selector));
+        TreeSet<E> newSet = new TreeSet<>(comparing(selector));
         newSet.add(first);
         Collections.addAll(newSet, others);
         this.navigableSet = newSet;

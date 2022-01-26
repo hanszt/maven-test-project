@@ -10,7 +10,7 @@ public class AutoCloser implements AutoCloseable {
 
     @Override
     public void close() {
-        var exception = new IllegalStateException("Could not close all");
+        IllegalStateException exception = new IllegalStateException("Could not close all");
         for (AutoCloseable autoCloseable : autoCloseables) {
             try {
                 autoCloseable.close();

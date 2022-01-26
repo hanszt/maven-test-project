@@ -8,6 +8,7 @@ import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import static hzt.stream.StreamUtils.by;
@@ -29,14 +30,14 @@ class CollectionPredicatesTest {
         final Painter firstPainter = paintingList.stream()
                 .map(Painting::painter)
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(NoSuchElementException::new);
 
         firstPainter.forEach(System.out::println);
         System.out.println();
 
-        final var paintings = paintingList.stream()
+        final List<Painting> paintings = paintingList.stream()
                 .filter(by(Painting::painter, MyCollections::listOfIterable, containsAll(firstPainter)))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
         paintings.forEach(System.out::println);
 

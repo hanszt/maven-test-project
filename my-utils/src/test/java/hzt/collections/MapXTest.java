@@ -10,7 +10,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDate;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,13 +27,13 @@ class MapXTest {
 
     @Test
     void testInvertMap() {
-        final var museumMap = TestSampleGenerator.createMuseumMap();
+        final Map<String, Museum> museumMap = TestSampleGenerator.createMuseumMap();
 
-        final var expected = museumMap.entrySet().stream()
-                .map(e -> Map.entry(e.getValue(), e.getKey()))
-                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+        final Map<Museum, String> expected = museumMap.entrySet().stream()
+                .map(e -> new AbstractMap.SimpleEntry<>(e.getValue(), e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        final var actual = MapX.of(museumMap).toInvertedMap();
+        final MapX<Museum, String> actual = MapX.of(museumMap).toInvertedMap();
 
         System.out.println("actual = " + actual);
 
@@ -40,14 +42,14 @@ class MapXTest {
 
     @Test
     void testToIterXThanSum() {
-        final var museumMap = TestSampleGenerator.createMuseumMap();
+        final Map<String, Museum> museumMap = TestSampleGenerator.createMuseumMap();
 
-        final var expected = museumMap.values().stream()
+        final int expected = museumMap.values().stream()
                 .map(Museum::getDateOfOpening)
                 .mapToInt(LocalDate::getDayOfMonth)
                 .sum();
 
-        final var actual = MapX.of(museumMap)
+        final int actual = MapX.of(museumMap)
                 .valuesToIterX(Museum::getDateOfOpening)
                 .sumOfInts(LocalDate::getDayOfMonth);
 
@@ -61,7 +63,7 @@ class MapXTest {
         List<IndexedValue<Map.Entry<String, Museum>>> list = new ArrayList<>();
         BiConsumer<Integer, Map.Entry<String, Museum>> biConsumer = (index, value) -> list.add(new IndexedValue<>(index, value));
 
-        final var museumListContainingNulls = TestSampleGenerator.getMuseumListContainingNulls();
+        final List<Museum> museumListContainingNulls = TestSampleGenerator.getMuseumListContainingNulls();
 
         ListX.of(museumListContainingNulls).associateBy(Museum::getName).forEachIndexed(biConsumer);
 
@@ -72,13 +74,13 @@ class MapXTest {
 
     @Test
     void flatMapToListOf() {
-        final var museumMap = TestSampleGenerator.createMuseumMap();
+        final Map<String, Museum> museumMap = TestSampleGenerator.createMuseumMap();
 
-        final var expected = museumMap.entrySet().stream()
+        final List<Painting> expected = museumMap.entrySet().stream()
                 .flatMap(e -> e.getValue().getPaintings().stream())
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var actual = MapX.of(museumMap).flatMapValuesToListOf(Museum::getPaintings);
+        final List<Painting> actual = MapX.of(museumMap).flatMapValuesToListOf(Museum::getPaintings);
 
         System.out.println("actual = " + actual);
 
@@ -87,9 +89,9 @@ class MapXTest {
 
     @Test
     void testMapOfMapXSameAsInputMap() {
-        final var museumMap = TestSampleGenerator.createMuseumMap();
+        final Map<String, Museum> museumMap = TestSampleGenerator.createMuseumMap();
 
-        final var mapX = MapX.of(museumMap);
+        final MapX<String, Museum> mapX = MapX.of(museumMap);
         MapX.of(mapX).entrySet().forEach(System.out::println);
 
         System.out.println("mapX = " + mapX);
@@ -99,14 +101,14 @@ class MapXTest {
 
     @Test
     void testComputeIfAbsent() {
-        final var museumMap = ListX.of(TestSampleGenerator.createMuseumList())
+        final MutableMapX<String, Museum> museumMap = ListX.of(TestSampleGenerator.createMuseumList())
                 .associateBy(Museum::getName);
 
-        var expected = museumMap.get("Van Gogh Museum");
+        Museum expected = museumMap.get("Van Gogh Museum");
 
-        final var mapX = MutableMapX.of(museumMap);
+        final MutableMapX<String, Museum> mapX = MutableMapX.of(museumMap);
 
-        final var van_gogh = mapX.computeIfAbsent("Van Gogh Museum", key -> {
+        final Museum van_gogh = mapX.computeIfAbsent("Van Gogh Museum", key -> {
             throw new IllegalStateException();
         });
 
@@ -117,22 +119,22 @@ class MapXTest {
 
     @Test
     void testMapXToList() {
-        final var museumMapX = MapX.of(TestSampleGenerator.createMuseumMap());
+        final MapX<String, Museum> museumMapX = MapX.of(TestSampleGenerator.createMuseumMap());
 
-        final var pairs = museumMapX.toListXOf(Pair::ofEntry);
+        final ListX<Pair<String, Museum>> pairs = museumMapX.toListXOf(Pair::ofEntry);
 
-        assertEquals(Set.of("Picasso Museum", "Van Gogh Museum", "Vermeer Museum"), pairs.toSetXOf(Pair::first));
+        assertEquals(new HashSetX<>(Arrays.asList("Picasso Museum", "Van Gogh Museum", "Vermeer Museum")), pairs.toSetXOf(Pair::first));
     }
 
     @Test
     void testFlatMapToList() {
-        final var museumMapX = MapX.of(TestSampleGenerator.createMuseumMap());
+        final MapX<String, Museum> museumMapX = MapX.of(TestSampleGenerator.createMuseumMap());
 
-        final var pairs = museumMapX.flatMapToListXOf(e -> e.getValue().getPaintings());
+        final ListX<Painting> pairs = museumMapX.flatMapToListXOf(e -> e.getValue().getPaintings());
 
-        final var expected = "Meisje met de rode hoed";
+        final String expected = "Meisje met de rode hoed";
 
-        final var actual = ListX.of(pairs).maxOf(Painting::name);
+        final String actual = ListX.of(pairs).maxOf(Painting::name);
 
         assertEquals(expected, actual);
     }

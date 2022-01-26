@@ -23,7 +23,7 @@ public interface MutableMapX<K, V> extends Map<K, V>, MapX<K, V>, ObjectX<Mutabl
 
     @Override
     default <K1, V1> MutableMapX<K1, V1> map(Function<K, K1> keyMapper, Function<V, V1> valueMapper) {
-        var resultMap = MutableMapX.<K1, V1>empty();
+        MutableMapX<K1, V1> resultMap = MutableMapX.<K1, V1>empty();
         for (Map.Entry<K, V> entry : this) {
             K key = entry.getKey();
             if (key != null) {

@@ -1,5 +1,6 @@
 package hzt.strings;
 
+import hzt.collections.ListX;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -19,14 +20,14 @@ class StringXTest {
 
     @Test
     void testToStringX() {
-        final var hallo = "hallo";
+        final String hallo = "hallo";
 
-        final var expected = groupByChars(hallo)
+        final List<Integer> expected = groupByChars(hallo)
                 .values().stream()
                 .map(List::size)
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
 
-        final var characterCounts = StringX.of(hallo).group().valuesToListXOf(List::size);
+        final ListX<Integer> characterCounts = StringX.of(hallo).group().valuesToListXOf(List::size);
 
         System.out.println("hallo = " + characterCounts);
 
@@ -35,14 +36,14 @@ class StringXTest {
 
     @Test
     void testReplaceFirstChar() {
-        final var hallo = StringX.of("hallo")
+        final String hallo = StringX.of("hallo")
                 .replaceFirstChar(c -> 'H').toString();
         assertEquals("Hallo", hallo);
     }
 
     @Test
     void testStringXPlus() {
-        final var stringX = StringX.of("Hallo").plus("Raar");
+        final StringX stringX = StringX.of("Hallo").plus("Raar");
         assertEquals("HalloRaar", stringX.toString());
     }
 
@@ -53,9 +54,9 @@ class StringXTest {
             "Avida Dollars ->  Salvador Dali",
             "Altissimvm planetam tergeminvm observavi -> Salve vmbistinevm geminatvm Martia proles"})
     void testStringIsAnagram(String string) {
-        final var split = StringX.of(string).split(" -> ");
-        final var string1 = split.first();
-        final var string2 = split.last();
+        final ListX<String> split = StringX.of(string).split(" -> ");
+        final String string1 = split.first();
+        final String string2 = split.last();
 
         assertTrue(StringX.of(string1).isAnagramOf(string2));
         assertTrue(isAnagram(string1, string2));
@@ -68,19 +69,19 @@ class StringXTest {
             "Avida Dollars ->  Salvador Dalis",
             "Altissimum planetam tergeminum observavi -> Salve umbistineum geminatum Martia proles"})
     void testStringIsNotAnagram(String string) {
-        final var split = StringX.of(string).split(" -> ");
-        final var string1 = split.first();
-        final var string2 = split.last();
+        final ListX<String> split = StringX.of(string).split(" -> ");
+        final String string1 = split.first();
+        final String string2 = split.last();
 
         assertFalse(StringX.of(string1).isAnagramOf(string2));
         assertFalse(isAnagram(string1, string2));
     }
 
     private static boolean isAnagram(String s1, String s2) {
-        final var parsed1 = s1.trim().toLowerCase(Locale.ROOT).replace(" ", "");
-        final var parsed2 = s2.trim().toLowerCase(Locale.ROOT).replace(" ", "");
-        final var grouping1 = groupByChars(parsed1);
-        final var grouping2 = groupByChars(parsed2);
+        final String parsed1 = s1.trim().toLowerCase(Locale.ROOT).replace(" ", "");
+        final String parsed2 = s2.trim().toLowerCase(Locale.ROOT).replace(" ", "");
+        final Map<Character, List<Character>> grouping1 = groupByChars(parsed1);
+        final Map<Character, List<Character>> grouping2 = groupByChars(parsed2);
         return grouping1.equals(grouping2);
     }
 

@@ -35,15 +35,15 @@ public final class MyFileUtils {
                     .entrySet()
                     .stream()
                     .filter(by(Entry::getValue, collectionGreaterThan(1)))
-                    .collect(toUnmodifiableMap(Entry::getKey, Entry::getValue));
+                    .collect(toMap(Entry::getKey, Entry::getValue));
         } catch (IOException e) {
             throw new IllegalStateException(start + " not found...", e);
         }
     }
 
     public static String loadFileAsTrimmedString(Path path) {
-        try (var lines = Files.lines(path, StandardCharsets.ISO_8859_1)) {
-            return lines.map(String::strip)
+        try (Stream<String> lines = Files.lines(path, StandardCharsets.ISO_8859_1)) {
+            return lines.map(String::trim)
                     .collect(joining());
         } catch (IOException e) {
             throw new IllegalStateException(e);

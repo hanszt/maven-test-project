@@ -29,7 +29,7 @@ final class ArrayXImpl<E> implements ArrayX<E> {
     }
 
     private @NotNull Iterator<E> arrayIterator() {
-        return new Iterator<>() {
+        return new Iterator<E>() {
             private int index = 0;
             @Override
             public boolean hasNext() {
@@ -38,7 +38,7 @@ final class ArrayXImpl<E> implements ArrayX<E> {
 
             @Override
             public E next() {
-                var prevIndex = index;
+                int prevIndex = index;
                 if (prevIndex < 0 || prevIndex >= array.length) {
                     throw new NoSuchElementException("index out of bounds. (Index value: " + index + ")");
                 }

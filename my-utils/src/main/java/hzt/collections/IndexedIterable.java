@@ -17,7 +17,7 @@ public interface IndexedIterable<T> {
         Objects.requireNonNull(action);
         Iterator<IndexedValue<T>> iterator = indexedIterator();
         while (iterator.hasNext()) {
-            final var next = iterator.next();
+            final IndexedValue<T> next = iterator.next();
             action.accept(next);
         }
     }

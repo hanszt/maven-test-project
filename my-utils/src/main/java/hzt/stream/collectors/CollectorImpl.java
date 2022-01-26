@@ -51,9 +51,13 @@ final class CollectorImpl<T, A, R> implements Collector<T, A, R> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (CollectorImpl) obj;
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        CollectorImpl<T, A,R> that = (CollectorImpl<T, A, R>) obj;
         return Objects.equals(this.supplier, that.supplier) &&
                 Objects.equals(this.accumulator, that.accumulator) &&
                 Objects.equals(this.combiner, that.combiner) &&
