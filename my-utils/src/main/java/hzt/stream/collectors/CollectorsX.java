@@ -81,8 +81,13 @@ public final class CollectorsX {
                 downstream.finisher(),
                 downstream.characteristics());
     }
+
     public static <K, V> Collector<Map.Entry<K, V>, ?, Map<K, V>> toMap() {
         return Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue);
+    }
+
+    public static <K, V> Collector<Map.Entry<K, V>, ?, Map<K, V>> toUnModifiableMap() {
+        return toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue);
     }
 
     public static <T> Collector<T, ?, List<T>> filteringToList(Predicate<? super T> predicate) {
@@ -130,6 +135,7 @@ public final class CollectorsX {
         return Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet);
     }
 
+    @SuppressWarnings("all")
     public static <T, K, V> Collector<T, ?, Map<K, V>> toUnmodifiableMap(
             Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
         return Collectors.collectingAndThen(Collectors.toMap(keyMapper, valueMapper), Collections::unmodifiableMap);
