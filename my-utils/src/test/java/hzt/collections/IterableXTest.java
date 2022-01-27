@@ -131,6 +131,19 @@ class IterableXTest {
     }
 
     @Test
+    void testSortedIfOfComparableType() {
+        var list = MutableListX.of(1, 3, 5, 4, 2, 7, 214, 5, 8, 3, 4, 123);
+        final var sorted = list.sorted();
+        assertIterableEquals(ListX.of(1, 2, 3, 3, 4, 4, 5, 5, 7, 8, 123, 214), sorted);
+    }
+
+    @Test
+    void testSortedThrowsExceptionWhenNotOfComparableType() {
+        var bankAccountList = ListX.of(TestSampleGenerator.createSampleBankAccountList());
+        assertThrows(IllegalStateException.class, bankAccountList::sorted);
+    }
+
+    @Test
     void testMaxOf() {
         var bankAccountList = ListX.of(TestSampleGenerator.createSampleBankAccountList());
 
