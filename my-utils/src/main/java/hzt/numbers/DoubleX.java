@@ -1,11 +1,11 @@
 package hzt.numbers;
 
-import hzt.utils.ObjectX;
+import hzt.utils.Transformable;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
-public final class DoubleX extends Number implements NumberX, ObjectX<DoubleX> {
+public final class DoubleX extends Number implements NumberX, Transformable<DoubleX> {
 
     private final Double aDouble;
 

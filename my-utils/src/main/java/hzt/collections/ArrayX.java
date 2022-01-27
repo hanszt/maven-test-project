@@ -1,11 +1,11 @@
 package hzt.collections;
 
-import hzt.utils.ObjectX;
+import hzt.utils.Transformable;
 
 import java.util.function.IntFunction;
 import java.util.function.ToIntFunction;
 
-public sealed interface ArrayX<E> extends IterableX<E>, ObjectX<ArrayX<E>> permits ArrayXImpl {
+public sealed interface ArrayX<E> extends IterableX<E>, Transformable<ArrayX<E>> permits ArrayXImpl {
 
     @SafeVarargs
     static <E> ArrayX<E> of(E... values) {

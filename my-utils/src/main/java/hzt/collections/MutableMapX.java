@@ -1,13 +1,13 @@
 package hzt.collections;
 
 import hzt.function.It;
-import hzt.utils.ObjectX;
+import hzt.utils.Transformable;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public interface MutableMapX<K, V> extends Map<K, V>, MapX<K, V>, ObjectX<MutableMapX<K, V>> {
+public interface MutableMapX<K, V> extends Map<K, V>, MapX<K, V>, Transformable<MutableMapX<K, V>> {
 
     static <K, V> MutableMapX<K, V> of(Map<K, V> map) {
         return new HashMapX<>(map);

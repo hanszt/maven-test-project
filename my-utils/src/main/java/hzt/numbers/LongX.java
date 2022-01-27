@@ -1,12 +1,12 @@
 package hzt.numbers;
 
-import hzt.utils.ObjectX;
+import hzt.utils.Transformable;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.Optional;
 
-public final class LongX extends Number implements NumberX, ObjectX<LongX> {
+public final class LongX extends Number implements NumberX, Transformable<LongX> {
     
     private final Long aLong;
 
