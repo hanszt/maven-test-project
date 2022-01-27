@@ -62,7 +62,7 @@ final class ArrayXImpl<E> implements ArrayX<E> {
 
     @Override
     public int binarySearch(int fromIndex, int toIndex, ToIntFunction<E> comparison) {
-        return IterableHelper.binarySearch(array.length, i -> array[i], fromIndex, toIndex, comparison);
+        return IterableXHelper.binarySearch(array.length, i -> array[i], fromIndex, toIndex, comparison);
     }
 
     @Override

@@ -60,7 +60,7 @@ final class ArrayListX<T> implements MutableListX<T> {
 
     @Override
     public int binarySearch(int fromIndex, int toIndex, ToIntFunction<T> comparison) {
-        return IterableHelper.binarySearch(size(), list::get, fromIndex, toIndex, comparison);
+        return IterableXHelper.binarySearch(size(), list::get, fromIndex, toIndex, comparison);
     }
 
     @Override

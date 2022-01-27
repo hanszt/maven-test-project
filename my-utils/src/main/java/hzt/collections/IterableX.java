@@ -23,7 +23,6 @@ import java.util.ListIterator;
 import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.NavigableSet;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -35,7 +34,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
-import java.util.function.IntSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
@@ -44,12 +42,6 @@ import java.util.function.ToLongFunction;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import static hzt.collections.IterableXHelper.collectionSizeOrElse;
-import static hzt.collections.IterableXHelper.comparisonOf;
-import static hzt.collections.IterableXHelper.findLastIfInstanceOfList;
-import static hzt.collections.IterableXHelper.findLastIfUnknownIterable;
-import static hzt.collections.IterableXHelper.noValuePresentException;
 
 /**
  * This is an interface to transform smaller iterables including collections or arrays to some other state.
@@ -204,7 +196,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
     }
 
     default <R> ListX<R> mapMultiToListXOf(BiConsumer<? super T, ? super Consumer<R>> mapper) {
-        var list = MutableListX.<R>empty();
+        MutableListX<R> list = MutableListX.empty();
         for (T t : this) {
             mapper.accept(t, (Consumer<R>) list::add);
         }
@@ -608,17 +600,6 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         return NavigableMapX.of(entries, It::self);
     }
 
-    @NotNull
-    private static <T, R extends Comparable<R>> R asComparableOrThrow(T value) {
-        if (value instanceof Comparable) {
-            var c = (Comparable<?>) value;
-            //noinspection unchecked
-            return (R) c;
-        } else {
-            throw new IllegalStateException(value.getClass().getSimpleName() + " is not of a comparable type");
-        }
-    }
-
     default <K> MapX<K, T> toMapXAssociatedBy(@NotNull Function<T, K> keyMapper) {
         return toMutableMap(keyMapper, It::self);
     }
@@ -632,7 +613,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
     }
 
     default <R extends Comparable<R>> IterableX<T> sorted() {
-        return sortedBy((Function<T, R>) IterableX::asComparableOrThrow);
+        return sortedBy((Function<T, R>) IterableXHelper::asComparableOrThrow);
     }
 
     default Stream<T> stream() {
@@ -824,12 +805,14 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
 
     @NotNull
     default <R extends Comparable<R>> R minOf(@NotNull Function<T, R> selector) {
-        return comparisonOf(iterator(), selector, (first, second) -> first != null && second != null && first.compareTo(second) > 0);
+        return IterableXHelper
+                .comparisonOf(iterator(), selector, (first, second) -> first != null && second != null && first.compareTo(second) > 0);
     }
 
     @NotNull
     default <R extends Comparable<R>> R maxOf(@NotNull Function<T, R> selector) {
-        return comparisonOf(iterator(), selector, (first, second) -> first != null && second != null && first.compareTo(second) < 0);
+        return IterableXHelper
+                .comparisonOf(iterator(), selector, (first, second) -> first != null && second != null && first.compareTo(second) < 0);
     }
 
     @NotNull
@@ -932,7 +915,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
     default <A, R> R collect(Supplier<A> supplier,
                              BiConsumer<A, ? super T> accumulator,
                              Function<A, R> finisher) {
-        var result = supplier.get();
+        A result = supplier.get();
         return collect(supplier, It.noFilter(), It::self, It.noFilter(), accumulator, finisher);
     }
 
@@ -940,7 +923,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
                              Predicate<T> filter,
                              Function<T, R> mapper,
                              BiConsumer<A, ? super R> accumulator) {
-        var result = supplier.get();
+        A result = supplier.get();
         return collect(supplier, filter, mapper, It.noFilter(), accumulator, It::self);
     }
 
@@ -1000,7 +983,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
 
     default <S, C extends Collection<S>, R> SetX<R> intersectionOf(
             @NotNull Function<T, C> toCollectionMapper, Function<S, R> selector) {
-        MutableSetX<R> common = MutableSetX.<R>empty();
+        MutableSetX<R> common = MutableSetX.empty();
         for (T t : this) {
             final C collection = toCollectionMapper.apply(t);
             final MutableListX<R> resultList = MutableListX.empty();
@@ -1032,7 +1015,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
                 return next;
             }
         }
-        throw noValuePresentException();
+        throw IterableXHelper.noValuePresentException();
     }
 
     @NotNull
@@ -1049,7 +1032,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
                 }
             }
         }
-        throw noValuePresentException();
+        throw IterableXHelper.noValuePresentException();
     }
 
     default Optional<T> findFirst() {
@@ -1082,12 +1065,12 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         final Iterator<T> iterator = iterator();
         final Iterable<T> iterable = iterable();
         if (!iterator.hasNext()) {
-            throw noValuePresentException();
+            throw IterableXHelper.noValuePresentException();
         } else if (iterable instanceof List) {
-            return findLastIfInstanceOfList(Objects::nonNull, (List<T>) iterable).map(mapper)
+            return IterableXHelper.findLastIfInstanceOfList(Objects::nonNull, (List<T>) iterable).map(mapper)
                     .orElseThrow(IllegalStateException::new);
         } else {
-            return findLastIfUnknownIterable(Objects::nonNull, iterator).map(mapper)
+            return IterableXHelper.findLastIfUnknownIterable(Objects::nonNull, iterator).map(mapper)
                     .orElseThrow(IllegalStateException::new);
         }
     }
@@ -1100,11 +1083,11 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         final Iterator<T> iterator = iterator();
         final Iterable<T> iterable = iterable();
         if (!iterator.hasNext()) {
-            throw noValuePresentException();
+            throw IterableXHelper.noValuePresentException();
         } else if (iterable instanceof List) {
-            return findLastIfInstanceOfList(predicate, ((List<T>) iterable));
+            return IterableXHelper.findLastIfInstanceOfList(predicate, ((List<T>) iterable));
         } else {
-            return findLastIfUnknownIterable(predicate, iterator);
+            return IterableXHelper.findLastIfUnknownIterable(predicate, iterator);
         }
     }
 
@@ -1205,8 +1188,8 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
     default <A, R> MutableListX<R> zipToMutableListWith(Iterable<A> otherIterable, BiFunction<T, A, R> function) {
         final Iterator<A> otherIterator = otherIterable.iterator();
         final Iterator<T> iterator = iterator();
-        final int resultListSize = Math.min(collectionSizeOrElse(this,10),
-                collectionSizeOrElse(IterableX.of(otherIterable), 10));
+        final int resultListSize = Math.min(IterableXHelper.collectionSizeOrElse(this,10),
+                IterableXHelper.collectionSizeOrElse(IterableX.of(otherIterable), 10));
 
         final MutableListX<R> list = MutableListX.withInitCapacity(resultListSize);
         while (iterator.hasNext() && otherIterator.hasNext()) {

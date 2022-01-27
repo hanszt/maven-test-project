@@ -11,6 +11,7 @@ import hzt.stream.StreamUtils;
 import hzt.utils.MyObjects;
 import hzt.utils.Pair;
 
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -24,6 +25,7 @@ import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collector;
@@ -34,6 +36,36 @@ import java.util.stream.Stream;
 public final class CollectorsX {
 
     private CollectorsX() {
+    }
+
+    public static <T, A, R>
+    Collector<T, ?, R> filtering(Predicate<? super T> predicate,
+                                 Collector<? super T, A, R> downstream) {
+        BiConsumer<A, ? super T> downstreamAccumulator = downstream.accumulator();
+        return new CollectorImpl<>(downstream.supplier(),
+                (r, t) -> {
+                    if (predicate.test(t)) {
+                        downstreamAccumulator.accept(r, t);
+                    }
+                },
+                downstream.combiner(), downstream.finisher(),
+                downstream.characteristics());
+    }
+
+    public static <T, U, A, R>
+    Collector<T, ?, R> flatMapping(Function<? super T, ? extends Stream<? extends U>> mapper,
+                                   Collector<? super U, A, R> downstream) {
+        BiConsumer<A, ? super U> downstreamAccumulator = downstream.accumulator();
+        return new CollectorImpl<>(downstream.supplier(),
+                (r, t) -> {
+                    try (Stream<? extends U> result = mapper.apply(t)) {
+                        if (result != null) {
+                            result.sequential().forEach(u -> downstreamAccumulator.accept(r, u));
+                        }
+                    }
+                },
+                downstream.combiner(), downstream.finisher(),
+                downstream.characteristics());
     }
 
     //Experimental. Runs faster into out of memory error than mapMulti method from Stream. No buffer implemented here
@@ -53,9 +85,54 @@ public final class CollectorsX {
         return Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue);
     }
 
+    public static <T> Collector<T, ?, List<T>> filteringToList(Predicate<? super T> predicate) {
+        return filtering(predicate, toUnmodifiableList());
+    }
+
+    public static <T, R> Collector<T, ?, List<R>> mappingToList(Function<? super T, ? extends R> mapper) {
+        return Collectors.mapping(mapper, toUnmodifiableList());
+    }
+
+    public static <T, R> Collector<T, ?, List<R>> multiMappingToList(BiConsumer<? super T, ? super Consumer<R>> mapper) {
+        return multiMapping(mapper, toUnmodifiableList());
+    }
+
+    public static <T, R> Collector<T, ?, List<R>> flatMappingToList(Function<? super T, ? extends Stream<? extends R>> mapper) {
+        return flatMapping(mapper, toUnmodifiableList());
+    }
+
+    public static <T> Collector<T, ?, Set<T>> filteringToSet(Predicate<? super T> predicate) {
+        return filtering(predicate, toUnmodifiableSet());
+    }
+
+    public static <T, R> Collector<T, ?, Set<R>> mappingToSet(Function<? super T, ? extends R> mapper) {
+        return Collectors.mapping(mapper, toUnmodifiableSet());
+    }
+
+    public static <T, R> Collector<T, ?, Set<R>> multiMappingToSet(BiConsumer<? super T, ? super Consumer<R>> mapper) {
+        return multiMapping(mapper, toUnmodifiableSet());
+    }
+
+    public static <T, R> Collector<T, ?, Set<R>> flatMappingToSet(Function<? super T, ? extends Stream<? extends R>> mapper) {
+        return flatMapping(mapper, toUnmodifiableSet());
+    }
+
     public static <T, A, K> Collector<T, ?, Map<K, List<T>>> groupingBy(Function<? super T, ? extends A> classifierPart1,
                                                                         Function<? super A, ? extends K> classifierPart2) {
         return Collectors.groupingBy(StreamUtils.function(classifierPart1).andThen(classifierPart2));
+    }
+
+    public static <T> Collector<T, ?, List<T>> toUnmodifiableList() {
+        return Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList);
+    }
+
+    public static <T> Collector<T, ?, Set<T>> toUnmodifiableSet() {
+        return Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet);
+    }
+
+    public static <T, K, V> Collector<T, ?, Map<K, V>> toUnmodifiableMap(
+            Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
+        return Collectors.collectingAndThen(Collectors.toMap(keyMapper, valueMapper), Collections::unmodifiableMap);
     }
 
     public static <T> Collector<T, ?, ListX<T>> toListX() {
@@ -92,6 +169,13 @@ public final class CollectorsX {
     private static <K, V> Map<K, V> accumulateMap(Map<K, V> left, Map<K, V> right) {
         left.putAll(right);
         return left;
+    }
+
+
+    public static <T, R1, R2> Collector<T, ?, Map.Entry<R1, R2>> teeingToEntry(
+            Collector<? super T, ?, R1> downstream1,
+            Collector<? super T, ?, R2> downstream2) {
+        return teeing(downstream1, downstream2, AbstractMap.SimpleEntry::new);
     }
 
     public static <T> Collector<T, ?, DoubleStatistics> toDoubleStatisticsBy(ToDoubleFunction<? super T> toDoubleFunction) {
