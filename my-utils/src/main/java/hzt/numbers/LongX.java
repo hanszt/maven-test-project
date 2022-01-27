@@ -1,10 +1,10 @@
 package hzt.numbers;
 
-import hzt.utils.ObjectX;
+import hzt.utils.Transformable;
 
 import java.util.Objects;
 
-public final class LongX extends Number implements NumberX, ObjectX<LongX> {
+public final class LongX extends Number implements NumberX, Transformable<LongX> {
     
     private final Long aLong;
 

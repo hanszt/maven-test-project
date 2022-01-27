@@ -1,10 +1,10 @@
 package hzt.numbers;
 
-import hzt.utils.ObjectX;
+import hzt.utils.Transformable;
 
 import java.util.Objects;
 
-public final class IntX extends Number implements NumberX, ObjectX<IntX> {
+public final class IntX extends Number implements NumberX, Transformable<IntX> {
 
     private final Integer integer;
 

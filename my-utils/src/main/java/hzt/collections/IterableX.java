@@ -1039,6 +1039,14 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         return findFirstOf(It::self);
     }
 
+    default T findFirstOrElseGet(Supplier<T> supplier) {
+        return findFirstOf(It::self).orElseGet(supplier);
+    }
+
+    default T findFirstOrElse(T defaultValue) {
+        return findFirstOf(It::self).orElse(defaultValue);
+    }
+
     default Optional<T> findFirst(Predicate<T> predicate) {
         for (T next : this) {
             if (next != null && predicate.test(next)) {
@@ -1077,6 +1085,14 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
 
     default Optional<T> findLast() {
         return findLastOf(It::self);
+    }
+
+    default T findLastOrElse(T defaultVal) {
+        return findFirstOrElseGet(() -> defaultVal);
+    }
+
+    default T findLastOrElseGet(Supplier<T> supplier) {
+        return findLast().orElseGet(supplier);
     }
 
     default Optional<T> findLast(@NotNull Predicate<T> predicate) {

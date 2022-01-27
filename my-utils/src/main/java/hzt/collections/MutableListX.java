@@ -1,7 +1,7 @@
 package hzt.collections;
 
 import hzt.function.It;
-import hzt.utils.ObjectX;
+import hzt.utils.Transformable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public interface MutableListX<E> extends List<E>, ListX<E>, ObjectX<MutableListX<E>> {
+public interface MutableListX<E> extends List<E>, ListX<E>, Transformable<MutableListX<E>> {
 
     static <E> MutableListX<E> empty() {
         return new ArrayListX<>();

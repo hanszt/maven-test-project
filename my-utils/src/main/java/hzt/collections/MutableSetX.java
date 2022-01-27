@@ -1,6 +1,6 @@
 package hzt.collections;
 
-import hzt.utils.ObjectX;
+import hzt.utils.Transformable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public interface MutableSetX<E> extends Set<E>, SetX<E>, ObjectX<MutableSetX<E>> {
+public interface MutableSetX<E> extends Set<E>, SetX<E>, Transformable<MutableSetX<E>> {
 
     static <E> MutableSetX<E> empty() {
         return new HashSetX<>();
