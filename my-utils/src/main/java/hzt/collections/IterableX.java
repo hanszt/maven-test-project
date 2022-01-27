@@ -3,9 +3,9 @@ package hzt.collections;
 import hzt.function.It;
 import hzt.function.QuadFunction;
 import hzt.function.TriFunction;
-import hzt.stream.collectors.BigDecimalCollectors;
-import hzt.stream.collectors.BigDecimalSummaryStatistics;
+import hzt.stream.collectors.BigDecimalStatistics;
 import hzt.stream.collectors.CollectorsX;
+import hzt.stream.collectors.DoubleStatistics;
 import hzt.strings.StringX;
 import hzt.utils.Pair;
 import hzt.utils.Triple;
@@ -16,7 +16,6 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
 import java.util.Iterator;
 import java.util.List;
@@ -43,7 +42,6 @@ import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -205,7 +203,19 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         return mapIndexedToMutableList(mapper);
     }
 
-    default <R> IterableX<R> mapNotNull(Function<T, R> mapper) {
+    default <R> ListX<R> mapMultiToListXOf(BiConsumer<? super T, ? super Consumer<R>> mapper) {
+        var list = MutableListX.<R>empty();
+        for (T t : this) {
+            mapper.accept(t, (Consumer<R>) list::add);
+        }
+        return list;
+    }
+
+    default <R> IterableX<R> mapMulti(BiConsumer<? super T, ? super Consumer<R>> mapper) {
+        return IterableX.of(mapMultiToListXOf(mapper));
+    }
+
+    default <R> IterableX<R> mapNotNull(Function<? super T, ? extends R> mapper) {
         return IterableX.of(toCollectionNotNullOf(MutableListX::empty, mapper));
     }
 
@@ -493,20 +503,33 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
     }
 
     default IntSummaryStatistics statsOf(ToIntFunction<T> mapper) {
-        return stream().filter(Objects::nonNull).mapToInt(mapper).summaryStatistics();
+        return collect(IntSummaryStatistics::new,
+                Objects::nonNull,
+                mapper::applyAsInt,
+                IntSummaryStatistics::accept);
     }
 
     default LongSummaryStatistics statsOf(ToLongFunction<T> mapper) {
-        return stream().filter(Objects::nonNull).mapToLong(mapper).summaryStatistics();
+        return collect(LongSummaryStatistics::new,
+                Objects::nonNull,
+                mapper::applyAsLong,
+                LongSummaryStatistics::accept);
     }
 
-    default DoubleSummaryStatistics statsOf(ToDoubleFunction<T> mapper) {
-        return stream().filter(Objects::nonNull).mapToDouble(mapper).summaryStatistics();
+    default DoubleStatistics statsOf(ToDoubleFunction<T> mapper) {
+        return collect(DoubleStatistics::new,
+                Objects::nonNull,
+                mapper::applyAsDouble,
+                DoubleStatistics::accept);
     }
 
-    default BigDecimalSummaryStatistics statsOf(Function<T, BigDecimal> mapper) {
-        return mapFiltering(Objects::nonNull, mapper, Objects::nonNull)
-                .collect(BigDecimalCollectors.summarizingBigDecimal());
+    default BigDecimalStatistics statsOf(Function<T, BigDecimal> mapper) {
+        return collect(BigDecimalStatistics::new,
+                Objects::nonNull,
+                mapper,
+                Objects::nonNull,
+                BigDecimalStatistics::accept,
+                It::self);
     }
 
     default <K, V> MutableMapX<K, V> toMutableMap(
@@ -554,7 +577,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         if (iterable instanceof Set) {
             return MutableSetX.of(((Set<T>) iterable));
         }
-        throw new IllegalArgumentException(iterable().getClass().getSimpleName() + " is not an instance of Set");
+        throw new IllegalArgumentException(iterable.getClass().getSimpleName() + " is not an instance of Set");
     }
 
     default NavigableSetX<T> getNavigableSetOrElseThrow() {
@@ -585,6 +608,17 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         return NavigableMapX.of(entries, It::self);
     }
 
+    @NotNull
+    private static <T, R extends Comparable<R>> R asComparableOrThrow(T value) {
+        if (value instanceof Comparable) {
+            var c = (Comparable<?>) value;
+            //noinspection unchecked
+            return (R) c;
+        } else {
+            throw new IllegalStateException(value.getClass().getSimpleName() + " is not of a comparable type");
+        }
+    }
+
     default <K> MapX<K, T> toMapXAssociatedBy(@NotNull Function<T, K> keyMapper) {
         return toMutableMap(keyMapper, It::self);
     }
@@ -597,12 +631,12 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
         return IterableX.of(toListSortedBy(selector));
     }
 
-    default IterableX<T> sorted() {
-        return IterableX.of(stream().sorted().collect(Collectors.toList()));
+    default <R extends Comparable<R>> IterableX<T> sorted() {
+        return sortedBy((Function<T, R>) IterableX::asComparableOrThrow);
     }
 
     default Stream<T> stream() {
-        return StreamSupport.stream(iterable().spliterator(), false);
+        return StreamSupport.stream(spliterator(), false);
     }
 
     default IterableX<Integer> indices() {
@@ -891,8 +925,41 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
     default <A, R> R collect(@NotNull Collector<T, A, R> collector) {
         A result = collector.supplier().get();
         final BiConsumer<A, T> accumulator = collector.accumulator();
-        iterable().forEach(t -> accumulator.accept(result, t));
+        forEach(t -> accumulator.accept(result, t));
         return collector.finisher().apply(result);
+    }
+
+    default <A, R> R collect(Supplier<A> supplier,
+                             BiConsumer<A, ? super T> accumulator,
+                             Function<A, R> finisher) {
+        var result = supplier.get();
+        return collect(supplier, It.noFilter(), It::self, It.noFilter(), accumulator, finisher);
+    }
+
+    default <A, R> A collect(Supplier<A> supplier,
+                             Predicate<T> filter,
+                             Function<T, R> mapper,
+                             BiConsumer<A, ? super R> accumulator) {
+        var result = supplier.get();
+        return collect(supplier, filter, mapper, It.noFilter(), accumulator, It::self);
+    }
+
+    default <A, U, R> R collect(Supplier<A> supplier,
+                                Predicate<T> filter,
+                                Function<T, U> mapper,
+                                Predicate<U> resultFilter,
+                                BiConsumer<A, ? super U> accumulator,
+                                Function<A, R> finisher) {
+        A result = supplier.get();
+        for (T t : this) {
+            if (filter.test(t)) {
+                U u = mapper.apply(t);
+                if (resultFilter.test(u)) {
+                    accumulator.accept(result, u);
+                }
+            }
+        }
+        return finisher.apply(result);
     }
 
     default MutableMapX<T, MutableListX<T>> group() {
@@ -1160,7 +1227,7 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
 
     default SetX<T> union(Iterable<T> other) {
         MutableSetX<T> union = MutableSetX.empty();
-        iterable().forEach(union::add);
+        forEach(union::add);
         other.forEach(union::add);
         return union;
     }
@@ -1301,19 +1368,19 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
     }
 
     default IterableX<T> skip(int count) {
-        return IterableX.of(skipToList(count));
+        return IterableX.of(skipToListX(count));
     }
 
-    default ListX<T> skipToList(int n) {
-        return ListX.of(stream().skip(n).collect(Collectors.toList()));
+    default ListX<T> skipToListX(int n) {
+       return filterIndexedToMutableList((i, t) -> i >= n);
     }
 
     default IterableX<T> limit(int bound) {
-        return IterableX.of(limitToList(bound));
+        return IterableX.of(limitToListX(bound));
     }
 
-    default ListX<T> limitToList(int bound) {
-        return ListX.of(stream().limit(bound).collect(Collectors.toList()));
+    default ListX<T> limitToListX(int bound) {
+        return filterIndexedToMutableList((i, t) -> i < bound);
     }
 
     default String joinToString() {
