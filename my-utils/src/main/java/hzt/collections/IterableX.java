@@ -25,6 +25,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.BinaryOperator;
@@ -39,7 +40,6 @@ import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -616,9 +616,9 @@ public interface IterableX<T> extends Iterable<T>, IndexedIterable<T> {
     }
 
     @NotNull
-    private static <R, K extends Comparable<K>> K asComparableOrThrow(R key) {
-        if (key instanceof Comparable) {
-            var c = (Comparable<?>) key;
+    private static <T, R extends Comparable<R>> R asComparableOrThrow(T value) {
+        if (value instanceof Comparable) {
+            var c = (Comparable<?>) value;
             //noinspection unchecked
             return (R) c;
         } else {
