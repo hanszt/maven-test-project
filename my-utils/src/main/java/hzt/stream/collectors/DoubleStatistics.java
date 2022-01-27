@@ -8,7 +8,7 @@ public final class DoubleStatistics extends DoubleSummaryStatistics {
     private double sumOfSquareCompensation; // Low order bits of sum
     private double simpleSumOfSquare; // Used to compute right sum for non-finite inputs
 
-    DoubleStatistics() {
+    public DoubleStatistics() {
         super();
     }
 

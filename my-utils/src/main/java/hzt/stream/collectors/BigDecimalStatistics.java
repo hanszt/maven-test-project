@@ -8,7 +8,7 @@ public final class BigDecimalStatistics extends BigDecimalSummaryStatistics {
 
     private BigDecimal sumOfSquare = BigDecimal.ZERO;
 
-    BigDecimalStatistics() {
+    public BigDecimalStatistics() {
         super();
     }
 
