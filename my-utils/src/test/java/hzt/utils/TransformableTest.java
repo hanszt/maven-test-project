@@ -16,9 +16,9 @@ class TransformableTest {
 
     @Test
     void testCreateAnObjectXOfSomethingAndUseTheDefaultFunctions() {
-        final var vanGoghAuction = Generator.createVanGoghAuction();
+        final PaintingAuction vanGoghAuction = Generator.createVanGoghAuction();
 
-        final var localDate = Transformable.of(vanGoghAuction)
+        final LocalDate localDate = Transformable.of(vanGoghAuction)
                 .apply(a -> a.setMostPopularPainting(Painting.of("Nijntje")))
                 .let(PaintingAuction::getDateOfOpening);
 
@@ -27,13 +27,13 @@ class TransformableTest {
 
     @Test
     void testAlsoWhen() {
-        final var list = MutableListX.<Painting>empty();
+        final MutableListX<Painting> list = MutableListX.empty();
 
-        final var expected = new Painter("Test", "Hallo", LocalDate.of(2000, 1, 1));
+        final Painter expected = new Painter("Test", "Hallo", LocalDate.of(2000, 1, 1));
 
-        final var vanGoghAuction = Generator.createVanGoghAuction();
+        final PaintingAuction vanGoghAuction = Generator.createVanGoghAuction();
 
-        final var painter = Transformable.of(vanGoghAuction)
+        final Painter painter = Transformable.of(vanGoghAuction)
                 .apply(auction -> auction.setMostPopularPainting(Painting.of("Nijntje")))
                 .run(PaintingAuction::getMostPopularPainting)
                 .apply(System.out::println)

@@ -3,7 +3,6 @@ package hzt.collections;
 import hzt.function.It;
 import hzt.stream.collectors.BigDecimalCollectors;
 import hzt.stream.collectors.BigDecimalSummaryStatistics;
-import hzt.stream.collectors.CollectorsX;
 import hzt.stream.collectors.TriTuple;
 import hzt.strings.StringX;
 import hzt.utils.Pair;
@@ -22,6 +21,7 @@ import test.model.PaintingAuction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.Period;
 import java.time.Year;
 import java.time.chrono.ChronoLocalDate;
@@ -46,10 +46,8 @@ import java.util.stream.IntStream;
 
 import static hzt.stream.collectors.CollectorsX.branching;
 import static hzt.stream.collectors.CollectorsX.intersectingBy;
-import static hzt.stream.collectors.CollectorsX.mappingToList;
 import static hzt.stream.collectors.CollectorsX.toListX;
 import static hzt.stream.collectors.CollectorsX.toMapX;
-import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -358,14 +356,18 @@ class IterableXTest {
         final ListX<Museum> museumList = ListX.of(TestSampleGenerator.getMuseumListContainingNulls());
 
         final List<Museum> expected = new ArrayList<>();
-//                museumList.stream()
-//                .takeWhile(museum -> museum.getPaintings().size() < 3).collect(Collectors.toList());
+        for (Museum m : museumList) {
+            if (!(m.getPaintings().size() < 3)) {
+                break;
+            }
+            expected.add(m);
+        }
 
         final ListX<Museum> actual = museumList.takeWhile(museum -> museum.getPaintings().size() < 3);
 
         System.out.println("actual = " + actual);
 
-        assertFalse(actual.isEmpty());
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -983,13 +985,13 @@ class IterableXTest {
 
     @Test
     void testStreamCollectingAndThenEquivalent() {
-        final var integers = MutableListX.of(1, 4, 5, 3, 7, 4, 2);
+        final MutableListX<Integer> integers = MutableListX.of(1, 4, 5, 3, 7, 4, 2);
 
-        final var expected = integers.stream()
+        final int expected = integers.stream()
                 .filter(n -> n > 4)
                 .collect(collectingAndThen(toListX(), IterableXTest::calculateProduct));
 
-        final var product = integers
+        final int product = integers
                 .filter(n -> n > 4)
                 .let(IterableXTest::calculateProduct);
 
