@@ -6,7 +6,7 @@ import hzt.collections.MutableListX;
 import hzt.collections.MutableMapX;
 import hzt.function.It;
 import hzt.numbers.IntX;
-import hzt.utils.ObjectX;
+import hzt.utils.Transformable;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
 
-public final class StringX implements CharSequence, IterableX<Character>, ObjectX<StringX> {
+public final class StringX implements CharSequence, IterableX<Character>, Transformable<StringX> {
 
     private final String string;
 

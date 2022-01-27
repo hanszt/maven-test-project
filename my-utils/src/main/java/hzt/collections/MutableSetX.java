@@ -1,6 +1,6 @@
 package hzt.collections;
 
-import hzt.utils.ObjectX;
+import hzt.utils.Transformable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

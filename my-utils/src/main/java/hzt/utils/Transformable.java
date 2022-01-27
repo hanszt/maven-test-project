@@ -7,9 +7,9 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @FunctionalInterface
-public interface ObjectX<T> extends Supplier<T> {
+public interface Transformable<T> extends Supplier<T> {
 
-    static <T> ObjectX<T> of(T t) {
+    static <T> Transformable<T> of(T t) {
         return () -> t;
     }
 
@@ -17,8 +17,8 @@ public interface ObjectX<T> extends Supplier<T> {
         return mapper.apply(get());
     }
 
-    default <R> ObjectX<R> run(Function<T, R> mapper) {
-        return ObjectX.of(let(mapper));
+    default <R> Transformable<R> run(Function<T, R> mapper) {
+        return Transformable.of(let(mapper));
     }
 
     default T also(Consumer<T> block) {
@@ -27,8 +27,8 @@ public interface ObjectX<T> extends Supplier<T> {
         return t;
     }
 
-    default ObjectX<T> apply(Consumer<T> block) {
-        return ObjectX.of(also(block));
+    default Transformable<T> apply(Consumer<T> block) {
+        return Transformable.of(also(block));
     }
 
     default T when(Predicate<T> predicate, Consumer<T> block) {
@@ -39,8 +39,16 @@ public interface ObjectX<T> extends Supplier<T> {
         return t;
     }
 
-    default ObjectX<T> alsoWhen(Predicate<T> predicate, Consumer<T> block) {
-        return ObjectX.of(when(predicate, block));
+    default T unless(Predicate<T> predicate, Consumer<T> block) {
+        return when(predicate.negate(), block);
+    }
+
+    default Transformable<T> alsoWhen(Predicate<T> predicate, Consumer<T> block) {
+        return Transformable.of(when(predicate, block));
+    }
+
+    default Transformable<T> alsoUnless(Predicate<T> predicate, Consumer<T> block) {
+        return Transformable.of(unless(predicate, block));
     }
 
     default Optional<T> takeIf(Predicate<T> predicate) {

@@ -2,7 +2,6 @@ package hzt.collections;
 
 import hzt.function.It;
 import hzt.stream.collectors.BigDecimalCollectors;
-import hzt.stream.collectors.CollectorsX;
 import hzt.strings.StringX;
 import one.util.streamex.StreamEx;
 import org.hzt.test.TestSampleGenerator;
@@ -36,6 +35,8 @@ import java.util.stream.IntStream;
 import static hzt.stream.collectors.CollectorsX.branching;
 import static hzt.stream.collectors.CollectorsX.intersectingBy;
 import static hzt.stream.collectors.CollectorsX.mappingToList;
+import static hzt.stream.collectors.CollectorsX.toListX;
+import static hzt.stream.collectors.CollectorsX.toMapX;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -802,7 +803,7 @@ class IterableXTest {
 
         final var max = paintingList.stream()
                 .map(Painting::painter)
-                .collect(CollectorsX.toListX())
+                .collect(toListX())
                 .maxOf(Painter::getDateOfBirth);
 
         final var maxWithFullTransformer = paintingList
@@ -829,7 +830,7 @@ class IterableXTest {
 
         final MapX<LocalDate, String> actual = ListX.of(paintingList)
                 .map(Painting::painter)
-                .collect(CollectorsX.toMapX(Painter::getDateOfBirth, Painter::getLastname, (a, b) -> a));
+                .collect(toMapX(Painter::getDateOfBirth, Painter::getLastname, (a, b) -> a));
 
         assertEquals(expected, actual);
     }
@@ -967,6 +968,28 @@ class IterableXTest {
                 .toCollectionNotNullOf(ArrayDeque::new, It::self);
 
         assertTrue(strings.isEmpty());
+    }
+
+    @Test
+    void testStreamCollectingAndThenEquivalent() {
+        final var integers = MutableListX.of(1, 4, 5, 3, 7, 4, 2);
+
+        final var expected = integers.stream()
+                .filter(n -> n > 4)
+                .collect(collectingAndThen(toListX(), IterableXTest::calculateProduct));
+
+        final var product = integers
+                .filter(n -> n > 4)
+                .let(IterableXTest::calculateProduct);
+
+        System.out.println("product = " + product);
+
+        assertEquals(expected, product, () -> "Something went wrong. Did you know, you can also crate dates from ints? " +
+                integers.toListOf(day -> LocalDate.of(2020, Month.JANUARY, day)));
+    }
+
+    private static int calculateProduct(ListX<Integer> list) {
+        return list.reduce((result, integer) -> result * integer).orElse(0);
     }
 
     @Test
