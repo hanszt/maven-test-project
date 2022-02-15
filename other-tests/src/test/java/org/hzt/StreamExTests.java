@@ -22,7 +22,8 @@ class StreamExTests {
                 .flatMap(m -> m.getPaintings().stream())
                 .toList();
 
-        final var actual = StreamEx.of(museumList).toFlatList(Museum::getPaintings);
+        final var actual = StreamEx.of(museumList)
+                .toFlatList(Museum::getPaintings);
 
         assertIterableEquals(expected, actual);
     }

@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static org.hzt.ReflectionSample.PicassoFunctions.integerPropertyAccessor;
 import static java.util.stream.Collectors.toUnmodifiableMap;
+import static org.hzt.ReflectionSample.PicassoFunctions.integerPropertyAccessor;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

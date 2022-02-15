@@ -17,12 +17,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static hzt.collectors.BigDecimalCollectors.averagingBigDecimal;
+import static hzt.collectors.BigDecimalCollectors.summarizingBigDecimal;
+import static hzt.function.predicates.ComparingPredicates.greaterThan;
+import static hzt.function.predicates.ComparingPredicates.greaterThanInt;
+import static hzt.function.predicates.StringPredicates.contains;
 import static hzt.stream.StreamUtils.by;
-import static hzt.stream.collectors.BigDecimalCollectors.averagingBigDecimal;
-import static hzt.stream.collectors.BigDecimalCollectors.summarizingBigDecimal;
-import static hzt.stream.predicates.ComparingPredicates.greaterThan;
-import static hzt.stream.predicates.ComparingPredicates.greaterThanInt;
-import static hzt.stream.predicates.StringPredicates.contains;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;

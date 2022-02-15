@@ -29,7 +29,7 @@
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
         <mockito.version>4.2.0</mockito.version>
         <awaitility.version>4.1.1</awaitility.version>
-        <test-data-generator.version>1.2</test-data-generator.version>
+        <test-data-generator.version>0.7.11</test-data-generator.version>
         <!--        utils-->
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <guava.version>31.0.1-jre</guava.version>
@@ -40,7 +40,7 @@
         <spring-boot-starter-webflux.version>2.6.2</spring-boot-starter-webflux.version>
         <scala.binary.version>2.13</scala.binary.version>
         <akka.version>2.6.16</akka.version>
-        <org.hzt-utils.version>1.2</org.hzt-utils.version>
+        <org.hzt-utils.version>0.7.11</org.hzt-utils.version>
         <annotations.version>22.0.0</annotations.version>
         <!--plugins-->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -72,7 +72,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hzt.utils</groupId>
-                <artifactId>my-utils</artifactId>
+                <artifactId>core</artifactId>
                 <version>${org.hzt-utils.version}</version>
             </dependency>
             <dependency>

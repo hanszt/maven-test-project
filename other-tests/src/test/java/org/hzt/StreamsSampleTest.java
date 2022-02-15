@@ -1,8 +1,8 @@
 package org.hzt;
 
+import hzt.collectors.CollectorsX;
 import org.hzt.model.Payment;
 import org.hzt.model.Person;
-import hzt.stream.collectors.CollectorsX;
 import org.hzt.test.model.Book;
 import org.hzt.test.model.Museum;
 import org.hzt.test.model.Painter;
@@ -26,13 +26,13 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static hzt.collectors.CollectorsX.flatMappingToList;
+import static hzt.collectors.CollectorsX.mappingToSet;
+import static hzt.collectors.CollectorsX.multiMappingToList;
+import static hzt.function.predicates.ComparingPredicates.greaterThan;
+import static hzt.function.predicates.StringPredicates.containsAllOf;
 import static hzt.stream.StreamUtils.by;
 import static hzt.stream.StreamUtils.function;
-import static hzt.stream.collectors.CollectorsX.flatMappingToList;
-import static hzt.stream.collectors.CollectorsX.mappingToSet;
-import static hzt.stream.collectors.CollectorsX.multiMappingToList;
-import static hzt.stream.predicates.ComparingPredicates.greaterThan;
-import static hzt.stream.predicates.StringPredicates.containsAllOf;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.function.Predicate.isEqual;
 import static java.util.stream.Collectors.groupingBy;

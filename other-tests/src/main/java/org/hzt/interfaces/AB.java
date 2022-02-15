@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static hzt.stream.predicates.StringPredicates.contains;
+import static hzt.function.predicates.StringPredicates.contains;
 
 public class AB implements A {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(A.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AB.class);
 
     public static void main(String[] args) {
         Bic bic = new Bic("");
