@@ -12,6 +12,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.function.IntConsumer;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -105,6 +108,17 @@ class Jdk17StreamMethodsTest {
         assertFalse(datesOfBirth.isEmpty());
     }
 
-    //     (Functional?) programming question. What's that collection/stream/array operation called that processes a variable number of input elements to a single result?
+    @Test
+    void testIntStreamMapMulti() {
+        final var max = IntStream.range(0, 1_000).mapMulti(this::sum).max();
+        assertEquals(OptionalInt.of(1998), max);
+    }
+
+    private void sum(int value, IntConsumer consumer) {
+        consumer.accept(value + value);
+    }
+
+    //     (Functional?) programming question. What's that collection/stream/array operation called
+    //     that processes a variable number of input elements to a single result?
 //    https://twitter.com/nipafx/status/1319656592925708289
 }

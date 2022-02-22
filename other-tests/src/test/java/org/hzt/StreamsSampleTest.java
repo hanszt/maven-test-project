@@ -1,8 +1,14 @@
 package org.hzt;
 
+import hzt.collections.MutableSetX;
+import hzt.collections.SetX;
 import hzt.collectors.CollectorsX;
+import hzt.ranges.IntRange;
+import hzt.sequences.Sequence;
 import org.hzt.model.Payment;
 import org.hzt.model.Person;
+import org.hzt.primitve_sequences.IntSequence;
+import org.hzt.primitve_sequences.PrimitiveIterable;
 import org.hzt.test.model.Book;
 import org.hzt.test.model.Museum;
 import org.hzt.test.model.Painter;
@@ -25,6 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static hzt.collectors.CollectorsX.flatMappingToList;
 import static hzt.collectors.CollectorsX.mappingToSet;
@@ -38,6 +45,7 @@ import static java.util.function.Predicate.isEqual;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -265,6 +273,28 @@ class StreamsSampleTest {
         System.out.println(actual);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIntStreamFromIntIterable() {
+        PrimitiveIterable.OfInt intIterable = IntSequence.of(1, 2, 3, 4, 5).map(i -> i * 2);
+
+        final var actual = StreamSupport.intStream(intIterable.spliterator(), false).toArray();
+
+        assertArrayEquals(new int[] {2, 4, 6, 8, 10}, actual);
+    }
+
+    @Test
+    void testCollectFromIntStream() {
+        final SetX<Integer> integers = IntStream.iterate(0, i -> i < 100, i -> ++i)
+                .collect(MutableSetX::empty, Set::add, Set::addAll);
+
+        final SetX<Integer> set = Sequence.generate(0, i -> ++i).takeWhile(i -> i < 100).toSetX();
+
+        assertAll(
+                () -> assertEquals(100, integers.size()),
+                () -> assertEquals(integers, set)
+        );
     }
 
 }
