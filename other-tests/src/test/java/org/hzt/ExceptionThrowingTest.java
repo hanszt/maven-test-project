@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class ExceptionThrowingTest {
 
@@ -14,6 +15,7 @@ class ExceptionThrowingTest {
     void testExceptionGetMessageTest() {
         try {
             throwRuntimeException();
+            fail();
         }catch (RuntimeException e) {
             StackTraceElement[] stackTraceElements = e.getStackTrace();
             String stacktrace = Arrays.stream(stackTraceElements)

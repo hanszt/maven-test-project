@@ -63,6 +63,7 @@ class ResponseTimerFilterTest {
         final var response = getServletResponse();
 
         lambdaFilter.doFilter(request, response, ResponseTimerFilterTest::executeFilterChain);
+
         Assertions.assertThrows(NullPointerException.class, () ->
                 filter.doFilter(request, response, ResponseTimerFilterTest::executeFilterChain));
     }

@@ -164,7 +164,7 @@ class StreamsSampleTest {
 
     @Test
     void testCalculatePiParallelUsingDoubleStream() {
-        final var iterations = 100_000_000;
+        final var iterations = 10_000_000;
         //act
         Timer<Double> sequentialTimer = Timer.timeAFunction(iterations,
                 nrOfIterations -> StreamsSample.calculatePiAsDouble(nrOfIterations, false));

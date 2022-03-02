@@ -1,12 +1,12 @@
 package org.hzt.concurrent;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class CompletableFutureSampleTest {
 
@@ -23,14 +23,14 @@ class CompletableFutureSampleTest {
     void testCombiningTwoCompletableFutures() {
         var completableFuture = completableFutureSample.getStockPriceAndThenCombine();
         completableFuture.thenAccept(System.out::println);
-        Assertions.assertNotNull(completableFuture);
+        assertNotNull(completableFuture);
     }
 
     @Test
     void testComposeAndThenCombiningTwoCompletableFutures() {
         var completableFuture = completableFutureSample.getStockPriceThenComposeAndThanCombine();
         completableFuture.thenAccept(System.out::println);
-        Assertions.assertNotNull(completableFuture);
+        assertNotNull(completableFuture);
     }
 
     @Test

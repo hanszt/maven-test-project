@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Completable future in Java is like first promise in Javascript
  *
- * @see <first href="https://www.youtube.com/watch?v=0hQvWIdwnw4">
- *         Parallel and Asynchronous Programming with Streams and CompletableFuture with Venkat Subramaniam</first>
+ * @see <a href="https://www.youtube.com/watch?v=0hQvWIdwnw4">
+ *         Parallel and Asynchronous Programming with Streams and CompletableFuture with Venkat Subramaniam</a>
  *
  * <p>Stream equivalence:</p>
  * <ul>
@@ -51,13 +51,13 @@ public class CompletableFutureSample {
     }
 
     /**
-     * @see <first href="https://youtu.be/IwJ-SCfXoAU?t=8188">Complatable future google stock async</first>
+     * @see <a href="https://youtu.be/IwJ-SCfXoAU?t=8188">Complatable future google stock async</a>
      */
     CompletableFuture<Integer> getStockPriceAndThenCombine() {
         CompletableFuture<Integer> goog = CompletableFuture.supplyAsync(() -> getStockPrice("GOOG", 1));
         CompletableFuture<Integer> tesla = CompletableFuture.supplyAsync(() -> getStockPrice("TESLA", 1));
         CompletableFuture<Integer> completableFuture = goog.thenCombine(tesla, Integer::sum);
-        sleep(10_000);
+        sleep(1_000);
         return completableFuture;
     }
 
@@ -75,7 +75,7 @@ public class CompletableFutureSample {
                 .thenCompose(CompletableFuture::toCompletableFuture);
 
         CompletableFuture<Integer> completableFuture = goog.thenCombine(tesla, Integer::sum);
-        sleep(3_000);
+        sleep(2_000);
         return completableFuture;
     }
 

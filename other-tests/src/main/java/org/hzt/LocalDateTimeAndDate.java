@@ -12,6 +12,4 @@ public class LocalDateTimeAndDate {
         out.println(localDate.format(DateTimeFormatter.ISO_DATE));
     }
 
-
-
 }

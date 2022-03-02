@@ -18,8 +18,12 @@ import static java.lang.System.out;
 public class PropertiesSample {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesSample.class);
-    private static final String PROP_FILE1_LOCATION = "./resources/testProject.properties";
-    private static final String PROP_FILE2_LOCATION = "./resources/xml-properties.xml";
+
+    public static final String PROPERTIES_INPUT_DIR = "other-tests/src/main/resources";
+    public static final String OUTPUT_DIR = "other-tests/output";
+
+    private static final String PROP_FILE1_LOCATION = PROPERTIES_INPUT_DIR + "/application.properties";
+    private static final String PROP_FILE2_LOCATION = PROPERTIES_INPUT_DIR + "/xml-properties.xml";
     private static final String PROP_NAME_QUEUE_MANAGER = "queue.manager";
 
     public static void main(String[] args) {
@@ -28,8 +32,9 @@ public class PropertiesSample {
         File propertiesXmlFile = new File(PROP_FILE2_LOCATION);
 
         try (final var inputStream = new BufferedInputStream(new FileInputStream(propertiesFile));
-             final var fileOutputStreamXml = new FileOutputStream("./resources/newApp.xml");
-             final var fileWriter = new FileWriter("./resources/newApp.properties")) {
+             final var fileOutputStreamXml = new FileOutputStream(OUTPUT_DIR + "/newApp.xml");
+             final var fileWriter = new FileWriter(OUTPUT_DIR + "/newApp.properties")) {
+
             Properties properties1 = new Properties();
             properties1.load(inputStream);
             LOGGER.info(properties1.getProperty(PROP_NAME_QUEUE_MANAGER));
@@ -48,17 +53,16 @@ public class PropertiesSample {
             properties2.list(out);
             enumerate(properties1);
         } catch (IOException e) {
-            LOGGER.error("", e);
+            LOGGER.error("Io error: ", e);
         }
 
     }
 
     private static void enumerate(Properties appProps) {
         LambdaLogging.logIfInfoEnabled(() -> String.format("%nEnumeration of %s%n", appProps.toString()));
-        Enumeration<Object> valueEnumeration = appProps.elements();
-        while (valueEnumeration.hasMoreElements()) {
-            LOGGER.info("Next element: {}", valueEnumeration.nextElement());
-        }
+
+        Iterable<Object> valueEnumeration = () -> appProps.elements().asIterator();
+        valueEnumeration.forEach(value -> LOGGER.info("value: {}", value));
 
         Enumeration<Object> keyEnumeration = appProps.keys();
         while (keyEnumeration.hasMoreElements()) {

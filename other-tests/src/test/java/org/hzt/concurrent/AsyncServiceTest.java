@@ -33,7 +33,7 @@ class AsyncServiceTest {
     void testInitializeWithCustomProperties() {
         Awaitility.setDefaultPollInterval(10, TimeUnit.MILLISECONDS);
         Awaitility.setDefaultPollDelay(Duration.ZERO);
-        Awaitility.setDefaultTimeout(Duration.ofMinutes(1));
+        Awaitility.setDefaultTimeout(Duration.ofSeconds(5));
         asyncService.initialize();
         await().until(asyncService::isInitialized);
     }
@@ -92,7 +92,7 @@ class AsyncServiceTest {
 
     private void addValues(AsyncService service) {
         service.addValue(3);
-        service.addValue(4, Duration.ofMillis(1900));
+        service.addValue(4, Duration.ofMillis(1200));
         await().until(service::getValue, value -> value == 7);
     }
 }

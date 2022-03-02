@@ -3,9 +3,9 @@ package org.hzt;
 import org.hzt.collectors_samples.CollectorSamples;
 import org.hzt.model.Bic;
 import org.hzt.model.Person;
+import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Book;
 import org.hzt.test.model.Painting;
-import org.hzt.test.TestSampleGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,6 +19,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -211,6 +212,7 @@ class OtherTests {
         //unexpected
         Enumeration<String> enumeration = new Enumeration<>() {
             private int counter = 0;
+
             @Override
             public boolean hasMoreElements() {
                 return counter++ < 100;
@@ -239,7 +241,7 @@ class OtherTests {
 
     @SuppressWarnings("SameParameterValue")
     private static double calcPiRandom(final int iterations) {
-        long successCount = IntStream.rangeClosed(0 , iterations)
+        long successCount = IntStream.rangeClosed(0, iterations)
                 .filter(OtherTests::sqrtTwoRandomNmbrsSmOne)
                 .count();
         return (double) (4 * successCount) / iterations;
@@ -255,7 +257,10 @@ class OtherTests {
     void testMapAndCollectionIllegalInitialisation() {
         // Can lead to memory leaks:
         // see: https://stackoverflow.com/questions/6802483/how-to-directly-initialize-a-hashmap-in-a-literal-way
-        Map<String, String> map = new HashMap<>() {{ put("wat", "gek");put("raar", "dit moet niet kunnen"); }};
+        Map<String, String> map = new HashMap<>() {{
+            put("wat", "gek");
+            put("raar", "dit moet niet kunnen");
+        }};
         List<String> list = new ArrayList<>() {
             {
                 add("Hoi");
@@ -308,7 +313,7 @@ class OtherTests {
     @Test
     void testGenerateArrayContainingOneBillionElements() {
         final var ONE_BILLION = 1_000_000_000;
-        var array = IntStream.range(0, ONE_BILLION).toArray();
+        var array = IntStream.range(0, ONE_BILLION).parallel().toArray();
         assertEquals(ONE_BILLION, array.length);
     }
 
@@ -316,9 +321,11 @@ class OtherTests {
     void testStartingWithMaxRangeGetNumbersByDivisor() {
         final var DIVISOR = 20;
         var array = IntStream.range(0, Integer.MAX_VALUE)
-        .filter(i -> i % DIVISOR == 0)
-        .toArray();
+                .parallel()
+                .filter(i -> i % DIVISOR == 0)
+                .toArray();
         final var expected = (Integer.MAX_VALUE / DIVISOR) + 1;
+
         assertEquals(expected, array.length);
     }
 
@@ -373,6 +380,7 @@ class OtherTests {
                         return painting.isInMuseum() && painting.ageInYears() > 100;
                     }
                 })
+                .sorted(Comparator.comparing(a -> a.name))
                 .filter(a -> a.name.toLowerCase(Locale.ROOT).contains("meisje"))
                 .filter(a -> a.isInMuseumAndIsOlderThan100Years())
                 .toList();
@@ -383,8 +391,10 @@ class OtherTests {
 
         final var anonymous = list.get(1);
 
-        assertTrue((anonymous.name.startsWith("M")));
-        assertTrue(anonymous.isInMuseumAndIsOlderThan100Years());
+        assertAll(
+                () -> assertTrue((anonymous.name.startsWith("M"))),
+                () -> assertTrue(anonymous.isInMuseumAndIsOlderThan100Years())
+        );
     }
 
     @Test
