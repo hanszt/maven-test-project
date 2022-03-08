@@ -5,29 +5,31 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.hzt.utils</groupId>
+    <groupId>org.hzt.tests</groupId>
     <artifactId>maven-test-project</artifactId>
     <version>1.2</version>
     <packaging>pom</packaging>
 
     <modules>
+        <module>ocp-11-practice-module</module>
+        <module>design-patterns-examples</module>
+        <module>java-17-practice-module</module>
         <module>reactive-streams</module>
-        <module>only-jdk-content</module>
         <module>other-tests</module>
         <module>servlet-filter</module>
     </modules>
 
     <properties>
-        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <coverage.target>50%</coverage.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--        dependencies-->
-
         <!--        logging-->
         <log4j.version>2.17.1</log4j.version>
         <!--        test-->
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
-        <mockito.version>4.2.0</mockito.version>
+        <mockito.version>4.3.1</mockito.version>
         <awaitility.version>4.1.1</awaitility.version>
         <test-data-generator.version>0.7.11</test-data-generator.version>
         <!--        utils-->
@@ -208,8 +210,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
 

@@ -7,7 +7,7 @@ import static java.lang.System.*;
 
 public class LocalDateTimeAndDate {
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         var localDate = LocalDate.now();
         out.println(localDate.format(DateTimeFormatter.ISO_DATE));
     }

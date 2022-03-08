@@ -13,7 +13,7 @@ package org.hzt;
  */
 public class StringBufferVSStringBuilder {
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         try {
             testStringBufferVsStringBuilder();
         } catch (InterruptedException e) {

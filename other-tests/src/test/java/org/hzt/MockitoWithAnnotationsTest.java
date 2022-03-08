@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
- * @see <first href="https://mincong.io/2020/04/19/mockito-junit5/">Mockito: 3 Ways to Init Mock in JUnit 5</first>
+ * @see <a href="https://mincong.io/2020/04/19/mockito-junit5/">Mockito: 3 Ways to Init Mock in JUnit 5</a>
  * Requires Junit.jupiter.version of 5.7.0 or higher
  */
 @ExtendWith(MockitoExtension.class)

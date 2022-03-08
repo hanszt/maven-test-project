@@ -6,18 +6,19 @@ import java.time.LocalDate;
 import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AgeCalculatorTest {
 
     @Test
     void testCalculateAgeInDays() {
         final long ageInDays = AgeCalculator
-                .calculateDurationInDaysBetween(LocalDate.of(1994, Month.OCTOBER, 20), LocalDate.now());
+                .calculateDurationInDaysBetween(
+                        LocalDate.of(1994, Month.OCTOBER, 20),
+                        LocalDate.of(2022, Month.MARCH, 7));
 
         System.out.println("ageInDays = " + ageInDays);
 
-        assertTrue(ageInDays < 10_000);
+        assertEquals(10_000, ageInDays);
     }
 
     @Test

@@ -6,12 +6,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.hzt.utils</groupId>
+        <groupId>org.hzt.tests</groupId>
         <artifactId>maven-test-project</artifactId>
         <version>1.2</version>
     </parent>
 
-    <artifactId>only-jdk-content</artifactId>
+    <artifactId>java-17-practice-module</artifactId>
 
     <dependencies>
         <dependency>

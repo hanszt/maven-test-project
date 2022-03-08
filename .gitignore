@@ -46,3 +46,7 @@ Thumbs.db
 # IDE generated files #
 ######################
 target
+
+# Java serialization #
+######################
+*.ser

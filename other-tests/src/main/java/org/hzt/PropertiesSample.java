@@ -26,7 +26,7 @@ public class PropertiesSample {
     private static final String PROP_FILE2_LOCATION = PROPERTIES_INPUT_DIR + "/xml-properties.xml";
     private static final String PROP_NAME_QUEUE_MANAGER = "queue.manager";
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         LOGGER.info("Hello Test project");
         File propertiesFile = new File(PROP_FILE1_LOCATION);
         File propertiesXmlFile = new File(PROP_FILE2_LOCATION);
