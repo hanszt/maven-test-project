@@ -9,6 +9,7 @@ import org.hzt.test.model.Painter;
 import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Test;
 
+import java.awt.Color;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -65,74 +66,11 @@ class StreamUtilsTest {
         It.println("colorByComposedFilter = " + colorByComposedFilter);
         //assert
         assertAll(
-                () -> assertEquals(10, colorByComposedFilter.getBlue()),
+                () -> assertEquals(0, colorByComposedFilter.getBlue()),
                 () -> assertEquals(0, colorByCombinedFilter.getBlue()),
                 () -> assertEquals(255, colorByCombinedFilter.getRed()),
                 () -> assertTrue(originalColor.getGreen() < colorByCombinedFilter.getGreen())
         );
-    }
-    
-    private static class Color {
-
-        public static final int MAX_RGB_VALUE = 255;
-        private final int red;
-        private final int green;
-        private final int blue;
-
-        public Color(int red, int green, int blue) {
-            this.red = red;
-            this.green = green;
-            this.blue = blue;
-        }
-
-        public Color brighter() {
-            final var INCREASE_FACTOR = 10;
-            final var newRed = red + INCREASE_FACTOR;
-            final var newGreen = this.green + INCREASE_FACTOR;
-            final var newBlue = this.blue + INCREASE_FACTOR;
-            return new Color(
-                    Math.min(newRed, MAX_RGB_VALUE),
-                    Math.min(newGreen, MAX_RGB_VALUE),
-                    Math.min(newBlue, MAX_RGB_VALUE));
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Color color = (Color) o;
-            return red == color.red && green == color.green && blue == color.blue;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(red, green, blue);
-        }
-
-        public int getRed() {
-            return red;
-        }
-
-        public int getGreen() {
-            return green;
-        }
-
-        public int getBlue() {
-            return blue;
-        }
-
-        @Override
-        public String toString() {
-            return "Color{" +
-                    "red=" + red +
-                    ", green=" + green +
-                    ", blue=" + blue +
-                    '}';
-        }
     }
 
     private static Color maxRed(Color t) {
@@ -557,6 +495,15 @@ class StreamUtilsTest {
         names.forEach(It::println);
 
         assertEquals(1, names.size());
+    }
+
+    @Test
+    void testColorStream() {
+        final var count = Stream
+                .iterate(Color.BLACK, c -> !c.equals(Color.WHITE), Color::brighter)
+                .count();
+
+        assertEquals(15, count);
     }
 
 }
