@@ -6,6 +6,7 @@ import hzt.service_provider_modules.RandomFilterProvider;
 open module EnthuwareOCPStudyGroup {
 
     requires java.sql;
+    requires slf4j.api;
 
     exports hzt.interfaces;
     exports hzt.service_provider_modules;
