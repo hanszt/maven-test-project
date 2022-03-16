@@ -17,6 +17,8 @@
         <module>reactive-streams</module>
         <module>other-tests</module>
         <module>servlet-filter</module>
+        <module>scheduling-samples</module>
+        <module>transaction-samples</module>
     </modules>
 
     <properties>

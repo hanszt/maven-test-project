@@ -26,7 +26,7 @@ public interface IntSequence extends PrimitiveIterable.OfInt {
     }
 
     static IntSequence of(IntStream intStream) {
-        return () -> intStream.iterator();
+        return intStream::iterator;
     }
 
     default IntSequence map(IntUnaryOperator intUnaryOperator) {
