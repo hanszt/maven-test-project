@@ -1,7 +1,6 @@
 package org.hzt;
 
-import hzt.collections.MutableListX;
-import hzt.sequences.Sequence;
+import org.hzt.utils.sequences.Sequence;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;

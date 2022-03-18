@@ -2,7 +2,7 @@ package hzt.structural_patterns.adapter_pattern;
 
 public class SquarePegAdapter extends RoundPeg {
 
-    private SquarePeg peg;
+    private final SquarePeg peg;
 
     public SquarePegAdapter(SquarePeg peg) {
         this.peg = peg;

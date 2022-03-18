@@ -1,7 +1,7 @@
 package hzt.reactive.rxjava;
 
-import hzt.utils.It;
 import io.reactivex.rxjava3.core.Flowable;
+import org.hzt.utils.It;
 
 public class RxHelloWorld {
 

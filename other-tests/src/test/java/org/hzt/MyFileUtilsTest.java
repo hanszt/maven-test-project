@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import static hzt.stream.StreamUtils.by;
-import static hzt.stream.StreamUtils.function;
-import static hzt.function.predicates.StringPredicates.containsNoneOf;
+import static org.hzt.stream.StreamUtils.by;
+import static org.hzt.stream.StreamUtils.function;
+import static org.hzt.utils.function.predicates.StringPredicates.containsNoneOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MyFileUtilsTest {

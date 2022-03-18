@@ -1,9 +1,5 @@
 package org.hzt;
 
-import hzt.collections.MutableSetX;
-import hzt.collections.SetX;
-import hzt.collectors.CollectorsX;
-import hzt.sequences.Sequence;
 import org.hzt.model.Payment;
 import org.hzt.model.Person;
 import org.hzt.primitve_sequences.IntSequence;
@@ -13,6 +9,10 @@ import org.hzt.test.model.Book;
 import org.hzt.test.model.Museum;
 import org.hzt.test.model.Painter;
 import org.hzt.test.model.Painting;
+import org.hzt.utils.collections.MutableSetX;
+import org.hzt.utils.collections.SetX;
+import org.hzt.utils.collectors.CollectorsX;
+import org.hzt.utils.sequences.Sequence;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -32,17 +32,17 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static hzt.collectors.CollectorsX.flatMappingToList;
-import static hzt.collectors.CollectorsX.mappingToSet;
-import static hzt.collectors.CollectorsX.multiMappingToList;
-import static hzt.function.predicates.ComparingPredicates.greaterThan;
-import static hzt.function.predicates.StringPredicates.containsAllOf;
-import static hzt.stream.StreamUtils.by;
-import static hzt.stream.StreamUtils.function;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.function.Predicate.isEqual;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toUnmodifiableSet;
+import static org.hzt.stream.StreamUtils.by;
+import static org.hzt.stream.StreamUtils.function;
+import static org.hzt.utils.collectors.CollectorsX.flatMappingToList;
+import static org.hzt.utils.collectors.CollectorsX.mappingToSet;
+import static org.hzt.utils.collectors.CollectorsX.multiMappingToList;
+import static org.hzt.utils.function.predicates.ComparingPredicates.greaterThan;
+import static org.hzt.utils.function.predicates.StringPredicates.containsAllOf;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;

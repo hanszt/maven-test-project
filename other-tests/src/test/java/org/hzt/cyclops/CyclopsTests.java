@@ -1,7 +1,7 @@
 package org.hzt.cyclops;
 
 import cyclops.data.NonEmptyList;
-import hzt.collections.MutableListX;
+import org.hzt.utils.collections.MutableListX;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;

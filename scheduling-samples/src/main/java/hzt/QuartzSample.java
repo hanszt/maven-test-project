@@ -12,10 +12,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
+/**
+ * <a href="https://www.youtube.com/watch?v=uDkleDfmvBg">
+ * Getting Started: Scheduling Tasks with Quartz | Scheduling Tasks in Java - Quartz & Cron</a>
+ */
 @SuppressWarnings("ClassCanBeRecord")
 public final class QuartzSample {
 
@@ -43,7 +50,7 @@ public final class QuartzSample {
                             .toInstant()))
                     .withSchedule(SimpleScheduleBuilder
                             .simpleSchedule()
-                            .withIntervalInSeconds(1)
+                            .withIntervalInMilliseconds(500)
                             .withRepeatCount(10))
                     .build();
 
@@ -62,6 +69,20 @@ public final class QuartzSample {
 
     public static void main(String[] args) {
         LOGGER.info("Quartz sample started");
-        new QuartzSample(Clock.systemDefaultZone()).start();
+
+        final var scheduler = new QuartzSample(Clock.systemDefaultZone()).start();
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            @SuppressWarnings("all")
+            public void run() {
+                try {
+                    scheduler.shutdown();
+                } catch (SchedulerException e) {
+                    LOGGER.error("Scheduler exception occurred", e);
+                }
+                System.exit(0);
+            }
+        }, Duration.ofSeconds(10).toMillis());
     }
 }

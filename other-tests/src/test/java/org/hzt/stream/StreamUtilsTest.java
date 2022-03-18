@@ -1,12 +1,11 @@
 package org.hzt.stream;
 
-import hzt.stream.StreamUtils;
-import hzt.utils.It;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Book;
 import org.hzt.test.model.Museum;
 import org.hzt.test.model.Painter;
 import org.hzt.test.model.Painting;
+import org.hzt.utils.It;
 import org.junit.jupiter.api.Test;
 
 import java.awt.Color;
@@ -23,14 +22,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static hzt.function.predicates.DateTimePredicates.isBefore;
-import static hzt.function.predicates.StringPredicates.contains;
-import static hzt.function.predicates.StringPredicates.containsNoneOf;
-import static hzt.function.predicates.StringPredicates.hasEqualLength;
-import static hzt.function.predicates.StringPredicates.startsWith;
-import static hzt.stream.StreamUtils.*;
 import static java.util.Comparator.comparing;
 import static java.util.function.Predicate.isEqual;
+import static org.hzt.stream.StreamUtils.*;
+import static org.hzt.utils.function.predicates.DateTimePredicates.isBefore;
+import static org.hzt.utils.function.predicates.StringPredicates.contains;
+import static org.hzt.utils.function.predicates.StringPredicates.containsNoneOf;
+import static org.hzt.utils.function.predicates.StringPredicates.hasEqualLength;
+import static org.hzt.utils.function.predicates.StringPredicates.startsWith;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

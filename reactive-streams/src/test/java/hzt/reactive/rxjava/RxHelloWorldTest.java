@@ -1,10 +1,10 @@
 package hzt.reactive.rxjava;
 
-import hzt.numbers.IntX;
-import hzt.utils.It;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
+import org.hzt.utils.It;
+import org.hzt.utils.numbers.IntX;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertAll;

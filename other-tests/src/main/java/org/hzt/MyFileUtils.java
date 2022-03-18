@@ -1,6 +1,6 @@
 package org.hzt;
 
-import hzt.utils.It;
+import org.hzt.utils.It;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

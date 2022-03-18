@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static hzt.function.predicates.StringPredicates.contains;
+import static org.hzt.utils.function.predicates.StringPredicates.contains;
 
 public class AB implements A {
 

@@ -12,11 +12,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static hzt.function.predicates.ComparingPredicates.greaterThan;
-import static hzt.function.predicates.ComparingPredicates.greaterThanInt;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
 import static org.hzt.stream.StreamUtils.by;
+import static org.hzt.utils.function.predicates.ComparingPredicates.greaterThan;
+import static org.hzt.utils.function.predicates.ComparingPredicates.greaterThanInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 

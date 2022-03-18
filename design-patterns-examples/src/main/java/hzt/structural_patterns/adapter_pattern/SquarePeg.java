@@ -1,7 +1,7 @@
 package hzt.structural_patterns.adapter_pattern;
 
 public class SquarePeg {
-    private double width;
+    private final double width;
 
     public SquarePeg(double width) {
         this.width = width;

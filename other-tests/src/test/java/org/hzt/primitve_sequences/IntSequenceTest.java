@@ -1,10 +1,9 @@
 package org.hzt.primitve_sequences;
 
-import hzt.numbers.IntX;
+import org.hzt.utils.numbers.IntX;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;

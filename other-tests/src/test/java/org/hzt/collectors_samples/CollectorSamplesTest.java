@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static hzt.collectors.BigDecimalCollectors.averagingBigDecimal;
-import static hzt.collectors.BigDecimalCollectors.summarizingBigDecimal;
-import static hzt.function.predicates.StringPredicates.contains;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
+import static org.hzt.utils.collectors.BigDecimalCollectors.averagingBigDecimal;
+import static org.hzt.utils.collectors.BigDecimalCollectors.summarizingBigDecimal;
+import static org.hzt.utils.function.predicates.StringPredicates.contains;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;

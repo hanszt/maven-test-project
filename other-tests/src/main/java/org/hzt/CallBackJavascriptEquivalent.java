@@ -15,9 +15,6 @@ public final class CallBackJavascriptEquivalent {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CallBackJavascriptEquivalent.class);
 
-    private CallBackJavascriptEquivalent() {
-    }
-
     private static final String JAVASCRIPT_EQUIVALENT = "function hello(firstName, lastName, callback) {\n" +
                                                         "    print(firstName);\n" +
                                                         "    var result = firstName;\n" +
@@ -28,6 +25,9 @@ public final class CallBackJavascriptEquivalent {
                                                         "    }\n" +
                                                         "    return result;\n" +
                                                         "}\n";
+
+    private CallBackJavascriptEquivalent() {
+    }
 
     @VisibleForTesting
     static String setupEngine(ThrowingFunction<ScriptEngine, String> function) throws Exception {

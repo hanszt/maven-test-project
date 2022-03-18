@@ -1,7 +1,7 @@
 package hzt.reactive.own_implementation;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Flow;
 
@@ -10,7 +10,7 @@ import java.util.concurrent.Flow;
  */
 public class SimpleSubscriber implements Flow.Subscriber<Integer> {
 
-    private static final Logger LOGGER = LogManager.getLogger(SimpleSubscriber.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleSubscriber.class);
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {

@@ -1,6 +1,6 @@
 package org.hzt.primitve_sequences;
 
-import hzt.sequences.Sequence;
+import org.hzt.utils.sequences.Sequence;
 
 import java.util.ArrayList;
 import java.util.List;

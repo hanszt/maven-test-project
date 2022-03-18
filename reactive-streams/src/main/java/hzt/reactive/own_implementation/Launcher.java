@@ -1,7 +1,7 @@
 package hzt.reactive.own_implementation;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
@@ -13,7 +13,7 @@ import java.util.concurrent.SubmissionPublisher;
  */
 public class Launcher {
 
-    private static final Logger LOGGER = LogManager.getLogger(Launcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Launcher.class);
 
     public static void main(String[] args) {
         final var simplePublisher = new SimplePublisher(10);
@@ -23,6 +23,6 @@ public class Launcher {
         subscription.request(10);
         //implementation of java, synchronous, not really useful
         SubmissionPublisher<Integer> s = new SubmissionPublisher<>();
-        LOGGER.info(s);
+        LOGGER.info("{}", s);
     }
 }

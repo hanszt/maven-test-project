@@ -1,10 +1,10 @@
 package org.hzt.stream;
 
-import hzt.utils.It;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Book;
 import org.hzt.test.model.Painter;
 import org.hzt.test.model.Painting;
+import org.hzt.utils.It;
 import org.junit.jupiter.api.Test;
 
 import java.util.AbstractMap;
@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static hzt.stream.EntryStreamUtils.*;
-import static hzt.collectors.CollectorsX.toMap;
-import static hzt.function.predicates.StringPredicates.startsWithAnyOf;
+import static org.hzt.StringPredicates.startsWithAnyOf;
+import static org.hzt.stream.EntryStreamUtils.*;
+import static org.hzt.utils.collectors.CollectorsX.toMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;

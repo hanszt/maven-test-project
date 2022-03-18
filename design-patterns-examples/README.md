@@ -100,9 +100,13 @@ Let's see how we can implement it ourselves.
 ---
 #### Combinator pattern
 
+see package [combinator pattern](src/main/java/hzt/functional_patterns/combinator_pattern) for an example
 
+- also see [Implementing combinator pattern](https://youtu.be/VRpHdSFWGPs?t=6028)
 ---
-#### Borrower pattern
+#### Loan pattern
+
+see package [loan pattern](src/main/java/hzt/functional_patterns/loan_pattern) for an example
 
 ---
 
@@ -112,3 +116,4 @@ Let's see how we can implement it ourselves.
 - [Source making: Design patterns](https://sourcemaking.com/design_patterns/behavioral_patterns)
 - [Combinator/composition pattern](https://java-design-patterns.com/patterns/combinator/)
 - [Design Patterns in the Light of Lambda Expressions. Venkat Subramaniam, Agile developer, inc](https://www.youtube.com/watch?v=WN9kgdSVhDo)
+- [Functional programming patterns](https://dzone.com/articles/functional-programming-patterns-with-java-8)
