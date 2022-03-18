@@ -18,7 +18,7 @@ public class Bic {
 
     @Override
     public boolean equals(Object o) {
-        return this == o || (o instanceof Bic bic && Objects.equals(name, bic.name));
+        return this == o || (o instanceof Bic && Objects.equals(name, ((Bic) o).name));
     }
 
     @Override

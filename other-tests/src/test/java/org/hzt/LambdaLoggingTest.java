@@ -20,7 +20,8 @@ class LambdaLoggingTest {
                 LambdaLogging::logIfDebugEnabled);
 
         final var context = LogManager.getContext(false);
-        if (context instanceof LoggerContext ctx) {
+        if (context instanceof LoggerContext) {
+            LoggerContext ctx = (LoggerContext) context;
             Configuration config = ctx.getConfiguration();
             LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
             loggerConfig.setLevel(Level.DEBUG);

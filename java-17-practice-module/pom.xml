@@ -17,6 +17,12 @@
         <dependency>
             <groupId>org.hzt.utils</groupId>
             <artifactId>test-data-generator</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hzt.tests</groupId>
+            <artifactId>other-tests</artifactId>
+            <version>1.2</version>
         </dependency>
     </dependencies>
 

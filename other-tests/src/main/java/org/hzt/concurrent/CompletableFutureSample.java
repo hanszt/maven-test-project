@@ -53,7 +53,7 @@ public class CompletableFutureSample {
     /**
      * @see <a href="https://youtu.be/IwJ-SCfXoAU?t=8188">Complatable future google stock async</a>
      */
-    CompletableFuture<Integer> getStockPriceAndThenCombine() {
+    public CompletableFuture<Integer> getStockPriceAndThenCombine() {
         CompletableFuture<Integer> goog = CompletableFuture.supplyAsync(() -> getStockPrice("GOOG", 1));
         CompletableFuture<Integer> tesla = CompletableFuture.supplyAsync(() -> getStockPrice("TESLA", 1));
         CompletableFuture<Integer> completableFuture = goog.thenCombine(tesla, Integer::sum);
@@ -65,7 +65,7 @@ public class CompletableFutureSample {
      * compose is like flatMap. When you have first Completable future of first completable future, compose wraps it back into first
      * single completable future
      */
-    CompletableFuture<Integer> getStockPriceThenComposeAndThanCombine() {
+    public CompletableFuture<Integer> getStockPriceThenComposeAndThanCombine() {
         CompletableFuture<Integer> goog = CompletableFuture
                 .supplyAsync(() -> getCompFutForStockPrice("GOOG", 1))
                 .thenCompose(CompletableFuture::toCompletableFuture);

@@ -12,9 +12,7 @@ class ObjectToJsonConverterTest {
 
     @Test
     void testGivenObjectSerializedThenReturnExpectedJson() throws JsonSerializationException {
-        final String EXPECTED = """
-                {"firstName":"Soufiane","lastName":"Cheouati","birthDate":"1986-10-02"}
-                """.strip();
+        final String EXPECTED = "{\"firstName\":\"Soufiane\",\"lastName\":\"Cheouati\",\"birthDate\":\"1986-10-02\"}\n".strip();
         Person person = new Person("soufiane", "cheouati", LocalDate.of(1986, 10, 2));
 
         ObjectToJsonConverter serializer = new ObjectToJsonConverter();

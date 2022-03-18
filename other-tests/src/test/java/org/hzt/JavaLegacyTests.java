@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -29,7 +30,8 @@ class JavaLegacyTests {
         }
 
         final List<Integer> lsw = Sequence.of(iterable).toList();
-        final List<Integer> ld = StreamSupport.stream(iterable.spliterator(), false).toList();
+        final List<Integer> ld = StreamSupport.stream(iterable.spliterator(), false)
+                .collect(Collectors.toUnmodifiableList());
         final List<String> list = Collections.list(dictionary.keys());
 
         assertAll(

@@ -23,34 +23,34 @@ import java.util.stream.StreamSupport;
 @FunctionalInterface
 public interface FunctionalSequence<T> extends FunctionalIterable<T> {
 
-    static <T> FunctionalSequence<T> of(Iterable<T> iterable) {
+    static <T> FunctionalSequence<T> of(@NotNull Iterable<T> iterable) {
         return getFunctionalSequence(iterable.iterator());
     }
 
-    static <T> FunctionalSequence<T> of(Stream<T> stream) {
+    static <T> FunctionalSequence<T> of(@NotNull Stream<T> stream) {
         return getFunctionalSequence(stream.iterator());
     }
 
-    static <T> FunctionalSequence<T> of(FunctionalIterable<T> iterable) {
+    static <T> FunctionalSequence<T> of(@NotNull FunctionalIterable<T> iterable) {
         return iterable::functionalIterator;
     }
 
-    default <R> FunctionalSequence<R> map(Function<? super T, ? extends R> mapper) {
+    default <R> FunctionalSequence<R> map(@NotNull Function<? super T, ? extends R> mapper) {
         return () -> FunctionalIterators.mappingIterator(functionalIterator(), mapper);
     }
 
-    default FunctionalSequence<T> filter(Predicate<? super T> predicate) {
+    default FunctionalSequence<T> filter(@NotNull Predicate<? super T> predicate) {
         return () -> FunctionalIterators.filteringIterator(functionalIterator(), predicate);
     }
 
-    default FunctionalSequence<T> onEach(Consumer<T> consumer) {
+    default FunctionalSequence<T> onEach(@NotNull Consumer<T> consumer) {
         return map(value -> {
             consumer.accept(value);
             return value;
         });
     }
 
-    default T reduce(T init, BinaryOperator<T> binaryOperator) {
+    default T reduce(@NotNull T init, @NotNull BinaryOperator<T> binaryOperator) {
         T result = init;
         FunctionalIterator<T> iterator = functionalIterator();
         HoldingConsumer<T> consumer = new HoldingConsumer<>();
@@ -60,7 +60,7 @@ public interface FunctionalSequence<T> extends FunctionalIterable<T> {
         return result;
     }
 
-    default <C extends Collection<T>> C to(Supplier<C> collectionSupplier) {
+    default <C extends Collection<T>> C to(@NotNull Supplier<C> collectionSupplier) {
         final var collection = collectionSupplier.get();
         FunctionalIterator<T> iterator = functionalIterator();
         HoldingConsumer<T> consumer = new HoldingConsumer<>();
@@ -70,7 +70,7 @@ public interface FunctionalSequence<T> extends FunctionalIterable<T> {
         return collection;
     }
 
-    default T[] toArray(IntFunction<T[]> arrayFactory) {
+    default T[] toArray(@NotNull IntFunction<T[]> arrayFactory) {
         return toList().toArray(arrayFactory);
     }
 
@@ -97,7 +97,7 @@ public interface FunctionalSequence<T> extends FunctionalIterable<T> {
     }
 
     @NotNull
-    private static <T> FunctionalSequence<T> getFunctionalSequence(Iterator<T> downStream) {
+    private static <T> FunctionalSequence<T> getFunctionalSequence(@NotNull Iterator<T> downStream) {
         return new FunctionalSequence<>() {
 
             @Override

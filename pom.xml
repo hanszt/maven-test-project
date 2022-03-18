@@ -72,7 +72,6 @@
                 <groupId>org.hzt.utils</groupId>
                 <artifactId>test-data-generator</artifactId>
                 <version>${test-data-generator.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.hzt.utils</groupId>

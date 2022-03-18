@@ -3,17 +3,16 @@ package org.hzt;
 import hzt.collections.MutableSetX;
 import hzt.collections.SetX;
 import hzt.collectors.CollectorsX;
-import hzt.ranges.IntRange;
 import hzt.sequences.Sequence;
 import org.hzt.model.Payment;
 import org.hzt.model.Person;
 import org.hzt.primitve_sequences.IntSequence;
 import org.hzt.primitve_sequences.PrimitiveIterable;
+import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Book;
 import org.hzt.test.model.Museum;
 import org.hzt.test.model.Painter;
 import org.hzt.test.model.Painting;
-import org.hzt.test.TestSampleGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -104,7 +103,7 @@ class StreamsSampleTest {
         final var limitedList = list2.stream()
                 .sorted()
                 .limit(10)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         assertEquals(expectedLimitedList, limitedList);
     }
@@ -114,11 +113,11 @@ class StreamsSampleTest {
         final var iterator = getIntegerStream(100).iterator();
         final var expected = getIntegerStream(100)
                 .map(String::valueOf)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var result = StreamsSample.returnStreamFromIterator(iterator)
                 .map(String::valueOf)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         assertEquals(expected, result);
     }
@@ -132,7 +131,7 @@ class StreamsSampleTest {
     void testFibonacciUsingStreams() {
         final var expected = Stream.of(0, 1, 1, 2, 3, 5, 8, 13, 21, 34)
                 .map(BigInteger::valueOf)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var fibonacciList = StreamsSample.getFibonacci(10);
         assertEquals(expected, fibonacciList);
@@ -231,7 +230,7 @@ class StreamsSampleTest {
                 .filter(containsAllOf("a", "e"))
                 .distinct()
                 .onClose(() -> setClosedAndPrintClosed(message, isClosed))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private void setClosedAndPrintClosed(String message, AtomicBoolean closed) {

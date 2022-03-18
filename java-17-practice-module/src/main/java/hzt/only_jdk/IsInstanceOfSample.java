@@ -1,4 +1,4 @@
-package org.hzt.newsyntax;
+package hzt.only_jdk;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,18 +18,18 @@ public class IsInstanceOfSample {
     private static void testIsInstanceTest() throws ClassNotFoundException {
         Animal animal = Math.random() < .5 ? new Dog() : new Cat();
         LOGGER.info("{}", animal);
-        if (isInstanceByClassname(animal, "com.dnb.newsyntax.Dog")) {
-            LOGGER.info("it's first dog");
+        if (isInstanceByClassname(animal, Dog.class.getName())) {
+            LOGGER.info("it's a dog");
         } else {
-            LOGGER.info("It's first cat");
+            LOGGER.info("It's a cat");
         }
         if (animal instanceof Dog) {
-            LOGGER.info("It's first dog");
+            LOGGER.info("It's a dog");
         }
     }
 
     // This method tells us whether the object is an
-    // instance of class whose name is passed as first
+    // instance of class whose name is passed as a
     // string 'c'.
     // use isInstance() method when needed dynamically
     // Source: https://www.geeksforgeeks.org/instanceof-operator-vs-isinstance-method-in-java/
@@ -62,7 +62,6 @@ public class IsInstanceOfSample {
         }
     }
 
-    @SuppressWarnings("all")
     static sealed class Animal {
 
         private final int nrOfLegs;

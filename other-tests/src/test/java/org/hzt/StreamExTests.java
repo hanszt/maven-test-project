@@ -20,7 +20,7 @@ class StreamExTests {
 
         final var expected = museumList.stream()
                 .flatMap(m -> m.getPaintings().stream())
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         final var actual = StreamEx.of(museumList)
                 .toFlatList(Museum::getPaintings);

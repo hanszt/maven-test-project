@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,7 +30,7 @@ class GenericsTest {
     private static List<String> takeListAsWildCardAndGoToStringList(List<? super Person> persons) {
         return persons.stream()
                 .map(Object::toString)
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
     }
 
     @Test
@@ -43,11 +44,11 @@ class GenericsTest {
 
         final Object collect = list.stream().map(Object::getClass)
                 .filter(e -> e.equals(String.class))
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         for (Object object : list) {
-            if (object instanceof Person person) {
-                System.out.println("person.getAddress() = " + person.getAddress());
+            if (object instanceof Person) {
+                System.out.println("person.getAddress() = " + ((Person) object).getAddress());
             }
         }
         System.out.println(collect);
@@ -62,6 +63,8 @@ class GenericsTest {
     }
 
     public <T> List<T> genericMethod(List<T> list) {
-        return list.stream().filter(Objects::nonNull).toList();
+        return list.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toUnmodifiableList());
     }
 }

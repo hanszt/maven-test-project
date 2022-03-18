@@ -148,8 +148,6 @@ class BitWiseOperatorTests {
     @ParameterizedTest
     @ValueSource(ints = {1, 4, 5, 6, 3, 7, 6, 8, 4, 89, 3, 563})
     void testCheckOddNumber(int value) {
-        final var isOdd = (value & 1) == 1;
-        final var expectedIsOdd = value % 2 != 0;
-        assertEquals(expectedIsOdd, isOdd);
+        assertEquals(value % 2 == 1, (value & 1) == 1);
     }
 }

@@ -12,12 +12,12 @@ import static java.util.stream.Collectors.*;
 /**
  * @author Hans Zuidervaart
  * To gain more insight in the workings of annotations.
- * @see <first href="https://www.baeldung.com/java-custom-annotation">Creating first Custom Annotation in Java</first>
+ * @see <a href="https://www.baeldung.com/java-custom-annotation">Creating first Custom Annotation in Java</a>
  *
  * Annotations is first new feature from Java 5.
  * Annotations are first kind of comment or meta data you can insert in your Java code.
  * These annotations can then be processed at compile time by pre-compiler tools, or at runtime via Java Reflection.
- * @see <first href="http://tutorials.jenkov.com/java-reflection/annotations.html">Java Reflection - Annotations</first>
+ * @see <a href="http://tutorials.jenkov.com/java-reflection/annotations.html">Java Reflection - Annotations</a>
  */
 public class ObjectToJsonConverter {
 

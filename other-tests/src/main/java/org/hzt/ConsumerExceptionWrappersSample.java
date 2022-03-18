@@ -10,19 +10,14 @@ public class ConsumerExceptionWrappersSample {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerExceptionWrappersSample.class);
 
-    void arithmeticExceptionExample() {
-        List<Integer> integers = List.of(3, 9, 0, 7, 6, 10, 20, 6);
-        integers.forEach(i -> LOGGER.info("{}", 50 / i));
-    }
-
     @SuppressWarnings("SameParameterValue")
     static <T, E extends Exception> Consumer<T> consumerWrapper(Consumer<T> consumer, Class<E> throwableClass) {
-        return i -> wrapCheckedException(consumer, throwableClass, i);
+        return value -> wrapCheckedException(consumer, throwableClass, value);
     }
 
-    private static <T, E extends Exception> void wrapCheckedException(Consumer<T> consumer, Class<E> throwableClass, T i) {
+    private static <T, E extends Exception> void wrapCheckedException(Consumer<T> consumer, Class<E> throwableClass, T value) {
         try {
-            consumer.accept(i);
+            consumer.accept(value);
         } catch (@SuppressWarnings("all") Exception ex) {
             try {
                 var exCast = throwableClass.cast(ex);
@@ -33,12 +28,38 @@ public class ConsumerExceptionWrappersSample {
         }
     }
 
+    private static <T, E extends Throwable> Consumer<T> catching(Consumer<T> consumer, Consumer<E> exceptionConsumer) {
+        return e -> consumeValueOrException(consumer, exceptionConsumer, e);
+    }
+
+    private static <T, E extends Throwable> void consumeValueOrException(Consumer<T> consumer, Consumer<E> throwableClass, T value) {
+        try {
+            consumer.accept(value);
+        } catch (@SuppressWarnings("all") Throwable throwable) {
+            //noinspection unchecked
+            throwableClass.accept((E) throwable);
+        }
+    }
+
+    /**
+     * source: https://www.baeldung.com/java-lambda-exceptions
+     */
+    void consumeThrowingExample() {
+        List<Integer> integers = List.of(3, 9, 0, 7, 6, 10, 20, 6);
+        integers.forEach(catching(i -> LOGGER.info("{}", 50 / i), e -> LOGGER.error("Something went wrong", e)));
+    }
+
     /**
      * source: https://www.baeldung.com/java-lambda-exceptions
      */
     void consumerWrapperExample() {
         List<Integer> integers = List.of(3, 9, 0, 7, 6, 10, 20, 6);
         integers.forEach(consumerWrapper(i -> LOGGER.info("{}", 50 / i), ArithmeticException.class));
+    }
+
+    void arithmeticExceptionExample() {
+        List<Integer> integers = List.of(3, 9, 0, 7, 6, 10, 20, 6);
+        integers.forEach(i -> LOGGER.info("{}", 50 / i));
     }
 }
 

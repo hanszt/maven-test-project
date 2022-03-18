@@ -1,7 +1,7 @@
 # Design pattern examples
 A project to become familiar with all the different design patterns in Java.
 
-For each dessign pattern category, I have chosen a different source. (See sources for the ones I used).  
+For each design pattern category, I have chosen a different source. (See sources for the ones I used).  
 
 ---
 ## Patterns
@@ -94,7 +94,21 @@ Let's see how we can implement it ourselves.
 [![observer_pattern](design_pattern_images/observer_pattern.png)](https://refactoring.guru/design-patterns/observer)
 - [The Observer Pattern in Java](https://www.baeldung.com/java-observer-pattern)
 
+---
+### Behavioural patterns
+
+---
+#### Combinator pattern
+
+
+---
+#### Borrower pattern
+
+---
+
 ## Sources
 - [Design Patterns in Java](https://www.javatpoint.com/design-patterns-in-java)
 - [DESIGN PATTERNS Refactoring Guru](https://refactoring.guru/design-patterns)
 - [Source making: Design patterns](https://sourcemaking.com/design_patterns/behavioral_patterns)
+- [Combinator/composition pattern](https://java-design-patterns.com/patterns/combinator/)
+- [Design Patterns in the Light of Lambda Expressions. Venkat Subramaniam, Agile developer, inc](https://www.youtube.com/watch?v=WN9kgdSVhDo)

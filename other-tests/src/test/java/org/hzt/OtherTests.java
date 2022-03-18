@@ -160,12 +160,14 @@ class OtherTests {
     @Test
     void testCreatingBathes() {
         List<String> data = IntStream.range(0, 950)
-                .mapToObj(i -> "item " + i).toList();
+                .mapToObj(i -> "item " + i)
+                .collect(Collectors.toUnmodifiableList());
 
         final int BATCH_SIZE = 100;
 
         List<List<String>> batches = IntStream.range(0, (data.size() + BATCH_SIZE - 1) / BATCH_SIZE)
-                .mapToObj(i -> data.subList(i * BATCH_SIZE, Math.min(data.size(), (i + 1) * BATCH_SIZE))).toList();
+                .mapToObj(i -> data.subList(i * BATCH_SIZE, Math.min(data.size(), (i + 1) * BATCH_SIZE)))
+                .collect(Collectors.toUnmodifiableList());
 
         assertEquals(10, batches.size());
         printBatches(batches);
@@ -226,7 +228,8 @@ class OtherTests {
         final var list = Collections.list(enumeration);
         final var stringIterator = enumeration.asIterator();
         final Iterable<String> iterable = () -> stringIterator;
-        final var strings = StreamSupport.stream(iterable.spliterator(), false).toList();
+        final var strings = StreamSupport.stream(iterable.spliterator(), false)
+                .collect(Collectors.toUnmodifiableList());
         System.out.println(strings);
         assertNotEquals(strings, list);
     }
@@ -383,7 +386,7 @@ class OtherTests {
                 .sorted(Comparator.comparing(a -> a.name))
                 .filter(a -> a.name.toLowerCase(Locale.ROOT).contains("meisje"))
                 .filter(a -> a.isInMuseumAndIsOlderThan100Years())
-                .toList();
+                .collect(Collectors.toUnmodifiableList());
 
         list.forEach(anonymous -> System.out.println("Name: " + anonymous.name + " PaintingAge: " + anonymous.painting));
 

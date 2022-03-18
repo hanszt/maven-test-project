@@ -11,6 +11,7 @@ import java.time.Period;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressWarnings("unused")
 @JsonSerializable
 public class Person implements Comparable<Person> {
 
@@ -95,7 +96,7 @@ public class Person implements Comparable<Person> {
 
     @Override
     public boolean equals(Object obj) {
-        return this == obj || (obj instanceof Person other && Objects.equals(this.lastName, other.lastName));
+        return this == obj || (obj instanceof Person && Objects.equals(this.lastName, ((Person) obj).lastName));
     }
 
     @Override

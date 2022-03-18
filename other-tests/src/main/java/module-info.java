@@ -7,4 +7,5 @@ open module other.tests {
     requires core;
     requires one.util.streamex;
     requires org.jetbrains.annotations;
+    requires java.scripting;
 }

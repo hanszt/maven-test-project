@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,18 +32,5 @@ class CompletableFutureSampleTest {
         var completableFuture = completableFutureSample.getStockPriceThenComposeAndThanCombine();
         completableFuture.thenAccept(System.out::println);
         assertNotNull(completableFuture);
-    }
-
-    @Test
-    void testCompletableFuturesListResultUsingMapMulti() {
-        final List<CompletableFuture<Integer>> completableFutures = List.of(
-                completableFutureSample.getStockPriceAndThenCombine(),
-                completableFutureSample.getStockPriceThenComposeAndThanCombine());
-
-        final List<Integer> stockPrices = completableFutures.stream()
-                .<Integer>mapMulti(CompletableFuture::thenAccept)
-                .toList();
-
-        assertEquals(List.of(1500, 1500), stockPrices);
     }
 }

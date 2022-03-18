@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -20,7 +21,7 @@ final class StreamsSample {
     }
 
     public static List<BigInteger> getFibonacci(int length) {
-        return getFibonacciStream(length, BigInteger.ZERO).toList();
+        return getFibonacciStream(length, BigInteger.ZERO).collect(Collectors.toList());
     }
 
     public static BigInteger getNthFibonacciNumber(int n) {

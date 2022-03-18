@@ -17,4 +17,9 @@ class ConsumerExceptionWrappersSampleTest {
     void testThrowsNoRunTimeException() {
         assertDoesNotThrow(consumerExceptionWrappersSample::consumerWrapperExample);
     }
+
+    @Test
+    void testThrowingLogsStacktrace() {
+        assertDoesNotThrow(consumerExceptionWrappersSample::consumeThrowingExample);
+    }
 }
