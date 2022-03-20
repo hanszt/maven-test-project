@@ -32,12 +32,13 @@
         <!--        test-->
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
         <mockito.version>4.3.1</mockito.version>
-        <awaitility.version>4.1.1</awaitility.version>
+        <awaitility.version>4.2.0</awaitility.version>
         <test-data-generator.version>0.7.5.11</test-data-generator.version>
         <!--        utils-->
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <guava.version>31.0.1-jre</guava.version>
         <streamex.version>0.8.1</streamex.version>
+        <jool.version>0.9.14</jool.version>
         <!--        reactive-streams-->
         <reactive-streams-tck.version>1.0.3</reactive-streams-tck.version>
         <rxjava.version>3.1.1</rxjava.version>
@@ -82,6 +83,11 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jool</artifactId>
+                <version>${jool.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jetbrains</groupId>

@@ -13,10 +13,6 @@
 
     <artifactId>design-patterns-examples</artifactId>
 
-    <properties>
-        <jool.version>0.9.14</jool.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.hzt.utils</groupId>
@@ -25,7 +21,6 @@
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jool</artifactId>
-            <version>${jool.version}</version>
         </dependency>
     </dependencies>
 </project>

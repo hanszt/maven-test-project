@@ -39,6 +39,10 @@
             <artifactId>streamex</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jool</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.oath.cyclops</groupId>
             <artifactId>cyclops</artifactId>
         </dependency>

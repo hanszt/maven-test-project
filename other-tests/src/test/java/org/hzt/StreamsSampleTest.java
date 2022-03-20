@@ -296,4 +296,15 @@ class StreamsSampleTest {
         );
     }
 
+    @Test
+    void testStreamBuilder() {
+        final Stream<String> stream = Stream.<String>builder()
+                .add("Hallo").add("Dit").add("is").add("een").add("test").build();
+
+        final String[] actual = stream.toArray(String[]::new);
+        final String[] expected = {"Hallo", "Dit", "is", "een", "test"};
+
+        assertArrayEquals(expected, actual);
+    }
+
 }
