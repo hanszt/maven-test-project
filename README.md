@@ -14,10 +14,12 @@ This project consists of multiple modules:
 - [Scheduling samples](scheduling-samples/README.md)
 - [Tomcat servlet filter](servlet-filter/README.md)
 - [Transaction-samples](transaction-samples/README.md)
+- [Jasper Reports](jasper-reports/README.md)
 
 ## Requirements
 Some modules require the following custom dependencies:
-````
+```xml
+<dependencies>
     <dependency>
         <groupId>org.hzt.utils</groupId>
         <artifactId>test-data-generator</artifactId>
@@ -28,8 +30,8 @@ Some modules require the following custom dependencies:
         <artifactId>core</artifactId>
         <version>${org.hzt-utils.version}</version>
     </dependency>
-````
-
+</dependencies>
+```
 See the [pom](pom.xml)
 
 These dependencies are not yet available at maven central. You can use these dependencies by locally installing the

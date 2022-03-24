@@ -2,13 +2,14 @@ package hzt.functional_patterns.combinator_pattern;
 
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Painting;
+import org.hzt.utils.It;
+import org.hzt.utils.sequences.Sequence;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.time.Year;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static hzt.functional_patterns.combinator_pattern.PaintingValidator.Result;
 import static hzt.functional_patterns.combinator_pattern.PaintingValidator.isCreatedBeforeTheYear;
@@ -59,15 +60,15 @@ class PaintingValidatorTest {
 
     @Test
     void testValidatingPaintingWithInvalidMaxYearReturnsStatusCreationYearInvalid() {
-        final var validPainting = getTestPainting(
+        final var painting = getTestPainting(
                 Painting::isInMuseum,
                 p -> p.yearOfCreation().isAfter(Year.of(1700)));
 
-        System.out.println(validPainting);
+        System.out.println(painting);
 
         final var result = isCreatedBeforeTheYear(1700)
                 .and(isInMuseum())
-                .apply(validPainting);
+                .apply(painting);
 
         assertSame(Result.CREATION_YEAR_INVALID, result);
     }
@@ -89,16 +90,16 @@ class PaintingValidatorTest {
 
     @Test
     void testValidatingPaintingInvalidCustomValidationReturnsStatusInValid() {
-        final var validPainting = getTestPainting(
+        final var painting = getTestPainting(
                 Painting::isInMuseum,
                 p -> p.yearOfCreation().isBefore(Year.of(1800)));
 
-        System.out.println("validPainting = " + validPainting);
+        System.out.println(painting);
 
         final var result = isCreatedBeforeTheYear(1800)
                 .and(isInMuseum())
                 .and(p -> p.name().startsWith("a") ? Result.IS_VALID : Result.INVALID)
-                .apply(validPainting);
+                .apply(painting);
 
         assertSame(Result.INVALID, result);
     }
@@ -121,12 +122,9 @@ class PaintingValidatorTest {
     }
 
     @SafeVarargs
-    private static Painting getTestPainting(Predicate<Painting>... predicatesToBeSatisfied) {
-        Predicate<Painting> combinedPredicate = Stream.of(predicatesToBeSatisfied).reduce(p -> true, Predicate::and);
-        return paintingList.stream()
-                .filter(combinedPredicate)
-                .findFirst()
-                .orElseThrow();
+    private static Painting getTestPainting(Predicate<Painting>... predicates) {
+        Predicate<Painting> combinedPredicate = Sequence.of(predicates).reduce(It::noFilter, Predicate::and);
+        return Sequence.of(paintingList).first(combinedPredicate);
     }
 
 }
