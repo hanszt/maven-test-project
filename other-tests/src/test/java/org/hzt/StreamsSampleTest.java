@@ -2,8 +2,8 @@ package org.hzt;
 
 import org.hzt.model.Payment;
 import org.hzt.model.Person;
-import org.hzt.primitve_sequences.IntSequence;
-import org.hzt.primitve_sequences.PrimitiveIterable;
+import org.hzt.sequences.primitve_sequences.IntSequence;
+import org.hzt.sequences.primitve_sequences.PrimitiveIterable;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Book;
 import org.hzt.test.model.Museum;

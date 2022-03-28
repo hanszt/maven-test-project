@@ -1,4 +1,4 @@
-package org.hzt.functional_iterator_sequences;
+package org.hzt.sequences.functional_iterator_sequences;
 
 import org.jetbrains.annotations.NotNull;
 

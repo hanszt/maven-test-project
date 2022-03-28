@@ -1,4 +1,4 @@
-package org.hzt.primitve_sequences;
+package org.hzt.sequences.primitve_sequences;
 
 import java.util.NoSuchElementException;
 import java.util.PrimitiveIterator;

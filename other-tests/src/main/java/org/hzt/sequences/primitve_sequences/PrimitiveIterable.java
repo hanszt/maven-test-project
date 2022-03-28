@@ -1,4 +1,4 @@
-package org.hzt.primitve_sequences;
+package org.hzt.sequences.primitve_sequences;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -1,4 +1,4 @@
-package org.hzt.primitve_sequences;
+package org.hzt.sequences.primitve_sequences;
 
 import org.hzt.utils.numbers.IntX;
 import org.junit.jupiter.api.Test;
