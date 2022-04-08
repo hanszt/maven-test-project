@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -120,6 +121,15 @@ class ListTests {
         List<Integer> integers = new ArrayList<>(8);
         //noinspection ResultOfMethodCallIgnored
         assertThrows(IndexOutOfBoundsException.class, () -> integers.get(7));
+    }
+
+    @Test
+    void testListReplaceAll() {
+        List<String> names = new ArrayList<>(List.of("Sophie", "Rashied", "Piet", "Dominic"));
+
+        names.replaceAll(name -> name.toUpperCase(Locale.ROOT));
+
+        assertEquals(List.of("SOPHIE", "RASHIED", "PIET", "DOMINIC"), names);
     }
 
 }

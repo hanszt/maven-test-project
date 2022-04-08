@@ -3,11 +3,14 @@ package org.hzt;
 import org.hzt.utils.sequences.Sequence;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -38,6 +41,31 @@ class JavaLegacyTests {
                 () -> assertEquals(2, ld.size()),
                 () -> assertEquals(2, list.size()),
                 () -> assertEquals(Long.MAX_VALUE, l)
+        );
+    }
+
+    @Test
+    void testStringTokenizer() {
+        final var inputString = "This,is,a,test";
+        final var delimiter = ",";
+
+        final var stringTokenizer = new StringTokenizer(inputString, delimiter);
+        List<String> tokens = new ArrayList<>();
+        while (stringTokenizer.hasMoreElements()) {
+            tokens.add(stringTokenizer.nextToken());
+        }
+
+        final var list = Sequence.of(() -> new StringTokenizer(inputString, delimiter).asIterator())
+                .castIfInstanceOf(String.class)
+                .toList();
+
+        final var strings = Stream.of(inputString.split(delimiter))
+                .collect(Collectors.toList());
+
+        assertAll(
+                () -> assertEquals(List.of("This", "is", "a", "test"), tokens),
+                () -> assertEquals(strings, tokens),
+                () -> assertEquals(strings, list)
         );
     }
 }

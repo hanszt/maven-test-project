@@ -40,13 +40,13 @@
         <guava.version>31.0.1-jre</guava.version>
         <streamex.version>0.8.1</streamex.version>
         <jool.version>0.9.14</jool.version>
+        <org.hzt-utils.version>0.7.5.11</org.hzt-utils.version>
         <!--        reactive-streams-->
         <reactive-streams-tck.version>1.0.3</reactive-streams-tck.version>
         <rxjava.version>3.1.1</rxjava.version>
         <spring-boot-starter-webflux.version>2.6.2</spring-boot-starter-webflux.version>
         <scala.binary.version>2.13</scala.binary.version>
         <akka.version>2.6.16</akka.version>
-        <org.hzt-utils.version>0.7.5.11</org.hzt-utils.version>
         <annotations.version>22.0.0</annotations.version>
         <!--plugins-->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>

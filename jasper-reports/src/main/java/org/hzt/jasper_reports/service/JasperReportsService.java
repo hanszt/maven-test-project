@@ -12,6 +12,7 @@ import net.sf.jasperreports.export.SimplePdfReportConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.Optional;
 
@@ -31,19 +32,18 @@ public class JasperReportsService {
         }
     }
 
-    public void exportToPdf(String reportName, String fileName) {
-        InputStream employeeReportStream = getClass().getResourceAsStream(reportName);
+    public void exportToPdf(File inputFile, String pdfFileName) {
         final var exporter = new JRPdfExporter();
 
-        exporter.setExporterInput(new SimpleExporterInput(employeeReportStream));
-        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(fileName));
+        exporter.setExporterInput(new SimpleExporterInput(inputFile));
+        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(pdfFileName));
 
         final var reportConfig = new SimplePdfReportConfiguration();
         reportConfig.setSizePageToContent(true);
         reportConfig.setForceLineBreakPolicy(false);
 
         final var exportConfig = new SimplePdfExporterConfiguration();
-        exportConfig.setMetadataAuthor("baeldung");
+        exportConfig.setMetadataAuthor("hzt");
         exportConfig.setEncrypted(true);
         exportConfig.setAllowedPermissionsHint("PRINTING");
 

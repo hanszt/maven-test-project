@@ -6,4 +6,5 @@ module com.example.jasperreports {
 
     opens org.hzt.jasper_reports to javafx.fxml;
     exports org.hzt.jasper_reports;
+    exports org.hzt.jasper_reports.service;
 }
