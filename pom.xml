@@ -32,7 +32,7 @@
         <log4j.version>2.17.2</log4j.version>
         <!--        test-->
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
-        <mockito.version>4.3.1</mockito.version>
+        <mockito.version>4.5.1</mockito.version>
         <awaitility.version>4.2.0</awaitility.version>
         <test-data-generator.version>0.7.5.11</test-data-generator.version>
         <!--        utils-->

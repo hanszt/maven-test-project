@@ -18,7 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx-fxml.version>17.0.2</javafx-fxml.version>
         <javafx-maven-plugin.version>0.0.8</javafx-maven-plugin.version>
-        <jasperreports.version>6.19.0</jasperreports.version>
+        <jasperreports.version>6.19.1</jasperreports.version>
     </properties>
 
     <dependencies>

@@ -23,7 +23,7 @@ public class Person implements Comparable<Person> {
     private String lastName;
 
     @JsonElement(key = "birthDate")
-    private final LocalDate dateOfBirth;
+    private LocalDate dateOfBirth;
 
     private String address;
 
@@ -42,6 +42,14 @@ public class Person implements Comparable<Person> {
 
     public Person(String firstName) {
         this(firstName, "Undefinied", null, false);
+    }
+
+    public Person(String firstName, String lastName) {
+        this(firstName, lastName, null);
+    }
+
+    public static int compareFirstName(Person person1, Person person2) {
+        return person1.getFirstName().compareTo(person2.getFirstName());
     }
 
     @Initializable
@@ -64,6 +72,11 @@ public class Person implements Comparable<Person> {
 
     public LocalDate getDateOfBirth() {
         return dateOfBirth;
+    }
+
+    public Person withDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+        return this;
     }
 
     public int getAge() {

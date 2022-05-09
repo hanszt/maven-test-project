@@ -3,6 +3,7 @@ package hzt;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,8 +12,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -116,7 +119,7 @@ class IoTest {
 //                os = new FileOutputStream("c:\\default.txt");  //2 objects declared in try with resources are final
             }
             byte[] buffer = new byte[1024];
-            int bytesRead = 0;
+            int bytesRead;
             while ((bytesRead = is.read(buffer)) != -1) {  //3
                 os.write(buffer, 0, bytesRead);
                 System.out.println("Read and written bytes " + bytesRead);
@@ -128,5 +131,35 @@ class IoTest {
 
     void testVarInTryWithResourcesAreEffectivelyFinal() {
         copy("c:\\temp\\test1.txt", "c:\\temp\\test2.txt");
+    }
+
+    @Test
+    void testBufferedReaderLinesMethod() {
+        String testString = "Hallo dit is een test\nNa de break\nThird line";
+        final var inputStream = new ByteArrayInputStream(testString.getBytes(StandardCharsets.UTF_8));
+
+        final var strings = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                .lines()
+                .filter(s -> !s.contains("Na"))
+                .collect(Collectors.joining("\n"));
+
+        final var expected = "Hallo dit is een test\nThird line";
+
+        assertEquals(expected, strings);
+    }
+
+    @Test
+    void testInputStreamReadAllBytes() {
+        String testString = "Hallo dit is een test\nNa de break\nThird line";
+        final var inputStream = new ByteArrayInputStream(testString.getBytes(StandardCharsets.UTF_8));
+
+        final var actual = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8)
+                .lines()
+                .filter(s -> !s.contains("Na"))
+                .collect(Collectors.joining("\n"));
+
+        final var expected = "Hallo dit is een test\nThird line";
+
+        assertEquals(expected, actual);
     }
 }
