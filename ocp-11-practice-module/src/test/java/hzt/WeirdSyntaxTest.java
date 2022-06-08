@@ -2,6 +2,9 @@ package hzt;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class WeirdSyntaxTest {

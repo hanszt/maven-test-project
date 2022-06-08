@@ -11,8 +11,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
- * http://www.java2s.com/Tutorial/Java/0400__Servlet/Simplefilterformeasuringservletresponsetimes.htm
- * https://www.learn-it-with-examples.com/development/java/web-tier/using-java-filter-for-logging-example.html
+ * <a href="http://www.java2s.com/Tutorial/Java/0400__Servlet/Simplefilterformeasuringservletresponsetimes.htm">
+ *     Simplefilterformeasuringservletresponsetimes</a>
+ * <a href="https://www.learn-it-with-examples.com/development/java/web-tier/using-java-filter-for-logging-example.html">
+ *     using-java-filter-for-logging-example</a>
  */
 public class ResponseTimerFilter implements Filter {
 

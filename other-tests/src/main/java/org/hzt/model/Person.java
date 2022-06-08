@@ -48,10 +48,6 @@ public class Person implements Comparable<Person> {
         this(firstName, lastName, null);
     }
 
-    public static int compareFirstName(Person person1, Person person2) {
-        return person1.getFirstName().compareTo(person2.getFirstName());
-    }
-
     @Initializable
     private void initNames() {
         this.firstName = HztStringUtils.toOnlyFirstLetterUpperCase(firstName);
@@ -107,9 +103,13 @@ public class Person implements Comparable<Person> {
         return this.lastName.compareTo(o.lastName);
     }
 
+    public int compareFirstName(Person other) {
+        return firstName.compareTo(other.getFirstName());
+    }
+
     @Override
     public boolean equals(Object obj) {
-        return this == obj || (obj instanceof Person && Objects.equals(this.lastName, ((Person) obj).lastName));
+        return this == obj || (obj instanceof Person other && Objects.equals(this.lastName, other.lastName));
     }
 
     @Override

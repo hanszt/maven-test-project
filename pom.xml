@@ -16,10 +16,11 @@
         <module>java-17-practice-module</module>
         <module>reactive-streams</module>
         <module>other-tests</module>
-        <module>servlet-filter</module>
+        <module>java-web</module>
         <module>scheduling-samples</module>
         <module>transaction-samples</module>
         <module>jasper-reports</module>
+        <module>kafka-samples</module>
     </modules>
 
     <properties>
@@ -34,7 +35,6 @@
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
         <mockito.version>4.5.1</mockito.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <test-data-generator.version>0.7.5.11</test-data-generator.version>
         <!--        utils-->
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <guava.version>31.0.1-jre</guava.version>
@@ -73,7 +73,7 @@
             <dependency>
                 <groupId>org.hzt.utils</groupId>
                 <artifactId>test-data-generator</artifactId>
-                <version>${test-data-generator.version}</version>
+                <version>${org.hzt-utils.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hzt.utils</groupId>

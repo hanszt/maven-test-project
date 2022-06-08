@@ -43,11 +43,7 @@ import static org.hzt.utils.collectors.CollectorsX.mappingToSet;
 import static org.hzt.utils.collectors.CollectorsX.multiMappingToList;
 import static org.hzt.utils.function.predicates.ComparingPredicates.greaterThan;
 import static org.hzt.utils.function.predicates.StringPredicates.containsAllOf;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class StreamsSampleTest {
 
@@ -305,6 +301,17 @@ class StreamsSampleTest {
         final String[] expected = {"Hallo", "Dit", "is", "een", "test"};
 
         assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    void testIterableFromStream() {
+        Iterable<String> strings = () -> Stream.of("Iterable", "from", "a", "stream").iterator();
+        int counter = 0;
+        for (String s : strings) {
+            System.out.println("s = " + s);
+            counter++;
+        }
+        assertEquals(4, counter);
     }
 
 }

@@ -12,7 +12,7 @@ This project consists of multiple modules:
 - [Other tests](other-tests/README.md)
 - [Reactive programming](reactive-streams/README.md)
 - [Scheduling samples](scheduling-samples/README.md)
-- [Tomcat servlet filter](servlet-filter/README.md)
+- [Tomcat servlet filter](java-web/README.md)
 - [Transaction-samples](transaction-samples/README.md)
 - [Jasper Reports](jasper-reports/README.md)
 

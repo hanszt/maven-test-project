@@ -11,13 +11,14 @@ import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.UUID;
 
 /**
- * See <a href='https://www.baeldung.com/java-atomikos'>A Guide to Atomikos</a> for the tutorial where this code comes from
+ * See <a href="https://www.baeldung.com/java-atomikos">A Guide to Atomikos</a> for the tutorial where this code comes from
  */
 public class AtomikosSample {
 
@@ -33,7 +34,7 @@ public class AtomikosSample {
 
     public void placeOrder(String productId, int amount) throws HeuristicRollbackException, SystemException,
             HeuristicMixedException, RollbackException {
-        UserTransactionImp userTransaction = new UserTransactionImp();
+        UserTransaction userTransaction = new UserTransactionImp();
         AtomikosDataSourceBean inventoryDataSource = new AtomikosDataSourceBean();
         AtomikosNonXADataSourceBean orderDataSource = new AtomikosNonXADataSourceBean();
 

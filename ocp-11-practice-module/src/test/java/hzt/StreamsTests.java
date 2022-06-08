@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,6 +13,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.function.Predicate.not;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -74,13 +76,55 @@ class StreamsTests {
 //
 // 4 is basically same as //2. It will not work correctly for the same reason.
     @Test
-    void testFindingMaxValue() {
-        List<Integer> ls = List.of(3, 4, 6, 9, 2, 5, 7);
-        assertEquals(9, ls.stream().reduce(Integer.MIN_VALUE, (a, b) -> a > b ? a : b)); //1
-        assertEquals(3, ls.stream().max(Integer::max).get()); //2
-        assertEquals(9, ls.stream().max(Integer::compare).get()); //3
-        assertEquals(OptionalInt.of(9), ls.stream().mapToInt(i -> i).max()); //3
-        assertEquals(Optional.of(3), ls.stream().max((a, b) -> a > b ? a : b)); //4
+    void testFindingMaxIntValue() {
+        List<Integer> list = List.of(3, 4, 6, 9, 2, 5, 7);
+
+        //noinspection InvalidComparatorMethodReference
+        assertAll(
+                () -> assertEquals(9, list.stream().reduce(Integer.MIN_VALUE, (a, b) -> a > b ? a : b)), //1
+                () -> assertEquals(3, list.stream().max(Integer::max).orElseThrow()), //2
+                () -> assertEquals(9, list.stream().max(Integer::compare).orElseThrow()), //3
+                () -> assertEquals(OptionalInt.of(9), list.stream().mapToInt(i -> i).max()), //4
+                () -> assertEquals(Optional.of(3), list.stream().max((a, b) -> a > b ? a : b)), //5
+                () -> assertEquals(Optional.of(9), list.stream().reduce(Math::max)), //6
+                () -> assertEquals(Optional.of(9), list.stream().reduce(Integer::max)) //7
+        );
+    }
+
+    @Test
+    void testFindingMaxDoubleValue() {
+        List<Double> list = List.of(3.0, 4.0, 6.0, 9.0, 2.0, 5.0, 7.0);
+
+        assertAll(
+                () -> assertEquals(9, list.stream().reduce(Double.MIN_VALUE, (a, b) -> a > b ? a : b)), //1
+                () -> assertEquals(9, list.stream().max(Double::compare).orElseThrow()), //2
+                () -> assertEquals(9, list.stream().max(Double::compareTo).orElseThrow()), //2
+                () -> assertEquals(OptionalDouble.of(9), list.stream().mapToDouble(d -> d).max()), //3
+                () -> assertEquals(Optional.of(9.0), list.stream().reduce(Math::max)), //4
+                () -> assertEquals(Optional.of(9.0), list.stream().reduce(Double::max)) //5
+        );
+    }
+
+    @Test
+    void testFindMaxPerson() {
+        Set<String> set = Set.of("Ralph", "Hans", "Lucy", "Sophie");
+
+        final var person = set.stream()
+                .map(Person::new)
+                .max(Person::compareTo)
+                .orElseThrow();
+
+        final var person2 = set.stream()
+                .map(Person::new)
+                .max(Person::compare)
+                .orElseThrow();
+
+        final var expected = new Person("Sophie");
+
+        assertAll(
+                () -> assertEquals(expected, person),
+                () -> assertEquals(expected, person2)
+        );
     }
 
     @Test
@@ -101,7 +145,7 @@ class StreamsTests {
         assertEquals(expected, partitioningWithGroupingBy);
     }
 
-    private static class Person {
+    private static class Person implements Comparable<Person> {
 
         private static int next = 0;
 
@@ -110,6 +154,15 @@ class StreamsTests {
 
         public Person(String name) {
             this.name = name;
+        }
+
+        public static int compare(Person person, Person other) {
+            return person.name.compareTo(other.name);
+        }
+
+        @Override
+        public int compareTo(Person person) {
+            return name.compareTo(person.name);
         }
 
         @Override

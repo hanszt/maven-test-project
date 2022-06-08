@@ -1,5 +1,6 @@
 package org.hzt;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -26,5 +27,14 @@ class CollectionsTest {
         list.sort(Collections.reverseOrder());
         list.forEach(System.out::println);
         assertEquals(9, list.get(0));
+    }
+
+    @Test
+    @DisplayName("Test swap two elements")
+    void testSwapTwoElements() {
+        List<String> strings = new ArrayList<>(List.of("Hello", "this", "is", "a", "test"));
+        Collections.swap(strings, 0, strings.size() - 1);
+
+        assertEquals(List.of("test", "this", "is", "a", "Hello"), strings);
     }
 }

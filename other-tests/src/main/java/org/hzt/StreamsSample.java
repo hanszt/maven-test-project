@@ -26,7 +26,8 @@ final class StreamsSample {
 
     public static BigInteger getNthFibonacciNumber(int n) {
         return getFibonacciStream(n, BigInteger.ONE)
-                .reduce((first, second) -> second).orElseThrow();
+                .reduce((first, second) -> second)
+                .orElseThrow();
     }
 
     public static BigInteger getSumFibonacciNumbers(int n) {
