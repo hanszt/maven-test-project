@@ -1,9 +1,9 @@
 package org.hzt.model;
 
-import org.hzt.common.HztStringUtils;
 import org.hzt.custom_annotations.Initializable;
 import org.hzt.custom_annotations.JsonElement;
 import org.hzt.custom_annotations.JsonSerializable;
+import org.hzt.utils.strings.StringX;
 
 import java.time.LocalDate;
 import java.time.MonthDay;
@@ -50,8 +50,8 @@ public class Person implements Comparable<Person> {
 
     @Initializable
     private void initNames() {
-        this.firstName = HztStringUtils.toOnlyFirstLetterUpperCase(firstName);
-        this.lastName = HztStringUtils.toOnlyFirstLetterUpperCase(lastName);
+        this.firstName = StringX.capitalized(firstName);
+        this.lastName = StringX.capitalized(lastName);
     }
 
     public MonthDay getMonthDayFromDateOfBirth() {

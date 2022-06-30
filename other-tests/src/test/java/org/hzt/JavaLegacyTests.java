@@ -9,8 +9,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -27,13 +26,12 @@ class JavaLegacyTests {
         final Iterable<Integer> iterable = () -> dictionary.elements().asIterator();
         final var l = iterable.spliterator().estimateSize();
 
-        for (Integer s : iterable) {
-            System.out.println(s);
+        for (int i : iterable) {
+            System.out.println(i);
         }
 
         final List<Integer> lsw = Sequence.of(iterable).toList();
-        final List<Integer> ld = StreamSupport.stream(iterable.spliterator(), false)
-                .collect(Collectors.toUnmodifiableList());
+        final List<Integer> ld = StreamSupport.stream(iterable.spliterator(), false).toList();
         final List<String> list = Collections.list(dictionary.keys());
 
         assertAll(
@@ -55,12 +53,14 @@ class JavaLegacyTests {
             tokens.add(stringTokenizer.nextToken());
         }
 
-        final var list = Sequence.of(() -> new StringTokenizer(inputString, delimiter).asIterator())
+        //noinspection NullableProblems
+        final var list = Sequence.of(new StringTokenizer(inputString, delimiter)::asIterator)
                 .castIfInstanceOf(String.class)
                 .toList();
 
-        final var strings = Stream.of(inputString.split(delimiter))
-                .collect(Collectors.toList());
+        final var strings = Pattern.compile(delimiter)
+                .splitAsStream(inputString)
+                .toList();
 
         assertAll(
                 () -> assertEquals(List.of("This", "is", "a", "test"), tokens),

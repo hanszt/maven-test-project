@@ -43,7 +43,11 @@ import static org.hzt.utils.collectors.CollectorsX.mappingToSet;
 import static org.hzt.utils.collectors.CollectorsX.multiMappingToList;
 import static org.hzt.utils.function.predicates.ComparingPredicates.greaterThan;
 import static org.hzt.utils.function.predicates.StringPredicates.containsAllOf;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StreamsSampleTest {
 
@@ -288,7 +292,7 @@ class StreamsSampleTest {
 
         assertAll(
                 () -> assertEquals(100, integers.size()),
-                () -> assertEquals(integers, set)
+                () -> assertEquals(integers.toSetX(), set)
         );
     }
 

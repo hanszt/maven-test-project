@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -431,6 +433,16 @@ class OtherTests {
     void testTypeWitnessNotNeededAnyMore() {
         //noinspection RedundantTypeArguments
         assertDoesNotThrow(() -> printStrings(Collections.<String>emptyList()));
+    }
+
+    @Test
+    void testClassNewInstance() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        final var input = "new Class<>();";
+        Class<? extends String> theClass = input.getClass();
+        final Constructor<? extends String> constructor = theClass.getConstructor();
+        final var newString = constructor.newInstance();
+
+        assertEquals("", newString);
     }
 
     public void printStrings(List<String> strings) {

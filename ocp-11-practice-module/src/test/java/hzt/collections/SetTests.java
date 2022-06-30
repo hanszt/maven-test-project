@@ -6,14 +6,17 @@ import org.junit.jupiter.api.Test;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SetTests {
 
     @Test
     @Disabled("Takes to long")
     void testUnboundedSetAddThrowsOutOfMemoryError() {
-        assertThrows(OutOfMemoryError.class, () -> fillSetUntilOutOfMemory());
+        assertThrows(OutOfMemoryError.class, this::fillSetUntilOutOfMemory);
     }
 
     private void fillSetUntilOutOfMemory() {
@@ -31,4 +34,14 @@ class SetTests {
         }
     }
 
+    @Test
+    void testSetOfArraysCanStoreMultipleEqualContentArrays() {
+        Set<int[]> arraySet = new HashSet<>();
+        arraySet.add(new int[]{1, 2, 3, 4});
+
+        assertAll(
+                () -> assertTrue(arraySet.add(new int[]{1, 2, 3, 4})),
+                () -> assertEquals(2, arraySet.size())
+        );
+    }
 }

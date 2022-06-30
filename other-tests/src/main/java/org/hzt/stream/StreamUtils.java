@@ -1,6 +1,6 @@
 package org.hzt.stream;
 
-import org.hzt.PreConditions;
+import org.hzt.utils.PreConditions;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

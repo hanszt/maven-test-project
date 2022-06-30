@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -13,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -132,4 +135,15 @@ class ListTests {
         assertEquals(List.of("SOPHIE", "RASHIED", "PIET", "DOMINIC"), names);
     }
 
+    @Test
+    void testListCopyOfDoesThrowNullPointerWhenListContainsNull() {
+        final var integers = Arrays.asList(null, 1, 3, 4, null);
+        assertThrows(NullPointerException.class, () -> List.copyOf(integers));
+    }
+
+    @Test
+    void testCollectionsUnModifiableListDoesNotThrowNullPointerWhenListContainsNull() {
+        final var integers = Arrays.asList(null, 1, 3, 4, null);
+        assertDoesNotThrow(() -> Collections.unmodifiableList(integers));
+    }
 }

@@ -3,6 +3,7 @@ package org.hzt;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ProxySelector;
 import java.net.URI;
@@ -34,6 +35,8 @@ class HttpClientTests {
                 .thenApply(HttpResponse::body)
                 .join();
 
+        System.out.println(result);
+
         assertTrue(result.contains("body"));
     }
 
@@ -41,13 +44,15 @@ class HttpClientTests {
     void testPostSynchronous() {
         HttpClient client = buildHttpClient();
 
-        assertThrows(HttpConnectTimeoutException.class, () -> {
-            HttpRequest request = buildHttpPostRequest();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThrows(HttpConnectTimeoutException.class, () -> send(client));
+    }
 
-            System.out.println(response.statusCode());
-            System.out.println(response.body());
-        });
+    private void send(HttpClient client) throws IOException, InterruptedException {
+        HttpRequest request = buildHttpPostRequest();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        System.out.println(response.statusCode());
+        System.out.println(response.body());
     }
 
     private HttpRequest buildHttpPostRequest() throws FileNotFoundException {

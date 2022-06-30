@@ -7,6 +7,7 @@ import java.util.function.IntFunction;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -17,6 +18,7 @@ import static java.util.function.Predicate.not;
 @SuppressWarnings("SameParameterValue")
 public class StreamSplitting {
 
+    private static final Pattern SENTENCE_SPLITTER = Pattern.compile("[ ,.!?\r\n]");
     public static void main(String[] args) {
         StreamSplitting streamSplitting = new StreamSplitting();
         out.println("Partitioning by:");
@@ -43,13 +45,9 @@ public class StreamSplitting {
         return operate(intFunction.apply(20));
     }
 
-    private Stream<String> splitByRegex(String str) {
-        return Stream.of(str.split("[ ,.!?\r\n]"));
-    }
-
     private List<String> distinct(List<String> sentences) {
         return sentences.stream()
-                .flatMap(this::splitByRegex)
+                .flatMap(SENTENCE_SPLITTER::splitAsStream)
                 .filter(not(String::isEmpty))
                 .distinct()
                 .collect(Collectors.toList());
@@ -65,7 +63,9 @@ public class StreamSplitting {
         out.println();
     }
 
-    private Map<Integer, List<Integer>> groupingIntegers(int startInclusive, int endInclusive, UnaryOperator<Integer> integerIntegerFunction) {
+    private Map<Integer, List<Integer>> groupingIntegers(int startInclusive,
+                                                         int endInclusive,
+                                                         UnaryOperator<Integer> integerIntegerFunction) {
         return IntStream.rangeClosed(startInclusive, endInclusive)
                 .boxed()
                 .sorted().collect(Collectors.groupingBy(integerIntegerFunction));
@@ -75,7 +75,9 @@ public class StreamSplitting {
         out.printf("key: %2s, value: %s%n", e.getKey(), e.getValue());
     }
 
-    private Map<Boolean, List<Integer>> partitioningBy(int startInclusive, int endInclusive, Predicate<Integer> integerPredicate) {
+    private Map<Boolean, List<Integer>> partitioningBy(int startInclusive,
+                                                       int endInclusive,
+                                                       Predicate<Integer> integerPredicate) {
         return IntStream.rangeClosed(startInclusive, endInclusive)
                 .boxed()
                 .collect(Collectors.partitioningBy(integerPredicate));

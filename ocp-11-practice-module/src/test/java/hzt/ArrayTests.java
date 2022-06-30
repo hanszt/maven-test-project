@@ -4,12 +4,10 @@ import hzt.model.Student;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.Comparator;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static java.util.Comparator.comparingInt;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ArrayTests {
 
@@ -23,8 +21,11 @@ class ArrayTests {
         System.arraycopy(sourceArray, 0, destinationSubArray, 3, 6);
 
         Arrays.stream(destinationSubArray).forEach(System.out::println);
-        assertArrayEquals(sourceArray, destinationArray);
-        assertArrayEquals(new int[]{0, 0, 0, 1, 5, 4, 7, 3, 8, 0, 0}, destinationSubArray);
+
+        assertAll(
+                () -> assertArrayEquals(sourceArray, destinationArray),
+                () -> assertArrayEquals(new int[]{0, 0, 0, 1, 5, 4, 7, 3, 8, 0, 0}, destinationSubArray)
+        );
     }
 
     @Test
@@ -59,27 +60,21 @@ class ArrayTests {
     @Test
     void testArraysBinarySearch() {
         String[] strings = {"d", "bbb", "aaaa"}; // array sorted in ascending order by string length
-        final var stringLengthComparator = Comparator.comparing(String::length);
+        final var compareByLength = comparingInt(String::length);
 
-        final var indexOfStringLength1 = Arrays.binarySearch(strings, "x", stringLengthComparator);
-        final var indexOfStringLength2 = Arrays.binarySearch(strings, "ca", new MyStringComparator());
-        final var indexOfStringLength4 = Arrays.binarySearch(strings, "aaaa", stringLengthComparator);
+        final var indexOfStringLength1 = Arrays.binarySearch(strings, "x", compareByLength);
+        final var indexOfStringLength2 = Arrays.binarySearch(strings, "ca", compareByLength);
+        final var indexOfStringLength4 = Arrays.binarySearch(strings, "aaaa", compareByLength);
 
         Arrays.sort(strings);
         final var indexOfDWhenSortedInNaturalOrder = Arrays.binarySearch(strings, "d");
 
-        assertEquals(-2, indexOfStringLength2); //(-(insertion point) - 1) = -1 - 1 = -2
-        assertEquals(0, indexOfStringLength1);
-        assertEquals(2, indexOfDWhenSortedInNaturalOrder);
-        assertEquals(2, indexOfStringLength4);
-    }
-
-    class MyStringComparator implements Comparator {
-        public int compare(Object o1, Object o2) {
-            int s1 = ((String) o1).length();
-            int s2 = ((String) o2).length();
-            return s1 - s2;
-        }
+        assertAll(
+                () -> assertEquals(-2, indexOfStringLength2), //(-(insertion point) - 1) = -1 - 1 = -2
+                () -> assertEquals(0, indexOfStringLength1),
+                () -> assertEquals(2, indexOfDWhenSortedInNaturalOrder),
+                () -> assertEquals(2, indexOfStringLength4)
+        );
     }
 
     //q26 test 4
@@ -90,13 +85,16 @@ class ArrayTests {
         a[1] = new int[4];
         a[2] = new int[100];
 
-        assertDoesNotThrow(() -> a[2][90] = 10);
-        assertThrows(IndexOutOfBoundsException.class, () -> a[1][90] = 10);
-        assertEquals(2, a[0].length);
-        assertEquals(100, a[2].length);
+        assertAll(
+                () -> assertDoesNotThrow(() -> a[2][90] = 10),
+                () -> assertThrows(IndexOutOfBoundsException.class, () -> a[1][90] = 10),
+                () -> assertEquals(2, a[0].length),
+                () -> assertEquals(100, a[2].length)
+        );
     }
 
     //q3 test 5
+    @SuppressWarnings("CStyleArrayDeclaration")
     @Test
     void testDeclaringArrayInDifferentWays() {
         int[] a[] = new int[5][4];
@@ -108,9 +106,11 @@ class ArrayTests {
             c[i] = new int[4];
         }
 
-        assertArrayEquals(a, b);
-        assertArrayEquals(b, c);
-        assertArrayEquals(c, d);
+        assertAll(
+                () -> assertArrayEquals(a, b),
+                () -> assertArrayEquals(b, c),
+                () -> assertArrayEquals(c, d)
+        );
     }
 
 }

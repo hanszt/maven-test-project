@@ -5,9 +5,12 @@ import org.hzt.test.model.Book;
 import org.hzt.test.model.Painter;
 import org.hzt.test.model.Painting;
 import org.hzt.utils.It;
+import org.hzt.utils.collections.ListX;
+import org.hzt.utils.collections.MutableMapX;
+import org.hzt.utils.collectors.CollectorsX;
+import org.hzt.utils.streams.StreamX;
 import org.junit.jupiter.api.Test;
 
-import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -15,9 +18,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.function.Predicate.not;
 import static org.hzt.StringPredicates.startsWithAnyOf;
 import static org.hzt.stream.EntryStreamUtils.*;
 import static org.hzt.utils.collectors.CollectorsX.toMap;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,26 +35,26 @@ class EntryStreamUtilsTest {
         final Map<String, List<Book>> groupedByCategoryMap = TestSampleGenerator.createBookList().stream()
                 .collect(Collectors.groupingBy(Book::getCategory));
 
-        final List<String> groupedByBookNameListAsString = groupedByCategoryMap.entrySet().stream()
+        final ListX<String> groupedByBookNameListAsString = groupedByCategoryMap.entrySet().stream()
                 .map(value(HashSet::new))
                 .map(toSingle(EntryStreamUtilsTest::asString))
-                .collect(Collectors.toList());
+                .collect(CollectorsX.toListX());
 
         groupedByBookNameListAsString.forEach(It::println);
 
-        assertTrue(groupedByBookNameListAsString.stream().noneMatch(String::isEmpty));
+        assertTrue(groupedByBookNameListAsString.none(String::isEmpty));
     }
 
     @Test
     void testMapEntryThenFilterByValueThenFilterByKeyThenCollectToMap() {
-        final Map<String, List<Book>> groupedByCategoryMap = TestSampleGenerator.createBookList().stream()
-                .collect(Collectors.groupingBy(Book::getCategory));
+        final var groupedByCategoryMap = MutableMapX.ofMap(TestSampleGenerator.createBookList().stream()
+                .collect(Collectors.groupingBy(Book::getCategory)));
 
         It.println("groupedByCategoryMap:");
         groupedByCategoryMap.entrySet().forEach(It::println);
 
         final Map<String, Set<Book>> expectedMap = groupedByCategoryMap.entrySet().stream()
-                .map(e -> new AbstractMap.SimpleEntry<String, HashSet<Book>>(e.getKey(), new HashSet<>(e.getValue())) {})
+                .map(e -> Map.entry(e.getKey(), new HashSet<>(e.getValue())))
                 .filter(e -> e.getKey() != null && (e.getKey().startsWith("E") || e.getKey().startsWith("F")))
                 .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -61,10 +66,19 @@ class EntryStreamUtilsTest {
                 .filter(byValue(books -> !books.isEmpty()))
                 .collect(toMap());
 
+        final var actualMap1 = StreamX.ofMap(groupedByCategoryMap)
+                .mapByValues(HashSet::new)
+                .filterKeys(startsWithAnyOf("E", "F"))
+                .filterValues(not(Set::isEmpty))
+                .toMap();
+
         It.println("Result:");
         actualMap.entrySet().forEach(It::println);
 
-        assertEquals(expectedMap, actualMap);
+        assertAll(
+                () -> assertEquals(expectedMap, actualMap),
+                () -> assertEquals(expectedMap, actualMap1)
+        );
     }
 
     private static String asString(String s, Set<Book> books) {
@@ -131,7 +145,7 @@ class EntryStreamUtilsTest {
                 .filter(byValue(books -> !books.isEmpty()))
                 .forEach(entry(EntryStreamUtilsTest::assertResult)
                         .andThen(entry((bookCategory, bookSet) ->
-                                It.println("key: " +  bookCategory + ", value: " + bookSet))));
+                                It.println("key: " + bookCategory + ", value: " + bookSet))));
     }
 
     private static void assertResult(String category, HashSet<Book> books) {
