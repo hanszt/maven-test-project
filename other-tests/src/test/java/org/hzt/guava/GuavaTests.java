@@ -2,8 +2,6 @@ package org.hzt.guava;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;

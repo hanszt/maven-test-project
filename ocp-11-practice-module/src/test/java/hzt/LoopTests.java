@@ -2,7 +2,6 @@ package hzt;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -14,6 +13,7 @@ class LoopTests {
 
     @Test
     void testEnhancedForLoopOf3DArray() {
+        //noinspection CStyleArrayDeclaration
         int[][] ia[] = new int[3][4][];
         for (int[] array : ia[0]) {
             assertNull(array);
@@ -23,6 +23,7 @@ class LoopTests {
     @Test
     void testEnhancedForLoopOfCollectionWithVarInLoop() {
         Object o = null;
+        //noinspection rawtypes
         Collection c = new ArrayList();
 //        for(o : c) { not valid
         for (final var var : c) {
@@ -32,6 +33,7 @@ class LoopTests {
     }
 
     @Test
+    @SuppressWarnings("all")
     void testCrazyLoops() {
         var i = 0;
         for (i = 1; i < 5; i++) continue;  //(1)

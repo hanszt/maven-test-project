@@ -1,8 +1,12 @@
-## Maven test project
+# Maven test project
+
+---
 
 This is a project to test and explore Java conventions and concepts
 
 Author: Hans Zuidervaart
+
+---
 
 ## Modules
 This project consists of multiple modules:
@@ -15,6 +19,8 @@ This project consists of multiple modules:
 - [Tomcat servlet filter](java-web/README.md)
 - [Transaction-samples](transaction-samples/README.md)
 - [Jasper Reports](jasper-reports/README.md)
+
+---
 
 ## Requirements
 Some modules require the following custom dependencies:
@@ -36,3 +42,5 @@ See the [pom](pom.xml)
 
 These dependencies are not yet available at maven central. You can use these dependencies by locally installing the
 [hzt.utils](https://github.com/hanszt/hzt-utils) project modules using `mvm clean install`  
+
+---

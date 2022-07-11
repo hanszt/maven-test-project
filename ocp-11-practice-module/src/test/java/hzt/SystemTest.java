@@ -8,7 +8,6 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SystemTest {
 
@@ -29,6 +28,7 @@ class SystemTest {
     void testSystemGetConsoleCanReturnNull() {
         Console c = System.console();
         assertNull(c);//1
+        //noinspection ConstantConditions
         if (c != null) {
             String line = c.readLine("Please enter your name:"); //2
             System.out.println("Hello, " + line); //3
