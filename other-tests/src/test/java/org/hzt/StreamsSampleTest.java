@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.MonthDay;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -43,11 +44,7 @@ import static org.hzt.utils.collectors.CollectorsX.mappingToSet;
 import static org.hzt.utils.collectors.CollectorsX.multiMappingToList;
 import static org.hzt.utils.function.predicates.ComparingPredicates.greaterThan;
 import static org.hzt.utils.function.predicates.StringPredicates.containsAllOf;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class StreamsSampleTest {
 
@@ -103,7 +100,7 @@ class StreamsSampleTest {
         final var limitedList = list2.stream()
                 .sorted()
                 .limit(10)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         assertEquals(expectedLimitedList, limitedList);
     }
@@ -113,11 +110,11 @@ class StreamsSampleTest {
         final var iterator = getIntegerStream(100).iterator();
         final var expected = getIntegerStream(100)
                 .map(String::valueOf)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         final var result = StreamsSample.returnStreamFromIterator(iterator)
                 .map(String::valueOf)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         assertEquals(expected, result);
     }
@@ -131,7 +128,7 @@ class StreamsSampleTest {
     void testFibonacciUsingStreams() {
         final var expected = Stream.of(0, 1, 1, 2, 3, 5, 8, 13, 21, 34)
                 .map(BigInteger::valueOf)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         final var fibonacciList = StreamsSample.getFibonacci(10);
         assertEquals(expected, fibonacciList);
@@ -230,12 +227,19 @@ class StreamsSampleTest {
                 .filter(containsAllOf("a", "e"))
                 .distinct()
                 .onClose(() -> setClosedAndPrintClosed(message, isClosed))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
     }
 
     private void setClosedAndPrintClosed(String message, AtomicBoolean closed) {
         closed.set(true);
         System.out.println(message + " is closed now");
+    }
+
+    @Test
+    void testStreamToListDoesNotAllowsNulls() {
+        final var strings = Stream.of("This", "is", "a", null, "test").toList();
+        final var expected = Arrays.asList("This", "is", "a", null, "test");
+        assertEquals(expected, strings);
     }
 
     @Test
@@ -316,6 +320,38 @@ class StreamsSampleTest {
             counter++;
         }
         assertEquals(4, counter);
+    }
+
+    @Test
+    void testDifferenceBetweenFindAnyAndFindFirst() {
+        final var any = IntStream.iterate(-100, i -> ++i)
+                .limit(100_000)
+                .findAny()
+                .orElseThrow();
+
+        final var first =  IntStream.iterate(-100, i -> ++i)
+                .limit(100_000)
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals(any, first);
+    }
+
+    @Test
+    void testDifferenceBetweenFindAnyAndFindFirstInParallel() {
+        final var any = IntStream.iterate(-100, i -> ++i)
+                .limit(100_000)
+                .parallel()
+                .findAny()
+                .orElseThrow();
+
+        final var first =  IntStream.iterate(-100, i -> ++i)
+                .limit(100_000)
+                .parallel()
+                .findFirst()
+                .orElseThrow();
+
+        assertNotEquals(any, first);
     }
 
 }

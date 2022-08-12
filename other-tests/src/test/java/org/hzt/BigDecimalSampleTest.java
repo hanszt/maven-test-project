@@ -11,11 +11,8 @@ import static java.lang.System.out;
 
 class BigDecimalSampleTest {
 
-    private static final String SCALE_OF = "Scale of: ";
-    private static final String IS = " is: ";
-
     /**
-     * https://www.tutorialspoint.com/java/math/bigdecimal_equals.htm
+     * <a href="https://www.tutorialspoint.com/java/math/bigdecimal_equals.htm">Java bigDecimal equals</a>
      */
     @Test
     void sameValueNotSameScaleResultsInFalseUsingEquals() {
@@ -27,7 +24,7 @@ class BigDecimalSampleTest {
     }
 
     /**
-     * https://www.tutorialspoint.com/java/math/bigdecimal_equals.htm
+     * <a href="https://www.tutorialspoint.com/java/math/bigdecimal_equals.htm">Java bigDecimal equals</a>
      */
     @Test
     void sameValueNotSameScaleResultsInTrueUsingCompareTo() {
@@ -54,9 +51,15 @@ class BigDecimalSampleTest {
         out.println(bigDecimal + " after changing the scale to 2 and rounding with half even is " + scaledBigDecimalHalfEven);
         out.println(bigDecimal2 + " after changing the scale to 4 and rounding with mode half up is " + scaledBigDecimalHalfUp);
 
-        out.println(SCALE_OF + bigDecimal + IS + bigDecimal.scale());
-        out.println(SCALE_OF + scaledBigDecimalHalfUp + IS + scaledBigDecimalHalfUp.scale());
-        out.println(SCALE_OF + scaledBigDecimalHalfDown + IS + scaledBigDecimalHalfDown.scale());
+        out.println("Scale of: " + bigDecimal + " is: " + bigDecimal.scale());
+        out.println("Scale of: " + scaledBigDecimalHalfUp + " is: " + scaledBigDecimalHalfUp.scale());
+        out.println("Scale of: " + scaledBigDecimalHalfDown + " is: " + scaledBigDecimalHalfDown.scale());
+    }
+
+    @Test
+    void testBigDecimalOfNull() {
+        //noinspection ConstantConditions
+        assertThrows(NullPointerException.class, () -> new BigDecimal((String) null));
     }
 
 }

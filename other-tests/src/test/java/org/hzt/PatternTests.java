@@ -6,11 +6,7 @@ import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PatternTests {
 
@@ -174,6 +170,24 @@ class PatternTests {
         final int[] expected = {6, 4, 3, 6, 1, 1032};
 
         assertArrayEquals(expected, results);
+    }
+
+    @Test
+    void testSplitByEmptyString() {
+        final var test = "Test";
+        final var emptyStringPattern = Pattern.compile("");
+
+        final var split1 = emptyStringPattern.split(test);
+        final var split2 = emptyStringPattern.splitAsStream(test).toArray(String[]::new);
+        final var split3 = test.split("");
+
+        final String[] expected = {"T", "e", "s", "t"};
+
+        assertAll(
+                () -> assertArrayEquals(expected, split1),
+                () -> assertArrayEquals(expected, split2),
+                () -> assertArrayEquals(expected, split3)
+        );
     }
 
 }

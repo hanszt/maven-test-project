@@ -37,12 +37,12 @@ class JooqTests {
 
     @Test
     void testSliding() {
-        final var integers = Seq.of(1, 2, 3, 4, 4)
+        final var windows = Seq.of(1, 2, 3, 4, 4)
                 .sliding(3)
                 .peek(System.out::println);
 
-        System.out.println("integers = " + integers);
+        System.out.println("windows = " + windows);
 
-        assertEquals(3, integers.count());
+        assertEquals(3, windows.count());
     }
 }
