@@ -2,6 +2,8 @@ package hzt.http;
 
 import com.google.gson.Gson;
 import hzt.http.model.Transcript;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,6 +17,7 @@ import java.net.http.HttpResponse;
  */
 public class SpeechApiController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpeechApiController.class);
     public static void main(String[] args) {
         try {
             Transcript transcript = new Transcript();
@@ -23,7 +26,7 @@ public class SpeechApiController {
             Gson gson = new Gson();
             final var json = gson.toJson(transcript);
 
-            System.out.println("json = " + json);
+            LOGGER.info("json = {}", json);
 
             HttpRequest postRequest = HttpRequest.newBuilder()
                     .uri(new URI("https://api.assemblyai.com/v2/transcript"))
@@ -35,11 +38,13 @@ public class SpeechApiController {
 
             HttpResponse<String> response = httpClient.send(postRequest, HttpResponse.BodyHandlers.ofString());
 
-            System.out.println("response.body() = " + response.body());
+            final var body = response.body();
+            LOGGER.info("response.body() = {}", body);
         } catch (URISyntaxException e) {
             throw new IllegalStateException(e);
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(e);
         }
 
     }

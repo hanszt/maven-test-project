@@ -1,5 +1,8 @@
 package org.hzt;
 
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -52,39 +55,79 @@ class PatternTests {
         assertEquals(expected, result);
     }
 
-    @Test
-    void testPatternMatcherReplaceAllByResult() {
-        final var nonDigits = "\\d";
-        final var nonDigitPattern = Pattern.compile(nonDigits);
-        final var testString = "PhoneNr: 0645344553, Mail: hello@test.com";
+    @Nested
+    class MatcherTests {
 
-        final var result = nonDigitPattern.matcher(testString).replaceAll("d");
+        @Test
+        void testPatternMatcherReplaceAllByResult() {
+            final var nonDigits = "\\d";
+            final var nonDigitPattern = Pattern.compile(nonDigits);
+            final var testString = "PhoneNr: 0645344553, Mail: hello@test.com";
 
-        final var expected = testString.replaceAll(nonDigits, "d");
+            final var result = nonDigitPattern.matcher(testString).replaceAll("d");
 
-        System.out.println(result);
+            final var expected = testString.replaceAll(nonDigits, "d");
 
-        assertEquals(expected, result);
-    }
+            System.out.println(result);
 
-    @Test
-    void testMatcherGroup() {
-        final var input = "6 example input 4";
-        final var pattern = Pattern.compile("(\\d)(.*)(\\d)");
-        final var matcher = pattern.matcher(input);
+            assertEquals(expected, result);
+        }
 
-        final var matches = matcher.matches();
-        final var groupCount = matcher.groupCount();
+        @Test
+        void testMatcherGroup() {
+            final var input = "6 example input 4";
+            final var pattern = Pattern.compile("(\\d)(.*)(\\d)");
+            final var matcher = pattern.matcher(input);
 
-        assertAll(
-                () -> assertTrue(matches),
-                () -> assertEquals(3, groupCount),
-                () -> assertEquals("6 example input 4", matcher.group()),
-                () -> assertEquals("6 example input 4", matcher.group(0)),
-                () -> assertEquals("6", matcher.group(1)),
-                () -> assertEquals(" example input ", matcher.group(2)),
-                () -> assertEquals("4", matcher.group(3))
-        );
+            final var matches = matcher.matches();
+            final var groupCount = matcher.groupCount();
+
+            assertAll(
+                    () -> assertTrue(matches),
+                    () -> assertEquals(3, groupCount),
+                    () -> assertEquals("6 example input 4", matcher.group()),
+                    () -> assertEquals("6 example input 4", matcher.group(0)),
+                    () -> assertEquals("6", matcher.group(1)),
+                    () -> assertEquals(" example input ", matcher.group(2)),
+                    () -> assertEquals("4", matcher.group(3))
+            );
+        }
+
+        @Test
+        void testMatcherResults() {
+            final var input = "6 example input 4 45345";
+            final var matcher = Pattern.compile("\\d+").matcher(input);
+
+            final var matchResults = matcher.results()
+                    .map(MatchResult::group)
+                    .toList();
+
+            assertEquals(List.of("6", "4", "45345"), matchResults);
+        }
+
+        @Test
+        void testMatcherResultsOfAComplicatedRegex() {
+            final var input = """
+                6 example input 4, here is some extra text
+                hello some text without nr start
+                3 second input 6
+                1 third input 1032
+                """;
+
+            final var textBeginningAndEndingWithNr = Pattern.compile("(\\d)(.*)(\\d)");
+            final var results = textBeginningAndEndingWithNr.matcher(input)
+                    .results()
+                    .map(MatchResult::group)
+                    .toList();
+
+            final var expected = List.of(
+                    "6 example input 4",
+                    "3 second input 6",
+                    "1 third input 1032");
+
+            assertEquals(expected, results);
+        }
+
     }
 
     @Test
@@ -116,41 +159,6 @@ class PatternTests {
     }
 
     @Test
-    void testMatcherResults() {
-        final var input = "6 example input 4 45345";
-        final var matcher = Pattern.compile("\\d+").matcher(input);
-
-        final var matchResults = matcher.results()
-                .map(MatchResult::group)
-                .toList();
-
-        assertEquals(List.of("6", "4", "45345"), matchResults);
-    }
-
-    @Test
-    void testMatcherResultsOfAComplicatedRegex() {
-        final var input = """
-                6 example input 4, here is some extra text
-                hello some text without nr start
-                3 second input 6
-                1 third input 1032
-                """;
-
-        final var textBeginningAndEndingWithNr = Pattern.compile("(\\d)(.*)(\\d)");
-        final var results = textBeginningAndEndingWithNr.matcher(input)
-                .results()
-                .map(MatchResult::group)
-                .toList();
-
-        final var expected = List.of(
-                "6 example input 4",
-                "3 second input 6",
-                "1 third input 1032");
-
-        assertEquals(expected, results);
-    }
-
-    @Test
     void testFilteringOutAllNrsInAText() {
         final var input = """
                 6 example input 4, here is some extra text
@@ -172,7 +180,8 @@ class PatternTests {
         assertArrayEquals(expected, results);
     }
 
-    @Test
+    @Tag("Splitting")
+    @RepeatedTest(3)
     void testSplitByEmptyString() {
         final var test = "Test";
         final var emptyStringPattern = Pattern.compile("");
