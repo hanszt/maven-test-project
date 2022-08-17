@@ -37,6 +37,7 @@
         <awaitility.version>4.2.0</awaitility.version>
         <!--        utils-->
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
         <guava.version>31.0.1-jre</guava.version>
         <streamex.version>0.8.1</streamex.version>
         <jool.version>0.9.14</jool.version>
@@ -103,6 +104,12 @@
                 <!--            be careful updating this version-->
                 <!--suppress MavenPackageUpdate -->
                 <version>${commons-beanutils.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
