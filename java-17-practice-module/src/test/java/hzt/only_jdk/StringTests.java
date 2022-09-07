@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
 import java.util.Spliterators;
+import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
@@ -130,5 +131,17 @@ class StringTests {
         final var charCount = testText.chars().count();
 
         assertEquals(codePointCount, charCount);
+    }
+
+    /**
+     * This class is also in the java.util.stream.Collectors#joining(CharSequence) method
+     *
+     * @see java.util.stream.Collectors#joining(CharSequence)
+     */
+    @Test
+    void testStringJoiner() {
+        StringJoiner joiner = new StringJoiner(";");
+        final var string = joiner.add("Hi").add("Why").add("is").add("this").toString();
+        assertEquals("Hi;Why;is;this", string);
     }
 }

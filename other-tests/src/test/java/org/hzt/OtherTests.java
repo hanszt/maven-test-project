@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +31,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -41,6 +42,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Comparator.comparing;
+import static org.hzt.iterators.Enumerations.sizedEnumeration;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OtherTests {
@@ -163,13 +165,13 @@ class OtherTests {
     void testCreatingBathes() {
         List<String> data = IntStream.range(0, 950)
                 .mapToObj(i -> "item " + i)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         final int BATCH_SIZE = 100;
 
         List<List<String>> batches = IntStream.range(0, (data.size() + BATCH_SIZE - 1) / BATCH_SIZE)
                 .mapToObj(i -> data.subList(i * BATCH_SIZE, Math.min(data.size(), (i + 1) * BATCH_SIZE)))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         assertEquals(10, batches.size());
         printBatches(batches);
@@ -213,27 +215,12 @@ class OtherTests {
 
     @Test
     void testEnumerationToList() {
-        //unexpected
-        Enumeration<String> enumeration = new Enumeration<>() {
-            private int counter = 0;
-
-            @Override
-            public boolean hasMoreElements() {
-                return counter++ < 100;
-            }
-
-            @Override
-            public String nextElement() {
-                return String.valueOf(counter);
-            }
-        };
-        final var list = Collections.list(enumeration);
-        final var stringIterator = enumeration.asIterator();
-        final Iterable<String> iterable = () -> stringIterator;
-        final var strings = StreamSupport.stream(iterable.spliterator(), false)
-                .collect(Collectors.toUnmodifiableList());
+        final var size = 100;
+        final var list = Collections.list(sizedEnumeration(size, String::valueOf));
+        final var spliterator = Spliterators.spliterator(sizedEnumeration(size, String::valueOf).asIterator(), size, Spliterator.ORDERED);
+        final var strings = StreamSupport.stream(spliterator, false).toList();
         System.out.println(strings);
-        assertNotEquals(strings, list);
+        assertEquals(strings, list);
     }
 
     @Test
@@ -247,12 +234,12 @@ class OtherTests {
     @SuppressWarnings("SameParameterValue")
     private static double calcPiRandom(final int iterations) {
         long successCount = IntStream.rangeClosed(0, iterations)
-                .filter(OtherTests::sqrtTwoRandomNmbrsSmOne)
+                .filter(i -> sqrtTwoRandomNumbersSmallerEqualThanOne())
                 .count();
         return (double) (4 * successCount) / iterations;
     }
 
-    private static boolean sqrtTwoRandomNmbrsSmOne(int i) {
+    private static boolean sqrtTwoRandomNumbersSmallerEqualThanOne() {
         double x = Math.random();
         double y = Math.random();
         return x * x + y * y <= 1;
@@ -388,7 +375,7 @@ class OtherTests {
                 .sorted(Comparator.comparing(a -> a.name))
                 .filter(a -> a.name.toLowerCase(Locale.ROOT).contains("meisje"))
                 .filter(a -> a.isInMuseumAndIsOlderThan100Years())
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         list.forEach(anonymous -> System.out.println("Name: " + anonymous.name + " PaintingAge: " + anonymous.painting));
 

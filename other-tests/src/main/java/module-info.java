@@ -8,4 +8,5 @@ open module other.tests {
     requires one.util.streamex;
     requires org.jetbrains.annotations;
     requires java.scripting;
+    requires commons.math3;
 }

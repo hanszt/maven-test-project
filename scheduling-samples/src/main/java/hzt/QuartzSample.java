@@ -23,7 +23,6 @@ import java.util.TimerTask;
  * <a href="https://www.youtube.com/watch?v=uDkleDfmvBg">
  * Getting Started: Scheduling Tasks with Quartz | Scheduling Tasks in Java - Quartz & Cron</a>
  */
-@SuppressWarnings("ClassCanBeRecord")
 public final class QuartzSample {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QuartzSample.class);

@@ -24,11 +24,11 @@ public final class Timer<R> {
         return result;
     }
 
-    public double getTimeInMillis() {
+    public double getDurationInMillis() {
         return durationInNanos / 1e6;
     }
 
-    public Duration getTimeAsDuration() {
+    public Duration getDuration() {
         return Duration.of(durationInNanos, ChronoUnit.NANOS);
     }
 
@@ -39,14 +39,14 @@ public final class Timer<R> {
      * @param <R> The type of the output parameter
      * @return first Timer object that contains the time it took to execute the function and the result of the function
      */
-    public static <T, R> Timer<R> timeAFunction(T t, Function<T, R> function) {
+    public static <T, R> Timer<R> timeAFunction(T t, Function<? super T, ? extends R> function) {
         long start = System.nanoTime();
         R r = function.apply(t);
         long time = System.nanoTime() - start;
         return new Timer<>(r, time);
     }
 
-    public static <R> Timer<R> timeAFunction(long aLong, LongFunction<R> function) {
+    public static <R> Timer<R> timeAFunction(long aLong, LongFunction<? extends R> function) {
         long start = System.nanoTime();
         R r = function.apply(aLong);
         long time = System.nanoTime() - start;
@@ -59,7 +59,7 @@ public final class Timer<R> {
      * @param <T> The type of the parameter consumed
      * @return first Timer object that contains the time it took to execute the consumer
      */
-    public static <T> Timer<Void> timeAConsumer(T t, Consumer<T> consumer) {
+    public static <T> Timer<Void> timeAConsumer(T t, Consumer<? super T> consumer) {
         long start = System.nanoTime();
         consumer.accept(t);
         long time = System.nanoTime() - start;
