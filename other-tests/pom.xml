@@ -19,7 +19,7 @@
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <nashorn-core.version>15.4</nashorn-core.version>
         <vavr.version>0.10.4</vavr.version>
-        <eclipse-collections.version>11.0.0</eclipse-collections.version>
+        <eclipse-collections.version>11.1.0</eclipse-collections.version>
     </properties>
 
     <dependencies>
@@ -57,10 +57,12 @@
         <dependency>
             <groupId>com.oath.cyclops</groupId>
             <artifactId>cyclops</artifactId>
+            <version>10.4.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+            <version>31.1-jre</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.eclipse.collections/eclipse-collections -->
         <dependency>

@@ -31,16 +31,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--        dependencies-->
         <!--        logging-->
-        <log4j.version>2.17.2</log4j.version>
+        <log4j.version>2.18.0</log4j.version>
         <!--        test-->
-        <junit.jupiter.version>5.8.2</junit.jupiter.version>
-        <mockito.version>4.6.1</mockito.version>
+        <junit.jupiter.version>5.9.0</junit.jupiter.version>
+        <mockito.version>4.7.0</mockito.version>
         <awaitility.version>4.2.0</awaitility.version>
         <!--        utils-->
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-math3.version>3.6.1</commons-math3.version>
-        <guava.version>31.0.1-jre</guava.version>
+        <guava.version>31.1-jre</guava.version>
         <streamex.version>0.8.1</streamex.version>
         <jool.version>0.9.14</jool.version>
         <org.hzt-utils.version>0.7.5.11</org.hzt-utils.version>
