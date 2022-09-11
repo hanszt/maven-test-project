@@ -1,5 +1,7 @@
 package org.hzt;
 
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
+import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
 import org.hzt.model.Payment;
 import org.hzt.model.Person;
 import org.hzt.sequences.primitve_sequences.IntSequence;
@@ -9,12 +11,16 @@ import org.hzt.test.model.Book;
 import org.hzt.test.model.Museum;
 import org.hzt.test.model.Painter;
 import org.hzt.test.model.Painting;
+import org.hzt.utils.It;
+import org.hzt.utils.PreConditions;
 import org.hzt.utils.collections.MutableSetX;
 import org.hzt.utils.collections.SetX;
 import org.hzt.utils.collectors.CollectorsX;
 import org.hzt.utils.sequences.Sequence;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -33,12 +39,15 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static java.math.BigInteger.*;
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.valueOf;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.function.Predicate.isEqual;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.hzt.Streams.fibonacciStream;
@@ -137,29 +146,47 @@ class StreamsTest {
                 .map(BigInteger::valueOf)
                 .toList();
 
-        final var fibonacciList = Streams.fibonacciList(10);
+        final var fibonacciList = Streams.fibonacciStream().limit(10).toList();
         assertEquals(expected, fibonacciList);
     }
 
     @Test
     void testNthFibonacciNrUsingStreams() {
-        final var fibonacciList = Streams.getNthFibonacciNumber(500);
+        final var fibonacciList = getNthFibonacciNumber(500);
         assertEquals(new BigDecimal(
                 "139423224561697880139724382870407283950070256587697307264108962948325571622863290691557658876222521294125"
         ).toBigInteger(), fibonacciList);
     }
 
+    @SuppressWarnings("SameParameterValue")
+    private static BigInteger getNthFibonacciNumber(int n) {
+        return fibonacciStream()
+                .skip(1)
+                .limit(n)
+                .reduce((first, second) -> second)
+                .orElseThrow();
+    }
+
     @Test
     void testSumFibonacciNrUsingStreams() {
-        final var fibonacciList = Streams.getSumFibonacciNumbers(500);
+        final var fibonacciList = getSumFibonacciNumbers(500);
         assertEquals(new BigDecimal(
                 "365014740723634211012237077906479355996081581501455497852747829366800199361550174096573645929019489792750"
         ).toBigInteger(), fibonacciList);
     }
 
+    private static BigInteger getSumFibonacciNumbers(@SuppressWarnings("SameParameterValue") int n) {
+        return fibonacciStream()
+                .skip(1)
+                .limit(n)
+                .reduce(BigInteger.ZERO, BigInteger::add);
+    }
+
     @Test
     void testCalculatePiParallelUsingStreams() {
-        Timer<BigDecimal> timer = Timer.timeAFunction(10_000_000, Streams::calculatePi);
+        Timer<BigDecimal> timer = Timer.timeAFunction(10_000_000, amount -> Streams.parallelLeibnizBdStream(amount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .multiply(BigDecimal.valueOf(4)));
         final var result = timer.getResult();
         System.out.println("Duration: " + timer.getDuration());
         assertEquals(new BigDecimal("3.1415927972"), result);
@@ -170,9 +197,9 @@ class StreamsTest {
         final var iterations = 10_000_000;
         //act
         Timer<Double> sequentialTimer = Timer.timeAFunction(iterations,
-                Streams::calculatePiAsDouble);
+                nr -> Streams.leibnizStream(nr).sum() * 4);
         Timer<Double> parallelTimer = Timer.timeAFunction(iterations,
-                Streams::calculatePiAsDoubleInParallel);
+                nr -> Streams.parallelLeibnizStream(nr).sum() * 4);
 
         final var seqTimeInMillis = sequentialTimer.getDurationInMillis();
         final var parallelTimeInMillis = parallelTimer.getDurationInMillis();
@@ -182,6 +209,106 @@ class StreamsTest {
         //assert
         assertTrue(parallelTimeInMillis < seqTimeInMillis);
         assertEquals(parallelTimer.getResult(), sequentialTimer.getResult());
+    }
+
+    @Nested
+    class CollatzConjectureTests {
+
+        @Test
+        void testCollatzStream() {
+            final var collatzNrs = Streams.collatzStream(BigInteger.valueOf(3))
+                    .peek(System.out::println)
+                    .takeWhile(not(ONE::equals))
+                    .toList();
+
+            final var expected = IntStream.of(3, 10, 5, 16, 8, 4, 2)
+                    .mapToObj(BigInteger::valueOf)
+                    .toList();
+
+            assertEquals(expected, collatzNrs);
+        }
+
+        @Test
+        void testCollatzStreamLong() {
+            final var collatzNrs = Streams.collatzStream(valueOf(27))
+                    .takeWhile(not(ONE::equals))
+                    .count();
+
+            assertEquals(111L, collatzNrs);
+        }
+
+        @Test
+        void testCollatzStreamLongVsBd() {
+            final var collatzNrsBdStream = Streams.collatzStream(valueOf(27))
+                    .takeWhile(not(ONE::equals))
+                    .mapToLong(BigInteger::longValue)
+                    .toArray();
+
+            final var collatzNrs = Streams.collatzStream(27L)
+                    .peek(It::println)
+                    .takeWhile(nr -> nr != 1L)
+                    .toArray();
+
+            assertArrayEquals(collatzNrs, collatzNrsBdStream);
+        }
+
+        /**
+         * Benford's law, also known as the Newcomb–Benford law, the law of anomalous numbers, or the first-digit law,
+         * is an observation that in many real-life sets of numerical data, the leading digit is likely to be small.
+         *
+         * @see <a href="https://youtu.be/094y1Z2wpJg?t=322">Benford's law</a>
+         * @see <a href="https://en.wikipedia.org/wiki/Benford%27s_law">Benford's law wikipedia</a>
+         */
+        @Test
+        void testBenfordsLawCollatzNrs() {
+            final var result = LongStream.range(1, 200_000)
+                    .flatMap(initNr -> Streams.collatzStream(initNr).takeWhile(nr -> nr != 1))
+                    .collect(IntIntHashMap::new,
+                            (map, value) -> map.addToValue(firstDigit(value), 1),
+                            IntIntHashMap::putAll);
+
+            final var firstDigitPresenceInAscendingOrder = Sequence.of(result.keyValuesView())
+                    .sortedBy(IntIntPair::getTwo)
+                    .mapToInt(IntIntPair::getOne)
+                    .toArray();
+
+            System.out.println("result = " + result);
+
+            assertArrayEquals(new int[]{9, 8, 7, 6, 5, 4, 3, 2, 1}, firstDigitPresenceInAscendingOrder);
+        }
+
+        int firstDigit(final long input) {
+            PreConditions.require(input >= 0, () -> "x must be greater ot equal to 0. (was " + input + ")");
+            long x = input;
+            while (x > 9) {
+                x /= 10;
+            }
+            return (int) x;
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {
+                "123123 -> 1",
+                "2353453 -> 2",
+                "567567435 -> 5",
+                "0 -> 0"})
+        void testFirstDigit(String string) {
+            final String[] split = string.split(" -> ");
+            final var input = Long.parseLong(split[0]);
+            final var expected = Integer.parseInt(split[1]);
+
+            assertEquals(expected, firstDigit(input));
+        }
+
+        @Test
+        void testMaxNrInCollatzSequencesTill200000() {
+            final var maxNr = LongStream.range(1, 200_000)
+                    .flatMap(initNr -> Streams.collatzStream(initNr).takeWhile(nr -> nr != 1))
+                    .max()
+                    .orElseThrow();
+
+            assertEquals(17_202_377_752L, maxNr);
+        }
     }
 
     @Test
@@ -494,7 +621,7 @@ class StreamsTest {
             final var range = IntStream.range(0, 2_000);
 
             final var windows = Streams
-                    .windowed(range::iterator, 10,false)
+                    .windowed(range::iterator, 10, false)
                     .toList();
 
             System.out.println("windows = " + windows);

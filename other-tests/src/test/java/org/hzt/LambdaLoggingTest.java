@@ -40,6 +40,7 @@ class LambdaLoggingTest {
     }
 
     private static String expensiveMessage() {
-        return String.valueOf(Streams.calculatePiAsDouble(100_000_000));
+        final double pi = Streams.leibnizStream(100_000_000).sum() * 4;
+        return String.valueOf(pi);
     }
 }

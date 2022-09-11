@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.LongPredicate;
+import java.util.stream.DoubleStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -28,27 +29,6 @@ final class Streams {
     public static Stream<Integer> returnStreamFromIterator(Iterator<Integer> iterator) {
         Iterable<Integer> iterable = () -> iterator;
         return StreamSupport.stream(iterable.spliterator(), false);
-    }
-
-    public static List<BigInteger> fibonacciList(int length) {
-        return fibonacciStream()
-                .limit(length)
-                .toList();
-    }
-
-    public static BigInteger getNthFibonacciNumber(int n) {
-        return fibonacciStream()
-                .skip(1)
-                .limit(n)
-                .reduce((first, second) -> second)
-                .orElseThrow();
-    }
-
-    public static BigInteger getSumFibonacciNumbers(int n) {
-        return fibonacciStream()
-                .skip(1)
-                .limit(n)
-                .reduce(BigInteger.ZERO, BigInteger::add);
     }
 
     public static Stream<BigInteger> fibonacciStream() {
@@ -96,37 +76,50 @@ final class Streams {
         };
     }
 
-        //leibniz formula for PI: PI/4 = 1 - 1/3 + 1/5 - 1/7......
+    //leibniz formula for PI: PI/4 = 1 - 1/3 + 1/5 - 1/7......
     //converges very slowly
-    public static BigDecimal calculatePi(long nrOfIterations) {
+    public static Stream<BigDecimal> parallelLeibnizBdStream(long nrOfIterations) {
         return LongStream.rangeClosed(0, nrOfIterations)
                 .parallel()
                 .map(Streams::nextInLeibnizSeq)
-                .mapToObj(nr -> BigDecimal.ONE.divide(BigDecimal.valueOf(nr), 10, RoundingMode.HALF_UP))
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .multiply(BigDecimal.valueOf(4));
+                .mapToObj(nr -> BigDecimal.ONE.divide(BigDecimal.valueOf(nr), 10, RoundingMode.HALF_UP));
     }
 
     //leibniz formula for PI: PI/4 = 1 - 1/3 + 1/5 - 1/7......
-    public static double calculatePiAsDouble(long nrOfIterations) {
+    public static DoubleStream leibnizStream(long nrOfIterations) {
         return LongStream.rangeClosed(0, nrOfIterations)
                 .map(Streams::nextInLeibnizSeq)
-                .mapToDouble(nr -> 1. / nr)
-                .sum() * 4;
+                .mapToDouble(nr -> 1. / nr);
     }
 
-    public static double calculatePiAsDoubleInParallel(long nrOfIterations) {
+    public static DoubleStream parallelLeibnizStream(long nrOfIterations) {
         return LongStream.rangeClosed(0, nrOfIterations)
                 .parallel()
                 .map(Streams::nextInLeibnizSeq)
-                .mapToDouble(nr -> 1. / nr)
-                .sum() * 4;
+                .mapToDouble(nr -> 1. / nr);
     }
 
     private static long nextInLeibnizSeq(long nr) {
         final var pow = Math.pow(-1, nr);
         final var value = nr * 2 + 1;
         return (long) (pow * value);
+    }
+
+    public static Stream<BigInteger> collatzStream(BigInteger initValue) {
+        final var three = BigInteger.valueOf(3);
+        return Stream.iterate(initValue,
+                nr -> nr.mod(BigInteger.TWO).equals(BigInteger.ZERO) ?
+                        nr.divide(BigInteger.TWO) :
+                        nr.multiply(three).add(BigInteger.ONE));
+    }
+
+    /**
+     * @param initValue the starting value of a stream following the rules of the Collatz conjecture
+     * @return A stream following the collatz sequence
+     * @see <a href="https://www.youtube.com/watch?v=094y1Z2wpJg">The Simplest Math Problem No One Can Solve - Collatz Conjecture</a>
+     */
+    public static LongStream collatzStream(long initValue) {
+        return LongStream.iterate(initValue, nr -> nr % 2 == 0 ? (nr / 2) : (nr * 3 + 1L));
     }
 
     public static <T> Stream<T> empty() {
