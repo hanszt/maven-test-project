@@ -1,36 +1,44 @@
 package hzt.creational_patterns.singleton_pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings({"squid:S106", "squid:S2221"})
 class JDBCSingletonDemo {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JDBCSingletonDemo.class);
 
     private static final List<Integer> readValueList = new ArrayList<>();
 
     static int count = 1;
     static int choice;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         JDBCSingleton jdbc = JDBCSingleton.getInstance();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        try {
         do {
-            System.out.println("DATABASE OPERATIONS");
-            System.out.println(" --------------------- ");
-            System.out.println(" 1. Insertion ");
-            System.out.println(" 2. View      ");
-            System.out.println(" 3. Delete    ");
-            System.out.println(" 4. Update    ");
-            System.out.println(" 5. Exit      ");
+            LOGGER.info("DATABASE OPERATIONS");
+            LOGGER.info(" --------------------- ");
+            LOGGER.info(" 1. Insertion ");
+            LOGGER.info(" 2. View      ");
+            LOGGER.info(" 3. Delete    ");
+            LOGGER.info(" 4. Update    ");
+            LOGGER.info(" 5. Exit      ");
 
             System.out.print("\n");
             System.out.print("Please enter the choice what you want to perform in the database: ");
 
-            choice = Integer.parseInt(br.readLine());
+
+                choice = Integer.parseInt(br.readLine());
             switch (choice) {
 
                 case 1:
@@ -48,10 +56,14 @@ class JDBCSingletonDemo {
                 default:
                     return;
             }
-            System.out.println("Press Enter key to continue...");
+
+            LOGGER.info("Press Enter key to continue...");
             readValueList.add(System.in.read());
         } while (choice != 4);
-        System.out.println("ReadValues: " + readValueList);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+        LOGGER.info("ReadValues: {}", readValueList);
     }
 
     private static void executeUpdate(JDBCSingleton jdbc, BufferedReader br) throws IOException {
@@ -63,11 +75,11 @@ class JDBCSingletonDemo {
         try {
             int i = jdbc.update(username, password);
             if (i > 0) {
-                System.out.println((count++) + " Data has been updated successfully");
+                LOGGER.info("{} Data has been updated successfully", count++);
             }
 
-        } catch (Exception e) {
-           e.printStackTrace();
+        } catch (RuntimeException e) {
+           LOGGER.error("Could not execute update", e);
         }
     }
 
@@ -78,13 +90,13 @@ class JDBCSingletonDemo {
         try {
             int i = jdbc.delete(userid);
             if (i > 0) {
-                System.out.println((count++) + " Data has been deleted successfully");
+                LOGGER.info("{} Data has been deleted successfully", count++);
             } else {
-                System.out.println("Data has not been deleted");
+                LOGGER.info("Data has not been deleted");
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Could not execute delete", e);
         }
     }
 
@@ -95,7 +107,7 @@ class JDBCSingletonDemo {
         try {
             jdbc.view(username);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Could not execute view", e);
         }
     }
 
@@ -108,13 +120,13 @@ class JDBCSingletonDemo {
         try {
             int i = jdbc.insert(username, password);
             if (i > 0) {
-                System.out.println((count++) + " Data has been inserted successfully");
+                LOGGER.info("{} Data has been inserted successfully", (count++));
             } else {
-                System.out.println("Data has not been inserted ");
+                LOGGER.info("Data has not been inserted ");
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Could not execute insertion", e);
         }
     }
 }

@@ -1,5 +1,7 @@
 package org.hzt;
 
+import org.apache.commons.math3.fraction.BigFraction;
+import org.apache.commons.math3.fraction.Fraction;
 import org.hzt.iterators.WindowedIterator;
 import org.hzt.iterators.ZipWithNextIterator;
 
@@ -14,6 +16,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.LongPredicate;
 import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -26,9 +29,8 @@ final class Streams {
     private Streams() {
     }
 
-    public static Stream<Integer> returnStreamFromIterator(Iterator<Integer> iterator) {
-        Iterable<Integer> iterable = () -> iterator;
-        return StreamSupport.stream(iterable.spliterator(), false);
+    public static Stream<Integer> streamFromIterator(Iterator<Integer> iterator) {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator, 0), false);
     }
 
     public static Stream<BigInteger> fibonacciStream() {
@@ -55,6 +57,12 @@ final class Streams {
                 .map(Pair::first);
     }
 
+    public static LongStream fibonacciLongStream() {
+        final long[] seed = {0L, 1L};
+        return Stream.iterate(seed, pair -> new long[] {pair[1], pair[0] + pair[1]})
+                .mapToLong(p -> p[0]);
+    }
+
     /**
      * A stream implementation that is inspired by the sieve of eratosthenes
      * @see <a href="https://en.wikipedia.org/wiki/Sieve_of_Pritchard">Sieve of Pritchard</a>
@@ -78,31 +86,44 @@ final class Streams {
 
     //leibniz formula for PI: PI/4 = 1 - 1/3 + 1/5 - 1/7......
     //converges very slowly
-    public static Stream<BigDecimal> parallelLeibnizBdStream(long nrOfIterations) {
+    public static Stream<BigDecimal> leibnizBdStream(long nrOfIterations) {
+        final var four = BigDecimal.valueOf(4);
         return LongStream.rangeClosed(0, nrOfIterations)
-                .parallel()
                 .map(Streams::nextInLeibnizSeq)
-                .mapToObj(nr -> BigDecimal.ONE.divide(BigDecimal.valueOf(nr), 10, RoundingMode.HALF_UP));
+                .mapToObj(nr -> four.divide(BigDecimal.valueOf(nr), 10, RoundingMode.HALF_UP));
+    }
+
+    //leibniz formula for PI: PI/4 = 1 - 1/3 + 1/5 - 1/7......
+    public static Stream<Fraction> leibnizFractionStream(int nrOfIterations) {
+        return IntStream.rangeClosed(0, nrOfIterations)
+                .map(Streams::nextInLeibnizSeq)
+                .mapToObj(nr -> new Fraction(4, nr));
+    }
+
+    //leibniz formula for PI: PI/4 = 1 - 1/3 + 1/5 - 1/7......
+    public static Stream<BigFraction> leibnizBigFractionStream(int nrOfIterations) {
+        return IntStream.rangeClosed(0, nrOfIterations)
+                .map(Streams::nextInLeibnizSeq)
+                .mapToObj(nr -> new BigFraction(4, nr));
     }
 
     //leibniz formula for PI: PI/4 = 1 - 1/3 + 1/5 - 1/7......
     public static DoubleStream leibnizStream(long nrOfIterations) {
         return LongStream.rangeClosed(0, nrOfIterations)
                 .map(Streams::nextInLeibnizSeq)
-                .mapToDouble(nr -> 1. / nr);
-    }
-
-    public static DoubleStream parallelLeibnizStream(long nrOfIterations) {
-        return LongStream.rangeClosed(0, nrOfIterations)
-                .parallel()
-                .map(Streams::nextInLeibnizSeq)
-                .mapToDouble(nr -> 1. / nr);
+                .mapToDouble(nr -> 4. / nr);
     }
 
     private static long nextInLeibnizSeq(long nr) {
         final var pow = Math.pow(-1, nr);
         final var value = nr * 2 + 1;
         return (long) (pow * value);
+    }
+
+    private static int nextInLeibnizSeq(int nr) {
+        final var pow = Math.pow(-1, nr);
+        final var value = nr * 2 + 1;
+        return (int) (pow * value);
     }
 
     public static Stream<BigInteger> collatzStream(BigInteger initValue) {

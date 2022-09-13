@@ -7,11 +7,12 @@ import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Book;
 import org.hzt.test.model.Painting;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.Constructor;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -49,11 +50,16 @@ class OtherTests {
 
     @Test
     void testChars() {
-        IntStream.range(33, 900).mapToObj(OtherTests::toCharacter).forEach(System.out::println);
+        IntStream.range(33, 900)
+                .mapToObj(OtherTests::toCharacter)
+                .forEach(System.out::println);
+
         System.out.println();
+
         "Hello".chars()
                 .mapToObj(OtherTests::toCharacter)
                 .forEach(System.out::println);
+
         String.format("Hello,%nI'm Hans").lines().forEach(System.out::printf);
         char c = 'ͽ';
         assertEquals(893, c);
@@ -65,20 +71,20 @@ class OtherTests {
 
     @Test
     void testStreamFindFirstNotNullSafe() {
-        List<Bic> bics = List.of(new Bic(null), new Bic(null));
+        final var bics = List.of(new Bic(null), new Bic(null));
         assertThrows(NullPointerException.class, () -> getAnyNameThrowingNull(bics));
     }
 
     @Test
     void testStreamFindFirstDoesNotThrowNull() {
-        List<Bic> bics = List.of(new Bic(null), new Bic(null));
+        final var bics = List.of(new Bic(null), new Bic(null));
         assertTrue(getAnyName(bics).isEmpty());
     }
 
     @Test
     void testStreamFindFirstNotNullSafeButNotThrowing() {
-        String expected = "Sophie";
-        Optional<String> anyName = getAnyNameThrowingNull(List.of(new Bic(expected), new Bic(null)));
+        final var expected = "Sophie";
+        final var anyName = getAnyNameThrowingNull(List.of(new Bic(expected), new Bic(null)));
         anyName.ifPresentOrElse(assertIsEqualTo(expected), () -> fail("Not present"));
     }
 
@@ -133,7 +139,7 @@ class OtherTests {
 
     @Test
     void testSetBehaviourContainingNull() {
-        Set<String> stringSet = new HashSet<>();
+        final Set<String> stringSet = new HashSet<>();
         stringSet.add(null);
         assertTrue(stringSet.remove(null));
     }
@@ -146,14 +152,14 @@ class OtherTests {
 
     @Test
     void testGenericsMethodToString() {
-        var opt = Optional.of("Hallo");
+        final var opt = Optional.of("Hallo");
         opt.ifPresentOrElse(assertIsEqualTo("Hallo"), () -> fail("Not present"));
     }
 
     @Test
     void testGenericsMethodToBic() {
         final var bic = new Bic("Hallo");
-        var opt = Optional.of(bic);
+        final var opt = Optional.of(bic);
         opt.ifPresentOrElse(assertIsEqualTo(bic), () -> fail("Not present"));
     }
 
@@ -233,23 +239,26 @@ class OtherTests {
 
     @SuppressWarnings("SameParameterValue")
     private static double calcPiRandom(final int iterations) {
-        long successCount = IntStream.rangeClosed(0, iterations)
+        final long successCount = IntStream.rangeClosed(0, iterations)
                 .filter(i -> sqrtTwoRandomNumbersSmallerEqualThanOne())
                 .count();
         return (double) (4 * successCount) / iterations;
     }
 
     private static boolean sqrtTwoRandomNumbersSmallerEqualThanOne() {
-        double x = Math.random();
-        double y = Math.random();
+        final double x = Math.random();
+        final double y = Math.random();
         return x * x + y * y <= 1;
     }
 
+    /**
+     * Can lead to memory leaks:
+     * @see <a href="https://stackoverflow.com/questions/6802483/how-to-directly-initialize-a-hashmap-in-a-literal-way">
+     *     For up to Java Version 8</a>
+     */
     @Test
     void testMapAndCollectionIllegalInitialisation() {
-        // Can lead to memory leaks:
-        // see: https://stackoverflow.com/questions/6802483/how-to-directly-initialize-a-hashmap-in-a-literal-way
-        Map<String, String> map = new HashMap<>() {{
+        final Map<String, String> map = new HashMap<>() {{
             put("wat", "gek");
             put("raar", "dit moet niet kunnen");
         }};
@@ -391,7 +400,21 @@ class OtherTests {
 
     @Test
     void testPuttingAllKindsOfObjectsInBoundedWildCardList() {
-        List<? super Comparable<?>> list = new ArrayList<>();
+        final List<? super Comparable<?>> list = new ArrayList<>();
+        list.add(LocalDate.of(2021, Month.OCTOBER, 4));
+        list.add("Hello");
+        list.add("This is weird");
+        list.add(BigDecimal.valueOf(20));
+        list.add(new Person("", null, null));
+
+        list.forEach(System.out::println);
+
+        assertTrue(list.contains("Hello"));
+    }
+
+    @Test
+    void testExtendedBoundedWildCardList() {
+        final List<? super Comparable<? extends Comparable<? extends Comparable<? extends Comparable<?>>>>> list = new ArrayList<>();
         list.add(LocalDate.of(2021, Month.OCTOBER, 4));
         list.add("Hello");
         list.add("This is weird");
@@ -406,7 +429,7 @@ class OtherTests {
     @Test
     void testModifyingUnderlingArrayViaArraysAsList() {
         final Integer[] expected = {1, 4, 10, 7, 3, 8};
-        Integer[] actual = {1, 4, 5, 7, 3, 8};
+        final Integer[] actual = {1, 4, 5, 7, 3, 8};
 
         final var integerList = Arrays.asList(actual);
 
@@ -416,6 +439,10 @@ class OtherTests {
         assertArrayEquals(expected, actual);
     }
 
+    public void printStrings(List<String> strings) {
+        strings.forEach(System.out::println);
+    }
+
     @Test
     void testTypeWitnessNotNeededAnyMore() {
         //noinspection RedundantTypeArguments
@@ -423,17 +450,55 @@ class OtherTests {
     }
 
     @Test
-    void testClassNewInstance() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        final var input = "new Class<>();";
-        Class<? extends String> theClass = input.getClass();
-        final Constructor<? extends String> constructor = theClass.getConstructor();
-        final var newString = constructor.newInstance();
-
-        assertEquals("", newString);
+    void testExec() throws IOException {
+        Process process = Runtime.getRuntime().exec("docker exec rabbitmq bash");
+        assertTrue(process.isAlive());
     }
 
-    public void printStrings(List<String> strings) {
-        strings.forEach(System.out::println);
+    /**
+     * Filed a Stackoverflow question for test cases below.
+     * <p>
+     * A JDK bug is reported in response
+     *
+     * @see <a href="https://stackoverflow.com/questions/73654810/why-does-string-creation-using-newinstance-method-behave-different-when-usin">
+     *     Why does String creation using `newInstance()` method behave different when using `var` compared to using explicit type `String`?</a>
+     * @see <a href="https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8293578">JDK-8293578 : Duplicate ldc generated by javac</a>
+     * @see <a href="https://bugs.openjdk.org/browse/JDK-8293578">Duplicate ldc generated by javac</a>
+     */
+    @Nested
+    class NewInstanceUsingReflection {
+
+        @Test
+        void testClassNewInstance() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+            final var input = "A string";
+            final var theClass = input.getClass();
+            final var constructor = theClass.getConstructor();
+            final String newString = constructor.newInstance();
+
+            assertEquals("", newString);
+        }
+
+        @Test
+        void testClassNewInstanceWithVarOnly() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+            final var input = "A string";
+            final var theClass = input.getClass();
+            final var constructor = theClass.getConstructor();
+            final var newString = constructor.newInstance();
+
+            // unexpected
+            assertEquals("A string", newString);
+        }
+
+        @Test
+        void testNewInstanceInlined() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+            final var newString = "A string"
+                    .getClass()
+                    .getConstructor()
+                    .newInstance();
+            // unexpected
+            assertEquals("A string", newString);
+        }
+
     }
 
 }

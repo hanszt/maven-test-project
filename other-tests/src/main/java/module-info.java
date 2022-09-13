@@ -9,4 +9,6 @@ open module other.tests {
     requires org.jetbrains.annotations;
     requires java.scripting;
     requires commons.math3;
+    requires org.eclipse.collections.impl;
+    requires org.eclipse.collections.api;
 }

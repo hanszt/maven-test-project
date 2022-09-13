@@ -1,7 +1,9 @@
 package org.hzt;
 
+import org.apache.commons.math3.fraction.BigFraction;
+import org.apache.commons.math3.fraction.Fraction;
+import org.eclipse.collections.api.map.primitive.IntIntMap;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
-import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
 import org.hzt.model.Payment;
 import org.hzt.model.Person;
 import org.hzt.sequences.primitve_sequences.IntSequence;
@@ -12,7 +14,6 @@ import org.hzt.test.model.Museum;
 import org.hzt.test.model.Painter;
 import org.hzt.test.model.Painting;
 import org.hzt.utils.It;
-import org.hzt.utils.PreConditions;
 import org.hzt.utils.collections.MutableSetX;
 import org.hzt.utils.collections.SetX;
 import org.hzt.utils.collectors.CollectorsX;
@@ -24,6 +25,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.MonthDay;
@@ -50,6 +52,7 @@ import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toUnmodifiableSet;
+import static org.hzt.Streams.fibonacciLongStream;
 import static org.hzt.Streams.fibonacciStream;
 import static org.hzt.Streams.fibonacciStreamV2;
 import static org.hzt.Streams.subtractingFibonacciStream;
@@ -128,7 +131,7 @@ class StreamsTest {
                 .map(String::valueOf)
                 .toList();
 
-        final var result = Streams.returnStreamFromIterator(iterator)
+        final var result = Streams.streamFromIterator(iterator)
                 .map(String::valueOf)
                 .toList();
 
@@ -141,65 +144,53 @@ class StreamsTest {
     }
 
     @Test
-    void testFibonacciUsingStreams() {
-        final var expected = Stream.of(0, 1, 1, 2, 3, 5, 8, 13, 21, 34)
-                .map(BigInteger::valueOf)
-                .toList();
-
-        final var fibonacciList = Streams.fibonacciStream().limit(10).toList();
-        assertEquals(expected, fibonacciList);
-    }
-
-    @Test
-    void testNthFibonacciNrUsingStreams() {
-        final var fibonacciList = getNthFibonacciNumber(500);
-        assertEquals(new BigDecimal(
-                "139423224561697880139724382870407283950070256587697307264108962948325571622863290691557658876222521294125"
-        ).toBigInteger(), fibonacciList);
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private static BigInteger getNthFibonacciNumber(int n) {
-        return fibonacciStream()
-                .skip(1)
-                .limit(n)
-                .reduce((first, second) -> second)
-                .orElseThrow();
-    }
-
-    @Test
-    void testSumFibonacciNrUsingStreams() {
-        final var fibonacciList = getSumFibonacciNumbers(500);
-        assertEquals(new BigDecimal(
-                "365014740723634211012237077906479355996081581501455497852747829366800199361550174096573645929019489792750"
-        ).toBigInteger(), fibonacciList);
-    }
-
-    private static BigInteger getSumFibonacciNumbers(@SuppressWarnings("SameParameterValue") int n) {
-        return fibonacciStream()
-                .skip(1)
-                .limit(n)
-                .reduce(BigInteger.ZERO, BigInteger::add);
-    }
-
-    @Test
     void testCalculatePiParallelUsingStreams() {
-        Timer<BigDecimal> timer = Timer.timeAFunction(10_000_000, amount -> Streams.parallelLeibnizBdStream(amount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .multiply(BigDecimal.valueOf(4)));
+        Timer<BigDecimal> timer = Timer.timeALongFunction(10_000_000, amount -> Streams.leibnizBdStream(amount)
+                .parallel()
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
         final var result = timer.getResult();
         System.out.println("Duration: " + timer.getDuration());
-        assertEquals(new BigDecimal("3.1415927972"), result);
+        assertEquals(new BigDecimal("3.1415927694"), result);
+    }
+
+    @Test
+    void testCalculatePiUsingLeibnizFractionStream() {
+        final var timer = Timer.timeAnIntFunction(11, amount -> Streams.leibnizFractionStream(amount)
+                .reduce(Fraction::add)
+                .orElseThrow());
+        final var result = timer.getResult();
+        System.out.println("Duration: " + timer.getDuration());
+
+        final var expected = new Fraction(1023461776, 334639305);
+        System.out.println("result = " + result.doubleValue());
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testCalculatePiUsingLeibnizBigFractionStream() {
+        final var timer = Timer.timeAnIntFunction(2_000, amount -> Streams.leibnizBigFractionStream(amount)
+                .reduce(BigFraction::add)
+                .orElseThrow());
+
+        final var result = timer.getResult();
+        System.out.println("Duration: " + timer.getDuration());
+
+        final var decimalValue = result.doubleValue();
+        System.out.println("result = " + decimalValue);
+
+        final var actual = BigDecimal.valueOf(decimalValue).setScale(2, RoundingMode.HALF_UP);
+        assertEquals(BigDecimal.valueOf(3.14), actual);
     }
 
     @Test
     void testCalculatePiParallelUsingDoubleStream() {
         final var iterations = 10_000_000;
         //act
-        Timer<Double> sequentialTimer = Timer.timeAFunction(iterations,
-                nr -> Streams.leibnizStream(nr).sum() * 4);
-        Timer<Double> parallelTimer = Timer.timeAFunction(iterations,
-                nr -> Streams.parallelLeibnizStream(nr).sum() * 4);
+        Timer<Double> sequentialTimer = Timer.timeALongFunction(iterations,
+                nr -> Streams.leibnizStream(nr).sum());
+        Timer<Double> parallelTimer = Timer.timeALongFunction(iterations,
+                nr -> Streams.leibnizStream(nr).parallel().sum());
 
         final var seqTimeInMillis = sequentialTimer.getDurationInMillis();
         final var parallelTimeInMillis = parallelTimer.getDurationInMillis();
@@ -261,29 +252,17 @@ class StreamsTest {
          */
         @Test
         void testBenfordsLawCollatzNrs() {
-            final var result = LongStream.range(1, 200_000)
-                    .flatMap(initNr -> Streams.collatzStream(initNr).takeWhile(nr -> nr != 1))
-                    .collect(IntIntHashMap::new,
-                            (map, value) -> map.addToValue(firstDigit(value), 1),
-                            IntIntHashMap::putAll);
+            final IntIntMap result = StatisticsUtils.benfordsDistribution(LongStream.range(1, 500_000)
+                    .flatMap(initNr -> Streams.collatzStream(initNr).takeWhile(nr -> nr != 1)));
 
             final var firstDigitPresenceInAscendingOrder = Sequence.of(result.keyValuesView())
-                    .sortedBy(IntIntPair::getTwo)
+                    .sorted(Comparator.comparingInt(IntIntPair::getTwo))
                     .mapToInt(IntIntPair::getOne)
                     .toArray();
 
             System.out.println("result = " + result);
 
             assertArrayEquals(new int[]{9, 8, 7, 6, 5, 4, 3, 2, 1}, firstDigitPresenceInAscendingOrder);
-        }
-
-        int firstDigit(final long input) {
-            PreConditions.require(input >= 0, () -> "x must be greater ot equal to 0. (was " + input + ")");
-            long x = input;
-            while (x > 9) {
-                x /= 10;
-            }
-            return (int) x;
         }
 
         @ParameterizedTest
@@ -297,7 +276,7 @@ class StreamsTest {
             final var input = Long.parseLong(split[0]);
             final var expected = Integer.parseInt(split[1]);
 
-            assertEquals(expected, firstDigit(input));
+            assertEquals(expected, StatisticsUtils.firstDigit(input));
         }
 
         @Test
@@ -309,6 +288,20 @@ class StreamsTest {
 
             assertEquals(17_202_377_752L, maxNr);
         }
+    }
+
+    @Test
+    void testBenfordsLawNotApplicableToLineairNrLine() {
+        final IntIntMap result = StatisticsUtils.benfordsDistribution(LongStream.range(0, 100_000));
+
+        final var firstDigitPresenceInAscendingOrder = Sequence.of(result.keyValuesView())
+                .sorted(Comparator.comparingInt(IntIntPair::getTwo))
+                .mapToInt(IntIntPair::getOne)
+                .toArray();
+
+        System.out.println("result = " + result);
+
+        assertArrayEquals(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, firstDigitPresenceInAscendingOrder);
     }
 
     @Test
@@ -445,32 +438,114 @@ class StreamsTest {
         assertArrayEquals(expected, actual);
     }
 
-    @Test
-    void testParallelFibonacciStream() {
-        final var count = fibonacciStream()
-                .parallel()
-                .takeWhile(s -> s.toString().length() < 10_000)
-                .count();
+    @Nested
+    class FibonacciSequence {
 
-        assertEquals(47847, count);
-    }
+        @Test
+        void testFibonacciUsingStreams() {
+            final var expected = Stream.of(0, 1, 1, 2, 3, 5, 8, 13, 21, 34)
+                    .map(BigInteger::valueOf)
+                    .toList();
 
-    @Test
-    void testParallelFibonacciStreamBehavesDifferentThenSequential() {
-        final var parallelStream = fibonacciStream()
-                .parallel()
-                .dropWhile(s -> s.toString().length() < 10)
-                .filter(s -> s.isProbablePrime(100));
+            final var fibonacciList = Streams.fibonacciStream().limit(10).toList();
+            assertEquals(expected, fibonacciList);
+        }
 
-        final var sequentialStream = fibonacciStream()
-                .dropWhile(s -> s.toString().length() < 10)
-                .filter(s -> s.isProbablePrime(100));
+        @Test
+        void testNthFibonacciNrUsingStreams() {
+            final var fibonacciList = fibonacciStream()
+                    .skip(1)
+                    .limit(500)
+                    .reduce((first, second) -> second)
+                    .orElseThrow();
 
-        //noinspection ResultOfMethodCallIgnored
-        assertAll(
-                () -> assertEquals(Optional.of(valueOf(2971215073L)), sequentialStream.findAny()),
-                () -> assertThrows(OutOfMemoryError.class, parallelStream::findAny)
-        );
+            assertEquals(new BigInteger(
+                    "139423224561697880139724382870407283950070256587697307264108962948325571622863290691557658876222521294125"
+            ), fibonacciList);
+        }
+
+        @Test
+        void testSumFibonacciNrUsingStreams() {
+            final var fibonacciList = fibonacciStream()
+                    .skip(1)
+                    .limit(500)
+                    .reduce(BigInteger.ZERO, BigInteger::add);
+
+            assertEquals(new BigDecimal(
+                    "365014740723634211012237077906479355996081581501455497852747829366800199361550174096573645929019489792750"
+            ).toBigInteger(), fibonacciList);
+        }
+
+        @Test
+        void testParallelFibonacciStream() {
+            final var count = fibonacciStream()
+                    .parallel()
+                    .takeWhile(s -> s.toString().length() < 10_000)
+                    .count();
+
+            assertEquals(47847, count);
+        }
+
+        @Test
+        void testParallelFibonacciStreamBehavesDifferentThenSequential() {
+            final var parallelStream = fibonacciStream()
+                    .parallel()
+                    .dropWhile(s -> s.toString().length() < 10)
+                    .filter(s -> s.isProbablePrime(100));
+
+            final var sequentialStream = fibonacciStream()
+                    .dropWhile(s -> s.toString().length() < 10)
+                    .filter(s -> s.isProbablePrime(100));
+
+            //noinspection ResultOfMethodCallIgnored
+            assertAll(
+                    () -> assertEquals(Optional.of(valueOf(2971215073L)), sequentialStream.findAny()),
+                    () -> assertThrows(OutOfMemoryError.class, parallelStream::findAny)
+            );
+        }
+
+        @Test
+        void testFibPrimeAfter100Terms() {
+            final var fibPrime = fibonacciStreamV2()
+//                .parallel()
+                    .skip(100)
+                    .filter(s -> s.isProbablePrime(100))
+                    .findFirst();
+
+            assertEquals(Optional.of(new BigInteger("1066340417491710595814572169")), fibPrime);
+        }
+
+        @Test
+        void testFibonacciLongStream() {
+            final var fibNrs = fibonacciLongStream()
+                    .takeWhile(l -> l >= 0L)
+                    .toArray();
+
+            System.out.println(Arrays.toString(fibNrs));
+
+            assertEquals(93, fibNrs.length);
+        }
+
+        @Test
+        void testBenfordsLawFibonacciSequence() {
+            final var longStream = fibonacciStream()
+                    .skip(1)
+                    .map(BigInteger::toString)
+                    .limit(10_000)
+                    .mapToLong(s -> Long.parseLong(s.substring(0, 1)));
+
+            final var result = StatisticsUtils.benfordsDistribution(longStream);
+
+            final var firstDigitPresenceInAscendingOrder = Sequence.of(result.keyValuesView())
+                    .sorted(Comparator.comparingInt(IntIntPair::getTwo))
+                    .mapToInt(IntIntPair::getOne)
+                    .toArray();
+
+            System.out.println("result = " + result);
+
+            assertArrayEquals(new int[]{9, 8, 7, 6, 5, 4, 3, 2, 1}, firstDigitPresenceInAscendingOrder);
+        }
+
     }
 
     @Test
@@ -490,17 +565,6 @@ class StreamsTest {
                 .findFirst();
 
         assertEquals(OptionalLong.of(10007), primeTenDigits);
-    }
-
-    @Test
-    void testFibPrimeAfter100Terms() {
-        final var fibPrime = fibonacciStreamV2()
-//                .parallel()
-                .skip(100)
-                .filter(s -> s.isProbablePrime(100))
-                .findFirst();
-
-        assertEquals(Optional.of(new BigInteger("1066340417491710595814572169")), fibPrime);
     }
 
     @Test

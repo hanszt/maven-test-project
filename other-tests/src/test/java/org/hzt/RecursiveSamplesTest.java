@@ -102,6 +102,23 @@ class RecursiveSamplesTest {
             "2, 4 -> 2",
             "12, 36 -> 12",
             "35, 12 -> 1",
+            "-5, 5 -> 5"})
+    void testGreatestIntCommonDivisor(String input) {
+        final var strings = StringX.of(input).split(", ", " -> ");
+        final var first = Integer.parseInt(strings.get(0));
+        final var second = Integer.parseInt(strings.get(1));
+        final var gcd = RecursiveSamples.gcdByEuclidsAlgorithm(first, second);
+
+        final var expected = Integer.parseInt(strings.get(2));
+
+        assertEquals(expected, gcd);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "2, 4 -> 2",
+            "12, 36 -> 12",
+            "35, 12 -> 1",
             "-5, 5 -> 5",
             "31940434634990099905, 51680708854858323072 -> 1"})
     void testGreatestCommonDivisorBigInt(String input) {

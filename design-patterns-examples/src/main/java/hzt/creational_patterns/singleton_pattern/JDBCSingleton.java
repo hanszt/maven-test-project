@@ -1,13 +1,26 @@
 package hzt.creational_patterns.singleton_pattern;
 
-import java.sql.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+@SuppressWarnings({"SqlNoDataSourceInspection", "squid:S2974"})
 class JDBCSingleton {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JDBCSingleton.class);
     //Step 1
     // create a JDBCSingleton class.
     //static member holds only one instance of the JDBCSingleton class.
 
-    private static JDBCSingleton jdbc;
+    private static class InstanceHolder {
+
+        private static final JDBCSingleton jdbc = new JDBCSingleton();
+    }
 
     //JDBCSingleton prevents the instantiation from any other class.
     private JDBCSingleton() {
@@ -15,10 +28,7 @@ class JDBCSingleton {
 
     //Now we are providing global point of access.
     public static JDBCSingleton getInstance() {
-        if (jdbc == null) {
-            jdbc = new JDBCSingleton();
-        }
-        return jdbc;
+        return InstanceHolder.jdbc;
     }
 
     private static Connection getConnection() throws SQLException {
@@ -35,7 +45,7 @@ class JDBCSingleton {
             recordCounter = ps.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not insert username and password...", e);
         }
         return recordCounter;
     }
@@ -47,11 +57,13 @@ class JDBCSingleton {
 
             ps.setString(1, name);
             while (rs.next()) {
-                System.out.println("Name= " + rs.getString(2) + "\t" + "Password= " + rs.getString(3));
+                final var userName = rs.getString(2);
+                final var password = rs.getString(3);
+                LOGGER.info("Name= {}\tPassword= {}", userName, password);
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not view name...", e);
         }
     }
 
@@ -65,7 +77,7 @@ class JDBCSingleton {
             ps.setString(2, name);
             recordCounter = ps.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not update name and password...", e);
         }
         return recordCounter;
     }
@@ -77,7 +89,7 @@ class JDBCSingleton {
             ps.setInt(1, userid);
             recordCounter = ps.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not delete user with id: " + userid, e);
         }
         return recordCounter;
     }

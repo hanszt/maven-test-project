@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.LongFunction;
 
 public final class Timer<R> {
@@ -39,6 +40,7 @@ public final class Timer<R> {
      * @param <R> The type of the output parameter
      * @return first Timer object that contains the time it took to execute the function and the result of the function
      */
+    @SuppressWarnings("unused")
     public static <T, R> Timer<R> timeAFunction(T t, Function<? super T, ? extends R> function) {
         long start = System.nanoTime();
         R r = function.apply(t);
@@ -46,9 +48,16 @@ public final class Timer<R> {
         return new Timer<>(r, time);
     }
 
-    public static <R> Timer<R> timeAFunction(long aLong, LongFunction<? extends R> function) {
+    public static <R> Timer<R> timeALongFunction(long aLong, LongFunction<? extends R> function) {
         long start = System.nanoTime();
         R r = function.apply(aLong);
+        long time = System.nanoTime() - start;
+        return new Timer<>(r, time);
+    }
+
+    public static <R> Timer<R> timeAnIntFunction(int integer, IntFunction<? extends R> function) {
+        long start = System.nanoTime();
+        R r = function.apply(integer);
         long time = System.nanoTime() - start;
         return new Timer<>(r, time);
     }

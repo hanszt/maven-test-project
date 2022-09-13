@@ -45,7 +45,7 @@ public final class RecursiveSamples {
      * @return the fourier transform of the input
      */
     public static Complex[] fastFourierTransform(Complex[] input) {
-        int length = input.length;
+        final int length = input.length;
         // base case
         if (length == 1) {
             return new Complex[]{input[0]};
@@ -57,30 +57,30 @@ public final class RecursiveSamples {
 
         final var halfLength = length / 2;
 
-        Complex[] halfLengthArray = new Complex[halfLength];
+        final var halfLengthArray = new Complex[halfLength];
 
         // compute FFT of even terms
         for (int k = 0; k < halfLength; k++) {
             halfLengthArray[k] = input[2 * k];
         }
-        Complex[] evenFFT = fastFourierTransform(halfLengthArray);
+        final Complex[] evenFFT = fastFourierTransform(halfLengthArray);
 
         // compute FFT of odd terms
         // reuse the array (to avoid n log n space)
         for (int k = 0; k < halfLength; k++) {
             halfLengthArray[k] = input[2 * k + 1];
         }
-        Complex[] oddFFT = fastFourierTransform(halfLengthArray);
+        final Complex[] oddFFT = fastFourierTransform(halfLengthArray);
 
         return combine(evenFFT, oddFFT, length, halfLength);
     }
 
     @NotNull
     private static Complex[] combine(Complex[] evenFFT, Complex[] oddFFT, int length, int halfLength) {
-        Complex[] result = new Complex[length];
+        final var result = new Complex[length];
         for (int k = 0; k < halfLength; k++) {
-            double phi = -(2 * Math.PI) * k / length;
-            Complex angle = new Complex(Math.cos(phi), Math.sin(phi));
+            final var phi = -(2 * Math.PI) * k / length;
+            final var angle = new Complex(Math.cos(phi), Math.sin(phi));
 
             final var complex = angle.multiply(oddFFT[k]);
 
@@ -97,6 +97,13 @@ public final class RecursiveSamples {
      * @see <a href="https://www.baeldung.com/java-greatest-common-divisor">Finding Greatest Common Divisor in Java</a>
      */
     public static long gcdByEuclidsAlgorithm(long n1, long n2) {
+        if (n2 == 0) {
+            return n1;
+        }
+        return gcdByEuclidsAlgorithm(n2, n1 % n2);
+    }
+
+    public static int gcdByEuclidsAlgorithm(int n1, int n2) {
         if (n2 == 0) {
             return n1;
         }
