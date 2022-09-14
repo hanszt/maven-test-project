@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.Month;
 
+import static org.hzt.utils.It.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AgeCalculatorTest {
@@ -16,7 +17,7 @@ class AgeCalculatorTest {
                         LocalDate.of(1994, Month.OCTOBER, 20),
                         LocalDate.of(2022, Month.MARCH, 7));
 
-        System.out.println("ageInDays = " + ageInDays);
+        println("ageInDays = " + ageInDays);
 
         assertEquals(10_000, ageInDays);
     }
@@ -32,9 +33,9 @@ class AgeCalculatorTest {
         final LocalDate dateWhenAgeHuibInDaysIs30_000 = AgeCalculator
                 .calculateDateWhenAgeInDaysReached(30_000, LocalDate.of(1954, Month.SEPTEMBER, 23));
 
-        System.out.println("dateWhenAgeSophieInDaysIs10_000 = " + dateWhenAgeSophieInDaysIs10_000);
-        System.out.println("dateWhenAgeHansInDaysIs15_000 = " + dateWhenAgeHansInDaysIs15_000);
-        System.out.println("dateWhenAgeHuibInDaysIs30_000 = " + dateWhenAgeHuibInDaysIs30_000);
+        println("dateWhenAgeSophieInDaysIs10_000 = " + dateWhenAgeSophieInDaysIs10_000);
+        println("dateWhenAgeHansInDaysIs15_000 = " + dateWhenAgeHansInDaysIs15_000);
+        println("dateWhenAgeHuibInDaysIs30_000 = " + dateWhenAgeHuibInDaysIs30_000);
 
         assertEquals(LocalDate.of(2022, Month.MARCH, 7), dateWhenAgeSophieInDaysIs10_000);
     }
@@ -57,8 +58,8 @@ class AgeCalculatorTest {
                 BIRTHDATE_HUIB,
                 dateWhenAgeHuibInDaysIs30_000);
 
-        System.out.println("ageInYears = " + ageInYears);
-        System.out.println("ageInYearsHuibWhen30_000Days = " + ageInYearsHuibWhen30_000Days);
+        println("ageInYears = " + ageInYears);
+        println("ageInYearsHuibWhen30_000Days = " + ageInYearsHuibWhen30_000Days);
 
         assertEquals(54, ageInYears);
     }

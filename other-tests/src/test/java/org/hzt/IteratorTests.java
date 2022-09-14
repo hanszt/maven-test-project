@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.PrimitiveIterator;
 import java.util.Set;
 
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class IteratorTests {
@@ -49,10 +50,10 @@ class IteratorTests {
         int result = 0;
         while (iterator.hasNext()) {
             result = iterator.nextInt();
-            System.out.println("result = " + result);
+            println("result = " + result);
         }
         iterator.i = 80;
-        iterator.forEachRemaining((int i) -> System.out.println("i = " + i));
+        iterator.forEachRemaining((int i) -> println("i = " + i));
         assertEquals(100, result);
     }
 

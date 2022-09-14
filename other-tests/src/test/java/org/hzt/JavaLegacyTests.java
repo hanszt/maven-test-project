@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -27,7 +28,7 @@ class JavaLegacyTests {
         final var l = iterable.spliterator().estimateSize();
 
         for (int i : iterable) {
-            System.out.println(i);
+            println(i);
         }
 
         final List<Integer> lsw = Sequence.of(iterable).toList();
@@ -53,7 +54,6 @@ class JavaLegacyTests {
             tokens.add(stringTokenizer.nextToken());
         }
 
-        //noinspection NullableProblems
         final var list = Sequence.of(new StringTokenizer(inputString, delimiter)::asIterator)
                 .castIfInstanceOf(String.class)
                 .toList();

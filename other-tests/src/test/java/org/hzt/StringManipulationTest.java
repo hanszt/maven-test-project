@@ -1,8 +1,9 @@
 package org.hzt;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.hzt.utils.It.println;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -14,8 +15,11 @@ class StringManipulationTest {
     void testStartAndEndIndexTest() {
         int startindex = MESSAGE_ID_TEMPLATE.indexOf("mfi");
         int endIndexDate = MESSAGE_ID_TEMPLATE.lastIndexOf('y');
-        Assertions.assertEquals("mfi", MESSAGE_ID_TEMPLATE.substring(startindex));
-        Assertions.assertEquals("y33mfi", MESSAGE_ID_TEMPLATE.substring(endIndexDate));
+
+        assertAll(
+                () -> assertEquals("mfi", MESSAGE_ID_TEMPLATE.substring(startindex)),
+                () -> assertEquals("y33mfi", MESSAGE_ID_TEMPLATE.substring(endIndexDate))
+        );
     }
 
     @Test
@@ -39,7 +43,7 @@ class StringManipulationTest {
     @Test
     void testReplaceFirst() {
         final var replaceFirstResult = "Hallo dit is een teststring".replaceFirst("e", "");
-        System.out.println("replaceFirst = " + replaceFirstResult);
+        println("replaceFirst = " + replaceFirstResult);
         assertEquals("Hallo dit is en teststring", replaceFirstResult);
     }
 }

@@ -6,6 +6,7 @@ import org.hzt.model.Person;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Book;
 import org.hzt.test.model.Painting;
+import org.hzt.utils.It;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,7 @@ import java.util.stream.StreamSupport;
 
 import static java.util.Comparator.comparing;
 import static org.hzt.iterators.Enumerations.sizedEnumeration;
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OtherTests {
@@ -52,15 +54,15 @@ class OtherTests {
     void testChars() {
         IntStream.range(33, 900)
                 .mapToObj(OtherTests::toCharacter)
-                .forEach(System.out::println);
+                .forEach(It::println);
 
-        System.out.println();
+        println();
 
         "Hello".chars()
                 .mapToObj(OtherTests::toCharacter)
-                .forEach(System.out::println);
+                .forEach(It::println);
 
-        String.format("Hello,%nI'm Hans").lines().forEach(System.out::printf);
+        String.format("Hello,%nI'm Hans").lines().forEach(It::printf);
         char c = 'ͽ';
         assertEquals(893, c);
     }
@@ -111,7 +113,7 @@ class OtherTests {
         final int[] expected = IntStream.rangeClosed(0, 64).toArray();
         final int[] actual = IntStream.rangeClosed(00, 0100).toArray();
 
-        Arrays.stream(actual).forEach(System.out::println);
+        Arrays.stream(actual).forEach(It::println);
 
         assertEquals(8, OCTAL);
         assertArrayEquals(expected, actual);
@@ -122,7 +124,7 @@ class OtherTests {
         final int[] expected = IntStream.rangeClosed(0, 256).toArray();
         final int[] actual = IntStream.rangeClosed(0x0, 0x100).toArray();
 
-        Arrays.stream(actual).forEach(System.out::println);
+        Arrays.stream(actual).forEach(It::println);
 
         assertArrayEquals(expected, actual);
     }
@@ -132,7 +134,7 @@ class OtherTests {
         final int[] expected = IntStream.rangeClosed(0, 8).toArray();
         final int[] actual = IntStream.rangeClosed(0b0, 0b1000).toArray();
 
-        Arrays.stream(actual).forEach(System.out::println);
+        Arrays.stream(actual).forEach(It::println);
 
         assertArrayEquals(expected, actual);
     }
@@ -186,9 +188,9 @@ class OtherTests {
     private void printBatches(List<List<String>> batches) {
         int counter = 0;
         for (List<String> batch : batches) {
-            System.out.println("Batch " + counter);
-            System.out.println("batch = " + batch);
-            System.out.println();
+            println("Batch " + counter);
+            println("batch = " + batch);
+            println();
             counter++;
         }
     }
@@ -196,7 +198,7 @@ class OtherTests {
     @Test
     void testThrowable() {
         final var throwable = new Throwable();
-        System.out.println("throwable.getLocalizedMessage() = " + throwable.getLocalizedMessage());
+        println("throwable.getLocalizedMessage() = " + throwable.getLocalizedMessage());
         assertNull(throwable.getMessage());
     }
 
@@ -225,7 +227,7 @@ class OtherTests {
         final var list = Collections.list(sizedEnumeration(size, String::valueOf));
         final var spliterator = Spliterators.spliterator(sizedEnumeration(size, String::valueOf).asIterator(), size, Spliterator.ORDERED);
         final var strings = StreamSupport.stream(spliterator, false).toList();
-        System.out.println(strings);
+        println(strings);
         assertEquals(strings, list);
     }
 
@@ -362,7 +364,7 @@ class OtherTests {
                 .map(o -> o.getClass().getSimpleName())
                 .collect(Collectors.joining("\n"));
 
-        System.out.println(string);
+        println(string);
         assertTrue(string.contains("Painting"));
         assertTrue(string.contains("Person"));
     }
@@ -386,7 +388,7 @@ class OtherTests {
                 .filter(a -> a.isInMuseumAndIsOlderThan100Years())
                 .toList();
 
-        list.forEach(anonymous -> System.out.println("Name: " + anonymous.name + " PaintingAge: " + anonymous.painting));
+        list.forEach(anonymous -> println("Name: " + anonymous.name + " PaintingAge: " + anonymous.painting));
 
         assertFalse(list.isEmpty());
 
@@ -407,7 +409,7 @@ class OtherTests {
         list.add(BigDecimal.valueOf(20));
         list.add(new Person("", null, null));
 
-        list.forEach(System.out::println);
+        list.forEach(It::println);
 
         assertTrue(list.contains("Hello"));
     }
@@ -421,7 +423,7 @@ class OtherTests {
         list.add(BigDecimal.valueOf(20));
         list.add(new Person("", null, null));
 
-        list.forEach(System.out::println);
+        list.forEach(It::println);
 
         assertTrue(list.contains("Hello"));
     }
@@ -440,7 +442,7 @@ class OtherTests {
     }
 
     public void printStrings(List<String> strings) {
-        strings.forEach(System.out::println);
+        strings.forEach(It::println);
     }
 
     @Test

@@ -4,6 +4,7 @@ import org.hzt.model.Employee;
 import org.hzt.model.Person;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Book;
+import org.hzt.utils.It;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -36,7 +37,7 @@ class CollectorSamplesTest {
                 new CashBalance("ing", false),
                 new CashBalance("triodos", false));
         var actual = collectorSamples.collectingAndThenToFirstElementIfSizeOne(items).orElse(null);
-        items.forEach(System.out::println);
+        items.forEach(It::println);
         assertEquals(expected, actual);
     }
 

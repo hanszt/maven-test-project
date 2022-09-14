@@ -21,6 +21,7 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static java.math.BigInteger.*;
 import static java.util.Spliterator.IMMUTABLE;
 import static java.util.Spliterator.ORDERED;
 
@@ -34,13 +35,13 @@ final class Streams {
     }
 
     public static Stream<BigInteger> fibonacciStream() {
-        final BigInteger[] seed = {BigInteger.ZERO, BigInteger.ONE};
+        final BigInteger[] seed = {ZERO, ONE};
         return Stream.iterate(seed, fibPair -> new BigInteger[]{fibPair[1], fibPair[0].add(fibPair[1])})
                 .map(fibPair -> fibPair[0]);
     }
 
     public static Stream<BigInteger> subtractingFibonacciStream() {
-        final BigInteger[] seed = {BigInteger.ZERO, BigInteger.ONE.negate()};
+        final BigInteger[] seed = {ZERO, ONE.negate()};
         return Stream.iterate(seed, fibPair -> new BigInteger[]{fibPair[1], fibPair[0].subtract(fibPair[1])})
                 .map(fibPair -> fibPair[0]);
     }
@@ -53,7 +54,7 @@ final class Streams {
 
         }
         return Stream
-                .iterate(new Pair(BigInteger.ZERO, BigInteger.ONE), Pair::next)
+                .iterate(new Pair(ZERO, ONE), Pair::next)
                 .map(Pair::first);
     }
 
@@ -127,11 +128,9 @@ final class Streams {
     }
 
     public static Stream<BigInteger> collatzStream(BigInteger initValue) {
-        final var three = BigInteger.valueOf(3);
-        return Stream.iterate(initValue,
-                nr -> nr.mod(BigInteger.TWO).equals(BigInteger.ZERO) ?
-                        nr.divide(BigInteger.TWO) :
-                        nr.multiply(three).add(BigInteger.ONE));
+        final var three = valueOf(3);
+        return Stream
+                .iterate(initValue, nr -> nr.mod(TWO).equals(ZERO) ? nr.divide(TWO) : nr.multiply(three).add(ONE));
     }
 
     /**

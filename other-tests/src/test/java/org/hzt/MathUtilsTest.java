@@ -3,6 +3,7 @@ package org.hzt;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MathUtilsTest {
@@ -14,8 +15,8 @@ class MathUtilsTest {
         final var expected = normalInverseSqrt(value);
         final var actual = MathUtils.fastInverseSqrt(value);
 
-        System.out.println("expected = " + expected);
-        System.out.println("actual = " + actual);
+        println("expected = " + expected);
+        println("actual = " + actual);
 
         final var expectedRounded = ROUNDED_TO_THREE.formatted(expected);
         final var actualRounded = ROUNDED_TO_THREE.formatted(actual);
@@ -30,8 +31,8 @@ class MathUtilsTest {
         final var expected = normalInverseSqrt(value);
         final var actual = MathUtils.fastInverseSqrt(value);
 
-        System.out.println("expected = " + expected);
-        System.out.println("actual = " + actual);
+        println("expected = " + expected);
+        println("actual = " + actual);
 
         final var expectedRounded = ROUNDED_TO_FIVE.formatted(expected);
         final var actualRounded = ROUNDED_TO_FIVE.formatted(actual);

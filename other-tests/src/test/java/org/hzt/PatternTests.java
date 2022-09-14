@@ -1,5 +1,6 @@
 package org.hzt;
 
+import org.hzt.utils.It;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Tag;
@@ -9,7 +10,12 @@ import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hzt.utils.It.println;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PatternTests {
 
@@ -32,7 +38,7 @@ class PatternTests {
 
         final var commaCount = string.chars()
                 .mapToObj(i -> (char) i)
-                .peek(System.out::println)
+                .peek(It::println)
                 .map(String::valueOf)
                 .filter(pattern.asPredicate())
                 .count();
@@ -50,7 +56,7 @@ class PatternTests {
 
         final var expected = testString.replaceAll(nonDigits, "d");
 
-        System.out.println(result);
+        println(result);
 
         assertEquals(expected, result);
     }
@@ -68,7 +74,7 @@ class PatternTests {
 
             final var expected = testString.replaceAll(nonDigits, "d");
 
-            System.out.println(result);
+            println(result);
 
             assertEquals(expected, result);
         }

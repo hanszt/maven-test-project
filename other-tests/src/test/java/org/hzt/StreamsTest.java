@@ -4,6 +4,7 @@ import org.apache.commons.math3.fraction.BigFraction;
 import org.apache.commons.math3.fraction.Fraction;
 import org.eclipse.collections.api.map.primitive.IntIntMap;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
+import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.hzt.model.Payment;
 import org.hzt.model.Person;
 import org.hzt.sequences.primitve_sequences.IntSequence;
@@ -52,12 +53,14 @@ import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toUnmodifiableSet;
+import static org.hzt.StatisticsUtils.firstDigit;
 import static org.hzt.Streams.fibonacciLongStream;
 import static org.hzt.Streams.fibonacciStream;
 import static org.hzt.Streams.fibonacciStreamV2;
 import static org.hzt.Streams.subtractingFibonacciStream;
 import static org.hzt.stream.StreamUtils.by;
 import static org.hzt.stream.StreamUtils.function;
+import static org.hzt.utils.It.println;
 import static org.hzt.utils.collectors.CollectorsX.flatMappingToList;
 import static org.hzt.utils.collectors.CollectorsX.mappingToSet;
 import static org.hzt.utils.collectors.CollectorsX.multiMappingToList;
@@ -74,7 +77,7 @@ class StreamsTest {
             new Payment("4", BigDecimal.valueOf(2_000_000)));
 
     private static <K, V> void printKeyAndValue(K key, V value) {
-        System.out.println("key = " + key + ", value = " + value);
+        println("key = " + key + ", value = " + value);
     }
 
     @Test
@@ -149,7 +152,7 @@ class StreamsTest {
                 .parallel()
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
         final var result = timer.getResult();
-        System.out.println("Duration: " + timer.getDuration());
+        println("Duration: " + timer.getDuration());
         assertEquals(new BigDecimal("3.1415927694"), result);
     }
 
@@ -159,10 +162,10 @@ class StreamsTest {
                 .reduce(Fraction::add)
                 .orElseThrow());
         final var result = timer.getResult();
-        System.out.println("Duration: " + timer.getDuration());
+        println("Duration: " + timer.getDuration());
 
         final var expected = new Fraction(1023461776, 334639305);
-        System.out.println("result = " + result.doubleValue());
+        println("result = " + result.doubleValue());
 
         assertEquals(expected, result);
     }
@@ -174,10 +177,12 @@ class StreamsTest {
                 .orElseThrow());
 
         final var result = timer.getResult();
-        System.out.println("Duration: " + timer.getDuration());
+        final var duration = timer.getDuration();
+        String formattedDuration = String.format("%2d:%02d s", duration.toSecondsPart(), duration.toMillisPart());
+        println("Duration: " + formattedDuration);
 
         final var decimalValue = result.doubleValue();
-        System.out.println("result = " + decimalValue);
+        println("result = " + decimalValue);
 
         final var actual = BigDecimal.valueOf(decimalValue).setScale(2, RoundingMode.HALF_UP);
         assertEquals(BigDecimal.valueOf(3.14), actual);
@@ -194,9 +199,9 @@ class StreamsTest {
 
         final var seqTimeInMillis = sequentialTimer.getDurationInMillis();
         final var parallelTimeInMillis = parallelTimer.getDurationInMillis();
-        System.out.println("Sequential in milliseconds = " + seqTimeInMillis);
-        System.out.println("Parallel in milliseconds = " + parallelTimeInMillis);
-        System.out.println("parallelTimer.getResult() = " + parallelTimer.getResult());
+        println("Sequential in milliseconds = " + seqTimeInMillis);
+        println("Parallel in milliseconds = " + parallelTimeInMillis);
+        println("parallelTimer.getResult() = " + parallelTimer.getResult());
         //assert
         assertTrue(parallelTimeInMillis < seqTimeInMillis);
         assertEquals(parallelTimer.getResult(), sequentialTimer.getResult());
@@ -208,7 +213,7 @@ class StreamsTest {
         @Test
         void testCollatzStream() {
             final var collatzNrs = Streams.collatzStream(BigInteger.valueOf(3))
-                    .peek(System.out::println)
+                    .peek(It::println)
                     .takeWhile(not(ONE::equals))
                     .toList();
 
@@ -252,17 +257,21 @@ class StreamsTest {
          */
         @Test
         void testBenfordsLawCollatzNrs() {
-            final IntIntMap result = StatisticsUtils.benfordsDistribution(LongStream.range(1, 500_000)
+            final IntIntMap firstDigitToCounts = StatisticsUtils.groupedCounts(StatisticsUtils::firstDigit, LongStream.range(1, 500_000)
                     .flatMap(initNr -> Streams.collatzStream(initNr).takeWhile(nr -> nr != 1)));
 
-            final var firstDigitPresenceInAscendingOrder = Sequence.of(result.keyValuesView())
+            final var firstDigitPresenceInAscendingOrder = Sequence.of(firstDigitToCounts.keyValuesView())
                     .sorted(Comparator.comparingInt(IntIntPair::getTwo))
                     .mapToInt(IntIntPair::getOne)
                     .toArray();
 
-            System.out.println("result = " + result);
+            println("result = " + firstDigitToCounts);
 
-            assertArrayEquals(new int[]{9, 8, 7, 6, 5, 4, 3, 2, 1}, firstDigitPresenceInAscendingOrder);
+            assertAll(
+                    () -> assertArrayEquals(new int[]{9, 8, 7, 6, 5, 4, 3, 2, 1}, firstDigitPresenceInAscendingOrder),
+                    () -> assertTrue(StatisticsUtils.obeysBenfordsLaw(firstDigitToCounts))
+            );
+
         }
 
         @ParameterizedTest
@@ -276,7 +285,7 @@ class StreamsTest {
             final var input = Long.parseLong(split[0]);
             final var expected = Integer.parseInt(split[1]);
 
-            assertEquals(expected, StatisticsUtils.firstDigit(input));
+            assertEquals(expected, firstDigit(input));
         }
 
         @Test
@@ -292,16 +301,20 @@ class StreamsTest {
 
     @Test
     void testBenfordsLawNotApplicableToLineairNrLine() {
-        final IntIntMap result = StatisticsUtils.benfordsDistribution(LongStream.range(0, 100_000));
+        final var dataSet = LongStream.range(0, 100_000).toArray();
+        final IntIntMap result = StatisticsUtils.groupedCounts(StatisticsUtils::firstDigit, Arrays.stream(dataSet));
 
         final var firstDigitPresenceInAscendingOrder = Sequence.of(result.keyValuesView())
                 .sorted(Comparator.comparingInt(IntIntPair::getTwo))
                 .mapToInt(IntIntPair::getOne)
                 .toArray();
 
-        System.out.println("result = " + result);
+        println("result = " + result);
 
-        assertArrayEquals(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, firstDigitPresenceInAscendingOrder);
+        assertAll(
+                () -> assertArrayEquals(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, firstDigitPresenceInAscendingOrder),
+                () -> assertFalse(StatisticsUtils.obeysBenfordsLaw(Arrays.stream(dataSet)))
+        );
     }
 
     @Test
@@ -319,7 +332,7 @@ class StreamsTest {
         monthDayListMap.entrySet().stream()
                 .filter(by(Entry::getValue, List::size, greaterThan(0)))
                 .sorted(comparingByKey())
-                .forEach(System.out::println);
+                .forEach(It::println);
 
         assertFalse(monthDayListMap.isEmpty());
         assertEquals(monthDayListMap1.size(), monthDayListMap.size());
@@ -359,7 +372,7 @@ class StreamsTest {
 
     private void setClosedAndPrintClosed(String message, AtomicBoolean closed) {
         closed.set(true);
-        System.out.println(message + " is closed now");
+        println(message + " is closed now");
     }
 
     @Test
@@ -384,7 +397,7 @@ class StreamsTest {
                 .map(Painter::getDateOfDeath)
                 .collect(CollectorsX.multiMapping(Optional::ifPresent, toUnmodifiableSet()));
 
-        System.out.println(actual);
+        println(actual);
         assertEquals(expected, actual);
     }
 
@@ -400,7 +413,7 @@ class StreamsTest {
                 .collect(groupingBy(museum -> museum.getPaintings().size(),
                         multiMappingToList(Museum::toDatesOfBirthPainters)));
 
-        System.out.println(actual);
+        println(actual);
 
         assertEquals(expected, actual);
     }
@@ -480,28 +493,10 @@ class StreamsTest {
         void testParallelFibonacciStream() {
             final var count = fibonacciStream()
                     .parallel()
-                    .takeWhile(s -> s.toString().length() < 10_000)
+                    .takeWhile(s -> s.toString().length() < 1_000)
                     .count();
 
-            assertEquals(47847, count);
-        }
-
-        @Test
-        void testParallelFibonacciStreamBehavesDifferentThenSequential() {
-            final var parallelStream = fibonacciStream()
-                    .parallel()
-                    .dropWhile(s -> s.toString().length() < 10)
-                    .filter(s -> s.isProbablePrime(100));
-
-            final var sequentialStream = fibonacciStream()
-                    .dropWhile(s -> s.toString().length() < 10)
-                    .filter(s -> s.isProbablePrime(100));
-
-            //noinspection ResultOfMethodCallIgnored
-            assertAll(
-                    () -> assertEquals(Optional.of(valueOf(2971215073L)), sequentialStream.findAny()),
-                    () -> assertThrows(OutOfMemoryError.class, parallelStream::findAny)
-            );
+            assertEquals(4782, count);
         }
 
         @Test
@@ -521,29 +516,49 @@ class StreamsTest {
                     .takeWhile(l -> l >= 0L)
                     .toArray();
 
-            System.out.println(Arrays.toString(fibNrs));
+            println(Arrays.toString(fibNrs));
 
             assertEquals(93, fibNrs.length);
         }
 
         @Test
         void testBenfordsLawFibonacciSequence() {
+            final var stream = fibonacciStream()
+                    .skip(1)
+                    .limit(10_000)
+                    .map(BigInteger::toString);
+
+            final var result = StatisticsUtils.groupedCounts(s -> s.substring(0, 1), stream);
+
+            final var firstDigitPresenceInAscendingOrder = Sequence.of(result.keyValuesView())
+                    .sorted(Comparator.comparingInt(ObjectIntPair::getTwo))
+                    .map(ObjectIntPair::getOne)
+                    .mapToInt(Integer::parseInt)
+                    .toArray();
+
+            println("result = " + result);
+
+            assertArrayEquals(new int[]{9, 8, 7, 6, 5, 4, 3, 2, 1}, firstDigitPresenceInAscendingOrder);
+        }
+
+        @Test
+        void testBenfordsLawHoldsForFibonacciInHexadecimals() {
             final var longStream = fibonacciStream()
                     .skip(1)
-                    .map(BigInteger::toString)
-                    .limit(10_000)
-                    .mapToLong(s -> Long.parseLong(s.substring(0, 1)));
+                    .map(b -> b.toString(16))
+                    .limit(2_000)
+                    .mapToLong(s -> Long.parseLong(s.substring(0, 1), 16));
 
-            final var result = StatisticsUtils.benfordsDistribution(longStream);
+            final var result = StatisticsUtils.groupedCounts(value -> (int) value, longStream);
 
             final var firstDigitPresenceInAscendingOrder = Sequence.of(result.keyValuesView())
                     .sorted(Comparator.comparingInt(IntIntPair::getTwo))
                     .mapToInt(IntIntPair::getOne)
                     .toArray();
 
-            System.out.println("result = " + result);
+            println("result = " + result);
 
-            assertArrayEquals(new int[]{9, 8, 7, 6, 5, 4, 3, 2, 1}, firstDigitPresenceInAscendingOrder);
+            assertArrayEquals(new int[]{15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}, firstDigitPresenceInAscendingOrder);
         }
 
     }
@@ -572,7 +587,7 @@ class StreamsTest {
         Iterable<String> strings = () -> Stream.of("Iterable", "from", "a", "stream").iterator();
         int counter = 0;
         for (String s : strings) {
-            System.out.println("s = " + s);
+            println("s = " + s);
             counter++;
         }
         assertEquals(4, counter);
@@ -638,11 +653,11 @@ class StreamsTest {
             final var integers = List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
             final var array = Streams.zipWithNext(integers, Integer::sum)
-                    .peek(System.out::println)
+                    .peek(It::println)
                     .mapToInt(Integer::intValue)
                     .toArray();
 
-            System.out.println(Arrays.toString(array));
+            println(Arrays.toString(array));
 
             assertArrayEquals(new int[]{1, 3, 5, 7, 9, 11, 13, 15, 17, 19}, array);
         }
@@ -652,7 +667,7 @@ class StreamsTest {
             final var integers = List.of(0);
 
             final var integerStream = Streams.zipWithNext(integers, Integer::sum);
-            assertThrows(NoSuchElementException.class, () -> integerStream.forEach(System.out::println));
+            assertThrows(NoSuchElementException.class, () -> integerStream.forEach(It::println));
         }
 
         @Test
@@ -675,7 +690,7 @@ class StreamsTest {
 
             final var windows = Streams.windowed(range::iterator, 10).toList();
 
-            System.out.println("windows = " + windows);
+            println("windows = " + windows);
 
             assertEquals(20, windows.size());
         }
@@ -688,7 +703,7 @@ class StreamsTest {
                     .windowed(range::iterator, 10, false)
                     .toList();
 
-            System.out.println("windows = " + windows);
+            println("windows = " + windows);
 
             assertEquals(1991, windows.size());
         }
@@ -706,7 +721,7 @@ class StreamsTest {
             final var grouping = fibonacciNrs.parallelStream()
                     .collect(Collectors.groupingByConcurrent(s -> s.mod(valueOf(7L))));
 
-            System.out.println("grouping = " + grouping);
+            println("grouping = " + grouping);
 
             assertEquals(7, grouping.size());
         }
@@ -714,7 +729,7 @@ class StreamsTest {
         @Test
         void testToConcurrentMap() {
             final var fibonacciNrs = subtractingFibonacciStream()
-                    .peek(System.out::println)
+                    .peek(It::println)
                     .limit(1_000)
                     .toList();
 

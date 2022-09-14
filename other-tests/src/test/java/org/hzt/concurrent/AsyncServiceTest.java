@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.given;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -71,10 +72,10 @@ class AsyncServiceTest {
         final int TIMES_EXECUTED = 64;
         long durationSeq = AsyncService.executeAsyncServiceAndTime(TIMES_EXECUTED, asyncService::executeStreamCallingExpensiveMethodMock);
         long durationParallel = AsyncService.executeAsyncServiceAndTime(TIMES_EXECUTED, asyncService::executeStreamInParallelCallingExpensiveMethodMock);
-        System.out.println("durationSeq = " + durationSeq / 1e9 + " s");
-        System.out.println("durationParallel = " + durationParallel / 1e9 + " s");
+        println("durationSeq = " + durationSeq / 1e9 + " s");
+        println("durationParallel = " + durationParallel / 1e9 + " s");
         long timesFaster = durationSeq / durationParallel;
-        System.out.println("timesFaster = " + timesFaster);
+        println("timesFaster = " + timesFaster);
         assertTrue(durationSeq > durationParallel);
     }
 

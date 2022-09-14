@@ -4,6 +4,7 @@ import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import org.junit.jupiter.api.Test;
 
+import static org.hzt.utils.It.*;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -25,7 +26,7 @@ class EclipseCollectionsTest {
         intIntHashMap.addToValue(1, 1);
         intIntHashMap.addToValue(4, 2);
 
-        System.out.println("intIntHashMap = " + intIntHashMap);
+        println("intIntHashMap = " + intIntHashMap);
 
         assertArrayEquals(new int[] {12, 1, 2}, intIntHashMap.toArray());
     }

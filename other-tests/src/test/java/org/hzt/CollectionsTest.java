@@ -1,5 +1,6 @@
 package org.hzt;
 
+import org.hzt.utils.It;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +26,7 @@ class CollectionsTest {
     void testSortReverseOrder() {
         List<Integer> list = new ArrayList<>(List.of(1, 5, 4, 7, 2, 8, 9, 5, 7));
         list.sort(Collections.reverseOrder());
-        list.forEach(System.out::println);
+        list.forEach(It::println);
         assertEquals(9, list.get(0));
     }
 

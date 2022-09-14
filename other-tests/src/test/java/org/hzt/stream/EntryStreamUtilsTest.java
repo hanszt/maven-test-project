@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import static java.util.function.Predicate.not;
 import static org.hzt.StringPredicates.startsWithAnyOf;
 import static org.hzt.stream.EntryStreamUtils.*;
+import static org.hzt.utils.It.*;
 import static org.hzt.utils.collectors.CollectorsX.toMap;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,7 +51,7 @@ class EntryStreamUtilsTest {
         final var groupedByCategoryMap = MutableMapX.ofMap(TestSampleGenerator.createBookList().stream()
                 .collect(Collectors.groupingBy(Book::getCategory)));
 
-        It.println("groupedByCategoryMap:");
+        println("groupedByCategoryMap:");
         groupedByCategoryMap.entrySet().forEach(It::println);
 
         final Map<String, Set<Book>> expectedMap = groupedByCategoryMap.entrySet().stream()
@@ -72,7 +73,7 @@ class EntryStreamUtilsTest {
                 .filterValues(not(Set::isEmpty))
                 .toMap();
 
-        It.println("Result:");
+        println("Result:");
         actualMap.entrySet().forEach(It::println);
 
         assertAll(
@@ -101,7 +102,7 @@ class EntryStreamUtilsTest {
                 .map(toEntry(Painter::getLastname, List::size))
                 .collect(toMap());
 
-        It.println("result = " + result);
+        println("result = " + result);
         assertTrue(result.keySet().containsAll(Arrays.asList("van Gogh", "Picasso")));
     }
 
@@ -136,7 +137,7 @@ class EntryStreamUtilsTest {
         final Map<String, List<Book>> groupedByCategoryMap = TestSampleGenerator.createBookList().stream()
                 .collect(Collectors.groupingBy(Book::getCategory));
 
-        It.println("groupedByCategoryMap:");
+        println("groupedByCategoryMap:");
         groupedByCategoryMap.entrySet().forEach(It::println);
 
         groupedByCategoryMap.entrySet().stream()
@@ -145,7 +146,7 @@ class EntryStreamUtilsTest {
                 .filter(byValue(books -> !books.isEmpty()))
                 .forEach(entry(EntryStreamUtilsTest::assertResult)
                         .andThen(entry((bookCategory, bookSet) ->
-                                It.println("key: " + bookCategory + ", value: " + bookSet))));
+                                println("key: " + bookCategory + ", value: " + bookSet))));
     }
 
     private static void assertResult(String category, HashSet<Book> books) {

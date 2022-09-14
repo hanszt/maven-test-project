@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import static java.util.Comparator.comparing;
 import static java.util.function.Predicate.isEqual;
 import static org.hzt.stream.StreamUtils.*;
+import static org.hzt.utils.It.println;
 import static org.hzt.utils.function.predicates.DateTimePredicates.isBefore;
 import static org.hzt.utils.function.predicates.StringPredicates.contains;
 import static org.hzt.utils.function.predicates.StringPredicates.containsNoneOf;
@@ -60,9 +61,9 @@ class StreamUtilsTest {
         final Color colorByCombinedFilter = combinedFilter.apply(originalColor);
         final Color colorByComposedFilter = composedFilter.apply(originalColor);
 
-        It.println("originalColor = " + originalColor);
-        It.println("colorByCombinedFilter = " + colorByCombinedFilter);
-        It.println("colorByComposedFilter = " + colorByComposedFilter);
+        println("originalColor = " + originalColor);
+        println("colorByCombinedFilter = " + colorByCombinedFilter);
+        println("colorByComposedFilter = " + colorByComposedFilter);
         //assert
         assertAll(
                 () -> assertEquals(0, colorByComposedFilter.getBlue()),
@@ -196,7 +197,7 @@ class StreamUtilsTest {
                         .compose(Book::getCategory)
                         .andThen(Class::getDeclaredFields))
                 .flatMap(Arrays::stream)
-                .collect(Collectors.toList());
+                .toList();
 
         fieldListOfObjectClass.forEach(It::println);
 
@@ -209,7 +210,7 @@ class StreamUtilsTest {
 
         final List<Book> filteredBookList = books.stream()
                 .filter(by(Book::hasCopies).or(Book::isAboutProgramming))
-                .collect(Collectors.toList());
+                .toList();
 
         filteredBookList.forEach(It::println);
 
@@ -258,8 +259,8 @@ class StreamUtilsTest {
                 .flatMap(castIfInstance(Double.class))
                 .collect(Collectors.toList());
 
-        It.println("numbers.size() = " + numbers.size());
-        It.println("actual.size() = " + actual.size());
+        println("numbers.size() = " + numbers.size());
+        println("actual.size() = " + actual.size());
 
         assertEquals(expected, actual);
     }
@@ -283,9 +284,9 @@ class StreamUtilsTest {
         final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
         final List<Painting> concatenatedList = Stream.concat(listContainingNestedNulls.stream(), paintingList.stream())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
-        It.println("concatenatedList = " + concatenatedList);
+        println("concatenatedList = " + concatenatedList);
 
         final List<Painting> paintings = concatenatedList.stream()
                 .filter(nonNull(Painting::painter))
@@ -301,9 +302,9 @@ class StreamUtilsTest {
         final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
         final List<Painting> concatenatedList = Stream.concat(listContainingNestedNulls.stream(), paintingList.stream())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
-        It.println("concatenatedList = " + concatenatedList);
+        println("concatenatedList = " + concatenatedList);
 
         final List<Painting> containingNullsFilteredOutList = concatenatedList.stream()
                 .filter(nonNull(Painting::painter, Painter::getDateOfBirth))
@@ -332,9 +333,9 @@ class StreamUtilsTest {
         final List<Museum> expected = TestSampleGenerator.getMuseumListContainingNulls();
         final List<Museum> containingNulls = Stream.concat(listContainingNestedNulls.stream(), expected.stream())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
-        It.println("containingNulls = " + containingNulls);
+        println("containingNulls = " + containingNulls);
 
         final List<Museum> actual = containingNulls.stream()
                 .filter(nonNull(Museum::getMostPopularPainting, Painting::painter, Painter::getDateOfBirth))
@@ -350,9 +351,9 @@ class StreamUtilsTest {
 
         final List<Painting> paintings = Stream.concat(paintingListContainingNestedNulls.stream(), paintingList.stream())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
-        It.println("paintings = " + paintings);
+        println("paintings = " + paintings);
 
         final List<LocalDate> expected = paintings.stream()
                 .filter(Objects::nonNull)
@@ -373,7 +374,7 @@ class StreamUtilsTest {
     void testMapThreeLevelsDeepNullSafe() {
         final List<Museum> concatenatedMuseumList = getMuseumsContainingNulls();
 
-        It.println("concatenatedList = " + concatenatedMuseumList);
+        println("concatenatedList = " + concatenatedMuseumList);
 
         final List<DayOfWeek> expected = concatenatedMuseumList.stream()
                 .filter(Objects::nonNull)
@@ -394,7 +395,7 @@ class StreamUtilsTest {
                         LocalDate::getDayOfWeek))
                 .collect(Collectors.toList());
 
-        It.println("listOfDayOfWeekBirthDateMostPopularPaintingPainters = " + listOfDayOfWeekBirthDateMostPopularPaintingPainters);
+        println("listOfDayOfWeekBirthDateMostPopularPaintingPainters = " + listOfDayOfWeekBirthDateMostPopularPaintingPainters);
 
         assertEquals(expected, listOfDayOfWeekBirthDateMostPopularPaintingPainters);
     }
@@ -403,7 +404,7 @@ class StreamUtilsTest {
     void testMapFourLevelsDeepNullSafe() {
         final List<Museum> concatenatedMuseumList = getMuseumsContainingNulls();
 
-        It.println("concatenatedList = " + concatenatedMuseumList);
+        println("concatenatedList = " + concatenatedMuseumList);
 
         final List<DayOfWeek> expected = concatenatedMuseumList.stream()
                 .filter(Objects::nonNull)
@@ -429,7 +430,7 @@ class StreamUtilsTest {
                 LocalDate.of(1853, Month.MARCH, 20).getDayOfWeek(),
                 LocalDate.of(1881, Month.OCTOBER, 25).getDayOfWeek());
 
-        It.println("expectedDaysOfWeek = " + expectedDaysOfWeek);
+        println("expectedDaysOfWeek = " + expectedDaysOfWeek);
 
         assertAll(
                 () -> assertEquals(expectedDaysOfWeek, actual),
@@ -441,7 +442,7 @@ class StreamUtilsTest {
     void testMapFourLevelsDeepNullSafeWithMapMulti() {
         final List<Museum> concatenatedMuseumList = getMuseumsContainingNulls();
 
-        It.println("concatenatedList = " + concatenatedMuseumList);
+        println("concatenatedList = " + concatenatedMuseumList);
 
         final List<DayOfWeek> expected = concatenatedMuseumList.stream()
                 .filter(Objects::nonNull)
@@ -459,7 +460,7 @@ class StreamUtilsTest {
                 LocalDate.of(1853, Month.MARCH, 20).getDayOfWeek(),
                 LocalDate.of(1881, Month.OCTOBER, 25).getDayOfWeek());
 
-        It.println("expectedDaysOfWeek = " + expectedDaysOfWeek);
+        println("expectedDaysOfWeek = " + expectedDaysOfWeek);
 
                 assertEquals(expectedDaysOfWeek, expected);
     }
@@ -489,7 +490,7 @@ class StreamUtilsTest {
         final List<String> names = streamOf(hans)
                 .filter(by(Painting::yearOfCreation, isBefore(1995)))
                 .map(Painting::name)
-                .collect(Collectors.toList());
+                .toList();
 
         names.forEach(It::println);
 

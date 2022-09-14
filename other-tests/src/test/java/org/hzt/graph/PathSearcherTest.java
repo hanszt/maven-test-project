@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hzt.utils.It.println;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class PathSearcherTest {
 
@@ -27,10 +28,10 @@ class PathSearcherTest {
     }
 
     private static void printResult(int source, int[] distances) {
-        System.out.println("The shortest path from node 0 to each node:");
+        println("The shortest path from node 0 to each node:");
 
         for (int i = 0; i < distances.length; i++) {
-            System.out.println(source + " to " + i + " is " + distances[i]);
+            println(source + " to " + i + " is " + distances[i]);
         }
     }
 

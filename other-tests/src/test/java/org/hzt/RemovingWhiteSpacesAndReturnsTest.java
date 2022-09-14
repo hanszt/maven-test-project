@@ -5,6 +5,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class RemovingWhiteSpacesAndReturnsTest {
@@ -18,7 +19,7 @@ class RemovingWhiteSpacesAndReturnsTest {
             "camt_004_CLM_ReturnAccount_RABO.xml", })
     void testRemoveSpacesFromLinesInTextFile(String fileName) throws IOException {
         String result = removingWhiteSpacesAndReturns.removeSpacesFromLinesInTextFile(fileName);
-        System.out.println(result);
+        println(result);
         assertFalse(result.isBlank());
     }
 

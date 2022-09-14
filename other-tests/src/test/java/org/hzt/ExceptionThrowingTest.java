@@ -1,5 +1,6 @@
 package org.hzt;
 
+import org.hzt.utils.It;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -17,10 +18,12 @@ class ExceptionThrowingTest {
             fail();
         }catch (RuntimeException e) {
             StackTraceElement[] stackTraceElements = e.getStackTrace();
+
             String stacktrace = Arrays.stream(stackTraceElements)
-                    .peek(System.out::println)
+                    .peek(It::println)
                     .map(StackTraceElement::toString)
                     .collect(joining());
+
             assertFalse(stacktrace.isEmpty());
         }
 

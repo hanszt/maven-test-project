@@ -2,6 +2,7 @@ package org.hzt;
 
 import org.junit.jupiter.api.Test;
 
+import static org.hzt.utils.It.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CallBackJavascriptEquivalentTest {
@@ -45,7 +46,7 @@ class CallBackJavascriptEquivalentTest {
 
         final var expected = s.equals(expectedWhenEngineNotWorking) ? expectedWhenEngineNotWorking : expectedWhenEngineWorking;
 
-        System.out.println("expected = " + expected);
+        println("expected = " + expected);
 
         assertEquals(expected, s);
     }
@@ -57,7 +58,7 @@ class CallBackJavascriptEquivalentTest {
         final var expectedWhenEngineNotWorking = "No working engine";
         final var expected = s.equals(expectedWhenEngineNotWorking) ? expectedWhenEngineNotWorking : expectedWhenEngineWorking;
 
-        System.out.println("expected = " + expected);
+        println("expected = " + expected);
 
         assertEquals(expected, s.trim());
     }

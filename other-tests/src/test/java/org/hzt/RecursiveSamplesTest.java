@@ -1,6 +1,7 @@
 package org.hzt;
 
 import org.apache.commons.math3.complex.Complex;
+import org.hzt.utils.It;
 import org.hzt.utils.strings.StringX;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,6 +12,7 @@ import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -42,7 +44,7 @@ class RecursiveSamplesTest {
 
         final var expected = IntStream.rangeClosed(start, end).sum();
 
-        System.out.println(expected);
+        println(expected);
 
         final var sum = RecursiveSamples.sum(start, end);
 
@@ -71,7 +73,7 @@ class RecursiveSamplesTest {
         final var largerValueCount = Arrays.stream(fastFourierTransform)
                 .mapToDouble(Complex::abs)
                 .filter(absValue -> absValue > 1)
-                .peek(System.out::println)
+                .peek(It::println)
                 .count();
 
         assertAll(

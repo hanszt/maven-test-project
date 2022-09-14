@@ -1,5 +1,6 @@
 package org.hzt;
 
+import org.hzt.utils.It;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +24,8 @@ import static java.time.Month.OCTOBER;
 import static java.time.Month.SEPTEMBER;
 import static java.util.stream.Collectors.partitioningBy;
 import static org.awaitility.Awaitility.await;
+import static org.hzt.utils.It.println;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -44,7 +47,7 @@ class JavaTimeTest {
     }
 
     /**
-     * @see <first href="https://www.baeldung.com/awaitlity-testing">Introduction to Awaitility</first>
+     * @see <a href="https://www.baeldung.com/awaitlity-testing">Introduction to Awaitility</a>
      */
     @Test
     @Disabled("This test can be ignored")
@@ -54,10 +57,13 @@ class JavaTimeTest {
         final var date2 = new Date(2L);
         final var date3 = new Date(3L);
         final var date4 = new Date(1L);
-        assertEquals(-1, date1.compareTo(date2));
-        assertEquals(1, date3.compareTo(date2));
-        assertEquals(0, date4.compareTo(date1));
-        await().atLeast(Duration.ofMillis(1)).until(() -> prevMomentComparedToNow(now));
+
+        assertAll(
+                () -> assertEquals(-1, date1.compareTo(date2)),
+                () -> assertEquals(1, date3.compareTo(date2)),
+                () -> assertEquals(0, date4.compareTo(date1)),
+                () -> await().atLeast(Duration.ofMillis(1)).until(() -> prevMomentComparedToNow(now))
+        );
     }
 
     private boolean prevMomentComparedToNow(Date prevNow) {
@@ -70,7 +76,7 @@ class JavaTimeTest {
         final var isLeapYearMap = IntStream.rangeClosed(0, 3000)
                 .mapToObj(Year::of)
                 .collect(partitioningBy(Year::isLeap));
-        isLeapYearMap.entrySet().forEach(System.out::println);
+        isLeapYearMap.entrySet().forEach(It::println);
         assertEquals(728, isLeapYearMap.get(true).size());
         assertEquals(2273, isLeapYearMap.get(false).size());
     }
@@ -90,9 +96,11 @@ class JavaTimeTest {
 
     @Test
     void testDayOfWeek() {
-        assertEquals(WEDNESDAY, LocalDate.of(1989, OCTOBER, 18).getDayOfWeek());
-        assertEquals(SUNDAY, LocalDate.of(1951, SEPTEMBER, 23).getDayOfWeek());
-        assertEquals(SUNDAY, MONDAY.plus(34649));
+        assertAll(
+                () -> assertEquals(WEDNESDAY, LocalDate.of(1989, OCTOBER, 18).getDayOfWeek()),
+                () -> assertEquals(SUNDAY, LocalDate.of(1951, SEPTEMBER, 23).getDayOfWeek()),
+                () -> assertEquals(SUNDAY, MONDAY.plus(34649))
+        );
     }
 
     @Test
@@ -102,11 +110,15 @@ class JavaTimeTest {
         final var localDateTime = Instant.ofEpochMilli(epochMilli)
                 .atZone(ZoneId.ofOffset("", ZoneOffset.UTC))
                 .toLocalDateTime();
-        System.out.println(localDateTime);
+
+        println(localDateTime);
+
         final var toEpochMilli = localDateTime
                 .toInstant(ZoneOffset.UTC)
                 .toEpochMilli();
-        System.out.println("LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli() = " + toEpochMilli);
+
+        println("LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli() = " + toEpochMilli);
+
         assertEquals(epochMilli, toEpochMilli);
     }
 

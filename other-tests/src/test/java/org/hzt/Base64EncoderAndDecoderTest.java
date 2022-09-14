@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.hzt.utils.It.println;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -65,9 +67,12 @@ class Base64EncoderAndDecoderTest {
     })
     void testFrdApplicationLogAuthorizationHeaderInfoContainsNC4099(String stringToDecode) {
         final var decodedString = encoderAndDecoder.base64Decode(stringToDecode);
-        System.out.println(decodedString);
-        assertTrue(decodedString.contains("NTLM"));
-        assertTrue(Base64EncoderAndDecoder.containsCharsInOrder(decodedString, "NC4099"));
+        println(decodedString);
+
+        assertAll(
+                () -> assertTrue(decodedString.contains("NTLM")),
+                () -> assertTrue(Base64EncoderAndDecoder.containsCharsInOrder(decodedString, "NC4099"))
+        );
     }
 
     @ParameterizedTest
@@ -79,7 +84,7 @@ class Base64EncoderAndDecoderTest {
     })
     void testApplicationHeaderDoesNotContainValidInfo(String stringToDecode) {
         final var decodedString = encoderAndDecoder.base64Decode(stringToDecode);
-        System.out.println(decodedString);
+        println(decodedString);
         boolean containsCharsOfNC4099 = Base64EncoderAndDecoder.containsCharsInOrder(decodedString, "NC4099");
         boolean containsCharsOfNC1913 = Base64EncoderAndDecoder.containsCharsInOrder(decodedString, "NC1913");
         assertFalse(decodedString.contains("NTLM"));

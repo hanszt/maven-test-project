@@ -1,5 +1,7 @@
 package org.hzt;
 
+import static org.hzt.utils.It.println;
+
 /**
  * Run this program first couple of times. We see that the StringBuilder does not
  * give us reliable results because its methods are not thread-safe as compared
@@ -11,6 +13,7 @@ package org.hzt;
  * class can be called concurrently by many threads, so the final size of the
  * StringBuilder is sometimes less than expected.
  */
+@SuppressWarnings("squid:S1149")
 public class StringBufferVSStringBuilder {
 
     public static void main(String... args) {
@@ -37,7 +40,7 @@ public class StringBufferVSStringBuilder {
         for (int i = 0; i < threadAmount; i++) {
             builderThreads[i].join();
         }
-        System.out.println("StringBuilderTest: Expected result is 1000; got " + sb.length());
+        println("StringBuilderTest: Expected result is 1000; got " + sb.length());
 
         //*************************String Buffer Test*******************************//
 
@@ -52,7 +55,7 @@ public class StringBufferVSStringBuilder {
         for (int i = 0; i < threadAmount; i++) {
             bufferThreads[i].join();
         }
-        System.out.println("StringBufferTest: Expected result is 1000; got " + sb2.length());
+        println("StringBufferTest: Expected result is 1000; got " + sb2.length());
     }
 
 
@@ -67,9 +70,7 @@ public class StringBufferVSStringBuilder {
 
         @Override
         public void run() {
-            for (int i = 0; i < 100; i++) {
-                sb.append("A");
-            }
+            sb.append("A".repeat(100));
 
         }
     }
@@ -86,10 +87,7 @@ public class StringBufferVSStringBuilder {
 
         @Override
         public void run() {
-            for (int i = 0; i < 100; i++) {
-                sb2.append("A");
-            }
-
+            sb2.append("A".repeat(100));
         }
     }
 }

@@ -1,11 +1,13 @@
 package org.hzt.unicode;
 
+import org.hzt.utils.It;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -44,7 +46,9 @@ class UniCodeTests {
         String smileyFace = "😀";
         String smileyFaceAsSurrogatePair = "\uD83D\uDE00";
 
-        smileyFace.codePoints().mapToObj(Integer::toHexString).forEach(System.out::println);
+        smileyFace.codePoints()
+                .mapToObj(Integer::toHexString)
+                .forEach(It::println);
 
         final var low = '\ude00';
         final var high = (char) 0xd83d;
@@ -63,13 +67,13 @@ class UniCodeTests {
     void testFromCodePointToLowAndHighSurrogate() {
         final var codePoint = 0x1f600;
         final var supplementaryCodePoint = Character.isSupplementaryCodePoint(codePoint);
-        System.out.println("supplementaryCodePoint = " + supplementaryCodePoint);
+        println("supplementaryCodePoint = " + supplementaryCodePoint);
 
         final var lowSurrogate = Character.lowSurrogate(codePoint);
         final var highSurrogate = Character.highSurrogate(codePoint);
         final var surrogates = new int[]{highSurrogate, lowSurrogate};
         final var smileyFace = new String(surrogates, 0, surrogates.length);
-        System.out.println(smileyFace);
+        println(smileyFace);
 
         assertAll(
                 () -> assertTrue(Character.isLowSurrogate(lowSurrogate)),
@@ -89,8 +93,8 @@ class UniCodeTests {
         int[] hexSurrogates = {0xD83D, 0xDC7D};
         final var alienEmoji = "\uD83D\uDC7D";
 
-        Arrays.stream(hexSurrogates).forEach(System.out::println);
-        Arrays.stream(hexSurrogates).mapToObj(Integer::toBinaryString).forEach(System.out::println);
+        Arrays.stream(hexSurrogates).forEach(It::println);
+        Arrays.stream(hexSurrogates).mapToObj(Integer::toBinaryString).forEach(It::println);
 
         int[] surrogates = {55357, 56445};
         int[] binarySurrogates = {0b1101100000111101, 0b1101110001111101};
@@ -99,7 +103,7 @@ class UniCodeTests {
         String alienEmojiStringFromHexSurrogates = new String(hexSurrogates, 0, hexSurrogates.length);
         String alienEmojiStringFromDecimalSurrogates = new String(surrogates, 0, surrogates.length);
 
-        System.out.println("alienEmoji = " + alienEmoji);
+        println("alienEmoji = " + alienEmoji);
 
         assertAll(
                 () -> assertEquals(alienEmoji, alienEmojiStringFromDecimalSurrogates),
@@ -115,7 +119,7 @@ class UniCodeTests {
         String gKeyFromHexadecimals = new String(surrogates, 0, surrogates.length);
         String gKey = "\uD834\uDD1E";
 
-        System.out.println("gKey = " + gKey);
+        println("gKey = " + gKey);
 
         assertAll(
                 () -> assertEquals(gKey, gKeyFromHexadecimals),
@@ -126,7 +130,7 @@ class UniCodeTests {
     @ParameterizedTest
     @ValueSource(strings = {"anna", "lol", "racecar", "lepel", G_KEY + "lol" + G_KEY, SMILEY_FACE + "lol" + SMILEY_FACE})
     void testIsPalindrome(String s) {
-        System.out.println(s);
+        println(s);
 
         assertAll(
                 () -> assertTrue(isPalindrome(s)),

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,7 +20,7 @@ class IntSequenceTest {
                 .toArray();
 
         for (int i : ints) {
-            System.out.println("i = " + i);
+            println("i = " + i);
         }
         assertArrayEquals(new int[] {4, 8, 12}, ints);
     }

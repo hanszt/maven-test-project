@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,7 +27,7 @@ class PiCalculatorTest {
         final var expected = new BigDecimal(PI_FIRST_100_DIGITS);
         final var pi = PiCalculator.piByMachinsFormula(numDigits);
 
-        System.out.println("pi = " + pi);
+        println("pi = " + pi);
 
         assertAll(
                 () -> assertEquals(numDigits, pi.scale()),

@@ -1,5 +1,6 @@
 package org.hzt.sequences.functional_iterator_sequences;
 
+import org.hzt.utils.It;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.hzt.utils.It.*;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,11 +19,11 @@ class FunctionalSequenceTest {
         final var strings = List.of("this", "is", "a", "test");
 
         final var sum = FunctionalSequence.of(strings)
-                .onEach(System.out::println)
+                .onEach(It::println)
                 .map(String::length)
                 .reduce(0, Integer::sum);
 
-        System.out.println("sum = " + sum);
+        println("sum = " + sum);
 
         assertEquals(11, sum);
     }
@@ -31,10 +33,10 @@ class FunctionalSequenceTest {
         final var stream = IntStream.range(0, 1000).boxed();
 
         final var list = FunctionalSequence.of(stream)
-                .onEach(System.out::println)
+                .onEach(It::println)
                 .toList();
 
-        System.out.println("list = " + list);
+        println("list = " + list);
 
         assertEquals(1_000, list.size());
     }
@@ -44,10 +46,10 @@ class FunctionalSequenceTest {
         final var strings = List.of(1, 2, 3, 4);
 
         final var sum = FunctionalSequence.of(strings)
-                .onEach(System.out::println)
+                .onEach(It::println)
                 .reduce(0, Integer::sum);
 
-        System.out.println("sum = " + sum);
+        println("sum = " + sum);
 
         assertEquals(10, sum);
     }
@@ -61,7 +63,7 @@ class FunctionalSequenceTest {
                 .stream()
                 .collect(Collectors.toSet());
 
-        System.out.println("set = " + set);
+        println("set = " + set);
 
         assertEquals(Set.of("1", "2", "3", "4"), set);
     }

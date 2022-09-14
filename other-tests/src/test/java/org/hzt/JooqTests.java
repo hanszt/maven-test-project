@@ -1,11 +1,13 @@
 package org.hzt;
 
+import org.hzt.utils.It;
 import org.jooq.lambda.Seq;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JooqTests {
@@ -30,7 +32,7 @@ class JooqTests {
                 .map(Integer::parseInt)
                 .toList();
 
-        System.out.println("integers = " + integers);
+        println("integers = " + integers);
 
         assertEquals(271, integers.size());
     }
@@ -39,9 +41,9 @@ class JooqTests {
     void testSliding() {
         final var windows = Seq.of(1, 2, 3, 4, 4)
                 .sliding(3)
-                .peek(System.out::println);
+                .peek(It::println);
 
-        System.out.println("windows = " + windows);
+        println("windows = " + windows);
 
         assertEquals(3, windows.count());
     }

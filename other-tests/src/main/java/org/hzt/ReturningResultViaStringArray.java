@@ -1,6 +1,6 @@
 package org.hzt;
 
-import org.hzt.utils.It;
+import static org.hzt.utils.It.println;
 
 public class ReturningResultViaStringArray {
 
@@ -13,6 +13,6 @@ public class ReturningResultViaStringArray {
             args[4] = "a";
             args[5] = "test";
         }
-        It.println("The length " + args.length + " is to short for the assigned values");
+        println("The length " + args.length + " is to short for the assigned values");
     }
 }

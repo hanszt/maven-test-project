@@ -1,6 +1,7 @@
 package org.hzt.vavr_tests;
 
 import io.vavr.collection.List;
+import org.hzt.utils.It;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +22,7 @@ class VavrCollectionsTests {
     void testListCombinations() {
         final var combinations = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).combinations();
 
-        combinations.forEach(System.out::println);
+        combinations.forEach(It::println);
 
         assertEquals(1024, combinations.size());
     }
@@ -30,7 +31,7 @@ class VavrCollectionsTests {
     void testListPermutations() {
         final var permutations = List.of(1, 2, 3, 4, 5, 6).permutations();
 
-        permutations.forEach(System.out::println);
+        permutations.forEach(It::println);
 
         //factorial of the size of the input list
         assertEquals(720, permutations.size());
@@ -40,7 +41,7 @@ class VavrCollectionsTests {
     void testListIntersperse() {
         final var interspersed = List.of(1, 2, 3, 4, 5, 6).intersperse(3);
 
-        interspersed.forEach(System.out::println);
+        interspersed.forEach(It::println);
 
         //factorial of the size of the input list
         assertEquals(11, interspersed.size());

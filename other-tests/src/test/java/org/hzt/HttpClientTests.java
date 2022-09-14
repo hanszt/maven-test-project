@@ -14,6 +14,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Paths;
 import java.time.Duration;
 
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -36,7 +37,7 @@ class HttpClientTests {
                 .thenApply(HttpResponse::body)
                 .join();
 
-        System.out.println(result);
+        println(result);
 
         assumeTrue(() -> result.contains("body"));
         assertTrue(result.contains("body"));
@@ -53,8 +54,8 @@ class HttpClientTests {
         HttpRequest request = buildHttpPostRequest();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        System.out.println(response.statusCode());
-        System.out.println(response.body());
+        println(response.statusCode());
+        println(response.body());
     }
 
     private HttpRequest buildHttpPostRequest() throws FileNotFoundException {

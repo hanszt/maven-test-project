@@ -5,9 +5,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.hzt.utils.It;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LambdaLoggingTest {
@@ -24,7 +26,7 @@ class LambdaLoggingTest {
             Configuration config = ctx.getConfiguration();
             LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
             loggerConfig.setLevel(Level.DEBUG);
-            ctx.updateLoggers();  // This causes all Loggers to refetch information from their LoggerConfig.
+            ctx.updateLoggers();  // This causes all Loggers to re-fetch information from their LoggerConfig.
         }
         Timer<Void> timerDebugEnabled = Timer.timeAConsumer(
                 LambdaLoggingTest::expensiveMessage,
@@ -32,10 +34,11 @@ class LambdaLoggingTest {
 
         final var timeInMillisDebugNotEnabled = timerDebugNotEnabled.getDurationInMillis();
         final var timeInMillisDebugEnabled = timerDebugEnabled.getDurationInMillis();
-        Timer<Void> timer = Timer.timeAConsumer("", System.out::println);
-        System.out.println("timeInMillisDebugNotEnabled = " + timeInMillisDebugNotEnabled);
-        System.out.println("timeInMillisDebugEnabled = " + timeInMillisDebugEnabled);
-        System.out.println("timer.getTimeInMillis() = " + timer.getDurationInMillis());
+        Timer<Void> timer = Timer.timeAConsumer("", It::println);
+        println("timeInMillisDebugNotEnabled = " + timeInMillisDebugNotEnabled);
+        println("timeInMillisDebugEnabled = " + timeInMillisDebugEnabled);
+        println("timer.getTimeInMillis() = " + timer.getDurationInMillis());
+
         assertTrue(timeInMillisDebugNotEnabled < timeInMillisDebugEnabled);
     }
 
