@@ -4,17 +4,22 @@ import org.apache.commons.math3.fraction.BigFraction;
 import org.apache.commons.math3.fraction.Fraction;
 import org.hzt.iterators.WindowedIterator;
 import org.hzt.iterators.ZipWithNextIterator;
+import org.hzt.utils.It;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.LongPredicate;
+import java.util.regex.Pattern;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -22,8 +27,9 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.math.BigInteger.*;
-import static java.util.Spliterator.IMMUTABLE;
-import static java.util.Spliterator.ORDERED;
+import static java.util.Spliterator.*;
+import static java.util.function.Predicate.not;
+import static org.hzt.utils.It.*;
 
 final class Streams {
 
@@ -60,15 +66,16 @@ final class Streams {
 
     public static LongStream fibonacciLongStream() {
         final long[] seed = {0L, 1L};
-        return Stream.iterate(seed, pair -> new long[] {pair[1], pair[0] + pair[1]})
+        return Stream.iterate(seed, pair -> new long[]{pair[1], pair[0] + pair[1]})
                 .mapToLong(p -> p[0]);
     }
 
     /**
      * A stream implementation that is inspired by the sieve of eratosthenes
+     *
+     * @return a LongStream of primes starting from 2
      * @see <a href="https://en.wikipedia.org/wiki/Sieve_of_Pritchard">Sieve of Pritchard</a>
      * @see <a href="https://stackoverflow.com/questions/43760641/java-8-streams-and-the-sieve-of-eratosthenes">Java 8: streams and the Sieve of Eratosthenes</a>
-     * @return a LongStream of primes starting from 2
      */
     @SuppressWarnings("squid:S3864")
     public static LongStream primes() {
@@ -153,12 +160,12 @@ final class Streams {
 
     public static <T, R> Stream<R> zipWithNext(Iterable<T> iterable, BiFunction<T, T, R> merger) {
         final var zipWithNextIterator = new ZipWithNextIterator<>(iterable.iterator(), merger);
-        return StreamSupport.stream(() -> Spliterators.spliteratorUnknownSize(zipWithNextIterator, ORDERED), ORDERED,  false);
+        return StreamSupport.stream(() -> Spliterators.spliteratorUnknownSize(zipWithNextIterator, ORDERED), ORDERED, false);
     }
 
     public static <T> Stream<List<T>> windowed(Iterable<T> iterable, int size, int step, boolean partialWindows) {
         final var windowedIterator = WindowedIterator.of(iterable.iterator(), size, i -> size, step, i -> step, partialWindows);
-        return StreamSupport.stream(() -> Spliterators.spliteratorUnknownSize(windowedIterator, ORDERED), ORDERED,  false);
+        return StreamSupport.stream(() -> Spliterators.spliteratorUnknownSize(windowedIterator, ORDERED), ORDERED, false);
     }
 
     public static <T> Stream<List<T>> windowed(Iterable<T> iterable, int size, int step) {
@@ -173,4 +180,75 @@ final class Streams {
         return windowed(iterable, size, 1);
     }
 
+    public static Stream<String> consoleLines(String stopKey) {
+        final var scanner = new Scanner(System.in);
+        final Spliterator<String> spliterator = new Spliterators.AbstractSpliterator<>(Integer.MAX_VALUE, Spliterator.ORDERED) {
+
+            @Override
+            public boolean tryAdvance(Consumer<? super String> action) {
+                final var nextLine = scanner.nextLine();
+                final var shouldAcceptNextLine = !stopKey.equalsIgnoreCase(nextLine);
+                if (shouldAcceptNextLine) {
+                    action.accept(nextLine);
+                }
+                return shouldAcceptNextLine;
+            }
+        };
+        return StreamSupport.stream(() -> spliterator, ORDERED, false);
+    }
+
+    public static Stream<String> consoleLines(Pattern stopKey) {
+        final var scanner = new Scanner(System.in);
+        final Iterator<String> iterator = new Iterator<>() {
+
+            private boolean shouldReturnNextLine = true;
+            private String nextLine = null;
+
+            @Override
+            public boolean hasNext() {
+                nextLine = scanner.nextLine();
+                shouldReturnNextLine = !stopKey.matcher(nextLine).matches();
+                return shouldReturnNextLine;
+            }
+
+            @Override
+            public String next() {
+                if (shouldReturnNextLine) {
+                    return nextLine;
+                }
+                throw new NoSuchElementException("No next line found");
+            }
+        };
+        return StreamSupport.stream(() -> Spliterators.spliteratorUnknownSize(iterator, ORDERED), ORDERED, false);
+    }
+
+    public static void main(String[] args) {
+        final var scanner = new Scanner(System.in);
+        final var maxNrOfMultiLines = 8;
+
+        println("Enter the lines from which the length will be echoed back: (Enter 'stop echo' to finish)");
+        consoleLines("stop echo")
+                .limit(maxNrOfMultiLines)
+                .mapToInt(String::length)
+                .forEach(It::println);
+
+        println("Enter the text you want to be processed as batch: (Enter 'stop batch' to finish)");
+        final var stop_batch = "stop batch";
+        consoleLines(stop_batch)
+                .limit(maxNrOfMultiLines)
+                .onClose(() -> printf("Max length (%s) reached or '%s' called", maxNrOfMultiLines, stop_batch))
+                .toList()
+                .forEach(It::println);
+
+        println("Enter a single line text");
+        println(scanner.next());
+
+        It.println("Enter ten inputs:");
+        final var firstTenTokens = scanner.tokens()
+                .takeWhile(not("stop"::equals))
+                .limit(10)
+                .toList();
+
+        println("firstTenTokens = " + firstTenTokens);
+    }
 }

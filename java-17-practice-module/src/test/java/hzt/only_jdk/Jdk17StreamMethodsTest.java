@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class Jdk17StreamMethodsTest {
 
     /**
-     * https://nipafx.dev/java-16-stream-mapmulti/
+     * <a href="https://nipafx.dev/java-16-stream-mapmulti/">Faster flatMaps with Stream::mapMulti in Java 16</a>
      */
     @Test
     void testMapMultiForOptional() {
@@ -110,15 +110,15 @@ class Jdk17StreamMethodsTest {
 
     @Test
     void testIntStreamMapMulti() {
-        final var max = IntStream.range(0, 1_000).mapMulti(this::sum).max();
+        final var max = IntStream.range(0, 1_000)
+                .mapMulti(this::timesTwo)
+                .max();
+
         assertEquals(OptionalInt.of(1998), max);
     }
 
-    private void sum(int value, IntConsumer consumer) {
-        consumer.accept(value + value);
+    private void timesTwo(int value, IntConsumer consumer) {
+        consumer.accept(2 * value);
     }
 
-    //     (Functional?) programming question. What's that collection/stream/array operation called
-    //     that processes a variable number of input elements to a single result?
-//    https://twitter.com/nipafx/status/1319656592925708289
 }

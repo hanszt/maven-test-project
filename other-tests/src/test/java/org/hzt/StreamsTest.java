@@ -5,6 +5,8 @@ import org.apache.commons.math3.fraction.Fraction;
 import org.eclipse.collections.api.map.primitive.IntIntMap;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
+import org.hzt.collections.IndexedDataStructure;
+import org.hzt.collections.TestDataStructure;
 import org.hzt.model.Payment;
 import org.hzt.model.Person;
 import org.hzt.sequences.primitve_sequences.IntSequence;
@@ -24,6 +26,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -40,6 +46,8 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -54,10 +62,7 @@ import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 import static org.hzt.StatisticsUtils.firstDigit;
-import static org.hzt.Streams.fibonacciLongStream;
-import static org.hzt.Streams.fibonacciStream;
-import static org.hzt.Streams.fibonacciStreamV2;
-import static org.hzt.Streams.subtractingFibonacciStream;
+import static org.hzt.Streams.*;
 import static org.hzt.stream.StreamUtils.by;
 import static org.hzt.stream.StreamUtils.function;
 import static org.hzt.utils.It.println;
@@ -130,6 +135,7 @@ class StreamsTest {
     @Test
     void testReturnStreamFromIterator() {
         final var iterator = getIntegerStream(100).iterator();
+
         final var expected = getIntegerStream(100)
                 .map(String::valueOf)
                 .toList();
@@ -139,6 +145,15 @@ class StreamsTest {
                 .toList();
 
         assertEquals(expected, result);
+    }
+
+    @Test
+    void testReturnStreamFromIterableUSingMapMulti() {
+        final List<Painting> list = TestSampleGenerator.createMuseumList().stream()
+                .mapMulti(Museum::forEach)
+                .toList();
+
+        assertEquals(9, list.size());
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -740,4 +755,106 @@ class StreamsTest {
             assertEquals(1_000, map.size());
         }
     }
+
+    @Test
+    void testStreamFromIndexedDataStructure() {
+        final var indexedDataStructure = new IndexedDataStructure<>("This", "is", "a", "test");
+
+        final var strings = IntStream.range(0, indexedDataStructure.size())
+                .mapToObj(indexedDataStructure::get)
+                .toList();
+
+        assertEquals(List.of("This", "is", "a", "test"), strings);
+    }
+
+    @Test
+    void testStreamFromIndexedDataStructureWithMapMulti() {
+        final var indexedDataStructure = new IndexedDataStructure<>("This", "is", "a", "second", "test");
+
+        final int[] ints = Stream.of(indexedDataStructure)
+                .mapMulti(this::acceptEachString)
+                .mapToInt(String::length)
+                .toArray();
+
+        assertArrayEquals(new int[]{4, 2, 1, 6, 4}, ints);
+    }
+
+    private void acceptEachString(IndexedDataStructure<String> stringIndexedDataStructure, Consumer<String> stringConsumer) {
+        for (int i = 0; i < stringIndexedDataStructure.size(); i++) {
+            stringConsumer.accept(stringIndexedDataStructure.get(i));
+        }
+    }
+
+    @Test
+    void testStreamFromNonCollectionDataStructureWithMapMulti() {
+        final var dataStructure = new TestDataStructure<>("This", "is", "a", "third", "test");
+
+        final int[] ints = Stream.of(dataStructure)
+                .<String>mapMulti(TestDataStructure::forEach)
+                .mapToInt(String::length)
+                .toArray();
+
+        assertArrayEquals(new int[]{4, 2, 1, 5, 4}, ints);
+    }
+
+    @Test
+    void givenDataInSystemIn_whenCallingLinesMethod_thenHaveUserInputData() {
+        final var stopKeyWord = "bye";
+        final String[] inputLines = {
+                "The first line.",
+                "The second line.",
+                "The last line.",
+                stopKeyWord,
+                "anything after 'bye' will be ignored"
+        };
+        final var expectedLines = Arrays.copyOf(inputLines, inputLines.length - 2);
+        final var expected = Arrays.stream(expectedLines).toList();
+
+        final InputStream stdin = System.in;
+        try {
+            System.setIn(new ByteArrayInputStream(String.join("\n", inputLines).getBytes()));
+            final var actual = Streams.consoleLines(stopKeyWord).toList();
+            assertEquals(expected, actual);
+        } finally {
+            System.setIn(stdin);
+        }
+    }
+
+    @Test
+    void givenDataInSystemIn_whenCallingLinesMethodWithStopPattern_thenHaveUserInputData() {
+        final String[] inputLines = {
+                "The first line.",
+                "The second line.",
+                "The last line.",
+                "234234",
+                "anything after a number will be ignored"
+        };
+        final var expectedLines = Arrays.copyOf(inputLines, inputLines.length - 2);
+        final var expected = Arrays.stream(expectedLines).toList();
+
+
+        final InputStream stdin = System.in;
+        try {
+            System.setIn(new ByteArrayInputStream(String.join("\n", inputLines).getBytes()));
+            final var oneOrMoreDigits = Pattern.compile("\\d+");
+            final var actual = Streams.consoleLines(oneOrMoreDigits).toList();
+            assertEquals(expected, actual);
+        } finally {
+            System.setIn(stdin);
+        }
+    }
+
+    @Test
+    void testBufferedReaderLines() {
+        final String[] inputLines = {
+                "The first line.",
+                "The second line.",
+                "The last line."
+        };
+        final var expected = Arrays.stream(inputLines).toList();
+        final var inputStream = new ByteArrayInputStream(String.join("\n", inputLines).getBytes());
+        final var actual = new BufferedReader(new InputStreamReader(inputStream)).lines().toList();
+        assertEquals(expected, actual);
+    }
+
 }

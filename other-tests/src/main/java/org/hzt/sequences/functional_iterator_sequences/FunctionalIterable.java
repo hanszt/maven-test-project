@@ -3,6 +3,7 @@ package org.hzt.sequences.functional_iterator_sequences;
 import java.util.function.Consumer;
 
 @FunctionalInterface
+@SuppressWarnings("squid:S1711")
 public interface FunctionalIterable<T> {
 
     FunctionalIterator<T> functionalIterator();

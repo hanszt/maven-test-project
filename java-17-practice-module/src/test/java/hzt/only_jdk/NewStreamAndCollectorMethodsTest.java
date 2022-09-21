@@ -65,7 +65,8 @@ class NewStreamAndCollectorMethodsTest {
         final List<Painting> paintingList = TestSampleGenerator.createPaintingList();
         final double expectedAverage = paintingList.stream()
                 .mapToInt(Painting::ageInYears)
-                .average().orElse(0);
+                .average()
+                .orElse(0);
         //act
         final var result = paintingList.stream()
                 .collect(teeing(

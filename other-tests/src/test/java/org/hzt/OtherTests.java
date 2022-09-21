@@ -292,7 +292,7 @@ class OtherTests {
     @Test
     void testCreatingListUsingReduce() {
         //does not maintain order
-        // right way in the sense that it provides onlu local mutability.
+        // right way in the sense that it provides only local mutability.
         // But can be delegated to Collect(toUnmodifiableList()); //This does maintain order
         final var reducedList = TestSampleGenerator.createBookList().stream()
                 .filter(Book::isAboutProgramming)
@@ -304,7 +304,7 @@ class OtherTests {
     @Test
     void testCreatingSetUsingReduce() {
         //does not maintain order
-        // right way in the sense that it provides onlu local mutability.
+        // right way in the sense that it provides only local mutability.
         // But can be delegated to Collect(toUnmodifiableList()); //This does maintain order
         final var reducedSet = TestSampleGenerator.createBookList().stream()
                 .filter(Book::isAboutProgramming)
@@ -481,7 +481,8 @@ class OtherTests {
         }
 
         @Test
-        void testClassNewInstanceWithVarOnly() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        void testClassNewInstanceWithVarOnly() throws NoSuchMethodException, InvocationTargetException,
+                InstantiationException, IllegalAccessException {
             final var input = "A string";
             final var theClass = input.getClass();
             final var constructor = theClass.getConstructor();
@@ -492,13 +493,34 @@ class OtherTests {
         }
 
         @Test
-        void testNewInstanceInlined() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        void testNewInstanceInlined() throws NoSuchMethodException, InvocationTargetException,
+                InstantiationException, IllegalAccessException {
             final var newString = "A string"
                     .getClass()
                     .getConstructor()
                     .newInstance();
             // unexpected
             assertEquals("A string", newString);
+        }
+
+        @Test
+        void testStringReAssignmentToExplicitStringType() throws NoSuchMethodException, InvocationTargetException,
+                InstantiationException, IllegalAccessException {
+            String string = "foo".getClass().getConstructor().newInstance();
+            println("string = " + string);
+            string = "bar";
+
+            assertEquals("bar", string);
+        }
+
+        @Test
+        void testStringReAssignmentToVar() throws NoSuchMethodException, InvocationTargetException,
+                InstantiationException, IllegalAccessException {
+            var string = "foo".getClass().getConstructor().newInstance();
+            println("string = " + string);
+            string = "bar";
+            // unexpected
+            assertEquals("foo", string);
         }
 
     }

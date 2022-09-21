@@ -19,17 +19,17 @@ class GenericsTest {
 
     @Test
     void testBoundedWildCard() {
-        List<? super Person> personList = new ArrayList<>();
+        final List<? super Person> personList = new ArrayList<>();
         personList.add(new Employee(""));
         final var hans = new Person("Hans");
         personList.add(hans);
-        List<String> strings = takeListAsWildCardAndGoToStringList(personList);
+        final List<String> strings = takeListAsWildCardAndGoToStringList(personList);
         println(strings);
 
         assertTrue(personList.contains(hans));
     }
 
-    private static List<String> takeListAsWildCardAndGoToStringList(List<? super Person> persons) {
+    private static List<String> takeListAsWildCardAndGoToStringList(final List<? super Person> persons) {
         return persons.stream()
                 .map(Object::toString)
                 .toList();
@@ -38,7 +38,7 @@ class GenericsTest {
     @Test
     @SuppressWarnings({"unchecked", "rawtypes"})
     void testRawList() {
-        List list = new ArrayList();
+        final List list = new ArrayList();
         list.add(new Person("Hans"));
         list.add("Raar");
         list.add(1);
@@ -50,7 +50,7 @@ class GenericsTest {
                 .toList();
 
         //noinspection RedundantOperationOnEmptyContainer
-        for (Object object : list) {
+        for (final Object object : list) {
             if (object instanceof Person) {
                 println("person.getAddress() = " + ((Person) object).getAddress());
             }
@@ -61,12 +61,12 @@ class GenericsTest {
 
     @Test
     void testGenericMethod() {
-        List<String> strings = Arrays.asList("Hans", "Hoe", "is", null);
-        List<String> list = filterNonNull(strings);
+        final List<String> strings = Arrays.asList("Hans", "Hoe", "is", null);
+        final List<String> list = filterNonNull(strings);
         assertEquals(3, list.size());
     }
 
-    public <T> List<T> filterNonNull(List<T> list) {
+    public <T> List<T> filterNonNull(final List<T> list) {
         return list.stream()
                 .filter(Objects::nonNull)
                 .toList();
