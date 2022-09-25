@@ -50,3 +50,11 @@ These dependencies are not yet available at maven central. You can use these dep
 [hzt.utils](https://github.com/hanszt/hzt-utils) project modules using `mvm clean install`
 
 ---
+
+## Cleaning all modules
+
+There is a [clean all](clean-all.cmd) file which can be used to  clean all existing modules in this project.
+
+If it fails, first run `mvn clean install` from this root
+
+---

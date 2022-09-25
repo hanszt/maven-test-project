@@ -11,10 +11,10 @@
         <version>1.2</version>
     </parent>
 
-    <artifactId>java-17-practice-module</artifactId>
+    <artifactId>latest-jdk-practice-module</artifactId>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>19</java.version>
     </properties>
 
     <dependencies>
@@ -22,11 +22,6 @@
             <groupId>org.hzt.utils</groupId>
             <artifactId>test-data-generator</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hzt.tests</groupId>
-            <artifactId>other-tests</artifactId>
-            <version>1.2</version>
         </dependency>
     </dependencies>
 
@@ -48,5 +43,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -11,8 +11,9 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>ocp-11-practice-module</module>
+        <module>benchmark</module>
         <module>design-patterns-examples</module>
+        <module>ocp-11-practice-module</module>
         <module>java-17-practice-module</module>
         <module>reactive-streams</module>
         <module>other-tests</module>
@@ -31,7 +32,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--        dependencies-->
         <!--        logging-->
-        <log4j.version>2.18.0</log4j.version>
+        <log4j.version>2.19.0</log4j.version>
         <!--        test-->
         <junit.jupiter.version>5.9.0</junit.jupiter.version>
         <mockito.version>4.7.0</mockito.version>

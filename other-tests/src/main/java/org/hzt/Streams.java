@@ -31,7 +31,7 @@ import static java.util.Spliterator.*;
 import static java.util.function.Predicate.not;
 import static org.hzt.utils.It.*;
 
-final class Streams {
+public final class Streams {
 
     private Streams() {
     }
