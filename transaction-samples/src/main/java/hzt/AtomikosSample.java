@@ -18,7 +18,7 @@ import java.sql.Statement;
 import java.util.UUID;
 
 /**
- * See <a href="https://www.baeldung.com/java-atomikos">A Guide to Atomikos</a> for the tutorial where this code comes from
+ * @see <a href="https://www.baeldung.com/java-atomikos">A Guide to Atomikos</a> for the tutorial where this code comes from
  */
 public class AtomikosSample {
 
@@ -32,6 +32,7 @@ public class AtomikosSample {
         }
     }
 
+    @SuppressWarnings({"squid:S1160", "SqlNoDataSourceInspection"})
     public void placeOrder(String productId, int amount) throws HeuristicRollbackException, SystemException,
             HeuristicMixedException, RollbackException {
         UserTransaction userTransaction = new UserTransactionImp();

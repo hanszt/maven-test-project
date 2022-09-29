@@ -1,18 +1,22 @@
 package org.hzt;
 
+import org.hzt.utils.strings.StringX;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import static org.hzt.BigDecimalSample.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static java.lang.System.out;
+import static org.hzt.BigDecimalSample.comparingBigDecimalsUsingCompareTo;
+import static org.hzt.BigDecimalSample.comparingBigDecimalsUsingEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BigDecimalSampleTest {
 
     /**
-     * <a href="https://www.tutorialspoint.com/java/math/bigdecimal_equals.htm">Java bigDecimal equals</a>
+     * @see <a href="https://www.tutorialspoint.com/java/math/bigdecimal_equals.htm">Java bigDecimal equals</a>
      */
     @Test
     void sameValueNotSameScaleResultsInFalseUsingEquals() {
@@ -24,7 +28,7 @@ class BigDecimalSampleTest {
     }
 
     /**
-     * <a href="https://www.tutorialspoint.com/java/math/bigdecimal_equals.htm">Java bigDecimal equals</a>
+     * @see <a href="https://www.tutorialspoint.com/java/math/bigdecimal_equals.htm">Java bigDecimal equals</a>
      */
     @Test
     void sameValueNotSameScaleResultsInTrueUsingCompareTo() {
@@ -60,6 +64,22 @@ class BigDecimalSampleTest {
     void testBigDecimalOfNull() {
         //noinspection ConstantConditions
         assertThrows(NullPointerException.class, () -> new BigDecimal((String) null));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "10,692,467,440,017.111 | #,##0.0# -> 10692467440017.111",
+            "10692467440017.111 | #.# -> 10692467440017.111"
+    })
+    void testDecimalFormat(String string) {
+        final var split = StringX.of(string).split(" | ", " -> ");
+        final var input = split.get(0);
+        final var pattern = split.get(1);
+        final var expected = new BigDecimal(split.get(2));
+
+        final var bigDecimal = BigDecimalSample.parseBigDecimal(input, pattern);
+
+        assertEquals(expected, bigDecimal);
     }
 
 }

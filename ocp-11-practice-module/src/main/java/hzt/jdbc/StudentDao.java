@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-// https://www.tutorialspoint.com/jdbc/index.htm
+/**
+ * @see <a href="https://www.tutorialspoint.com/jdbc/index.htm">JDBC Tutorial</a>
+ */
 public class StudentDao {
 
     private final DataAccess dataAccess;
@@ -51,7 +53,7 @@ public class StudentDao {
                 ps -> addStudent(student, ps));
     }
 
-    private int addStudent(Student student, PreparedStatement ps) {
+    private static int addStudent(Student student, PreparedStatement ps) {
         try {
             ps.setLong(1, student.getId());
             ps.setString(2, student.getName());

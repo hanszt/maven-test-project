@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * <a href="https://openjdk.java.net/groups/net/httpclient/intro.html">
+ * @see <a href="https://openjdk.java.net/groups/net/httpclient/intro.html">
  *     Introduction to the Java HTTP Client</a>
  */
 class HttpClientTests {

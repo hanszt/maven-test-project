@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  *    <li>thenApply is like: map</li>
  *    <li>thenCompose is like: flatMap</li>
  * <ul/>
- * <first href="https://agiledeveloper.com/downloads.html">Downloads Venkat</first>
+ * @see <a href="https://agiledeveloper.com/downloads.html">Downloads Venkat</a>
  */
 @SuppressWarnings("SameParameterValue")
 public class CompletableFutureSample {

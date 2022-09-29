@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
 /**
- * https://youtu.be/_stAxdjx8qk?t=595
+ * <a hewf="https://youtu.be/_stAxdjx8qk?t=662">Don’t use Reactive Streams in Java 9+ - Jacek Kunicki</a>
  */
 public class SimplePublisher implements Flow.Publisher<Integer> {
 
@@ -23,7 +23,7 @@ public class SimplePublisher implements Flow.Publisher<Integer> {
     }
 
     /**
-     * https://youtu.be/_stAxdjx8qk?t=950
+     * @see <a href="https://youtu.be/_stAxdjx8qk?t=950">Don’t use Reactive Streams in Java 9+ - Jacek Kunicki</a>
      */
     public class SimpleSubscription implements Flow.Subscription {
 

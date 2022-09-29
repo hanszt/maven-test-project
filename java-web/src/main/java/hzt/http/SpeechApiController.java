@@ -13,7 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 /**
- * <a href="https://www.youtube.com/watch?v=9oq7Y8n1t00">Speech api tutorial</a>
+ * @see <a href="https://www.youtube.com/watch?v=9oq7Y8n1t00">Speech api tutorial</a>
  */
 public class SpeechApiController {
 
@@ -28,6 +28,7 @@ public class SpeechApiController {
 
             LOGGER.info("json = {}", json);
 
+            @SuppressWarnings("squid:S1075")
             HttpRequest postRequest = HttpRequest.newBuilder()
                     .uri(new URI("https://api.assemblyai.com/v2/transcript"))
                     .headers("Authorization", "API_KEY_TO_BE_SPECIFIED")

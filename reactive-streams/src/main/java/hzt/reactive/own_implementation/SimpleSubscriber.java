@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Flow;
 
 /**
- * https://youtu.be/_stAxdjx8qk?t=662
+ * @see <a href="https://youtu.be/_stAxdjx8qk?t=662">Don’t use Reactive Streams in Java 9+ - Jacek Kunicki</a>
  */
 public class SimpleSubscriber implements Flow.Subscriber<Integer> {
 

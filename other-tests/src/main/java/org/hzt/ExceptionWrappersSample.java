@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class ConsumerExceptionWrappersSample {
+public class ExceptionWrappersSample {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerExceptionWrappersSample.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionWrappersSample.class);
 
     @SuppressWarnings("SameParameterValue")
     static <T, E extends Exception> Consumer<T> consumerWrapper(Consumer<T> consumer, Class<E> throwableClass) {
@@ -42,7 +42,7 @@ public class ConsumerExceptionWrappersSample {
     }
 
     /**
-     * source: https://www.baeldung.com/java-lambda-exceptions
+     * source: <a href="https://www.baeldung.com/java-lambda-exceptions">Exceptions in Java 8 Lambda Expressions</a>
      */
     void consumeThrowingExample() {
         List<Integer> integers = List.of(3, 9, 0, 7, 6, 10, 20, 6);
@@ -50,7 +50,7 @@ public class ConsumerExceptionWrappersSample {
     }
 
     /**
-     * source: https://www.baeldung.com/java-lambda-exceptions
+     * source: <a href="https://www.baeldung.com/java-lambda-exceptions">Exceptions in Java 8 Lambda Expressions</a>
      */
     void consumerWrapperExample() {
         List<Integer> integers = List.of(3, 9, 0, 7, 6, 10, 20, 6);

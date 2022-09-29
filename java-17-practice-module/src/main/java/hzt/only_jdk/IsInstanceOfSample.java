@@ -28,11 +28,13 @@ public class IsInstanceOfSample {
         }
     }
 
-    // This method tells us whether the object is an
-    // instance of class whose name is passed as a
-    // string 'c'.
-    // use isInstance() method when needed dynamically
-    // Source: https://www.geeksforgeeks.org/instanceof-operator-vs-isinstance-method-in-java/
+    /**
+    * This method tells us whether the object is an
+    * instance of class whose name is passed as a
+    * string 'c'.
+    * use isInstance() method when needed dynamically
+    * @see  <a href="https://www.geeksforgeeks.org/instanceof-operator-vs-isinstance-method-in-java/">nstanceof operator vs isInstance() Method in Java</a>
+    */
     @SuppressWarnings("all")
     public static boolean isInstanceByClassname(Object obj, String classname) throws ClassNotFoundException {
         return Class.forName(classname).isInstance(obj);

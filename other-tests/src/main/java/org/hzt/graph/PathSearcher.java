@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * A sample program of an implementation of dijkstra's algorithm using a priority queue
- * <a href="https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-in-java-using-priorityqueue/">
+ * @see <a href="https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-in-java-using-priorityqueue/">
  * *     Dijkstra’s shortest path algorithm in Java using PriorityQueue</a>
  */
 @SuppressWarnings("squid:S2384")

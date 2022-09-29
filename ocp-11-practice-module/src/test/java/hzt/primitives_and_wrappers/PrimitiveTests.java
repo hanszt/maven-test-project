@@ -2,11 +2,16 @@ package hzt.primitives_and_wrappers;
 
 import org.junit.jupiter.api.Test;
 
+import java.text.DecimalFormat;
+import java.util.Locale;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PrimitiveTests {
 
     // Q
+    @SuppressWarnings({"UnnecessaryLocalVariable", "RedundantCast"})
     @Test
     void testAddingCharsYieldsNumberTheCharIsRepresentedBy() {
         char a = 'a', b = 98; //1
@@ -16,6 +21,7 @@ class PrimitiveTests {
     }
 
     // Q 11 test 6
+    @SuppressWarnings("UnusedAssignment")
     @Test
     void testPrimitivesAsExpressions() {
         int a = 10;
@@ -24,5 +30,26 @@ class PrimitiveTests {
         b = b + (b = 5);
         assertEquals(14, a);
         assertEquals(25, b);
+    }
+
+    /**
+     * @see <a href="https://www.baeldung.com/java-decimalformat">A Practical Guide to DecimalFormat</a>
+     */
+    @Test
+    void testDecimalFormatOnDouble() {
+        final var defaultLocale = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.US);
+            double d = 1234567.89;
+
+            assertAll(
+                    () -> assertEquals("1234567.89", new DecimalFormat("#.##").format(d)),
+                    () -> assertEquals("1234567.89", new DecimalFormat("0.00").format(d)),
+                    () -> assertEquals("1234567.9", new DecimalFormat("#.#").format(d)),
+                    () -> assertEquals("1,234,567.9", new DecimalFormat("#,###.#").format(d))
+            );
+        } finally {
+            Locale.setDefault(defaultLocale);
+        }
     }
 }

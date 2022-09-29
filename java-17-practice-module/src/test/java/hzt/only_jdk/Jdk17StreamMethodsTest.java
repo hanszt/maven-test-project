@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class Jdk17StreamMethodsTest {
 
     /**
-     * <a href="https://nipafx.dev/java-16-stream-mapmulti/">Faster flatMaps with Stream::mapMulti in Java 16</a>
+     * @see <a href="https://nipafx.dev/java-16-stream-mapmulti/">Faster flatMaps with Stream::mapMulti in Java 16</a>
      */
     @Test
     void testMapMultiForOptional() {

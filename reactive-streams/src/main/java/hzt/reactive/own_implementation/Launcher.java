@@ -7,7 +7,7 @@ import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
 
 /**
- * https://youtu.be/_stAxdjx8qk?t=1523
+ * <a href="https://youtu.be/_stAxdjx8qk?t=662">Don’t use Reactive Streams in Java 9+ - Jacek Kunicki</a>
  * Don't implement reactive streams api yourself for real world applications
  * This is just a simple implementation out of curiosity
  */

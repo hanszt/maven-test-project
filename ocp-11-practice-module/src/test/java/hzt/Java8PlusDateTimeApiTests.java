@@ -1,6 +1,7 @@
 package hzt;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -19,12 +20,15 @@ import java.util.Locale;
 
 import static java.lang.System.out;
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class Java8PlusDateTimeApiTests {
 
-    @BeforeEach
-    void setup() {
+    private static final Locale defaultLocale = Locale.getDefault();
+
+    @BeforeAll
+    static void setup() {
         Locale.setDefault(Locale.GERMANY);
     }
 
@@ -32,10 +36,12 @@ class Java8PlusDateTimeApiTests {
     void testFormatLocalDate() {
         final var localDate = LocalDate.of(2021, 11, 26);
 
-        assertEquals("11", localDate.format(ofPattern("M")));
-        assertEquals("11", localDate.format(ofPattern("MM")));
-        assertEquals("Nov.", localDate.format(ofPattern("MMM")));
-        assertEquals("novembre", localDate.format(ofPattern("MMMM", Locale.FRANCE)));
+        assertAll(
+                () -> assertEquals("11", localDate.format(ofPattern("M"))),
+                () -> assertEquals("11", localDate.format(ofPattern("MM"))),
+                () -> assertEquals("Nov.", localDate.format(ofPattern("MMM"))),
+                () -> assertEquals("novembre", localDate.format(ofPattern("MMMM", Locale.FRANCE)))
+        );
     }
 
     @Test
@@ -43,7 +49,9 @@ class Java8PlusDateTimeApiTests {
         final var fixedInstant = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]").toInstant();
         var localDate = LocalDate.now(Clock.fixed(fixedInstant, ZoneId.systemDefault()));
         final var isoDateformat = localDate.format(DateTimeFormatter.ISO_DATE);
+
         out.println(isoDateformat);
+
         assertEquals("2011-12-03", isoDateformat);
     }
 
@@ -66,9 +74,9 @@ class Java8PlusDateTimeApiTests {
     }
 
     /**
-     * @see <a href="https://stackoverflow.com/questions/57174739/how-to-parse-japanese-era-date-string-values-into-localdate-localdatetime">
-     *     How to parse 🎌 Japanese Era Date string values into LocalDate & LocalDateTime</a>
      * @param dateToConversion the input of the parameterized test
+     * @see <a href="https://stackoverflow.com/questions/57174739/how-to-parse-japanese-era-date-string-values-into-localdate-localdatetime">
+     * How to parse 🎌 Japanese Era Date string values into LocalDate & LocalDateTime</a>
      */
     @ParameterizedTest
     @ValueSource(strings = {
@@ -88,5 +96,10 @@ class Java8PlusDateTimeApiTests {
         final var localDate = LocalDate.parse(input, japaneseEraDtf);
 
         assertEquals(expected, localDate.toString());
+    }
+
+    @AfterAll
+    static void tearDown() {
+        Locale.setDefault(defaultLocale);
     }
 }
