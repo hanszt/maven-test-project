@@ -23,6 +23,7 @@
         <module>jasper-reports</module>
         <module>kafka-samples</module>
         <module>selenium-samples</module>
+        <module>quantum-java</module>
     </modules>
 
     <properties>
@@ -30,14 +31,14 @@
         <maven.compiler.target>17</maven.compiler.target>
         <coverage.target>50%</coverage.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!--        dependencies-->
-        <!--        logging-->
+        <!--dependencies-->
+        <!--logging-->
         <log4j.version>2.19.0</log4j.version>
-        <!--        test-->
+        <!--test-->
         <junit.jupiter.version>5.9.0</junit.jupiter.version>
-        <mockito.version>4.7.0</mockito.version>
+        <mockito.version>4.8.0</mockito.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <!--        utils-->
+        <!--utils-->
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-math3.version>3.6.1</commons-math3.version>
@@ -45,18 +46,18 @@
         <streamex.version>0.8.1</streamex.version>
         <jool.version>0.9.14</jool.version>
         <org.hzt-utils.version>0.7.5.11</org.hzt-utils.version>
-        <!--        reactive-streams-->
-        <reactive-streams-tck.version>1.0.3</reactive-streams-tck.version>
-        <rxjava.version>3.1.1</rxjava.version>
-        <spring-boot-starter-webflux.version>2.6.2</spring-boot-starter-webflux.version>
-        <scala.binary.version>2.13</scala.binary.version>
-        <akka.version>2.6.16</akka.version>
         <annotations.version>22.0.0</annotations.version>
+        <cyclops.version>10.4.0</cyclops.version>
+        <!--reactive-streams-->
+        <reactive-streams-tck.version>1.0.3</reactive-streams-tck.version>
+        <rxjava.version>3.1.5</rxjava.version>
+        <spring-boot-starter-webflux.version>2.7.3</spring-boot-starter-webflux.version>
+        <scala.binary.version>2.13</scala.binary.version>
+        <akka.version>2.6.20</akka.version>
         <!--plugins-->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
-        <cyclops.version>10.4.0</cyclops.version>
     </properties>
 
     <dependencyManagement>
@@ -68,7 +69,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/org.reactivestreams/reactive-streams-tck -->
+            <!--https://mvnrepository.com/artifact/org.reactivestreams/reactive-streams-tck -->
             <dependency>
                 <groupId>io.reactivex.rxjava3</groupId>
                 <artifactId>rxjava</artifactId>
@@ -100,7 +101,7 @@
                 <version>${annotations.version}</version>
                 <scope>compile</scope>
             </dependency>
-            <!--        apache dependencies-->
+            <!--apache dependencies-->
             <dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
@@ -197,13 +198,13 @@
             <version>${awaitility.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <!--https://mvnrepository.com/artifact/com.google.guava/guava -->
     </dependencies>
 
     <build>
         <pluginManagement>
             <plugins>
-                <!--                https://www.baeldung.com/jacoco -->
+                <!--https://www.baeldung.com/jacoco -->
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>

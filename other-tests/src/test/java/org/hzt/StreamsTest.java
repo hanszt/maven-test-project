@@ -42,6 +42,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
@@ -855,6 +856,46 @@ class StreamsTest {
         final var inputStream = new ByteArrayInputStream(String.join("\n", inputLines).getBytes());
         final var actual = new BufferedReader(new InputStreamReader(inputStream)).lines().toList();
         assertEquals(expected, actual);
+    }
+
+    @Nested
+    class StreamReduceWrong {
+
+        @Test
+        void testStreamReduceSubtraction() {
+            final var reduce = IntStream.range(0, 100_000)
+                    .reduce(100, (i1, i2) -> i1 - i2);
+
+            final var reduceParallel = IntStream.range(0, 100_000)
+                    .parallel()
+                    .reduce(100, (i1, i2) -> i1 - i2);
+
+            println("reduce = " + reduce);
+            println("reduceParallel = " + reduceParallel);
+
+            assertNotEquals(reduce, reduceParallel);
+        }
+
+        @Test
+        void testStreamReduceStringBuilder() {
+            final var reduce = reduceWithStringBuilder(IntStream.range(0, 100)
+                    .mapToObj(Objects::toString));
+
+            final var parallelStream = IntStream.range(0, 100)
+                    .mapToObj(Objects::toString)
+                    .parallel();
+
+            println("reduce = " + reduce);
+
+            assertAll(
+                    () -> assertThrows(IndexOutOfBoundsException.class, () -> reduceWithStringBuilder(parallelStream)),
+                    () -> assertEquals(190, reduce.length())
+            );
+        }
+
+        private StringBuilder reduceWithStringBuilder(Stream<String> stream) {
+            return stream.reduce(new StringBuilder(), StringBuilder::append, StringBuilder::append);
+        }
     }
 
 }

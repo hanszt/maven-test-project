@@ -35,9 +35,9 @@ public class HelloSelenium {
         }
     }
 
-    public Path helloSelenium() {
+    public Path takeScreenshot(String url) {
         try {
-            driver.get("https://selenium.dev");
+            driver.get(url);
             if (driver instanceof TakesScreenshot takesScreenshot) {
                 return ScreenshotMaker.takeScreenshotAndWriteToTargetFolder(takesScreenshot);
             }

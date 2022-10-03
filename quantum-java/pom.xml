@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.hzt.tests</groupId>
+        <artifactId>maven-test-project</artifactId>
+        <version>1.2</version>
+    </parent>
+
+    <artifactId>quantum-java</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>time</module>
+        <module>mary-qubit</module>
+    </modules>
+
+    <properties>
+        <strange.version>0.1.3</strange.version>
+        <javafx.version>19</javafx.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-controls</artifactId>
+                <version>${javafx.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.redfx</groupId>
+            <artifactId>strange</artifactId>
+            <version>${strange.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.redfx</groupId>
+            <artifactId>strangefx</artifactId>
+            <!--suppress MavenPackageUpdate -->
+            <version>${strange.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

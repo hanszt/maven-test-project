@@ -17,7 +17,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <!--        dependencies-->
-        <kafka-streams.version>3.2.0</kafka-streams.version>
+        <kafka-streams.version>3.2.3</kafka-streams.version>
     </properties>
 
     <dependencies>

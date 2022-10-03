@@ -27,12 +27,16 @@ class SeleniumChromeDriverTests {
 
     @BeforeEach
     void setup() {
-        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
+        driver.manage()
+                .timeouts()
+                .implicitlyWait(Duration.ofMillis(500));
     }
 
     @Test
     void testGetTitle() {
-        driver.get("https://www.selenium.dev/selenium/web/web-form.html");
+        final var url = "https://www.selenium.dev/selenium/web/web-form.html";
+        NetConnectionTestUtils.assumeSiteAvailable(url);
+        driver.get(url);
         final var submitFormScreenShotPath = ScreenshotMaker.takeScreenshotAndWriteToTargetFolder(driver);
 
         String title = driver.getTitle();
@@ -45,7 +49,9 @@ class SeleniumChromeDriverTests {
 
     @Test
     void testWebdriverManager() {
-        driver.get("https://www.selenium.dev/selenium/web/web-form.html");
+        final var url = "https://www.selenium.dev/selenium/web/web-form.html";
+        NetConnectionTestUtils.assumeSiteAvailable(url);
+        driver.get(url);
         driver.manage().window().maximize();
 
         WebElement textBox = driver.findElement(By.name("my-text"));

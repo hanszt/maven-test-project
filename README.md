@@ -51,6 +51,16 @@ These dependencies are not yet available at maven central. You can use these dep
 
 ---
 
+### Running tests
+
+Run `mvn clean test` to run all tests using mvn
+
+If you get a module not found error while trying to run the tests via intellij,
+then first do a `mvn clean install` from here. After that,
+check that your intellij Maven-home-path is set to your local maven installation.
+
+---
+
 ## Cleaning all modules
 
 There is a [clean all](clean-all.cmd) file which can be used to  clean all existing modules in this project.
