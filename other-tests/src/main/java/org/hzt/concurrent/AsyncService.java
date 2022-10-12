@@ -1,5 +1,6 @@
 package org.hzt.concurrent;
 
+import org.hzt.TimingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,11 +11,13 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 
+import static org.hzt.TimingUtils.sleep;
+
 public class AsyncService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncService.class);
     private static final int DELAY = 500;
-    private static final int INIT_DELAY = 1_000;
+    private static final int INIT_DELAY = 1_000; // ms
 
     private final AtomicLong value = new AtomicLong(0);
     private final Executor executor = Executors.newFixedThreadPool(4);
@@ -30,7 +33,7 @@ public class AsyncService {
 
     void initialize() {
         executor.execute(() -> {
-            sleep(INIT_DELAY);
+            sleep(Duration.ofMillis(INIT_DELAY));
             initialized = true;
         });
     }
@@ -46,7 +49,7 @@ public class AsyncService {
     void addValue(long val, Duration delay) {
         throwIfNotInitialized();
         executor.execute(() -> {
-            sleep(delay.toMillis());
+            sleep(delay);
             value.addAndGet(val);
         });
     }
@@ -54,14 +57,6 @@ public class AsyncService {
     public long getValue() {
         throwIfNotInitialized();
         return value.longValue();
-    }
-
-    private static void sleep(long delay) {
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 
     private void throwIfNotInitialized() {
@@ -90,12 +85,7 @@ public class AsyncService {
     }
 
     private static void expensiveMethodMock(int i) {
-        try {
-            final var MILLIS_SECONDS = 10;
-            Thread.sleep(MILLIS_SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        TimingUtils.sleep(Duration.ofMillis(10));
         LOGGER.info("Dit is call nr {}", i);
     }
 }

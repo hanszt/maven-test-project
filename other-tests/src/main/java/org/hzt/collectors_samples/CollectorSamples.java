@@ -1,71 +1,22 @@
 package org.hzt.collectors_samples;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.IntSummaryStatistics;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
+import org.hzt.collections.CollectorHelper;
+
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.stream.Collector;
 
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toUnmodifiableList;
+public final class CollectorSamples {
 
-public class CollectorSamples {
-
-    Optional<CashBalance> collectingAndThenToFirstElementIfSizeOne(List<CashBalance> cashBalanceDetails) {
-        return cashBalanceDetails.stream()
-                .filter(CashBalance::isOpening)
-                .collect(toFirstElementIfSizeOne());
+    private CollectorSamples() {
     }
 
-    private static <T> Collector<T, ?, Optional<T>> toFirstElementIfSizeOne() {
-        return collectingAndThen(toUnmodifiableList(), CollectorSamples::returnElementIfSizeOne);
+    public static <T, K extends Comparable<? super K>, V> Collector<T, ?, NavigableMap<K, V>>
+    toNavigableMap(Function<? super T, ? extends K> keyMapper,
+                   Function<? super T, ? extends V> valueMapper) {
+        return Collector.of(TreeMap::new,
+                (m, t) -> m.put(keyMapper.apply(t), valueMapper.apply(t)),
+                CollectorHelper::combine);
     }
-
-    private static <T> Optional<T> returnElementIfSizeOne(List<T> list) {
-        if (list.size() == 1) {
-            return Optional.of(list.get(0));
-        }
-        return Optional.empty();
-    }
-
-    <T> T reduce(List<T> list, Predicate<T> predicate) {
-        return list.stream()
-                .filter(predicate)
-                .reduce((a, b) -> throwIfMoreThanOneElement()).orElse(null);
-    }
-
-    private static <T> T throwIfMoreThanOneElement() {
-        throw new MoreThanOneElementException();
-    }
-
-    static IntSummaryStatistics getInstSummaryStatistics(Collection<Integer> integers) {
-       return integers.stream().mapToInt(i -> i).summaryStatistics();
-    }
-
-    static class MoreThanOneElementException extends RuntimeException {
-    }
-
-    public static <T> ArrayList<T> combine(ArrayList<T> arrayList1, ArrayList<T> arrayList2) {
-        arrayList1.addAll(arrayList2);
-        return arrayList1;
-    }
-
-    public static <T> HashSet<T> combine(HashSet<T> hashSet1, HashSet<T> hashSet2) {
-        hashSet1.addAll(hashSet2);
-        return hashSet1;
-    }
-
-    public static <T> ArrayList<T> accumulate(ArrayList<T> arrayList, T t) {
-        arrayList.add(t);
-        return arrayList;
-    }
-
-    public static <T> HashSet<T> accumulate(HashSet<T> hashSet, T t) {
-        hashSet.add(t);
-        return hashSet;
-    }
-
 }

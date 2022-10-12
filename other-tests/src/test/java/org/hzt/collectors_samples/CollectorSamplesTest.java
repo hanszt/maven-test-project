@@ -5,29 +5,42 @@ import org.hzt.model.Person;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Book;
 import org.hzt.utils.It;
+import org.hzt.utils.sequences.Sequence;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.nio.file.Files;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.*;
+import static org.hzt.utils.Patterns.blankStringPattern;
 import static org.hzt.utils.collectors.BigDecimalCollectors.averagingBigDecimal;
 import static org.hzt.utils.collectors.BigDecimalCollectors.summarizingBigDecimal;
 import static org.hzt.utils.function.predicates.StringPredicates.contains;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CollectorSamplesTest {
-
-    private final CollectorSamples collectorSamples = new CollectorSamples();
 
     @Test
     void testGetExpectedWhenOnlyOneInList() {
@@ -36,37 +49,59 @@ class CollectorSamplesTest {
                 expected,
                 new CashBalance("ing", false),
                 new CashBalance("triodos", false));
-        var actual = collectorSamples.collectingAndThenToFirstElementIfSizeOne(items).orElse(null);
+
+        var actual = items.stream()
+                .filter(CashBalance::isOpening)
+                .collect(CollectorSamplesTest.toFirstElementIfSizeOne()).orElse(null);
+
         items.forEach(It::println);
+
         assertEquals(expected, actual);
+    }
+
+    private static <T> Collector<T, ?, Optional<T>> toFirstElementIfSizeOne() {
+        return collectingAndThen(toUnmodifiableList(), CollectorSamplesTest::returnElementIfSizeOne);
+    }
+
+    private static <T> Optional<T> returnElementIfSizeOne(List<T> list) {
+        if (list.size() == 1) {
+            return Optional.of(list.get(0));
+        }
+        return Optional.empty();
     }
 
     @Test
     void testGetNullWhenMoreThanOneInList() {
         var expected = new CashBalance("abn", true);
-        var actual = collectorSamples.collectingAndThenToFirstElementIfSizeOne(List.of(
-                expected,
-                new CashBalance("ing", true),
-                new CashBalance("triodos", false)))
+        var actual = Stream.of(
+                        expected,
+                        new CashBalance("ing", true),
+                        new CashBalance("triodos", false))
+                .filter(CashBalance::isOpening)
+                .collect(CollectorSamplesTest.toFirstElementIfSizeOne())
                 .orElse(null);
+
         assertNull(actual);
     }
 
     @Test
     void testGetNullWhenEmptyList() {
-        var actual = collectorSamples
-                .collectingAndThenToFirstElementIfSizeOne(Collections.emptyList())
+        var actual = Stream.<CashBalance>empty()
+                .filter(CashBalance::isOpening)
+                .collect(CollectorSamplesTest.toFirstElementIfSizeOne())
                 .orElse(null);
+
         assertNull(actual);
     }
 
     @Test
     void testReduceGetExpectedWhenOnlyOneInList() {
         var expected = new CashBalance("abn", true);
-        var actual = collectorSamples.reduce(List.of(
+        var actual = reduceThrowing(Stream.of(
                 expected,
                 new CashBalance("ing", false),
-                new CashBalance("triodos", false)), CashBalance::isOpening);
+                new CashBalance("triodos", false))).orElse(null);
+
         assertEquals(expected, actual);
     }
 
@@ -76,13 +111,24 @@ class CollectorSamplesTest {
                 new CashBalance("abn", true),
                 new CashBalance("ing", true),
                 new CashBalance("triodos", false));
-        assertThrows(CollectorSamples.MoreThanOneElementException.class,
-                () -> collectorSamples.reduce(list, CashBalance::isOpening));
+
+        final var stream = list.stream();
+        assertThrows(MoreThanOneElementException.class, () -> reduceThrowing(stream));
+    }
+
+    @NotNull
+    private static Optional<CashBalance> reduceThrowing(Stream<CashBalance> stream) {
+        return stream
+                .filter(CashBalance::isOpening)
+                .reduce((a, b) -> {
+                    throw new MoreThanOneElementException();
+                });
     }
 
     @Test
     void testReduceGetNullWhenEmptyList() {
-        assertNull(collectorSamples.reduce(Collections.emptyList(), CashBalance::isOpening));
+        final var reduce = reduceThrowing(Stream.of(new CashBalance("a bank", false)));
+        assertTrue(reduce::isEmpty);
     }
 
     @Test
@@ -91,7 +137,11 @@ class CollectorSamplesTest {
                 new CashBalance("abn", false),
                 new CashBalance("ing", false),
                 new CashBalance("triodos", false));
-        assertNull(collectorSamples.reduce(list, CashBalance::isOpening));
+
+        assertNull(reduceThrowing(list.stream()).orElse(null));
+    }
+
+    private static class MoreThanOneElementException extends RuntimeException {
     }
 
     @Test
@@ -111,6 +161,7 @@ class CollectorSamplesTest {
         var average = new BigDecimal("2000.00");
         final var min = new BigDecimal("1000");
         final var max = new BigDecimal("3000");
+
         var list = List.of(
                 new BigDecimal("2000"), min,
                 new BigDecimal("1500"), max,
@@ -118,11 +169,14 @@ class CollectorSamplesTest {
         //act
         var summaryStatistics = list.stream()
                 .collect(summarizingBigDecimal());
-        assertEquals(average, summaryStatistics.getAverage());
-        assertEquals(min, summaryStatistics.getMin());
-        assertEquals(max, summaryStatistics.getMax());
-        assertEquals(list.size(), (int) summaryStatistics.getCount());
-        assertEquals(new BigDecimal("10000"), summaryStatistics.getSum());
+
+        assertAll(
+                () -> assertEquals(average, summaryStatistics.getAverage()),
+                () -> assertEquals(min, summaryStatistics.getMin()),
+                () -> assertEquals(max, summaryStatistics.getMax()),
+                () -> assertEquals(list.size(), (int) summaryStatistics.getCount()),
+                () -> assertEquals(new BigDecimal("10000"), summaryStatistics.getSum())
+        );
     }
 
     @Test
@@ -145,8 +199,10 @@ class CollectorSamplesTest {
         var partitionedByMap = strings.stream()
                 .collect(partitioningBy(contains("e")));
 
-        assertEquals(List.of("hoe", "het", "een", "test", "hoe", "je"), partitionedByMap.get(true));
-        assertEquals(List.of("hallo", "is", "?", "dit", "is", "vind", "dat"), partitionedByMap.get(false));
+        assertAll(
+                () -> assertEquals(List.of("hoe", "het", "een", "test", "hoe", "je"), partitionedByMap.get(true)),
+                () -> assertEquals(List.of("hallo", "is", "?", "dit", "is", "vind", "dat"), partitionedByMap.get(false))
+        );
     }
 
     @Test
@@ -166,12 +222,14 @@ class CollectorSamplesTest {
                 .collect(groupingBy(Book::getCategory,
                         mapping(Book::getTitle, toUnmodifiableList())));
         //assert
-        assertTrue(bookTitleByCategory.get("Fiction")
-                .containsAll(List.of("Harry Potter", "Lord of the Rings", "The da Vinci Code")));
-        assertTrue(bookTitleByCategory.get("Programming")
-                .containsAll(List.of("Pragmatic Programmer", "OCP 11 Volume 1")));
-        assertTrue(bookTitleByCategory.get("Educational")
-                .contains("Homo Deus"));
+        assertAll(
+                () -> assertTrue(bookTitleByCategory.get("Fiction")
+                        .containsAll(List.of("Harry Potter", "Lord of the Rings", "The da Vinci Code"))),
+                () -> assertTrue(bookTitleByCategory.get("Programming")
+                        .containsAll(List.of("Pragmatic Programmer", "OCP 11 Volume 1"))),
+                () -> assertTrue(bookTitleByCategory.get("Educational")
+                        .contains("Homo Deus"))
+        );
     }
 
     @Test
@@ -197,13 +255,19 @@ class CollectorSamplesTest {
                         filtering(Person::isPlayingPiano,
                                 mapping(Person::getFirstName,
                                         toUnmodifiableList()))));
+
         final var peoplePlayingPiano = groupedByLastNamePlayingPianoToFirstName.values().stream()
                 .flatMap(Collection::stream)
                 .collect(toUnmodifiableSet());
         //assert
         final var expectedKeySet = Set.of("Burgmeijer", "Ruigrok", "Jacobs", "Vullings", "Bello", "Zuidervaart");
-        assertEquals(expectedKeySet, groupedByLastNamePlayingPianoToFirstName.keySet());
-        assertEquals(Set.of("Sophie", "Hans", "Henk", "Nikolai"), peoplePlayingPiano);
+
+        assertAll(
+                () -> assertEquals(expectedKeySet, groupedByLastNamePlayingPianoToFirstName.keySet()),
+                () -> assertEquals(Set.of("Sophie", "Hans", "Henk", "Nikolai"), peoplePlayingPiano)
+        );
+
+
     }
 
     @Test
@@ -213,6 +277,7 @@ class CollectorSamplesTest {
                 new Person("Matthijs", "Bayer", LocalDate.of(1993, 4, 4), true),
                 new Employee("Joop", "Schat", LocalDate.of(1994, 1, 2)));
         final var listOfPersonLists = List.of(Person.createTestPersonList(), otherPersonList);
+
         var groupedByLastNamePlayingPianoToFirstName2 = listOfPersonLists.stream()
                 .flatMap(Collection::stream)
                 .filter(Person::isPlayingPiano)
@@ -226,8 +291,256 @@ class CollectorSamplesTest {
                                         toUnmodifiableSet()))));
         //assert
         final var expectedKeySet = Set.of("Sophie", "Henk", "Matthijs", "Nikolai", "Hans");
-        assertEquals(expectedKeySet, groupedByLastNamePlayingPianoToFirstName);
-        assertEquals(groupedByLastNamePlayingPianoToFirstName, groupedByLastNamePlayingPianoToFirstName2);
+
+        assertAll(
+                () -> assertEquals(expectedKeySet, groupedByLastNamePlayingPianoToFirstName),
+                () -> assertEquals(groupedByLastNamePlayingPianoToFirstName, groupedByLastNamePlayingPianoToFirstName2)
+        );
+    }
+
+    @Test
+    void testParallelStreamWithNonCurrentCollectorRequiredCombiningPhase() throws IOException {
+        final List<String> words = readWordsInWorksOfShakespeare();
+
+        final var parallelStream = words.parallelStream()
+                .filter(not(String::isBlank));
+
+        //noinspection ResultOfMethodCallIgnored
+        Consumer<Stream<String>> toListThrowInCombingPhase = s -> s.collect(toListThrowWhenCombining());
+        assertThrows(UnsupportedOperationException.class, () -> toListThrowInCombingPhase.accept(parallelStream));
+    }
+
+    @Test
+    void testSequentialStreamWithNonCurrentCollectorDoesNotUseCombingPhase() throws IOException {
+        final List<String> words = readWordsInWorksOfShakespeare();
+
+        final var expected = words.stream()
+                .filter(not(String::isBlank))
+                .collect(toList());
+
+        final var actual = words.stream()
+                .filter(not(String::isBlank))
+                .collect(toListThrowWhenCombining());
+
+        System.out.println("actual.size() = " + actual.size());
+
+        assertEquals(expected, actual);
+    }
+
+    public static <T> Collector<T, List<T>, List<T>> toListThrowWhenCombining() {
+        final BinaryOperator<List<T>> combiner = (l, r) -> {
+            throw new UnsupportedOperationException("Combining phase not supported");
+        };
+        return Collector.of(ArrayList::new, List::add, combiner, Collector.Characteristics.IDENTITY_FINISH);
+    }
+
+    @Nested
+    class ConcurrentCollectorTests {
+
+        @Test
+        void testGroupingByToConcurrentMap() throws IOException {
+            final var words = readWordsInWorksOfShakespeare();
+
+            final var expected = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .collect(groupingByConcurrent(String::length, toSet()));
+
+            final var actual = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .collect(ConcurrentCollectors.groupingByConcurrentToSet(String::length));
+
+            System.out.println("expected.size() = " + expected.size());
+
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        void testToUnorderedListConcurrent() throws IOException {
+            final var words = readWordsInWorksOfShakespeare();
+
+            final var maxSize = 1_000;
+
+            final var sequentialUsingConcurrentCollector = words.stream()
+                    .filter(not(String::isBlank))
+                    .limit(maxSize)
+                    .collect(ConcurrentCollectors.toUnorderedConcurrentList());
+
+            final var sequentialList = words.stream()
+                    .filter(not(String::isBlank))
+                    .limit(maxSize)
+                    .collect(Collectors.toList());
+
+            final var actual = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .limit(maxSize)
+                    .collect(ConcurrentCollectors.toUnorderedConcurrentList());
+
+            System.out.println("list size = " + actual.size());
+
+            assertAll(
+                    () -> assertTrue(sequentialList.containsAll(actual)),
+                    () -> assertTrue(actual.containsAll(sequentialList)),
+                    () -> assertEquals(sequentialList, sequentialUsingConcurrentCollector)
+            );
+        }
+
+        @Test
+        void testCollectToConcurrentSkipListMap() throws IOException {
+            final var words = readWordsInWorksOfShakespeare();
+
+            final var expected = words.stream()
+                    .filter(not(String::isBlank))
+                    .distinct()
+                    .collect(CollectorSamples.toNavigableMap(It::self, String::length));
+
+            final var actual = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .distinct()
+                    .collect(ConcurrentCollectors.toConcurrentMap(It::self, String::length, ConcurrentSkipListMap::new));
+
+            System.out.println("actual size = " + actual.size());
+
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        void testToOrderedListConcurrent() throws IOException {
+            final var words = readWordsInWorksOfShakespeare();
+
+            final var expected = words.stream()
+                    .filter(not(String::isBlank))
+                    .collect(Collectors.toList());
+
+            final var list = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .collect(ConcurrentCollectors.toOrderedConcurrentList());
+
+            System.out.println("list size = " + list.size());
+
+            assertEquals(expected, list);
+        }
+
+        @Test
+        void testToConcurrentSkipListSet() throws IOException {
+            final var words = readWordsInWorksOfShakespeare();
+
+            final var maxSize = 1_000;
+
+            final NavigableSet<String> expected = words.stream()
+                    .filter(not(String::isBlank))
+                    .limit(maxSize)
+                    .collect(Collectors.collectingAndThen(Collectors.toSet(), TreeSet::new));
+
+            final NavigableSet<String> actual = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .limit(maxSize)
+                    .collect(ConcurrentCollectors.toConcurrentSkipListSet());
+
+            System.out.println("set size = " + actual.size());
+
+            assertAll(
+                    () -> assertEquals(expected, actual),
+                    () -> assertTrue(Sequence.of(actual).isSortedBy(It::self))
+            );
+        }
+
+        @Test
+        void testToConcurrentLinkedQueue() throws IOException {
+            final var words = readWordsInWorksOfShakespeare();
+
+            final var maxSize = 1_000;
+
+            final var expected = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .limit(maxSize)
+                    .toList();
+
+            final var actual = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .limit(maxSize)
+                    .sorted()
+                    .collect(ConcurrentCollectors.toQueueConcurrent());
+
+            System.out.println("list size = " + actual.size());
+
+            assertAll(
+                    () -> assertFalse(Sequence.of(actual).isSortedBy(It::self)),
+                    () -> assertTrue(expected.containsAll(actual)),
+                    () -> assertTrue(actual.containsAll(expected))
+            );
+        }
+
+        @Test
+        void testToConcurrentSet() throws IOException {
+            final var words = readWordsInWorksOfShakespeare();
+
+            System.out.println("words count = " + words.size());
+
+            final var concurrentSet = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .collect(ConcurrentCollectors.toSetConcurrent());
+
+            final var set = words.stream()
+                    .filter(not(String::isBlank))
+                    .collect(ConcurrentCollectors.toSetConcurrent());
+
+            final var sequentialSet = words.stream()
+                    .filter(not(String::isBlank))
+                    .collect(Collectors.toSet());
+
+            System.out.println("set size = " + set.size());
+
+            assertAll(
+                    () -> assertEquals(concurrentSet, sequentialSet),
+                    () -> assertEquals(sequentialSet, set)
+            );
+        }
+
+        @Test
+        void testToConcurrentMap() throws IOException {
+            final var words = readWordsInWorksOfShakespeare();
+
+            final var actualSequential = words.stream()
+                    .filter(not(String::isBlank))
+                    .distinct()
+                    .collect(ConcurrentCollectors.toConcurrentMap(s -> s, String::length));
+
+            final var expected = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .distinct()
+                    .collect(Collectors.toConcurrentMap(s -> s, String::length));
+
+            final var actual = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .distinct()
+                    .collect(ConcurrentCollectors.toConcurrentMap(s -> s, String::length));
+
+            System.out.println("expected.size() = " + expected.size());
+
+            assertAll(
+                    () -> assertEquals(expected, actual),
+                    () -> assertEquals(expected, actualSequential)
+            );
+        }
+
+    }
+
+    @NotNull
+    private List<String> readWordsInWorksOfShakespeare() throws IOException {
+        final var name = "/shakespeareworks.txt";
+
+        final var path = Optional.ofNullable(getClass().getResource(name))
+                .map(URL::getFile)
+                .map(File::new)
+                .map(File::toPath)
+                .orElseThrow(() -> new IllegalStateException("Could not load " + name));
+
+        try (final var lines = Files.lines(path)) {
+            return lines
+                    .flatMap(blankStringPattern::splitAsStream)
+                    .filter(not(String::isBlank))
+                    .toList();
+        }
     }
 
 }

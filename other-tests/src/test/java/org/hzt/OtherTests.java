@@ -1,12 +1,14 @@
 package org.hzt;
 
-import org.hzt.collectors_samples.CollectorSamples;
+import org.hzt.collections.CollectorHelper;
 import org.hzt.model.Bic;
 import org.hzt.model.Person;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Book;
 import org.hzt.test.model.Painting;
 import org.hzt.utils.It;
+import org.hzt.utils.iterables.Collectable;
+import org.hzt.utils.ranges.IntRange;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -177,12 +179,22 @@ class OtherTests {
 
         final int BATCH_SIZE = 100;
 
+        final var expected = IntRange.of(0, 950)
+                .mapToObj(i -> "item " + i)
+                .chunked(BATCH_SIZE)
+                .map(Collectable::toList)
+                .toList();
+
         List<List<String>> batches = IntStream.range(0, (data.size() + BATCH_SIZE - 1) / BATCH_SIZE)
                 .mapToObj(i -> data.subList(i * BATCH_SIZE, Math.min(data.size(), (i + 1) * BATCH_SIZE)))
                 .toList();
 
-        assertEquals(10, batches.size());
         printBatches(batches);
+
+        assertAll(
+                () -> assertEquals(10, batches.size()),
+                () -> assertEquals(expected, batches)
+        );
     }
 
     private void printBatches(List<List<String>> batches) {
@@ -255,8 +267,9 @@ class OtherTests {
 
     /**
      * Can lead to memory leaks:
+     *
      * @see <a href="https://stackoverflow.com/questions/6802483/how-to-directly-initialize-a-hashmap-in-a-literal-way">
-     *     For up to Java Version 8</a>
+     * For up to Java Version 8</a>
      */
     @Test
     void testMapAndCollectionIllegalInitialisation() {
@@ -286,6 +299,7 @@ class OtherTests {
                 .filter(Book::isAboutProgramming)
                 .map(Book::getTitle)
                 .forEach(bookTitles::add);
+
         assertTrue(bookTitles.containsAll(List.of("Pragmatic Programmer", "OCP 11 Volume 1")));
     }
 
@@ -297,7 +311,8 @@ class OtherTests {
         final var reducedList = TestSampleGenerator.createBookList().stream()
                 .filter(Book::isAboutProgramming)
                 .map(Book::getTitle)
-                .reduce(new ArrayList<>(), CollectorSamples::accumulate, CollectorSamples::combine);
+                .reduce(new ArrayList<String>(), CollectorHelper::accumulate, CollectorHelper::combine);
+
         assertTrue(reducedList.containsAll(List.of("Pragmatic Programmer", "OCP 11 Volume 1")));
     }
 
@@ -309,15 +324,63 @@ class OtherTests {
         final var reducedSet = TestSampleGenerator.createBookList().stream()
                 .filter(Book::isAboutProgramming)
                 .map(Book::getTitle)
-                .reduce(new HashSet<>(), CollectorSamples::accumulate, CollectorSamples::combine);
+                .reduce(new HashSet<String>(), CollectorHelper::accumulate, CollectorHelper::combine);
+
         assertTrue(reducedSet.containsAll(List.of("Pragmatic Programmer", "OCP 11 Volume 1")));
     }
 
     @Test
-    void testGenerateArrayContainingOneBillionElements() {
+    void testCreatingMapUsingReduce() {
+        //does not maintain order
+        // right way in the sense that it provides only local mutability.
+        // But can be delegated to Collect(toUnmodifiableList()); //This does maintain order
+        final var bookList = TestSampleGenerator.createBookList();
+
+        final var reducedMap = bookList.stream()
+                .filter(Book::isAboutProgramming)
+                .reduce(new HashMap<String, Book>(),
+                        (map, book) -> CollectorHelper.accumulate(map, book.getTitle(), book),
+                        CollectorHelper::combine);
+
+        final var expected = bookList.stream()
+                .filter(Book::isAboutProgramming)
+                .collect(Collectors.toMap(Book::getTitle, It::self));
+
+        assertEquals(expected, reducedMap);
+    }
+
+    @Test
+    void testGenerateArrayContainingOneBillionElementsByStream() {
         final var ONE_BILLION = 1_000_000_000;
         var array = IntStream.range(0, ONE_BILLION).parallel().toArray();
         assertEquals(ONE_BILLION, array.length);
+    }
+
+    @Test
+    void testGenerateArrayContainingMaxElements() {
+        final var MAX_MINUS_TWO = Integer.MAX_VALUE - 2;
+        final var bytes = new byte[MAX_MINUS_TWO];
+        setAll(bytes, b -> (byte) (b + 1));
+
+        System.out.println(Arrays.toString(Arrays.copyOf(bytes, 200)));
+
+        assertAll(
+                () -> assertEquals(MAX_MINUS_TWO, bytes.length),
+                () -> assertEquals((byte) -3, bytes[MAX_MINUS_TWO - 1])
+        );
+    }
+
+    public static void setAll(byte[] array, IntToByteFunction generator) {
+        Objects.requireNonNull(generator);
+        for (int i = 0; i < array.length; i++) {
+            array[i] = generator.applyAsByte(i);
+        }
+    }
+
+    @FunctionalInterface
+    interface IntToByteFunction {
+
+        byte applyAsByte(int value);
     }
 
     @Test
@@ -356,8 +419,15 @@ class OtherTests {
 
     @Test
     void testObjectToString() {
-        final var painting = TestSampleGenerator.createPaintingList().stream().findAny().orElseThrow();
-        final var person = Person.createTestPersonList().stream().findAny().orElseThrow();
+        final var painting = TestSampleGenerator.createPaintingList().stream()
+                .findAny()
+                .orElseThrow();
+
+        final var person = Person.createTestPersonList()
+                .stream()
+                .findAny()
+                .orElseThrow();
+
         List<Object> objects = List.of(painting, person, LocalDate.of(1989, 10, 18), new BigInteger("2000"));
 
         final var string = objects.stream()
@@ -463,7 +533,7 @@ class OtherTests {
      * A JDK bug is reported in response
      *
      * @see <a href="https://stackoverflow.com/questions/73654810/why-does-string-creation-using-newinstance-method-behave-different-when-usin">
-     *     Why does String creation using `newInstance()` method behave different when using `var` compared to using explicit type `String`?</a>
+     * Why does String creation using `newInstance()` method behave different when using `var` compared to using explicit type `String`?</a>
      * @see <a href="https://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8293578">JDK-8293578 : Duplicate ldc generated by javac</a>
      * @see <a href="https://bugs.openjdk.org/browse/JDK-8293578">Duplicate ldc generated by javac</a>
      */

@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import static org.hzt.utils.It.println;
+
 public class DataImporter {
 
     private final ActorSystem actorSystem;
@@ -61,12 +63,14 @@ public class DataImporter {
         return Source.single(content)
                 .via(calculateAverage())
                 .runWith(storeAverages(), Materializer.createMaterializer(actorSystem))
-                .whenComplete((d, e) -> {
-                    if (d != null) {
-                        System.out.println("Import finished ");
-                    } else {
-                        e.printStackTrace();
-                    }
-                });
+                .whenComplete(DataImporter::printResult);
+    }
+
+    private static void printResult(Done done, Throwable throwable) {
+        if (done != null) {
+            println("Import finished ");
+        } else {
+            throwable.printStackTrace();
+        }
     }
 }

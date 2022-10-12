@@ -3,14 +3,17 @@ package org.hzt.concurrent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+
+import static org.hzt.TimingUtils.sleep;
 
 /**
  * Completable future in Java is like first promise in Javascript
  *
  * @see <a href="https://www.youtube.com/watch?v=0hQvWIdwnw4">
- *         Parallel and Asynchronous Programming with Streams and CompletableFuture with Venkat Subramaniam</a>
+ * Parallel and Asynchronous Programming with Streams and CompletableFuture with Venkat Subramaniam</a>
  *
  * <p>Stream equivalence:</p>
  * <ul>
@@ -46,7 +49,7 @@ public class CompletableFutureSample {
 
     private static String computationallyIntensiveMethod() {
         final var STRING = "This is first String that is computationally intensive: 1";
-        sleep(1000);
+        sleep(Duration.ofSeconds(1));
         return STRING;
     }
 
@@ -57,7 +60,7 @@ public class CompletableFutureSample {
         CompletableFuture<Integer> goog = CompletableFuture.supplyAsync(() -> getStockPrice("GOOG", 1));
         CompletableFuture<Integer> tesla = CompletableFuture.supplyAsync(() -> getStockPrice("TESLA", 1));
         CompletableFuture<Integer> completableFuture = goog.thenCombine(tesla, Integer::sum);
-        sleep(1_000);
+        sleep(Duration.ofSeconds(1));
         return completableFuture;
     }
 
@@ -75,16 +78,8 @@ public class CompletableFutureSample {
                 .thenCompose(CompletableFuture::toCompletableFuture);
 
         CompletableFuture<Integer> completableFuture = goog.thenCombine(tesla, Integer::sum);
-        sleep(2_000);
+        sleep(Duration.ofSeconds(2));
         return completableFuture;
-    }
-
-    private static void sleep(int millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 
     private static CompletableFuture<Integer> getCompFutForStockPrice(String ticker, int numberOfShares) {
@@ -96,7 +91,7 @@ public class CompletableFutureSample {
         if ("GOOG".equals(ticker)) {
             price = 500;
         }
-        sleep(price * 2);
+        sleep(Duration.ofMillis(price * 2L));
         return numberOfShares * price;
     }
 
