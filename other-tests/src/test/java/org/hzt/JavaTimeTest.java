@@ -2,6 +2,8 @@ package org.hzt;
 
 import org.hzt.utils.It;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -13,22 +15,18 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.stream.IntStream;
 
 import static java.time.DayOfWeek.MONDAY;
 import static java.time.DayOfWeek.SUNDAY;
 import static java.time.DayOfWeek.WEDNESDAY;
-import static java.time.Month.FEBRUARY;
-import static java.time.Month.OCTOBER;
-import static java.time.Month.SEPTEMBER;
+import static java.time.Month.*;
 import static java.util.stream.Collectors.partitioningBy;
 import static org.awaitility.Awaitility.await;
 import static org.hzt.utils.It.println;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class JavaTimeTest {
 
@@ -120,6 +118,24 @@ class JavaTimeTest {
         println("LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli() = " + toEpochMilli);
 
         assertEquals(epochMilli, toEpochMilli);
+    }
+
+    @Nested
+    class JodaTimeToJavaTimeTests {
+
+        @Test
+        @DisplayName("Joda time format vs java time format")
+        void jodaTimeFormatVsJavaTimeFormat() {
+            org.joda.time.LocalDate date = new org.joda.time.LocalDate(2022, 1, 1);
+            LocalDate localDate = LocalDate.of(2022, JANUARY, 1);
+
+            final var actual = localDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            final var expected = date.toString("dd-MM-yyyy");
+
+            It.println(actual);
+
+            assertEquals(expected, actual);
+        }
     }
 
 }

@@ -4,7 +4,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.Clock;
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ import java.time.chrono.JapaneseDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalQuery;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import static java.lang.System.out;
 import static java.time.format.DateTimeFormatter.ofPattern;
@@ -74,28 +76,30 @@ class Java8PlusDateTimeApiTests {
     }
 
     /**
-     * @param dateToConversion the input of the parameterized test
+     * @param japaneseDate the input of the parameterized test
+     * @param expected the expected result
      * @see <a href="https://stackoverflow.com/questions/57174739/how-to-parse-japanese-era-date-string-values-into-localdate-localdatetime">
      * How to parse 🎌 Japanese Era Date string values into LocalDate & LocalDateTime</a>
      */
     @ParameterizedTest
-    @ValueSource(strings = {
-            "明治23年11月29日 -> 1890-11-29",
-            "昭和22年5月3日 -> 1947-05-03",
-            "令和5年1月11日 -> 2023-01-11"
-    })
-    void testLocalDatesFromJapaneseDates(String dateToConversion) {
-        final var split = dateToConversion.split(" -> ");
-        final var input = split[0];
-        final var expected = split[1];
+    @MethodSource("argumentsLocalDatesFromJapaneseDates")
+    void testLocalDatesFromJapaneseDates(String japaneseDate, String expected) {
 
-        DateTimeFormatter japaneseEraDtf = DateTimeFormatter.ofPattern("GGGGy年M月d日")
+        final var japaneseEraDtf = DateTimeFormatter.ofPattern("GGGGy年M月d日")
                 .withChronology(JapaneseChronology.INSTANCE)
                 .withLocale(Locale.JAPAN);
 
-        final var localDate = LocalDate.parse(input, japaneseEraDtf);
+        final var localDate = LocalDate.parse(japaneseDate, japaneseEraDtf);
 
         assertEquals(expected, localDate.toString());
+    }
+
+    private static Stream<Arguments> argumentsLocalDatesFromJapaneseDates() {
+        return Stream.of(
+                Arguments.arguments("明治23年11月29日", "1890-11-29"),
+                Arguments.arguments("昭和22年5月3日", "1947-05-03"),
+                Arguments.arguments("令和5年1月11日", "2023-01-11")
+        );
     }
 
     @AfterAll

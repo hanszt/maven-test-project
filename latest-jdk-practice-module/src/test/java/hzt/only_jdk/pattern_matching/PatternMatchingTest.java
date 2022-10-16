@@ -2,23 +2,24 @@ package hzt.only_jdk.pattern_matching;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Set;
+import java.util.TreeSet;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PatternMatchingTest {
 
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "param1 -> 6",
-            "par -> 7",
-            "This is a test! -> 15"
+    @CsvSource({
+            "param1, 6",
+            "par, 7",
+            "This is a test!, 15"
     })
-    void testStringToInteger(String string) {
-        final var split = string.split(" -> ");
-        final var input = split[0];
-        final var expected = Integer.parseInt(split[1]);
+    void testStringToInteger(String input, String actual) {
+        final var expected = Integer.parseInt(actual);
 
         final var length = PatternMatching.toInteger(input);
 
@@ -29,6 +30,19 @@ class PatternMatchingTest {
     void testNullToInteger() {
         final var value = PatternMatching.toInteger(null);
         assertEquals(0, value);
+    }
+
+    @Test
+    void testIntArrayToInteger() {
+        final var value = PatternMatching.toInteger(new int[] {2,2,3,4});
+        assertEquals(2, value);
+    }
+
+    @Test
+    void testNavigableSetToInteger() {
+        final var set = new TreeSet<>(Set.of(248, 247, 10023));
+        final var value = PatternMatching.toInteger(set);
+        assertEquals(247, value);
     }
 
     @Test
@@ -58,7 +72,7 @@ class PatternMatchingTest {
 
         final var value = PatternMatching.toInteger(rectangle);
 
-        assertEquals(10, value);
+        assertEquals(8, value);
     }
 
 }

@@ -20,7 +20,7 @@
         <module>java-web</module>
         <module>scheduling-samples</module>
         <module>transaction-samples</module>
-        <module>jasper-reports</module>
+        <module>pdf-exporters</module>
         <module>kafka-samples</module>
         <module>selenium-samples</module>
         <module>quantum-java</module>

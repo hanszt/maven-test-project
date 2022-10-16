@@ -27,6 +27,9 @@
 *.ipr
 help
 
+### Fleet ###
+.fleet
+
 # Logs and databases #
 ######################
 *.log

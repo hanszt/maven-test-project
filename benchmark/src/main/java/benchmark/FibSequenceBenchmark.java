@@ -13,18 +13,14 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Random;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 
-@SuppressWarnings("unused")
 @State(Scope.Benchmark)
 public class FibSequenceBenchmark {
 
-    private static final Random RANDOM = new Random(0);
     public static final String LIST_SIZE_AS_STRING = "1000";
-    private static final int FIB_NR_COUNT = Integer.parseInt(LIST_SIZE_AS_STRING);
 
     @Param({LIST_SIZE_AS_STRING})
     private int fibonacciNrCount;

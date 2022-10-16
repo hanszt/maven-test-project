@@ -20,6 +20,7 @@
         <nashorn-core.version>15.4</nashorn-core.version>
         <vavr.version>0.10.4</vavr.version>
         <eclipse-collections.version>11.1.0</eclipse-collections.version>
+        <joda-time.version>2.12.0</joda-time.version>
     </properties>
 
     <dependencies>
@@ -83,6 +84,14 @@
             <artifactId>nashorn-core</artifactId>
             <version>${nashorn-core.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
