@@ -2,10 +2,14 @@ package org.hzt;
 
 import org.apache.commons.math3.complex.Complex;
 import org.hzt.utils.It;
-import org.hzt.utils.strings.StringX;
+import org.hzt.utils.sequences.Sequence;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.converter.ArgumentConverter;
+import org.junit.jupiter.params.converter.ConvertWith;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -13,9 +17,8 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 import static org.hzt.utils.It.println;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class RecursiveSamplesTest {
 
@@ -83,54 +86,51 @@ class RecursiveSamplesTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "2, 4 -> 2",
-            "12, 36 -> 12",
-            "35, 12 -> 1",
-            "-5, 5 -> 5"})
-    void testGreatestCommonDivisor(String input) {
-        final var strings = StringX.of(input).split(", ", " -> ");
-        final var first = Long.parseLong(strings.get(0));
-        final var second = Long.parseLong(strings.get(1));
-        final var gcd = RecursiveSamples.gcdByEuclidsAlgorithm(first, second);
-
-        final var expected = Long.parseLong(strings.get(2));
-
+    @MethodSource("commonDivisorParams")
+    void testGreatestCommonDivisor(long first, long second, long expected) {
+        final var gcd = RecursiveSamples.gcdByEuclidesAlgorithm(first, second);
         assertEquals(expected, gcd);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "2, 4 -> 2",
-            "12, 36 -> 12",
-            "35, 12 -> 1",
-            "-5, 5 -> 5"})
-    void testGreatestIntCommonDivisor(String input) {
-        final var strings = StringX.of(input).split(", ", " -> ");
-        final var first = Integer.parseInt(strings.get(0));
-        final var second = Integer.parseInt(strings.get(1));
-        final var gcd = RecursiveSamples.gcdByEuclidsAlgorithm(first, second);
-
-        final var expected = Integer.parseInt(strings.get(2));
-
+    @MethodSource("commonDivisorParams")
+    void testGreatestIntCommonDivisor(int first, int second, int expected) {
+        final var gcd = RecursiveSamples.gcdByEuclidesAlgorithm(first, second);
         assertEquals(expected, gcd);
     }
 
+    static Sequence<Arguments> commonDivisorParams() {
+        return Sequence.of(
+                arguments(2, 4, 2),
+                arguments(12, 36, 12),
+                arguments(35, 12, 1),
+                arguments(-5, 5, 5)
+        );
+    }
+
     @ParameterizedTest
-    @ValueSource(strings = {
-            "2, 4 -> 2",
-            "12, 36 -> 12",
-            "35, 12 -> 1",
-            "-5, 5 -> 5",
-            "31940434634990099905, 51680708854858323072 -> 1"})
-    void testGreatestCommonDivisorBigInt(String input) {
-        final var strings = StringX.of(input).split(", ", " -> ");
-        final var first = new BigInteger(strings.get(0));
-        final var second = new BigInteger(strings.get(1));
-        final var gcd = RecursiveSamples.gcdByEuclidsAlgorithm(first, second);
-
-        final var expected = new BigInteger(strings.get(2));
-
+    @MethodSource("bigIntCommonDivisorParams")
+    void testGreatestCommonDivisorBigInt(
+            @ConvertWith(BigIntegerConverter.class) BigInteger first,
+            @ConvertWith(BigIntegerConverter.class) BigInteger second,
+            @ConvertWith(BigIntegerConverter.class) BigInteger expected) {
+        final var gcd = RecursiveSamples.gcdByEuclidesAlgorithm(first, second);
         assertEquals(expected, gcd);
+    }
+
+    static class BigIntegerConverter implements ArgumentConverter {
+
+        @Override
+        public Object convert(Object source, ParameterContext context) {
+            return source instanceof Integer integer ? BigInteger.valueOf(integer) : source;
+        }
+    }
+
+    static Sequence<Arguments> bigIntCommonDivisorParams() {
+        return commonDivisorParams()
+                .plus(arguments(
+                        new BigInteger("31940434634990099905"),
+                        new BigInteger("51680708854858323072"),
+                        1));
     }
 }

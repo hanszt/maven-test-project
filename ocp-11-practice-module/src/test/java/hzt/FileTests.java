@@ -1,6 +1,8 @@
 package hzt;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,4 +40,11 @@ class FileTests {
                 () -> assertTrue(parentDeleted)
         );
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"file1", "file2"})
+    void testImplicitConversionToFile(File file) {
+        assertFalse(file.exists());
+    }
+
 }

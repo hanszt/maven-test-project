@@ -1,6 +1,8 @@
 package hzt.java.nio.file.tests;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +22,7 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PathTests {
 
@@ -159,5 +162,11 @@ class PathTests {
 
     private Path getSymbolicLink(Path target, Path link) throws IOException {
         return Files.createSymbolicLink(link, target);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"src/test/java/hzt/EnumTests.java", "README.md"})
+    void testImplicitConversionToPath_pathsExist(Path path) {
+        assertTrue(path.toFile().exists());
     }
 }

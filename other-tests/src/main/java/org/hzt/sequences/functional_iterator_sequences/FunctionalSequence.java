@@ -1,5 +1,6 @@
 package org.hzt.sequences.functional_iterator_sequences;
 
+import org.hzt.utils.sequences.Sequence;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -23,6 +24,10 @@ import java.util.stream.StreamSupport;
 @FunctionalInterface
 public interface FunctionalSequence<T> extends FunctionalIterable<T> {
 
+    @SafeVarargs
+    static <T> FunctionalSequence<T> of(@NotNull T... array) {
+        return getFunctionalSequence(Sequence.of(array).iterator());
+    }
     static <T> FunctionalSequence<T> of(@NotNull Iterable<T> iterable) {
         return getFunctionalSequence(iterable.iterator());
     }
@@ -52,8 +57,8 @@ public interface FunctionalSequence<T> extends FunctionalIterable<T> {
 
     default T reduce(@NotNull T init, @NotNull BinaryOperator<T> binaryOperator) {
         T result = init;
-        FunctionalIterator<T> iterator = functionalIterator();
-        HoldingConsumer<T> consumer = new HoldingConsumer<>();
+        final FunctionalIterator<T> iterator = functionalIterator();
+        final HoldingConsumer<T> consumer = new HoldingConsumer<>();
         while (iterator.tryAdvance(consumer)) {
             result = binaryOperator.apply(result, consumer.getAndClear());
         }
@@ -62,8 +67,8 @@ public interface FunctionalSequence<T> extends FunctionalIterable<T> {
 
     default <C extends Collection<T>> C to(@NotNull Supplier<C> collectionSupplier) {
         final var collection = collectionSupplier.get();
-        FunctionalIterator<T> iterator = functionalIterator();
-        HoldingConsumer<T> consumer = new HoldingConsumer<>();
+        final FunctionalIterator<T> iterator = functionalIterator();
+        final HoldingConsumer<T> consumer = new HoldingConsumer<>();
         while (iterator.tryAdvance(consumer)) {
             collection.add(consumer.getAndClear());
         }
@@ -113,5 +118,9 @@ public interface FunctionalSequence<T> extends FunctionalIterable<T> {
                 return hasNext;
             }
         };
+    }
+
+    default Sequence<T> asSequence() {
+        return this::iterator;
     }
 }

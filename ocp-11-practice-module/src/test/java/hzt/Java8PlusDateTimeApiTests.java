@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.Clock;
 import java.time.LocalDate;
@@ -22,8 +23,8 @@ import java.util.stream.Stream;
 
 import static java.lang.System.out;
 import static java.time.format.DateTimeFormatter.ofPattern;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.*;
 
 class Java8PlusDateTimeApiTests {
 
@@ -96,10 +97,20 @@ class Java8PlusDateTimeApiTests {
 
     private static Stream<Arguments> argumentsLocalDatesFromJapaneseDates() {
         return Stream.of(
-                Arguments.arguments("明治23年11月29日", "1890-11-29"),
-                Arguments.arguments("昭和22年5月3日", "1947-05-03"),
-                Arguments.arguments("令和5年1月11日", "2023-01-11")
+                arguments("明治23年11月29日", "1890-11-29"),
+                arguments("昭和22年5月3日", "1947-05-03"),
+                arguments("令和5年1月11日", "2023-01-11")
         );
+    }
+
+    /**
+     * @param localDate the date to test if it is a leap year
+     * @see <a href="https://www.baeldung.com/parameterized-tests-junit-5">Implicit Conversion</a>
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"2022-10-03", "1983-01-03", "1989-10-18", "1994-10-20"})
+    void testParameterImplicitlyParsedToLocalDate(LocalDate localDate) {
+        assertFalse(localDate.isLeapYear());
     }
 
     @AfterAll

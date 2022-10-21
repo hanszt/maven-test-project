@@ -12,7 +12,7 @@ public final class NetConnectionTestUtils {
     private NetConnectionTestUtils() {
     }
 
-    private static boolean isSiteAvailable(String urlAsString) {
+    private static boolean isSiteFound(String urlAsString) {
         try {
             final var url = new URL(urlAsString);
             final var urlConnection = (HttpURLConnection) url.openConnection();
@@ -24,7 +24,7 @@ public final class NetConnectionTestUtils {
         }
     }
 
-    public static void assumeSiteAvailable(String urlAsString) {
-        assumeTrue(isSiteAvailable(urlAsString), "Site at url " + urlAsString + " is not available. Check your internet connection.");
+    public static void assumeSiteCanBeFound(String urlAsString) {
+        assumeTrue(isSiteFound(urlAsString), "Site at url " + urlAsString + " is not available. Check your internet connection.");
     }
 }

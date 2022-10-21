@@ -12,7 +12,7 @@ public final class HoldingConsumer<T> implements Consumer<T> {
     }
 
     public T getAndClear() {
-        T next = value;
+        final T next = value;
         value = null;
         return next;
     }

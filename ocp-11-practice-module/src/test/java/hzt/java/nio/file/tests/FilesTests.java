@@ -107,7 +107,7 @@ class FilesTests {
 
         assertAll(
                 () -> assertEquals(start, path),
-                () -> assertEquals(95, regularFiles.size()),
+                () -> assertEquals(94, regularFiles.size()),
                 () -> assertEquals(35, directories.size())
         );
     }

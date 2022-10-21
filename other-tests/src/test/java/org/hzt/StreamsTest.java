@@ -24,7 +24,7 @@ import org.hzt.utils.sequences.Sequence;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -36,24 +36,12 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.MonthDay;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.OptionalLong;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.valueOf;
@@ -67,9 +55,7 @@ import static org.hzt.Streams.*;
 import static org.hzt.stream.StreamUtils.by;
 import static org.hzt.stream.StreamUtils.function;
 import static org.hzt.utils.It.println;
-import static org.hzt.utils.collectors.CollectorsX.flatMappingToList;
-import static org.hzt.utils.collectors.CollectorsX.mappingToSet;
-import static org.hzt.utils.collectors.CollectorsX.multiMappingToList;
+import static org.hzt.utils.collectors.CollectorsX.*;
 import static org.hzt.utils.function.predicates.ComparingPredicates.greaterThan;
 import static org.hzt.utils.function.predicates.StringPredicates.containsAllOf;
 import static org.junit.jupiter.api.Assertions.*;
@@ -291,16 +277,12 @@ class StreamsTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {
-                "123123 -> 1",
-                "2353453 -> 2",
-                "567567435 -> 5",
-                "0 -> 0"})
-        void testFirstDigit(String string) {
-            final String[] split = string.split(" -> ");
-            final var input = Long.parseLong(split[0]);
-            final var expected = Integer.parseInt(split[1]);
-
+        @CsvSource({
+                "123123, 1",
+                "2353453, 2",
+                "567567435, 5",
+                "0, 0"})
+        void testFirstDigit(int input, int expected) {
             assertEquals(expected, firstDigit(input));
         }
 

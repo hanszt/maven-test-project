@@ -6,17 +6,16 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-class Test1Tests {
+class EnthuwareTest1Tests {
 
     // Source: Enthuware Java11OCP Test 1 Q 22
     @Test
@@ -103,7 +102,7 @@ class Test1Tests {
     // Source: Enthuware Java11OCP Test 1 Q 26
     @Test
     void testIncrementAndGetInRangeOneToEightParallelStream() {
-        IntStream.range(0, 1000).forEach(Test1Tests::testQ26AtomicIntegerNotDeterministic);
+        IntStream.range(0, 1000).forEach(EnthuwareTest1Tests::testQ26AtomicIntegerNotDeterministic);
     }
 
     private static void testQ26AtomicIntegerNotDeterministic(int i) {
@@ -139,10 +138,10 @@ class Test1Tests {
 
     @Test
     void testIncrementAndGetAlwaysEightParallelStream() {
-        IntStream.range(0, 1000).forEach(Test1Tests::testQ26ModdedAtomicIntegerDeterministic);
+        IntStream.range(0, 1000).forEach(EnthuwareTest1Tests::testQ26ModdedAtomicIntegerDeterministic);
     }
 
-   static void testQ26ModdedAtomicIntegerDeterministic(int i) {
+    static void testQ26ModdedAtomicIntegerDeterministic(int i) {
         AtomicInteger atomicInteger = new AtomicInteger();
         Stream<String> stream = Stream.of("old", "king", "cole", "was", "a", "merry", "old", "soul").parallel();
 
@@ -158,14 +157,25 @@ class Test1Tests {
 
     @Test
     void testListOfAndSetOfDoNotSupportNullElements() {
-        assertThrows(NullPointerException.class, Test1::listOfAndSetOfDoNotSupportNullElements);
+        //noinspection ConstantConditions,ResultOfMethodCallIgnored
+        assertAll(
+                () -> assertThrows(NullPointerException.class, () -> List.of(1, 2, null)),
+                () -> assertThrows(NullPointerException.class, () -> Set.of(1, 2, 3, null))
+        );
     }
 
     @Test
     void testCalculateSum() {
         int[] array = {2, 4, 6, 4, 8, 6, 9, 2};
         int expected = IntStream.of(array).sum();
-        int actual   = Test1.calculateSum(array);
+        // Source: Enthuware Java11OCP Test 1 Q 36
+        int sum = 0;
+        int i = 0;
+        while (array[i] < 100) {
+            sum = sum + array[i];
+            i++;
+        }
+        int actual = sum;
 
         assertEquals(expected, actual);
     }

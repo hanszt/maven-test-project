@@ -1,8 +1,9 @@
 package org.hzt;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 public final class AgeCalculator {
 
@@ -10,7 +11,7 @@ public final class AgeCalculator {
     }
 
     public static long calculateDurationInDaysBetween(LocalDate from, LocalDate to) {
-        return Duration.between(from.atStartOfDay(), to.atStartOfDay()).toDays();
+        return DAYS.between(from, to);
     }
 
     public static long calculatePeriodInYearsBetween(LocalDate from, LocalDate to) {

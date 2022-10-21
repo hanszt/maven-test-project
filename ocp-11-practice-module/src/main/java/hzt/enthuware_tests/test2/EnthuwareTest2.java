@@ -5,11 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-public class Test2 {
+@SuppressWarnings("ALL")
+public class EnthuwareTest2 {
 
     public static void main(String[] args) {
         final @NonNull String s = "Hallo   ";
-        final var test2 = new Test2();
+        final var test2 = new EnthuwareTest2();
         final var trimmed = test2.testVarInFunctionNotAllowed(s);
         assert "Hallo".equals(trimmed);
 

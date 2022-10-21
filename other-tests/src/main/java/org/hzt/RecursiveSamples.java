@@ -96,24 +96,24 @@ public final class RecursiveSamples {
      * @return the greatest common divisor
      * @see <a href="https://www.baeldung.com/java-greatest-common-divisor">Finding Greatest Common Divisor in Java</a>
      */
-    public static long gcdByEuclidsAlgorithm(long n1, long n2) {
+    public static long gcdByEuclidesAlgorithm(long n1, long n2) {
         if (n2 == 0) {
             return n1;
         }
-        return gcdByEuclidsAlgorithm(n2, n1 % n2);
+        return gcdByEuclidesAlgorithm(n2, n1 % n2);
     }
 
-    public static int gcdByEuclidsAlgorithm(int n1, int n2) {
+    public static int gcdByEuclidesAlgorithm(int n1, int n2) {
         if (n2 == 0) {
             return n1;
         }
-        return gcdByEuclidsAlgorithm(n2, n1 % n2);
+        return gcdByEuclidesAlgorithm(n2, n1 % n2);
     }
 
-    public static BigInteger gcdByEuclidsAlgorithm(BigInteger n1, BigInteger n2) {
+    public static BigInteger gcdByEuclidesAlgorithm(BigInteger n1, BigInteger n2) {
         if (BigInteger.ZERO.equals(n2)) {
             return n1;
         }
-        return gcdByEuclidsAlgorithm(n2, n1.mod(n2));
+        return gcdByEuclidesAlgorithm(n2, n1.mod(n2));
     }
 }

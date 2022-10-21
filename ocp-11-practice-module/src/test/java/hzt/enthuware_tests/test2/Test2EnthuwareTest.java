@@ -8,11 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-class Test2Test {
+class Test2EnthuwareTest {
 
     // Source: Enthuware Java11OCP Test 2 Q 2
     @Test
@@ -21,9 +19,11 @@ class Test2Test {
         String uniqueExamName = new String(examName);
         String internedExamName = uniqueExamName.intern();
 
-        assertFalse(examName == uniqueExamName);
-        assertTrue(examName == internedExamName);
-        assertFalse(uniqueExamName == internedExamName);
+        assertAll(
+                () -> assertSame(examName, internedExamName),
+                () -> assertNotSame(examName, uniqueExamName),
+                () -> assertNotSame(uniqueExamName, internedExamName)
+        );
     }
 
     // Source: Enthuware Java11OCP Test 2 Q 7

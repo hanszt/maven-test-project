@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,12 +16,12 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MapTests {
 
@@ -175,16 +176,41 @@ class MapTests {
 
     @Test
     void testCollectToMapFromSourceWithDuplicatedKeysNotUsingMergeFunctionThrowsException() {
-        final var personList = List.of(
+        final var stream = Stream.of(
                 new Person(1, "Sophie"),
                 new Person(2L, "Hans"),
                 new Person(1L, "Ted"),
                 new Person(2L, "Huib"),
                 new Person(2L, "Matthijs"));
 
+        final var personMapCollector = Collectors.toMap(Person::getId, Person::getName);
         //noinspection ResultOfMethodCallIgnored
-        assertThrows(IllegalStateException.class, () -> personList.stream()
-                .collect(Collectors.toMap(Person::getId, Person::getName)));
+        assertThrows(IllegalStateException.class, () -> stream.collect(personMapCollector));
+    }
+
+    @Test
+    void testUpdateMapValues() {
+        final var map = IntStream.range(0, 10)
+                .boxed()
+                .collect(Collectors.toMap(i -> i, AtomicInteger::new));
+
+        updateMapValues(map.values());
+
+        final var count = map.values().stream()
+                .filter(i -> i.get() == 0)
+                .count();
+
+        assertEquals(5, count);
+    }
+
+    private static void updateMapValues(Collection<AtomicInteger> values) {
+        int counter = 0;
+        for (AtomicInteger value : values) {
+            if (counter % 2 == 0) {
+                value.set(0);
+            }
+            counter++;
+        }
     }
 
 
