@@ -24,6 +24,7 @@
         <module>kafka-samples</module>
         <module>selenium-samples</module>
         <module>quantum-java</module>
+        <module>math-utils-samples</module>
     </modules>
 
     <properties>
@@ -94,12 +95,6 @@
                 <groupId>org.jooq</groupId>
                 <artifactId>jool</artifactId>
                 <version>${jool.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jetbrains</groupId>
-                <artifactId>annotations</artifactId>
-                <version>${annotations.version}</version>
-                <scope>compile</scope>
             </dependency>
             <!--apache dependencies-->
             <dependency>

@@ -18,12 +18,12 @@ public final class CollectorHelper {
         return left;
     }
 
-    public static <T, C extends Collection<T>> C accumulate(C collection, T t) {
+    public static <T, C extends Collection<? super T>> C accumulate(C collection, T t) {
         collection.add(t);
         return collection;
     }
 
-    public static <K, V, M extends Map<K, V>> M accumulate(M map, K k, V v) {
+    public static <K, V, M extends Map<? super K, ? super V>> M accumulate(M map, K k, V v) {
         map.put(k, v);
         return map;
     }

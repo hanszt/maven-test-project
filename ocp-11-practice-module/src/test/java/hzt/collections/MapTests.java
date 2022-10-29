@@ -25,6 +25,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MapTests {
 
+    private static final String DO_NOT_USE_RANDOM_VALUES_IN_TESTS = "squid:S5977";
+
+    @SuppressWarnings(DO_NOT_USE_RANDOM_VALUES_IN_TESTS)
     private static final Random RANDOM = new Random();
 
     @Test
@@ -49,8 +52,10 @@ class MapTests {
         hansGrades.add(grade);
         pietGrades.add(6.0);
 
-        assertEquals(2, hansGrades.size());
-        assertEquals(1, pietGrades.size());
+        assertAll(
+                () -> assertEquals(2, hansGrades.size()),
+                () -> assertEquals(1, pietGrades.size())
+        );
     }
 
     @Test
@@ -59,10 +64,11 @@ class MapTests {
         final String hans = "Hans";
         final double grade = 7;
 
-        assertTrue(addToGradesIfPresent(groupedValues, grade, hans));
-        assertFalse(addToGradesIfPresent(groupedValues, 6.0, "Piet"));
-
-        assertEquals(1, groupedValues.size());
+        assertAll(
+                () -> assertTrue(addToGradesIfPresent(groupedValues, grade, hans)),
+                () -> assertFalse(addToGradesIfPresent(groupedValues, 6.0, "Piet")),
+                () -> assertEquals(1, groupedValues.size())
+        );
     }
 
     private boolean addToGradesIfPresent(Map<String, List<Double>> groupedValues, double grade, String key) {
@@ -81,10 +87,11 @@ class MapTests {
         final String hans = "Hans";
         final double grade = 7;
 
-        assertFalse(addPersonAndGrade(groupedValues, grade, hans).isEmpty());
-        assertFalse(addPersonAndGrade(groupedValues, 6.0, "Piet").isEmpty());
-
-        assertEquals(2, groupedValues.size());
+        assertAll(
+                () -> assertFalse(addPersonAndGrade(groupedValues, grade, hans).isEmpty()),
+                () -> assertFalse(addPersonAndGrade(groupedValues, 6.0, "Piet").isEmpty()),
+                () -> assertEquals(2, groupedValues.size())
+        );
     }
 
     @Test
@@ -96,10 +103,12 @@ class MapTests {
         final var mergedGradesPiet = groupedValues
                 .merge("Piet", new ArrayList<>(), (name, grades) -> new ArrayList<>(List.of(6.0)));
 
-        assertEquals(1, groupedValues.get("Hans").size());
-        assertEquals(0, groupedValues.get("Piet").size());
-        assertEquals(1, mergedGradesHans.size());
-        assertEquals(0, mergedGradesPiet.size());
+        assertAll(
+                () -> assertEquals(1, groupedValues.get("Hans").size()),
+                () -> assertEquals(0, groupedValues.get("Piet").size()),
+                () -> assertEquals(1, mergedGradesHans.size()),
+                () -> assertEquals(0, mergedGradesPiet.size())
+        );
     }
 
     //q20 test 5
@@ -131,8 +140,11 @@ class MapTests {
 
         System.out.println("firstEntry = " + firstEntry);
         System.out.println("lastEntry = " + lastEntry);
-        assertEquals(firstEntry, minimumTimestamp);
-        assertEquals(lastEntry, maxTimestamp);
+
+        assertAll(
+                () -> assertEquals(firstEntry, minimumTimestamp),
+                () -> assertEquals(lastEntry, maxTimestamp)
+        );
     }
 
     private static <T> T last(Iterable<T> iterable) {

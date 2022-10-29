@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FoundationTest2Test {
 
     @Test
-    void testCallingNaiveNativeMethodThrowsUnsAtisfiedLinkError() {
+    void testCallingNaiveNativeMethodThrowsUnsatisfiedLinkError() {
         final var foundationTest2 = new FoundationTest2();
         assertThrows(UnsatisfiedLinkError.class, foundationTest2::getVariance);
     }
@@ -23,7 +23,9 @@ class FoundationTest2Test {
         int leftShifted = value << 2;
         int rightShifted = value >> 1;
 
-        assertEquals(40, leftShifted);
-        assertEquals(5, rightShifted);
+        assertAll(
+                () -> assertEquals(40, leftShifted),
+                () -> assertEquals(5, rightShifted)
+        );
     }
 }

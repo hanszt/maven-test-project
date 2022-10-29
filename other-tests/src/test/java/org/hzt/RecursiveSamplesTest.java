@@ -86,20 +86,20 @@ class RecursiveSamplesTest {
     }
 
     @ParameterizedTest
-    @MethodSource("commonDivisorParams")
+    @MethodSource("defaultCommonDivisorParams")
     void testGreatestCommonDivisor(long first, long second, long expected) {
         final var gcd = RecursiveSamples.gcdByEuclidesAlgorithm(first, second);
         assertEquals(expected, gcd);
     }
 
     @ParameterizedTest
-    @MethodSource("commonDivisorParams")
+    @MethodSource("defaultCommonDivisorParams")
     void testGreatestIntCommonDivisor(int first, int second, int expected) {
         final var gcd = RecursiveSamples.gcdByEuclidesAlgorithm(first, second);
         assertEquals(expected, gcd);
     }
 
-    static Sequence<Arguments> commonDivisorParams() {
+    static Sequence<Arguments> defaultCommonDivisorParams() {
         return Sequence.of(
                 arguments(2, 4, 2),
                 arguments(12, 36, 12),
@@ -111,14 +111,14 @@ class RecursiveSamplesTest {
     @ParameterizedTest
     @MethodSource("bigIntCommonDivisorParams")
     void testGreatestCommonDivisorBigInt(
-            @ConvertWith(BigIntegerConverter.class) BigInteger first,
-            @ConvertWith(BigIntegerConverter.class) BigInteger second,
-            @ConvertWith(BigIntegerConverter.class) BigInteger expected) {
+            @ConvertWith(ToBigIntegerConverter.class) BigInteger first,
+            @ConvertWith(ToBigIntegerConverter.class) BigInteger second,
+            @ConvertWith(ToBigIntegerConverter.class) BigInteger expected) {
         final var gcd = RecursiveSamples.gcdByEuclidesAlgorithm(first, second);
         assertEquals(expected, gcd);
     }
 
-    static class BigIntegerConverter implements ArgumentConverter {
+    static class ToBigIntegerConverter implements ArgumentConverter {
 
         @Override
         public Object convert(Object source, ParameterContext context) {
@@ -127,10 +127,7 @@ class RecursiveSamplesTest {
     }
 
     static Sequence<Arguments> bigIntCommonDivisorParams() {
-        return commonDivisorParams()
-                .plus(arguments(
-                        new BigInteger("31940434634990099905"),
-                        new BigInteger("51680708854858323072"),
-                        1));
+        return defaultCommonDivisorParams()
+                .plus(arguments(new BigInteger("31940434634990099905"), new BigInteger("51680708854858323072"), 1));
     }
 }

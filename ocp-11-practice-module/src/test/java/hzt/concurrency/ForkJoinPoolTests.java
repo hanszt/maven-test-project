@@ -13,7 +13,9 @@ class ForkJoinPoolTests {
         final var forkJoinPool = ForkJoinPool.commonPool();
         forkJoinPool.execute(() -> System.out.println("hallo"));
         final var activeThreadCount = forkJoinPool.getActiveThreadCount();
+
         System.out.println("activeThreadCount = " + activeThreadCount);
+
         assertTrue(activeThreadCount > 0);
     }
 }

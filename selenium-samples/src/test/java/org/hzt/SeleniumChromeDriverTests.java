@@ -35,7 +35,7 @@ class SeleniumChromeDriverTests {
     @Test
     void testGetTitle() {
         final var url = "https://www.selenium.dev/selenium/web/web-form.html";
-        NetConnectionTestUtils.assumeSiteCanBeFound(url);
+        NetConnectionTestUtils.assumeCanConnectToHttpUrl(url);
         driver.get(url);
         final var submitFormScreenShotPath = ScreenshotMaker.takeScreenshotAndWriteToTargetFolder(driver);
 
@@ -50,7 +50,7 @@ class SeleniumChromeDriverTests {
     @Test
     void testWebdriverManager() {
         final var url = "https://www.selenium.dev/selenium/web/web-form.html";
-        NetConnectionTestUtils.assumeSiteCanBeFound(url);
+        NetConnectionTestUtils.assumeCanConnectToHttpUrl(url);
         driver.get(url);
         driver.manage().window().maximize();
 

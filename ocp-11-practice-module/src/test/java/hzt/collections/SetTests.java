@@ -23,6 +23,7 @@ class SetTests {
         Set<String> set = new HashSet<>();
         try {
             int counter = 0;
+            //noinspection InfiniteLoopStatement
             while (true) {
                 set.add("hoi" + counter);
                 counter++;

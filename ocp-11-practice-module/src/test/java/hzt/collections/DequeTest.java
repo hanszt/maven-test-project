@@ -10,10 +10,7 @@ import java.util.Stack;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toCollection;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * <p>The twelve methods described above are summarized in the
@@ -66,13 +63,15 @@ class DequeTest {
         final Integer[] expected = {3, 2, 1, 0};
 
         Deque<Integer> deque = new ArrayDeque<>(List.of(0));
-        assertTrue(deque.offerFirst(1));
-        assertDoesNotThrow(() -> deque.addFirst(2));
-        assertDoesNotThrow(() -> deque.push(3));
 
         deque.forEach(System.out::println);
 
-        assertArrayEquals(expected, deque.toArray(Integer[]::new));
+        assertAll(
+                () -> assertTrue(deque.offerFirst(1)),
+                () -> assertDoesNotThrow(() -> deque.addFirst(2)),
+                () -> assertDoesNotThrow(() -> deque.push(3)),
+                () -> assertArrayEquals(expected, deque.toArray(Integer[]::new))
+        );
     }
 
     /**
@@ -83,6 +82,7 @@ class DequeTest {
         final Integer[] expected = {0, 1, 2, 3, 4};
 
         Deque<Integer> deque = new ArrayDeque<>(List.of(0));
+
         assertDoesNotThrow(() -> deque.addLast(1));
         assertTrue(deque.add(2));
         assertTrue(deque.offerLast(3));
@@ -91,12 +91,14 @@ class DequeTest {
         deque.forEach(System.out::println);
 
         Queue<Integer> queue = new ArrayDeque<>(List.of(0));
+
         assertTrue(queue.offer(1));
         assertTrue(queue.add(2));
         assertTrue(queue.add(3));
         assertTrue(queue.offer(4));
 
         Stack<Integer> stack = new Stack<>();
+
         assertEquals(0, stack.push(0));
         assertEquals(1, stack.push(1));
         assertEquals(2, stack.push(2));
@@ -143,18 +145,22 @@ class DequeTest {
 
         Deque<Integer> deque = createDeque(1, 10);
 
-        assertEquals(10, deque.removeLast());
-        assertEquals(9, deque.pollLast());
+        assertAll(
+                () -> assertEquals(10, deque.removeLast()),
+                () -> assertEquals(9, deque.pollLast())
+        );
 
         Stack<Integer> stack = createDeque(1, 9).stream()
                 .collect(toCollection(Stack::new));
 
-        assertEquals(9, stack.pop());
 
         deque.forEach(System.out::println);
 
-        assertArrayEquals(expected, deque.toArray(Integer[]::new));
-        assertArrayEquals(expected, stack.toArray(Integer[]::new));
+        assertAll(
+                () -> assertEquals(9, stack.pop()),
+                () -> assertArrayEquals(expected, deque.toArray(Integer[]::new)),
+                () -> assertArrayEquals(expected, stack.toArray(Integer[]::new))
+        );
     }
 
     /**
@@ -219,9 +225,11 @@ class DequeTest {
         System.out.println(v2);
         System.out.println(v3);
 
-        assertEquals(3, v1);
-        assertEquals(2, v2);
-        assertEquals(1, v3);
+        assertAll(
+                () -> assertEquals(3, v1),
+                () -> assertEquals(2, v2),
+                () -> assertEquals(1, v3)
+        );
     }
 
     private static Deque<Integer> createDeque(int startInclusive, int endInclusive) {

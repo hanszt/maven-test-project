@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -69,7 +70,7 @@ class KafkaStreamSample {
         Topology topology = builder.build();
         try (KafkaStreams streams = new KafkaStreams(topology, streamsConfiguration)) {
             streams.start();
-            Thread.sleep(500);
+            TimeUnit.MILLISECONDS.sleep(500);
         }
     }
 

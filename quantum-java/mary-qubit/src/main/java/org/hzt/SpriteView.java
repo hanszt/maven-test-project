@@ -42,7 +42,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -78,18 +77,22 @@ public class SpriteView extends StackPane {
     public SpriteView(Image spriteSheet, MaryQubitApp.Location loc) {
         imageView = new ImageView(spriteSheet);
         this.location.set(loc);
-        setTranslateX(loc.getX() * MaryQubitApp.CELL_SIZE);
-        setTranslateY(loc.getY() * MaryQubitApp.CELL_SIZE);
-        ChangeListener<Object> updateImage = (ov, o, o2) -> imageView.setViewport(
-                new Rectangle2D(frame.get() * spriteWidth,
-                        direction.get().getOffset() * spriteHeight,
-                        spriteWidth, spriteHeight));
-        direction.addListener(updateImage);
-        frame.addListener(updateImage);
+        setTranslateX(loc.cellX() * MaryQubitApp.CELL_SIZE);
+        setTranslateY(loc.cellY() * MaryQubitApp.CELL_SIZE);
+        direction.addListener((o, c, n) -> updateViewPort());
+        frame.addListener((o, c, n) -> updateViewPort());
         spriteWidth = (int) (spriteSheet.getWidth() / 3);
         spriteHeight = (int) (spriteSheet.getHeight() / 4);
         direction.set(MaryQubitApp.Direction.RIGHT);
-        getChildren().add(imageView);
+        super.getChildren().add(imageView);
+    }
+
+    private void updateViewPort() {
+        final var rectangle2D = new Rectangle2D(
+                (double) frame.get() * spriteWidth,
+                (double) direction.get().getOffset() * spriteHeight,
+                spriteWidth, spriteHeight);
+        imageView.setViewport(rectangle2D);
     }
 
     public SpriteView(Image spriteSheet, SpriteView following) {
@@ -152,8 +155,8 @@ public class SpriteView extends StackPane {
             if (walking != null && walking.getStatus() == Animation.Status.RUNNING) {
                 return;
             }
-            int lx = location.getValue().getX();
-            int ly = location.getValue().getY();
+            int lx = location.getValue().cellX();
+            int ly = location.getValue().cellY();
             int dx = direction.getXOffset();
             int dy = direction.getYOffset();
             if (animals.isEmpty()) {
@@ -218,7 +221,7 @@ public class SpriteView extends StackPane {
             super(spriteSheet, following);
             label.textProperty().bind(number.asString());
             label.setFont(Font.font("Impact", 12 * MaryQubitApp.SCALE));
-            getChildren().add(label);
+            super.getChildren().add(label);
         }
     }
 
@@ -236,7 +239,7 @@ public class SpriteView extends StackPane {
     }
 
     private void visit() {
-        MapObject object = MaryQubitApp.map[location.get().getX()][location.get().getY()];
+        MapObject object = MaryQubitApp.map[location.get().cellX()][location.get().cellY()];
         if (object != null) {
             object.visit(this);
         }
@@ -257,8 +260,8 @@ public class SpriteView extends StackPane {
         walking = new Timeline(Animation.INDEFINITE,
                 new KeyFrame(Duration.seconds(.001), new KeyValue(direction, location.getValue().directionTo(loc))),
                 new KeyFrame(Duration.seconds(.002), new KeyValue(location, loc)),
-                new KeyFrame(Duration.seconds(1), new KeyValue(translateXProperty(), loc.getX() * MaryQubitApp.CELL_SIZE)),
-                new KeyFrame(Duration.seconds(1), new KeyValue(translateYProperty(), loc.getY() * MaryQubitApp.CELL_SIZE)),
+                new KeyFrame(Duration.seconds(1), new KeyValue(translateXProperty(), loc.cellX() * MaryQubitApp.CELL_SIZE)),
+                new KeyFrame(Duration.seconds(1), new KeyValue(translateYProperty(), loc.cellY() * MaryQubitApp.CELL_SIZE)),
                 new KeyFrame(Duration.seconds(.25), new KeyValue(frame, 0)),
                 new KeyFrame(Duration.seconds(.5), new KeyValue(frame, 1)),
                 new KeyFrame(Duration.seconds(.75), new KeyValue(frame, 2)),

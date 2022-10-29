@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class AnnotationsTargetTest {
 
     @Test
-//    @Disabled("This does not work for some reason")
     void testClassHasAnnotation() {
         final var annotationsTargetClass = AnnotationsTarget.class;
         assertNotNull(annotationsTargetClass.getAnnotation(MyArtifact.class));

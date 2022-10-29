@@ -1,6 +1,7 @@
 package org.hzt;
 
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 public final class TimingUtils {
 
@@ -9,7 +10,7 @@ public final class TimingUtils {
 
     public static void sleep(Duration duration) {
         try {
-            Thread.sleep(duration.toMillis());
+            TimeUnit.NANOSECONDS.sleep(duration.toNanos());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

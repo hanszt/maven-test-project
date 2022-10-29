@@ -16,13 +16,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class KafkaStreamSampleTest {
 
-    private static final String INPUT_TOPIC = "inputTopic";
+    private static final String DO_NOT_USE_THREAD_SLEEP_IN_TESTS = "squid:S2925";
 
     private final Properties streamsConfiguration = new Properties();
 
@@ -49,6 +50,7 @@ class KafkaStreamSampleTest {
     }
 
     @Test
+    @SuppressWarnings(DO_NOT_USE_THREAD_SLEEP_IN_TESTS)
     void testKafkaStreamMap() throws InterruptedException {
         StreamsBuilder builder = new StreamsBuilder();
         KStream<String, String> textLines = builder.stream("Hallo");
@@ -69,7 +71,7 @@ class KafkaStreamSampleTest {
         KafkaStreams streams = new KafkaStreams(topology, streamsConfiguration);
         streams.start();
 
-        Thread.sleep(500);
+        TimeUnit.MILLISECONDS.sleep(500);
         streams.close();
 
        assertTrue(pattern.matcher(" ").matches());

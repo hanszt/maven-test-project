@@ -15,10 +15,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ListTests {
 
@@ -103,8 +100,10 @@ class ListTests {
         List<Integer> bList = List.copyOf(collection); //2
 
         //noinspection ConstantConditions
-        assertThrows(UnsupportedOperationException.class, () -> bList.add(2));
-        assertEquals(collection, bList);
+        assertAll(
+                () -> assertThrows(UnsupportedOperationException.class, () -> bList.add(2)),
+                () -> assertEquals(collection, bList)
+        );
     }
 
     @Test
@@ -115,8 +114,10 @@ class ListTests {
         col.add(2); //2
         var list2 = List.copyOf(col); //3
 
-        assertEquals(List.of(Set.of(1, 2)), list1);
-        assertEquals(List.of(1, 2), list2);
+        assertAll(
+                () -> assertEquals(List.of(Set.of(1, 2)), list1),
+                () -> assertEquals(List.of(1, 2), list2)
+        );
     }
 
     @Test

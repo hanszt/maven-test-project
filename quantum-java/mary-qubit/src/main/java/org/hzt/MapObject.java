@@ -43,6 +43,12 @@ public abstract class MapObject extends SpriteView {
     boolean active = false;
     StrangeBridge strangeBridge;
 
+    protected MapObject(Image spriteSheet, MaryQubitApp.Location loc, StrangeBridge strangeBridge) {
+        super(spriteSheet, loc);
+        this.strangeBridge = strangeBridge;
+        MaryQubitApp.map[loc.cellX()][loc.cellY()] = this;
+    }
+
     void setActive (boolean v) {
         this.active = v;
     }
@@ -218,12 +224,6 @@ public abstract class MapObject extends SpriteView {
                 this.strangeBridge.clearProgram();
             }
         }
-    }
-
-    protected MapObject(Image spriteSheet, MaryQubitApp.Location loc, StrangeBridge strangeBridge) {
-        super(spriteSheet, loc);
-        MaryQubitApp.map[loc.getX()][loc.getY()] = this;
-        this.strangeBridge = strangeBridge;
     }
 
     public abstract void visit(SpriteView shepherd);

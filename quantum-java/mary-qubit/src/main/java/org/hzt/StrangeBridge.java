@@ -45,12 +45,18 @@ import org.redfx.strange.gate.X;
 import org.redfx.strange.local.SimpleQuantumExecutionEnvironment;
 import org.redfx.strangefx.render.Renderer;
 import org.redfx.strangefx.ui.QubitBoard;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class StrangeBridge extends Group {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StrangeBridge.class);
+
+    private static final String SHOULD_NOT_BE_CALLED_ON_THREAD_INSTANCES = "squid:S2236";
     private Program program;
     private final List<SpriteView.Lamb> qubitLamb = new LinkedList<>();
     private final Thread measureThread;
@@ -71,7 +77,6 @@ public class StrangeBridge extends Group {
         }
         this.program = newProgram;
         Step s1 = new Step();
-        double rnd = Math.random();
         s1.addGate(new Identity(nc - 1));
         this.program.addStep(s1);
         QuantumExecutionEnvironment simulator = new SimpleQuantumExecutionEnvironment();
@@ -83,7 +88,7 @@ public class StrangeBridge extends Group {
     }
 
     public void addH(int nr) {
-        System.err.println("add H to " + nr);
+        LOGGER.info("add H to {}", nr);
         Step s = new Step();
         s.addGate(new Hadamard(nr));
         this.program.addStep(s);
@@ -91,7 +96,7 @@ public class StrangeBridge extends Group {
     }
 
     public void addX(int nr) {
-        System.err.println("add X to " + nr);
+        LOGGER.info("add X to {}", nr);
         Step s = new Step();
         s.addGate(new X(nr));
         this.program.addStep(s);
@@ -99,14 +104,15 @@ public class StrangeBridge extends Group {
     }
 
     public void addCNot(int q1, int q2) {
-        System.err.println("Add CNot for " + q1 + ", " + q2);
+        LOGGER.info("Add CNot for {}, {}", q1, q2);
         Step s = new Step();
         s.addGate(new Cnot(q1, q2));
-        System.err.println("created step has gates " + s.getGates());
+        LOGGER.info("created step has gates {}", s.getGates());
         this.program.addStep(s);
         renderProgram();
     }
 
+    @SuppressWarnings(SHOULD_NOT_BE_CALLED_ON_THREAD_INSTANCES)
     private synchronized void renderProgram() {
         final var simulator = new SimpleQuantumExecutionEnvironment();
         this.result = simulator.runProgram(this.program);
@@ -132,22 +138,27 @@ public class StrangeBridge extends Group {
     }
 
     public int getLongResult() {
-//        System.err.println("get long result");
-        int result = 0;
         Qubit[] qubits = this.result.getQubits();
+        return calculateIntResult(qubits);
+    }
+
+    static int calculateIntResult(Qubit[] qubits) {
+        int intResult = 0;
         for (Qubit q : qubits) {
-            result = 2 * result;
-            result = result + q.measure();
+            intResult = 2 * intResult;
+            intResult = intResult + q.measure();
         }
-        return result;
+        return intResult;
     }
 
     public void measure() {
+        //noinspection InfiniteLoopStatement
         while (true) {
             Qubit[] qubits;
             Complex[] probs;
             int probCount = 0;
 
+            //noinspection SynchronizeOnNonFinalField
             synchronized (result) {
                 result.measureSystem();
                 qubits = result.getQubits();
@@ -161,9 +172,7 @@ public class StrangeBridge extends Group {
             }
             int i = 0;
             for (Qubit q : qubits) {
-//                        System.err.println("set q["+i+"] to "+q.measure());
                 SpriteView.Lamb target = qubitLamb.get(i++);
-//                        System.err.println("target = "+target);
                 target.setValue(q.measure());
             }
             try {
@@ -173,17 +182,13 @@ public class StrangeBridge extends Group {
                         this.wait();
                     }
                 } else { // more than one option, allow to render others
-                    Thread.sleep(250);
+                    TimeUnit.MILLISECONDS.sleep(250);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
 
         }
-    }
-
-    public Program getProgram() {
-        return this.program;
     }
 
 

@@ -163,20 +163,4 @@ class EnthuwareTest1Tests {
                 () -> assertThrows(NullPointerException.class, () -> Set.of(1, 2, 3, null))
         );
     }
-
-    @Test
-    void testCalculateSum() {
-        int[] array = {2, 4, 6, 4, 8, 6, 9, 2};
-        int expected = IntStream.of(array).sum();
-        // Source: Enthuware Java11OCP Test 1 Q 36
-        int sum = 0;
-        int i = 0;
-        while (array[i] < 100) {
-            sum = sum + array[i];
-            i++;
-        }
-        int actual = sum;
-
-        assertEquals(expected, actual);
-    }
 }

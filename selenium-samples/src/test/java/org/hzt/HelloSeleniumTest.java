@@ -10,7 +10,7 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.time.Duration;
 
-import static org.hzt.NetConnectionTestUtils.assumeSiteCanBeFound;
+import static org.hzt.NetConnectionTestUtils.assumeCanConnectToHttpUrl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -19,9 +19,12 @@ class HelloSeleniumTest {
     @Test
     void testHelloSeleniumWithFireFox() {
         final var url = "https://selenium.dev";
-        assumeSiteCanBeFound(url);
+
+        assumeCanConnectToHttpUrl(url);
+
         final var webDriver = WebDriverManagerConfig.setupFirefoxWebDriver(new FirefoxOptions());
         final var screenshotPath = new HelloSelenium(webDriver).takeScreenshot(url);
+
         assertTrue(screenshotPath.toFile().exists());
     }
 
@@ -39,10 +42,12 @@ class HelloSeleniumTest {
         @Test
         void testHelloSeleniumWithChromeHeadless() {
             final var url = "https://selenium.dev";
-            assumeSiteCanBeFound(url);
+            assumeCanConnectToHttpUrl(url);
+
             final var chromeOptions = new ChromeOptions();
             final var driver = WebDriverManagerConfig.setupChromeWebDriver(chromeOptions.setHeadless(true));
             final var screenshotPath = new HelloSelenium(driver).takeScreenshot(url);
+
             assertTrue(screenshotPath.toFile().exists());
         }
 
@@ -57,7 +62,7 @@ class HelloSeleniumTest {
 
             final var url = "https://" + username + ":" + password + "@" + "the-internet.herokuapp.com/basic_auth";
 
-            assumeSiteCanBeFound(url);
+            assumeCanConnectToHttpUrl(url);
 
             driver.get(url);
 
@@ -75,7 +80,7 @@ class HelloSeleniumTest {
             new AuthorisationUtils(driver).sendCredentialsUsingDevTools(username, password);
 
             final var url = "https://the-internet.herokuapp.com/basic_auth";
-            assumeSiteCanBeFound(url);
+            assumeCanConnectToHttpUrl(url);
 
             driver.get(url);
 

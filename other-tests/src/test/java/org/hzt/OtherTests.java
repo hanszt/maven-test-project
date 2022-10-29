@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -222,6 +221,7 @@ class OtherTests {
         book.setTitle("Hallo");
         book2.setTitle("Test");
         set.addAll(Set.of(book, book2));
+
         assertEquals(book2, set.last());
     }
 
@@ -245,10 +245,9 @@ class OtherTests {
 
     @Test
     void testCalcPiRandom() {
-        final var result = BigDecimal.valueOf(calcPiRandom(1_000_000));
-        final var actual = result.setScale(2, RoundingMode.HALF_UP);
-        final var expected = BigDecimal.valueOf(3.14);
-        assertEquals(expected, actual);
+        final var result = calcPiRandom(1_000_000);
+        println(result);
+        assertTrue(3.13 <= result && result <= 3.15);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -295,6 +294,7 @@ class OtherTests {
         //This can lead to first race condition when parallelized, does not maintain order.
         //Example  of shared mutability. This is devils work
         List<String> bookTitles = new ArrayList<>();
+
         TestSampleGenerator.createBookList().stream()
                 .filter(Book::isAboutProgramming)
                 .map(Book::getTitle)
@@ -362,7 +362,7 @@ class OtherTests {
         final var bytes = new byte[MAX_MINUS_TWO];
         setAll(bytes, b -> (byte) (b + 1));
 
-        System.out.println(Arrays.toString(Arrays.copyOf(bytes, 200)));
+        println(Arrays.toString(Arrays.copyOf(bytes, 200)));
 
         assertAll(
                 () -> assertEquals(MAX_MINUS_TWO, bytes.length),
@@ -435,8 +435,11 @@ class OtherTests {
                 .collect(Collectors.joining("\n"));
 
         println(string);
-        assertTrue(string.contains("Painting"));
-        assertTrue(string.contains("Person"));
+
+        assertAll(
+                () -> assertTrue(string.contains("Painting")),
+                () -> assertTrue(string.contains("Person"))
+        );
     }
 
     @Test
@@ -472,12 +475,12 @@ class OtherTests {
 
     @Test
     void testPuttingAllKindsOfObjectsInBoundedWildCardList() {
-        final List<? super Comparable<?>> list = new ArrayList<>();
-        list.add(LocalDate.of(2021, Month.OCTOBER, 4));
-        list.add("Hello");
-        list.add("This is weird");
-        list.add(BigDecimal.valueOf(20));
-        list.add(new Person("", null, null));
+        final List<? super Comparable<?>> list = List.of(
+                LocalDate.of(2021, Month.OCTOBER, 4),
+                "Hello",
+                "This is weird",
+                BigDecimal.valueOf(20),
+                new Person("", null, null));
 
         list.forEach(It::println);
 
@@ -521,10 +524,18 @@ class OtherTests {
         assertDoesNotThrow(() -> printStrings(Collections.<String>emptyList()));
     }
 
+    /**
+     * <a href="https://www.tabnine.com/code/java/methods/java.lang.Runtime/exec">How to use exec method in java.lang.Runtime</a>
+     */
     @Test
-    void testExec() throws IOException {
-        Process process = Runtime.getRuntime().exec("docker exec rabbitmq bash");
-        assertTrue(process.isAlive());
+    void testExecNvidiaSmi() throws IOException {
+        Process process = Runtime.getRuntime().exec("nvidia-smi");
+
+        try (final var inputStream = process.getInputStream()) {
+            final var result = new String(inputStream.readAllBytes());
+            println(result);
+        }
+        assertFalse(process.isAlive());
     }
 
     /**

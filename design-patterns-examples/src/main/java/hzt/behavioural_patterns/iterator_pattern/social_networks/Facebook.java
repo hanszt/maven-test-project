@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+import static org.hzt.utils.It.println;
 
 public class Facebook implements SocialNetwork {
 
@@ -22,7 +25,7 @@ public class Facebook implements SocialNetwork {
         // Instead, we emulates long network connection, which you would expect
         // in the real life...
         simulateNetworkLatency();
-        System.out.println("Facebook: Loading profile '" + profileEmail + "' over the network...");
+        println("Facebook: Loading profile '" + profileEmail + "' over the network...");
 
         // ...and return test data.
         return findProfile(profileEmail);
@@ -33,7 +36,7 @@ public class Facebook implements SocialNetwork {
         // Instead, we emulates long network connection, which you would expect
         // in the real life...
         simulateNetworkLatency();
-        System.out.println("Facebook: Loading '" + contactType + "' list of '" + profileEmail + "' over the network...");
+        println("Facebook: Loading '" + contactType + "' list of '" + profileEmail + "' over the network...");
 
         // ...and return test data.
         Profile profile = findProfile(profileEmail);
@@ -52,9 +55,9 @@ public class Facebook implements SocialNetwork {
         return null;
     }
 
-    private void simulateNetworkLatency() {
+    private static void simulateNetworkLatency() {
         try {
-            Thread.sleep(2500);
+            TimeUnit.MILLISECONDS.sleep(2500);
         } catch (InterruptedException ex) {
             ex.printStackTrace();
             Thread.currentThread().interrupt();

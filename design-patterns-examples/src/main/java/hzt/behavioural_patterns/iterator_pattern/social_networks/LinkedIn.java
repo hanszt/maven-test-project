@@ -8,8 +8,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings(LinkedIn.REPLACE_SYSTEM_OUT_BY_LOGGER)
 public class LinkedIn implements SocialNetwork {
+
+    static final String REPLACE_SYSTEM_OUT_BY_LOGGER = "squid:S106";
     private final List<Profile> contacts;
 
     public LinkedIn(List<Profile> cache) {
@@ -51,9 +55,9 @@ public class LinkedIn implements SocialNetwork {
         return null;
     }
 
-    private void simulateNetworkLatency() {
+    private static void simulateNetworkLatency() {
         try {
-            Thread.sleep(2500);
+            TimeUnit.NANOSECONDS.sleep(2500);
         } catch (InterruptedException ex) {
             ex.printStackTrace();
             Thread.currentThread().interrupt();

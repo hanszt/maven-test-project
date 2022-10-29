@@ -57,6 +57,7 @@ public final class MaryQubitApp extends Application {
         final var root = new Group();
         final var scene = new Scene(root, BOARD_WIDTH, BOARD_HEIGHT, Color.WHITE);
         primaryStage.setScene(scene);
+
         populateBackground(root);
 
         final var styles = "/styles.css";
@@ -65,24 +66,23 @@ public final class MaryQubitApp extends Application {
                 .map(URL::toExternalForm)
                 .ifPresentOrElse(scene.getStylesheets()::add, () -> LOGGER.error("Could not find {}", styles));
 
-        root.getChildren().add(barn);
-        root.getChildren().add(rainbow);
-        root.getChildren().add(new MapObject.Church(new Location(6, 2), strangeBridge));
-        root.getChildren().add(chickenCoop);
-        root.getChildren().add(nest);
+        final var children = root.getChildren();
+        children.addAll(barn, rainbow, new MapObject.Church(new Location(6, 2), strangeBridge), chickenCoop, nest);
+
         final var fox = new MapObject.Fox(new Location(7, 4), strangeBridge);
         fox.setDirection(Direction.LEFT);
         fox.setScaleX(.5);
         fox.setScaleY(.5);
-        root.getChildren().add(fox);
+
+        children.add(fox);
+
         helpTextProperty.set("Use the arrows to navigate Mary");
         var mary = new SpriteView.Mary(new Location(0, 3), this);
-        root.getChildren().addAll(createCells(mary));
+        children.addAll(createCells(mary));
         strangeBridge.setOpacity(0.5);
-        root.getChildren().add(strangeBridge);
-        root.getChildren().add(createHelpNode());
 
-        root.getChildren().add(mary);
+        children.addAll(strangeBridge, createHelpNode(), mary);
+
         scene.addEventHandler(KeyEvent.KEY_PRESSED, ke -> moveMary(mary, ke));
 
         primaryStage.show();
@@ -187,14 +187,6 @@ public final class MaryQubitApp extends Application {
     }
 
     public record Location(int cellX, int cellY) {
-
-        public int getX() {
-            return cellX;
-        }
-
-        public int getY() {
-            return cellY;
-        }
 
         public Location offset(final int x, final int y) {
             return new Location(cellX + x, cellY + y);
