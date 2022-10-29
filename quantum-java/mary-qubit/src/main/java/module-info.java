@@ -6,4 +6,6 @@ module mary.qubit {
     requires strangefx;
 
     exports org.hzt to javafx.graphics;
+
+    opens org.hzt;
 }

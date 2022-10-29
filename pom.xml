@@ -61,6 +61,16 @@
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
     </properties>
 
+    <!--https://stackoverflow.com/questions/13834141/create-local-maven-repository-->
+    <repositories>
+        <repository>
+            <id>local-maven-repo</id>
+            <!--https://stackoverflow.com/questions/3084629/finding-the-root-directory-of-a-multi-module-maven-reactor-project-->
+            <!--suppress MavenModelInspection -->
+            <url>file:///${maven.multiModuleProjectDirectory}/_local-mvn-repo</url>
+        </repository>
+    </repositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
