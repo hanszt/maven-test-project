@@ -5,11 +5,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static java.util.Comparator.comparingInt;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SetTests {
 
@@ -43,6 +43,25 @@ class SetTests {
         assertAll(
                 () -> assertTrue(arraySet.add(new int[]{1, 2, 3, 4})),
                 () -> assertEquals(2, arraySet.size())
+        );
+    }
+
+    @Test
+    void testTreeSetComparingByStringLengthMaintainsUniquenessByResultOfComparison() {
+        final var inputSet = Set.of("Mies", "Aap", "Noot", "Gijsbrecht");
+
+        final var treeSet = inputSet.stream()
+                .collect(Collectors.toCollection(() -> new TreeSet<>(comparingInt(String::length))));
+
+        System.out.println("inputSet = " + inputSet);
+        System.out.println("treeSet = " + treeSet);
+
+        final var hashSetFromTreeSet = new HashSet<>(treeSet);
+
+        assertAll(
+                () -> assertEquals(3, treeSet.size()),
+                () -> assertTrue(treeSet.containsAll(inputSet)),
+                () -> assertFalse(hashSetFromTreeSet.containsAll(inputSet))
         );
     }
 }

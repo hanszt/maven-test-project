@@ -1,4 +1,6 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Sat Oct 29 14:03:35 CEST 2022
+#Wed Nov 02 17:12:22 CET 2022
 core-0.7.5.11.pom>=
+core-0.7.5.11.jar>local-maven-repo=
+core-0.7.5.11.pom>local-maven-repo=
 core-0.7.5.11.jar>=

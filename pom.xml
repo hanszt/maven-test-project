@@ -25,6 +25,7 @@
         <module>selenium-samples</module>
         <module>quantum-java</module>
         <module>math-utils-samples</module>
+        <module>programming-puzzles</module>
     </modules>
 
     <properties>
@@ -47,7 +48,6 @@
         <streamex.version>0.8.1</streamex.version>
         <jool.version>0.9.14</jool.version>
         <org.hzt-utils.version>0.7.5.11</org.hzt-utils.version>
-        <annotations.version>22.0.0</annotations.version>
         <cyclops.version>10.4.0</cyclops.version>
         <!--reactive-streams-->
         <reactive-streams-tck.version>1.0.3</reactive-streams-tck.version>
@@ -56,7 +56,7 @@
         <scala.binary.version>2.13</scala.binary.version>
         <akka.version>2.6.20</akka.version>
         <!--plugins-->
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
     </properties>

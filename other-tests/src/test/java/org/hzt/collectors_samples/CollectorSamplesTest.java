@@ -5,16 +5,16 @@ import org.hzt.model.Person;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Book;
 import org.hzt.utils.It;
+import org.hzt.utils.Lazy;
 import org.hzt.utils.sequences.Sequence;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,8 +32,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingInt;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.*;
+import static org.hzt.collectors_samples.CollectorSamples.toNavigableMap;
+import static org.hzt.collectors_samples.CollectorSamples.toNavigableSet;
+import static org.hzt.utils.It.println;
 import static org.hzt.utils.Patterns.blankStringPattern;
 import static org.hzt.utils.collectors.BigDecimalCollectors.averagingBigDecimal;
 import static org.hzt.utils.collectors.BigDecimalCollectors.summarizingBigDecimal;
@@ -41,6 +45,8 @@ import static org.hzt.utils.function.predicates.StringPredicates.contains;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CollectorSamplesTest {
+
+    private static final Lazy<List<String>> lazyReadWordsOfShakespeare = Lazy.of(CollectorSamplesTest::readWordsInWorksOfShakespeare);
 
     @Test
     void testGetExpectedWhenOnlyOneInList() {
@@ -180,6 +186,19 @@ class CollectorSamplesTest {
     }
 
     @Test
+    void testCollectToNavigableSet() {
+        final var strings =
+                Stream.of("hallo", "hoe", "is", "het", "?", "dit", "is", "een", "test", "hoe", "vind", "je", "dat");
+
+        final var navigableSet = strings.collect(toNavigableSet(comparingInt(String::length)));
+
+        assertAll(
+                () -> assertEquals(5, navigableSet.size()),
+                () -> assertTrue(Sequence.of(navigableSet).isSortedBy(String::length))
+        );
+    }
+
+    @Test
     void testGroupingBy() {
         List<String> strings =
                 List.of("hallo", "hoe", "is", "het", "?", "dit", "is", "een", "test", "hoe", "vind", "je", "dat");
@@ -299,8 +318,8 @@ class CollectorSamplesTest {
     }
 
     @Test
-    void testParallelStreamWithNonCurrentCollectorRequiredCombiningPhase() throws IOException {
-        final List<String> words = readWordsInWorksOfShakespeare();
+    void testParallelStreamWithNonCurrentCollectorRequiredCombiningPhase() {
+        final List<String> words = lazyReadWordsOfShakespeare.get();
 
         final var parallelStream = words.parallelStream()
                 .filter(not(String::isBlank));
@@ -311,8 +330,8 @@ class CollectorSamplesTest {
     }
 
     @Test
-    void testSequentialStreamWithNonCurrentCollectorDoesNotUseCombingPhase() throws IOException {
-        final List<String> words = readWordsInWorksOfShakespeare();
+    void testSequentialStreamWithNonCurrentCollectorDoesNotUseCombingPhase() {
+        final List<String> words = lazyReadWordsOfShakespeare.get();
 
         final var expected = words.stream()
                 .filter(not(String::isBlank))
@@ -338,8 +357,8 @@ class CollectorSamplesTest {
     class ConcurrentCollectorTests {
 
         @Test
-        void testGroupingByToConcurrentMap() throws IOException {
-            final var words = readWordsInWorksOfShakespeare();
+        void testGroupingByToConcurrentMap() {
+            final var words = lazyReadWordsOfShakespeare.get();
 
             final var expected = words.parallelStream()
                     .filter(not(String::isBlank))
@@ -355,8 +374,8 @@ class CollectorSamplesTest {
         }
 
         @Test
-        void testToUnorderedListConcurrent() throws IOException {
-            final var words = readWordsInWorksOfShakespeare();
+        void testToUnorderedListConcurrent() {
+            final var words = lazyReadWordsOfShakespeare.get();
 
             final var maxSize = 1_000;
 
@@ -385,13 +404,13 @@ class CollectorSamplesTest {
         }
 
         @Test
-        void testCollectToConcurrentSkipListMap() throws IOException {
-            final var words = readWordsInWorksOfShakespeare();
+        void testCollectToConcurrentSkipListMap() {
+            final var words = lazyReadWordsOfShakespeare.get();
 
             final var expected = words.stream()
                     .filter(not(String::isBlank))
                     .distinct()
-                    .collect(CollectorSamples.toNavigableMap(It::self, String::length));
+                    .collect(toNavigableMap(It::self, String::length));
 
             final var actual = words.parallelStream()
                     .filter(not(String::isBlank))
@@ -404,8 +423,8 @@ class CollectorSamplesTest {
         }
 
         @Test
-        void testToOrderedListConcurrent() throws IOException {
-            final var words = readWordsInWorksOfShakespeare();
+        void testToOrderedListConcurrent() {
+            final var words = lazyReadWordsOfShakespeare.get();
 
             final var expected = words.stream()
                     .filter(not(String::isBlank))
@@ -421,8 +440,8 @@ class CollectorSamplesTest {
         }
 
         @Test
-        void testToConcurrentSkipListSet() throws IOException {
-            final var words = readWordsInWorksOfShakespeare();
+        void testToConcurrentSkipListSet() {
+            final var words = lazyReadWordsOfShakespeare.get();
 
             final var maxSize = 1_000;
 
@@ -445,8 +464,8 @@ class CollectorSamplesTest {
         }
 
         @Test
-        void testToConcurrentLinkedQueue() throws IOException {
-            final var words = readWordsInWorksOfShakespeare();
+        void testToConcurrentLinkedQueue() {
+            final var words = lazyReadWordsOfShakespeare.get();
 
             final var maxSize = 1_000;
 
@@ -471,8 +490,8 @@ class CollectorSamplesTest {
         }
 
         @Test
-        void testToConcurrentSet() throws IOException {
-            final var words = readWordsInWorksOfShakespeare();
+        void testToConcurrentSet() {
+            final var words = lazyReadWordsOfShakespeare.get();
 
             System.out.println("words count = " + words.size());
 
@@ -497,8 +516,8 @@ class CollectorSamplesTest {
         }
 
         @Test
-        void testToConcurrentMap() throws IOException {
-            final var words = readWordsInWorksOfShakespeare();
+        void testToConcurrentMap() {
+            final var words = lazyReadWordsOfShakespeare.get();
 
             final var actualSequential = words.stream()
                     .filter(not(String::isBlank))
@@ -526,20 +545,18 @@ class CollectorSamplesTest {
     }
 
     @NotNull
-    private List<String> readWordsInWorksOfShakespeare() throws IOException {
-        final var name = "/shakespeareworks.txt";
-
-        final var path = Optional.ofNullable(getClass().getResource(name))
-                .map(URL::getFile)
-                .map(File::new)
-                .map(File::toPath)
-                .orElseThrow(() -> new IllegalStateException("Could not load " + name));
+    private static List<String> readWordsInWorksOfShakespeare() {
+        final var userDir = Path.of(System.getProperty("user.dir")).getParent();
+        final var path = userDir.resolve("_input").resolve("shakespeareworks.txt");
+        println("Reading words of " + path + "...");
 
         try (final var lines = Files.lines(path)) {
             return lines
                     .flatMap(blankStringPattern::splitAsStream)
                     .filter(not(String::isBlank))
                     .toList();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
     }
 

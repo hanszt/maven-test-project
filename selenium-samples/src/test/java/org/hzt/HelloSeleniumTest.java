@@ -1,6 +1,7 @@
 package org.hzt;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -14,6 +15,7 @@ import static org.hzt.NetConnectionTestUtils.assumeCanConnectToHttpUrl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Disabled("This test takes to long")
 class HelloSeleniumTest {
 
     @Test

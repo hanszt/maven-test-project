@@ -21,7 +21,7 @@ public class HelloSelenium {
     }
 
     public static void main(String[] args) {
-        searchGoogle("java", "test", "selenium testing");
+        searchGoogle("java", "software testing", "selenium testing");
     }
 
     private static void searchGoogle(String... searchTerms) {
