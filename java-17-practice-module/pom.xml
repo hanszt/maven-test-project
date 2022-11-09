@@ -27,6 +27,12 @@
             <groupId>org.hzt.tests</groupId>
             <artifactId>other-tests</artifactId>
             <version>1.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -40,10 +46,6 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <release>${java.version}</release>
-                    <compilerArgs>
-                        <!--https://www.baeldung.com/java-preview-features-->
-                        --enable-preview
-                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>

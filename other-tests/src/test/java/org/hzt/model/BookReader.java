@@ -13,4 +13,8 @@ public class BookReader {
     public String getBookCategory() {
         return book.getCategory();
     }
+
+    public String getDescription() {
+        return book.getDescription();
+    }
 }

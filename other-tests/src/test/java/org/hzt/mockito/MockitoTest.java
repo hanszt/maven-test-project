@@ -1,4 +1,4 @@
-package org.hzt;
+package org.hzt.mockito;
 
 import org.junit.jupiter.api.Test;
 

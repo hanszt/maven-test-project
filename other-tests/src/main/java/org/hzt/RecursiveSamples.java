@@ -3,10 +3,17 @@ package org.hzt;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.util.ArithmeticUtils;
 import org.hzt.utils.PreConditions;
+import org.hzt.utils.collections.primitives.IntList;
+import org.hzt.utils.collections.primitives.IntMutableList;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
+import static org.hzt.utils.It.println;
+
+/**
+ * @see <a href="https://www.youtube.com/watch?v=SPri4PTUY_8">Tail Call Optimization</a>
+ */
 public final class RecursiveSamples {
 
     private RecursiveSamples() {
@@ -115,5 +122,88 @@ public final class RecursiveSamples {
             return n1;
         }
         return gcdByEuclidesAlgorithm(n2, n1.mod(n2));
+    }
+
+    public static IntList tailRecursionWithReturn(int n) {
+        return tailRecursionWithReturn(n, IntMutableList.empty());
+    }
+
+    public static IntList tailRecursionWithReturn(int n, IntList resultList) {
+        if (n == 0) {
+            return resultList.plus(n);
+        }
+        println(n);
+        return tailRecursionWithReturn(n < 0 ? (n + 1) : (n - 1), resultList.plus(n));
+    }
+
+    public static IntList headRecursionWithReturn(int n) {
+        return headRecursionWithReturn(n, IntMutableList.empty());
+    }
+
+    public static IntList headRecursionWithReturn(int n, IntList resultList) {
+        if (n != 0) {
+            return headRecursionWithReturn(n < 0 ? (n + 1) : (n - 1), resultList.plus(n));
+        }
+        println(n);
+        return resultList.plus(n);
+    }
+
+    /**
+     * @param x the initial value
+     * @param integers the list subject be filled
+     * @see <a  href="https://www.youtube.com/watch?v=o2nQDij5eqs">Head Recursion and Tail Recursion in Java</a>
+     */
+    public static void mysteryHead(int x, IntMutableList integers) {
+        if (x > 0) {
+            mysteryHead(x - 1, integers);
+        }
+        integers.add(x);
+    }
+
+    /**
+     * @param x the initial value
+     * @param integers the list subject be filled
+     * @see <a  href="https://www.youtube.com/watch?v=o2nQDij5eqs">Head Recursion and Tail Recursion in Java</a>
+     */
+    public static void mysteryTail(int x, IntMutableList integers) {
+        integers.add(x);
+        if (x <= 0) {
+            return;
+        }
+        mysteryTail(x - 1, integers);
+    }
+
+    /**
+     * @param n the number from which you want subject calculate the factorial
+     * @return the calculated factorial
+     * @see <a href="https://www.youtube.com/watch?v=wOIS1qMO1RM">Tail Recursion Optimization for Java</a>
+     */
+    public static BigInteger factorial(int n) {
+        return factorial(BigInteger.ONE, BigInteger.valueOf(n));
+    }
+
+    /**
+     * Tail recursion optimization is not supported in java
+     * @see RecursiveSamples#factorialTailRecOptimization(int) subject see the result of tail recursion optimization. (Transformation in loop)
+     */
+    public static BigInteger factorial(BigInteger acc, BigInteger n) {
+        if (n.compareTo(BigInteger.ONE) <= 0) {
+            return acc;
+        }
+        return factorial(acc.multiply(n), n.subtract(BigInteger.ONE));
+    }
+
+    public static BigInteger factorialTailRecOptimization(int n) {
+        return factorialTailRecOptimization(BigInteger.ONE, BigInteger.valueOf(n));
+    }
+
+    public static BigInteger factorialTailRecOptimization(BigInteger acc, BigInteger n) {
+        while (true) {
+            if (n.compareTo(BigInteger.ONE) <= 0) {
+                return acc;
+            }
+            acc = acc.multiply(n);
+            n = n.subtract(BigInteger.ONE);
+        }
     }
 }

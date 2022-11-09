@@ -20,10 +20,18 @@
         <nashorn-core.version>15.4</nashorn-core.version>
         <vavr.version>0.10.4</vavr.version>
         <eclipse-collections.version>11.1.0</eclipse-collections.version>
-        <joda-time.version>2.12.0</joda-time.version>
+        <joda-time.version>2.12.1</joda-time.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.hzt.utils</groupId>
             <artifactId>core</artifactId>
@@ -96,6 +104,25 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <source>src/main/java</source>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>

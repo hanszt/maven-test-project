@@ -1,6 +1,9 @@
 package org.hzt.graph;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -9,9 +12,11 @@ import java.util.List;
 import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
+@DisplayNameGeneration(DisplayNameGenerator.Simple.class)
 class PathSearcherTest {
 
     @Test
+    @Tag("UnitTest")
     void testDijkstraUsingPriorityQueue() {
         int numberOfNodes = 5;
         int source = 0;

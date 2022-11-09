@@ -1,8 +1,9 @@
-package org.hzt;
+package org.hzt.mockito;
 
 import org.hzt.model.BookReader;
 import org.hzt.test.model.Book;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -25,12 +26,24 @@ class MockitoWithAnnotationsTest {
 
     @BeforeEach
     void setup() {
-        when(book.getCategory()).thenReturn("Test category");
         bookReader = new BookReader(book);
     }
 
     @Test
     void testStubbing2() {
+        when(book.getCategory()).thenReturn("Test category");
         assertEquals("Test category", bookReader.getBookCategory(), "Testing first stub");
+    }
+
+    @Nested
+    @ExtendWith(MockitoExtension.class)
+    class ParameterMockTest {
+
+        @Test
+        void testMockAsParameter(@Mock Book book) {
+            when(book.getDescription()).thenReturn("This is a mocked book");
+            final var localBookReader = new BookReader(book);
+            assertEquals("This is a mocked book", localBookReader.getDescription());
+        }
     }
 }

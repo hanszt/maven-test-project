@@ -2,7 +2,10 @@ package org.hzt;
 
 import org.apache.commons.math3.complex.Complex;
 import org.hzt.utils.It;
+import org.hzt.utils.collections.primitives.IntList;
+import org.hzt.utils.collections.primitives.IntMutableList;
 import org.hzt.utils.sequences.Sequence;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -129,5 +132,66 @@ class RecursiveSamplesTest {
     static Sequence<Arguments> bigIntCommonDivisorParams() {
         return defaultCommonDivisorParams()
                 .plus(arguments(new BigInteger("31940434634990099905"), new BigInteger("51680708854858323072"), 1));
+    }
+
+    @Nested
+    class TailAndHeadRecursionTests {
+        @Test
+        void testHeadRecursion() {
+            final var integers = RecursiveSamples.headRecursionWithReturn(10);
+            assertEquals(IntList.of(10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0), integers);
+        }
+
+        @Test
+        void testTailRecursion() {
+            final var integers = RecursiveSamples.tailRecursionWithReturn(10);
+            assertEquals(IntList.of(10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0), integers);
+        }
+
+        @Test
+        void testMysteryHead() {
+            IntMutableList list = IntMutableList.empty();
+            RecursiveSamples.mysteryHead(4, list);
+            assertEquals(IntList.of(0, 1, 2, 3, 4), list);
+        }
+
+        @Test
+        void testMysteryTail() {
+            IntMutableList list = IntMutableList.empty();
+            RecursiveSamples.mysteryTail(4, list);
+            assertEquals(IntList.of(4, 3, 2, 1, 0), list);
+        }
+
+        @Test
+        void testFactorialRecursive() {
+            final var factorial1 = RecursiveSamples.factorial(5);
+            final var factorial2 = RecursiveSamples.factorialTailRecOptimization(5);
+
+            System.out.println("factorial = " + factorial1);
+
+            assertEquals(factorial1 ,factorial2);
+        }
+
+        @Test
+        void testTailRecursionStackOverflowInJava() {
+            assertThrows(StackOverflowError.class, () -> RecursiveSamples.factorial(50_000));
+        }
+
+        @Test
+        void testNoStackOverflowWithKotlinTailCallOptimizationOrLoopVersionInJava() {
+            final var factorial = RecursiveSamplesKt.factorial(50_000);
+            final var factorialFromJavaLoop = RecursiveSamples.factorialTailRecOptimization(50_000);
+            assertEquals(factorial, factorialFromJavaLoop);
+        }
+
+        /**
+         * In mathematics, the Dottie number is a constant that is the unique real root of the equation: cos(x) = x
+         */
+        @Test
+        void testCalculateFixedPointUsingTailRecursion() {
+            final var fixPoint = RecursiveSamplesKt.findFixPoint();
+            final var dottieNumberApproximation = 0.7390851332151611;
+            assertEquals(dottieNumberApproximation, fixPoint);
+        }
     }
 }

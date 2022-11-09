@@ -11,4 +11,5 @@ open module other.tests {
     requires commons.math3;
     requires org.eclipse.collections.impl;
     requires org.eclipse.collections.api;
+    requires kotlin.stdlib;
 }

@@ -82,7 +82,7 @@ class Java8PlusDateTimeApiTests {
      * @see <a href="https://stackoverflow.com/questions/57174739/how-to-parse-japanese-era-date-string-values-into-localdate-localdatetime">
      * How to parse 🎌 Japanese Era Date string values into LocalDate & LocalDateTime</a>
      */
-    @ParameterizedTest
+    @ParameterizedTest(name = "Japanese date {0} converts to {1}")
     @MethodSource("argumentsLocalDatesFromJapaneseDates")
     void testLocalDatesFromJapaneseDates(String japaneseDate, String expected) {
 

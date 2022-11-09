@@ -32,7 +32,7 @@ internal class StringPuzzlesTest {
         val (ordersAsString, expected) = string.split(" -> ")
 
         val orders = ordersAsString.split("| ")
-            .map { order -> order.split(",").map(String::toInt).toIntArray() }
+            .map { it.split(",").map(String::toInt).toIntArray() }
             .toTypedArray()
 
         val actualNr = ArrayPuzzles.getNumberOfBacklogOrders(orders)

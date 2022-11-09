@@ -10,8 +10,11 @@ import org.hzt.utils.It;
 import org.hzt.utils.iterables.Collectable;
 import org.hzt.utils.ranges.IntRange;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -48,6 +51,7 @@ import static java.util.Comparator.comparing;
 import static org.hzt.iterators.Enumerations.sizedEnumeration;
 import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class OtherTests {
 
@@ -350,10 +354,10 @@ class OtherTests {
     }
 
     @Test
-    void testGenerateArrayContainingOneBillionElementsByStream() {
-        final var ONE_BILLION = 1_000_000_000;
-        var array = IntStream.range(0, ONE_BILLION).parallel().toArray();
-        assertEquals(ONE_BILLION, array.length);
+    void testGenerateArrayContainingFiveHundredMillionElementsByStream() {
+        final var FIVE_HUNDRED_MILLION = 500_000_000;
+        var array = IntStream.range(0, FIVE_HUNDRED_MILLION).parallel().toArray();
+        assertEquals(FIVE_HUNDRED_MILLION, array.length);
     }
 
     @Test
@@ -522,6 +526,23 @@ class OtherTests {
     void testTypeWitnessNotNeededAnyMore() {
         //noinspection RedundantTypeArguments
         assertDoesNotThrow(() -> printStrings(Collections.<String>emptyList()));
+    }
+
+    @RepeatedTest(100)
+    void testFlakyOrNot() {
+        assertEquals(0.5, Math.random(), 0.5);
+    }
+
+    /**
+     * @see <a href="https://youtu.be/EQPr7OhG768?t=1004">IntelliJ IDEA Conf 2022 | Evolving JUnit 5</a>
+     * @return A stream of dynamic tests
+     */
+    @TestFactory
+    Stream<DynamicTest> evenNumberDivisibleByTwo() {
+        return IntStream.iterate(0, n -> n + 2)
+                .limit(200)
+                .mapToObj(n -> dynamicTest(n + " is divisible by 2",
+                        () -> assertEquals(0, n % 2)));
     }
 
     /**

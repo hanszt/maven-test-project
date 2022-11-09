@@ -167,7 +167,7 @@ public final class ArrayPuzzles {
     }
 
     private static void match(final Queue<Order> buys, final Queue<Order> sells) {
-        while (!(buys.isEmpty() || sells.isEmpty())) {
+        while (!buys.isEmpty() && !sells.isEmpty()) {
             final Order buy = buys.peek();
             final Order sell = sells.peek();
             if (sell.price > buy.price) {

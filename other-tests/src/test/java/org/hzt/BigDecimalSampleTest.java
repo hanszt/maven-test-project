@@ -10,8 +10,6 @@ import java.math.RoundingMode;
 import java.util.List;
 
 import static java.lang.System.out;
-import static org.hzt.BigDecimalSample.comparingBigDecimalsUsingCompareTo;
-import static org.hzt.BigDecimalSample.comparingBigDecimalsUsingEquals;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -24,9 +22,8 @@ class BigDecimalSampleTest {
     void sameValueNotSameScaleResultsInFalseUsingEquals() {
         String value = "100000";
         final var expected = new BigDecimal(value);
-        var actual = new BigDecimal(value);
-        actual = actual.setScale(4, RoundingMode.HALF_UP);
-        assertFalse(comparingBigDecimalsUsingEquals(expected, actual));
+        final var actual = new BigDecimal(value).setScale(4, RoundingMode.HALF_UP);
+        assertNotEquals(expected, actual);
     }
 
     /**
@@ -36,9 +33,42 @@ class BigDecimalSampleTest {
     void sameValueNotSameScaleResultsInTrueUsingCompareTo() {
         String value = "100000";
         final var expected = new BigDecimal(value);
-        var actual = new BigDecimal(value);
-        actual = actual.setScale(4, RoundingMode.HALF_UP);
-        assertTrue(comparingBigDecimalsUsingCompareTo(expected, actual));
+        final var actual = new BigDecimal(value).setScale(4, RoundingMode.HALF_UP);
+        assertEquals(0, expected.compareTo(actual));
+    }
+
+    @Test
+    void testBigDecimalOfNull() {
+        //noinspection ConstantConditions
+        assertThrows(NullPointerException.class, () -> new BigDecimal((String) null));
+    }
+
+    @Test
+    void testBigDecimalDivisionWithoutScaleThrowsArithmeticExceptionWhenInfiniteDecimalExpansion() {
+        final var THREE = BigDecimal.valueOf(3);
+        //noinspection ResultOfMethodCallIgnored,BigDecimalMethodWithoutRoundingCalled
+        final var exception = assertThrows(ArithmeticException.class, () -> BigDecimal.ONE.divide(THREE));
+        assertEquals("Non-terminating decimal expansion; no exact representable decimal result.", exception.getMessage());
+    }
+
+    @Test
+    void testBigDecimalDivisionWithoutScaleWorksWhenNoInfiniteDecimalExpansion() {
+        final var TWO = BigDecimal.valueOf(2);
+        //noinspection BigDecimalMethodWithoutRoundingCalled
+        assertEquals(BigDecimal.valueOf(0.5), BigDecimal.ONE.divide(TWO));
+    }
+
+    @ParameterizedTest
+    @MethodSource("decimalFormatParams")
+    void testDecimalFormat(String input, String pattern, BigDecimal expected) {
+        final var actual = BigDecimalSample.parseBigDecimal(input, pattern);
+        assertEquals(expected, actual);
+    }
+
+    private static List<Arguments> decimalFormatParams() {
+        return List.of(
+                arguments("10,692,467,440,017.111", "#,##0.0#", BigDecimal.valueOf(10692467440017.111)),
+                arguments("10692467440017.111", "#.#", BigDecimal.valueOf(10692467440017.111)));
     }
 
     static class Runner {
@@ -62,25 +92,6 @@ class BigDecimalSampleTest {
             out.println("Scale of: " + scaledBigDecimalHalfUp + " is: " + scaledBigDecimalHalfUp.scale());
             out.println("Scale of: " + scaledBigDecimalHalfDown + " is: " + scaledBigDecimalHalfDown.scale());
         }
-    }
-
-    @Test
-    void testBigDecimalOfNull() {
-        //noinspection ConstantConditions
-        assertThrows(NullPointerException.class, () -> new BigDecimal((String) null));
-    }
-
-    @ParameterizedTest
-    @MethodSource("decimalFormatParams")
-    void testDecimalFormat(String input, String pattern, BigDecimal expected) {
-        final var actual = BigDecimalSample.parseBigDecimal(input, pattern);
-        assertEquals(expected, actual);
-    }
-
-    private static List<Arguments> decimalFormatParams() {
-        return List.of(
-                arguments("10,692,467,440,017.111", "#,##0.0#", BigDecimal.valueOf(10692467440017.111)),
-                arguments("10692467440017.111", "#.#", BigDecimal.valueOf(10692467440017.111)));
     }
 
 }

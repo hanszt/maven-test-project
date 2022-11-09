@@ -22,6 +22,10 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 class ComparatorTests {
 
+    ComparatorTests() {
+        System.out.printf("Constructing %s...%n", ComparatorTests.class.getSimpleName());
+    }
+
     @Test
     void comparePersonByLasName() {
         final var firstNames = Sequence.of("Piet", "Klaas", "Else");

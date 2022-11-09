@@ -5,6 +5,7 @@ import org.apache.commons.math3.fraction.Fraction;
 import org.eclipse.collections.api.map.primitive.IntIntMap;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.hzt.collections.IndexedDataStructure;
 import org.hzt.collections.TestDataStructure;
 import org.hzt.model.Payment;
@@ -21,8 +22,11 @@ import org.hzt.utils.collections.MutableSetX;
 import org.hzt.utils.collections.SetX;
 import org.hzt.utils.collectors.CollectorsX;
 import org.hzt.utils.sequences.Sequence;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -36,12 +40,24 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.MonthDay;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-import java.util.stream.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.valueOf;
@@ -55,10 +71,14 @@ import static org.hzt.Streams.*;
 import static org.hzt.stream.StreamUtils.by;
 import static org.hzt.stream.StreamUtils.function;
 import static org.hzt.utils.It.println;
-import static org.hzt.utils.collectors.CollectorsX.*;
+import static org.hzt.utils.collectors.CollectorsX.flatMappingToList;
+import static org.hzt.utils.collectors.CollectorsX.mappingToSet;
+import static org.hzt.utils.collectors.CollectorsX.multiMappingToList;
 import static org.hzt.utils.function.predicates.ComparingPredicates.greaterThan;
 import static org.hzt.utils.function.predicates.StringPredicates.containsAllOf;
+import static org.hzt.utils.numbers.DoubleX.GOLDEN_RATIO;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class StreamsTest {
 
@@ -276,6 +296,14 @@ class StreamsTest {
 
         }
 
+        @Test
+        void testIntList() {
+            final var list = IntStream.range(0, 10_000)
+                    .collect(IntArrayList::new, IntArrayList::add, IntArrayList::addAll);
+
+            assertEquals(10_000, list.size());
+        }
+
         @ParameterizedTest
         @CsvSource({
                 "123123, 1",
@@ -332,8 +360,10 @@ class StreamsTest {
                 .sorted(comparingByKey())
                 .forEach(It::println);
 
-        assertFalse(monthDayListMap.isEmpty());
-        assertEquals(monthDayListMap1.size(), monthDayListMap.size());
+        assertAll(
+                () -> assertFalse(monthDayListMap.isEmpty()),
+                () -> assertEquals(monthDayListMap1.size(), monthDayListMap.size())
+        );
     }
 
     @Test
@@ -342,11 +372,20 @@ class StreamsTest {
         AtomicBoolean isClosedOutsideTryWithResources = new AtomicBoolean();
 
         final var stream = TestSampleGenerator.createBookList().stream();
-        final var expected = getFilteredBookTitleList("Stream", isClosedOutsideTryWithResources, stream);
+        final var expected = stream
+                .map(Book::getTitle)
+                .filter(containsAllOf("a", "e"))
+                .distinct()
+                .onClose(() -> setClosedAndPrintClosed("Stream", isClosedOutsideTryWithResources))
+                .toList();
 
         try (final var bookStream = TestSampleGenerator.createBookList().stream()) {
-            final var filteredBookTitles = getFilteredBookTitleList(
-                    "Stream in try with resources block", isClosedInTryWithResourcesBlock, bookStream);
+            final var filteredBookTitles = bookStream
+                    .map(Book::getTitle)
+                    .filter(containsAllOf("a", "e"))
+                    .distinct()
+                    .onClose(() -> setClosedAndPrintClosed("Stream in try with resources block", isClosedInTryWithResourcesBlock))
+                    .toList();
 
             assertAll(
                     () -> assertEquals(3, filteredBookTitles.size()),
@@ -357,15 +396,6 @@ class StreamsTest {
                 () -> assertTrue(isClosedInTryWithResourcesBlock.get()),
                 () -> assertFalse(isClosedOutsideTryWithResources.get())
         );
-    }
-
-    private List<String> getFilteredBookTitleList(String message, AtomicBoolean isClosed, Stream<Book> bookStream) {
-        return bookStream
-                .map(Book::getTitle)
-                .filter(containsAllOf("a", "e"))
-                .distinct()
-                .onClose(() -> setClosedAndPrintClosed(message, isClosed))
-                .toList();
     }
 
     private void setClosedAndPrintClosed(String message, AtomicBoolean closed) {
@@ -517,6 +547,32 @@ class StreamsTest {
             println(Arrays.toString(fibNrs));
 
             assertEquals(93, fibNrs.length);
+        }
+
+        @Nested
+        class FibonacciAndGoldenRatioTests {
+
+            private static final int SCALE = 5;
+
+            @TestFactory
+            Sequence<DynamicTest> testConsecutiveFibNrRatiosConvergeToGoldenRatio() {
+                return Sequence.ofStream(fibonacciStream())
+                        .skipWhile(n -> n.equals(BigInteger.ZERO))
+                        .onEach(It::println)
+                        .map(BigDecimal::new)
+                        .zipWithNext((cur, next) -> next.divide(cur, SCALE, RoundingMode.HALF_UP))
+                        .mapIndexed(this::fibRatioApproximatesGoldenRatio)
+                        .skip(14)
+                        .take(100);
+            }
+
+            @NotNull
+            private DynamicTest fibRatioApproximatesGoldenRatio(int index, BigDecimal ratio) {
+                final int ratioNr = index + 1;
+                final var displayName = "Ratio " + ratioNr + ": " + ratio + " approximates golden ratio";
+                final var expected = BigDecimal.valueOf(GOLDEN_RATIO).setScale(SCALE, RoundingMode.HALF_UP);
+                return dynamicTest(displayName, () -> assertEquals(expected, ratio));
+            }
         }
 
         @Test

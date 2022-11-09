@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterRegistration;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -280,11 +281,6 @@ class ResponseTimerFilterTest {
             }
 
             @Override
-            public boolean isRequestedSessionIdFromUrl() {
-                return false;
-            }
-
-            @Override
             public boolean authenticate(HttpServletResponse httpServletResponse) {
                 return false;
             }
@@ -440,11 +436,6 @@ class ResponseTimerFilterTest {
             }
 
             @Override
-            public String getRealPath(String s) {
-                return null;
-            }
-
-            @Override
             public int getRemotePort() {
                 return 0;
             }
@@ -528,27 +519,7 @@ class ResponseTimerFilterTest {
                     }
 
                     @Override
-                    public Servlet getServlet(String s) {
-                        return null;
-                    }
-
-                    @Override
-                    public Enumeration<Servlet> getServlets() {
-                        return null;
-                    }
-
-                    @Override
-                    public Enumeration<String> getServletNames() {
-                        return null;
-                    }
-
-                    @Override
                     public void log(String s) {
-
-                    }
-
-                    @Override
-                    public void log(Exception e, String s) {
 
                     }
 
@@ -791,6 +762,21 @@ class ResponseTimerFilterTest {
 
             @Override
             public DispatcherType getDispatcherType() {
+                return null;
+            }
+
+            @Override
+            public String getRequestId() {
+                return null;
+            }
+
+            @Override
+            public String getProtocolRequestId() {
+                return null;
+            }
+
+            @Override
+            public ServletConnection getServletConnection() {
                 return null;
             }
         };
