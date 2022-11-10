@@ -18,7 +18,7 @@ class XmlSamplesTest {
                 </email> </emails>
                 """;
 
-        final var prettyPrintXml = XmlSamples.prettyPrintByTransformer(inputXml, this::configureTransformer);
+        final var prettyPrintXml = XmlSamples.prettyPrintXml(inputXml, this::configureTransformer);
         System.out.println(prettyPrintXml);
 
         assertEquals(14, prettyPrintXml.lines().count());

@@ -1,21 +1,13 @@
 package org.hzt.concurrent;
 
-import org.hzt.TimingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.time.Duration;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.IntConsumer;
-import java.util.stream.IntStream;
 
 import static org.hzt.TimingUtils.sleep;
 
 public class AsyncService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncService.class);
     private static final int DELAY = 500;
     private static final int INIT_DELAY = 1_000; // ms
 
@@ -63,29 +55,5 @@ public class AsyncService {
         if (!initialized) {
             throw new IllegalStateException("Service is not initialized");
         }
-    }
-
-    void executeStreamCallingExpensiveMethodMock(int times) {
-        LOGGER.info("Sequential:");
-        IntStream.range(0, times)
-                .forEach(AsyncService::expensiveMethodMock);
-    }
-
-    void executeStreamInParallelCallingExpensiveMethodMock(int times) {
-        LOGGER.info("In parallel:");
-        IntStream.range(0, times)
-                .parallel()
-                .forEach(AsyncService::expensiveMethodMock);
-    }
-
-    static long executeAsyncServiceAndTime(@SuppressWarnings("SameParameterValue") int times, IntConsumer consumer) {
-        long start = System.nanoTime();
-        consumer.accept(times);
-        return System.nanoTime() - start;
-    }
-
-    private static void expensiveMethodMock(int i) {
-        TimingUtils.sleep(Duration.ofMillis(10));
-        LOGGER.info("Dit is call nr {}", i);
     }
 }

@@ -48,7 +48,7 @@ public class CompletableFutureSample {
     }
 
     private static String computationallyIntensiveMethod() {
-        final var STRING = "This is first String that is computationally intensive: 1";
+        final var STRING = "This is a String that is computationally intensive: 1";
         sleep(Duration.ofSeconds(1));
         return STRING;
     }

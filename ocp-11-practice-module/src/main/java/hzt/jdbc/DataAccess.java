@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 public class DataAccess {
 
@@ -29,12 +29,11 @@ public class DataAccess {
         }
     }
 
-    public <R> R sqlQueryExecutor(String sql, Function<PreparedStatement, R> statementFunction) {
-        try (final var connection = DriverManager
-                .getConnection(dataBaseUrl, user, password);
-                var preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    public <T, R> R sqlQueryExecutor(String sql, T domainObject, BiFunction<T, PreparedStatement, R> statementFunction) {
+        try (final var connection = DriverManager.getConnection(dataBaseUrl, user, password);
+             final var preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             connection.setAutoCommit(false);
-            final var result = statementFunction.apply(preparedStatement);
+            final var result = statementFunction.apply(domainObject, preparedStatement);
             connection.commit();
             return result;
         } catch (SQLException e) {

@@ -27,11 +27,15 @@ public final class ConcurrentCollectors {
             Collector.Characteristics.CONCURRENT,
             Collector.Characteristics.UNORDERED};
 
+    private static final Collector.Characteristics[] CH_CONCURRENT_NOID = {
+            Collector.Characteristics.CONCURRENT,
+            Collector.Characteristics.UNORDERED};
+
     private ConcurrentCollectors() {
     }
 
     public static <T> Collector<T, Set<T>, Set<T>> toSetConcurrent() {
-        return Collector.of(ConcurrentHashMap::newKeySet, Set::add, ConcurrentCollectors::throwIfCalled,
+        return Collector.of(ConcurrentHashMap::newKeySet, Set::add, ConcurrentCollectors::throwIfCombinerCalled,
                 CH_CONCURRENT_ID);
     }
 
@@ -40,7 +44,7 @@ public final class ConcurrentCollectors {
             Function<? super T, ? extends V> valueMapper
     ) {
         return Collector.of(ConcurrentHashMap::new, (map, value) -> map.put(keyMapper.apply(value), valueMapper.apply(value)),
-                ConcurrentCollectors::throwIfCalled,
+                ConcurrentCollectors::throwIfCombinerCalled,
                 CH_CONCURRENT_ID);
     }
 
@@ -50,7 +54,7 @@ public final class ConcurrentCollectors {
         return Collector.of(ConcurrentHashMap::new, (m, t) -> {
                     K key = Objects.requireNonNull(classifier.apply(t), "element cannot be mapped to a null key");
                     setCollector.accumulator().accept(m.computeIfAbsent(key, k -> setCollector.supplier().get()), t);
-                }, ConcurrentCollectors::throwIfCalled,
+                }, ConcurrentCollectors::throwIfCombinerCalled,
                 CH_CONCURRENT_ID);
     }
 
@@ -81,19 +85,26 @@ public final class ConcurrentCollectors {
         return concurrentUnorderedIdCollector(ConcurrentSkipListSet::new, Collection::add);
     }
 
-    private static <A> A throwIfCalled(A left, A right) {
+    public static Collector<CharSequence, ?, String> concurrentJoining() {
+        return Collector.of(StringBuffer::new,
+                StringBuffer::append,
+                ConcurrentCollectors::throwIfCombinerCalled,
+                StringBuffer::toString, CH_CONCURRENT_NOID);
+    }
+
+    private static <A> A throwIfCombinerCalled(A left, A right) {
         throw new IllegalStateException("Combiner used in non concurrent non order preserving collector");
     }
 
     private static <T, A> Collector<T, A, A> concurrentUnorderedIdCollector(Supplier<A> supplier, BiConsumer<A, T> accumulator) {
-        return Collector.of(supplier, accumulator, ConcurrentCollectors::throwIfCalled, CH_CONCURRENT_ID);
+        return Collector.of(supplier, accumulator, ConcurrentCollectors::throwIfCombinerCalled, CH_CONCURRENT_ID);
     }
 
     public static <T, K, V, M extends ConcurrentMap<K, V>> Collector<T, ?, M>
     toConcurrentMap(Function<? super T, ? extends K> keyMapper,
                     Function<? super T, ? extends V> valueMapper,
                     Supplier<M> supplier) {
-        return Collectors.toConcurrentMap(keyMapper, valueMapper, ConcurrentCollectors::throwIfCalled, supplier);
+        return Collectors.toConcurrentMap(keyMapper, valueMapper, ConcurrentCollectors::throwIfCombinerCalled, supplier);
     }
 
 }

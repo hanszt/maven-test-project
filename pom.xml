@@ -26,6 +26,7 @@
         <module>quantum-java</module>
         <module>math-utils-samples</module>
         <module>programming-puzzles</module>
+        <module>demo-sogeti-2022</module>
     </modules>
 
     <properties>

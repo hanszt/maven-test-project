@@ -7,10 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @see <a href="https://www.tutorialspoint.com/jdbc/index.htm">JDBC Tutorial</a>
  */
+@SuppressWarnings({"SqlDialectInspection", "SqlNoDataSourceInspection"})
 public class StudentDao {
 
     private final DataAccess dataAccess;
@@ -29,31 +31,22 @@ public class StudentDao {
     }
 
     public List<Integer> insertStudents(List<Student> students) {
-        return dataAccess.sqlQueryExecutor("insert into Student(id, name, average_grade) values (?,?,?)",
-                insertStatement -> insertStudents(students, insertStatement));
+        final var sql = "insert into Student(id, name, average_grade) values (?,?,?)";
+        return dataAccess.sqlQueryExecutor(sql, students, StudentDao::insertStudents);
     }
 
     private static List<Integer> insertStudents(List<Student> students, PreparedStatement ps) {
-        List<Integer> statusList = new ArrayList<>();
-        try {
-            for (Student student : students) {
-                ps.setLong(1, student.getId());
-                ps.setString(2, student.getName());
-                ps.setDouble(3, student.getAverageGrade());
-                statusList.add(ps.executeUpdate());
-            }
-            return statusList;
-        } catch (SQLException e) {
-            throw new IllegalStateException(e);
-        }
+        return students.stream()
+                .map(student -> insertStudent(student, ps))
+                .collect(Collectors.toList());
     }
 
     public int insertStudent(Student student) {
-        return dataAccess.sqlQueryExecutor("insert into Student(id, name, average_grade) values (?,?,?)",
-                ps -> addStudent(student, ps));
+        final var sql = "insert into Student(id, name, average_grade) values (?,?,?)";
+        return dataAccess.sqlQueryExecutor(sql, student, StudentDao::insertStudent);
     }
 
-    private static int addStudent(Student student, PreparedStatement ps) {
+    private static int insertStudent(Student student, PreparedStatement ps) {
         try {
             ps.setLong(1, student.getId());
             ps.setString(2, student.getName());
@@ -68,6 +61,7 @@ public class StudentDao {
     public List<Student> getAllStudents() {
         try (var statement = dataAccess.getConnection().createStatement()) {
 
+            //noinspection SqlDialectInspection,SqlNoDataSourceInspection
             final var sql = "select * from Student";
             var resultSet = statement.executeQuery(sql);
             return getStudents(resultSet);

@@ -13,13 +13,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URL;
-import java.nio.file.Files;
-import java.util.Optional;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public final class XmlSamples {
@@ -32,7 +30,7 @@ public final class XmlSamples {
      * @return A pretty printed xml
      * @see <a href="https://www.baeldung.com/java-pretty-print-xml">Pretty-Print XML in Java</a>
      */
-    public static String prettyPrintByTransformer(String xmlString, Consumer<Transformer> transformerConfigurer) {
+    public static String prettyPrintXml(String xmlString, Consumer<Transformer> transformerConfigurer) {
         try {
             final var src = new InputSource(new StringReader(xmlString));
             final var factory = DocumentBuilderFactory.newInstance();
@@ -58,16 +56,11 @@ public final class XmlSamples {
     /**
      * @return the content of the pretty-print.xsl makes sure the empty nodes are filtered out
      */
-    private static String readPrettyPrintXslt() {
-        final var path = Optional.ofNullable(XmlSamples.class.getResource("/pretty-print.xsl"))
-                .map(URL::getFile)
-                .map(File::new)
-                .map(File::toPath)
-                .orElseThrow();
-        try {
-            return Files.readString(path);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
+    private static String readPrettyPrintXslt() throws IOException {
+        final var name = "/pretty-print.xsl";
+        try (final var resourceAsStream = XmlSamples.class.getResourceAsStream(name)) {
+            final var inputStream = Objects.requireNonNull(resourceAsStream, "Resource not found at " + name);
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 }

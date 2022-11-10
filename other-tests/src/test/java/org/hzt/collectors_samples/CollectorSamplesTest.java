@@ -542,6 +542,29 @@ class CollectorSamplesTest {
             );
         }
 
+        @Test
+        void testJoinConcurrent() {
+            final var words = lazyReadWordsOfShakespeare.get();
+
+            final var actualSequential = words.stream()
+                    .filter(not(String::isBlank))
+                    .collect(ConcurrentCollectors.concurrentJoining());
+
+            final var expected = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .collect(Collectors.joining());
+
+            final var actual = words.parallelStream()
+                    .filter(not(String::isBlank))
+                    .collect(ConcurrentCollectors.concurrentJoining());
+
+            System.out.println("expected.length() = " + expected.length());
+
+            assertAll(
+                    () -> assertEquals(expected.length(), actual.length()),
+                    () -> assertEquals(expected, actualSequential)
+            );
+        }
     }
 
     @NotNull

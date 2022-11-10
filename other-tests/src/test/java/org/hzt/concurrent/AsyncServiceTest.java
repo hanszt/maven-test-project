@@ -10,10 +10,8 @@ import java.util.concurrent.TimeUnit;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.given;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Hans Zuidervaart
@@ -65,18 +63,6 @@ class AsyncServiceTest {
                 .await().atMost(Duration.ofSeconds(5))
                 .atLeast(Duration.ofMillis(500))
                 .until(asyncService::getValue, equalTo(0L));
-    }
-
-    @Test
-    void testParallelStreamExecutesFasterThanSequentialStream() {
-        final int TIMES_EXECUTED = 64;
-        long durationSeq = AsyncService.executeAsyncServiceAndTime(TIMES_EXECUTED, asyncService::executeStreamCallingExpensiveMethodMock);
-        long durationParallel = AsyncService.executeAsyncServiceAndTime(TIMES_EXECUTED, asyncService::executeStreamInParallelCallingExpensiveMethodMock);
-        println("durationSeq = " + durationSeq / 1e9 + " s");
-        println("durationParallel = " + durationParallel / 1e9 + " s");
-        long timesFaster = durationSeq / durationParallel;
-        println("timesFaster = " + timesFaster);
-        assertTrue(durationSeq > durationParallel);
     }
 
     @Test
