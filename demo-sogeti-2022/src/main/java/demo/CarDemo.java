@@ -22,12 +22,12 @@ public final class CarDemo {
             new Car("Mercedes", Car.Type.COUPE, 30_000),
             new Car("Bmw", Car.Type.STATION_CAR, 40_000),
             new Car("Volvo", Car.Type.SEDAN, 9_000),
-            new Car("Suzuki", Car.Type.STATION_CAR, 15_000),
             new Car("Tesla", Car.Type.SUV, 30_000),
+            new Car("Renault", Car.Type.STATION_CAR, 10_000),
             new Car("Toyota", Car.Type.HATCH_BACK, 10_000),
             new Car("Volvo", Car.Type.STATION_CAR, 20_000),
-            new Car("Peugeot", Car.Type.STATION_CAR, 20_000),
-            new Car("Renault", Car.Type.HATCH_BACK, 10_000)
+            new Car("Suzuki", Car.Type.STATION_CAR, 15_000),
+            new Car("Peugeot", Car.Type.STATION_CAR, 20_000)
     );
 
     private CarDemo() {
