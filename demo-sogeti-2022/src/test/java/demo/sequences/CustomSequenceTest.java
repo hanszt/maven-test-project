@@ -10,9 +10,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import static org.hzt.utils.It.println;
+import static org.hzt.utils.numbers.DoubleX.GOLDEN_RATIO;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,23 +23,41 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class CustomSequenceTest {
 
-    @Test
-    void testBigIntFibonacciSequencePrimes() {
-        final long probableFibNrPrimeCount = fibonacciSequence()
-                .filter(fibNr -> fibNr.isProbablePrime(100))
-                .map(BigInteger::toString)
-                .onEach(It::println)
-                .takeWhile(fibNr -> fibNr.length() <= 100)
-                .count();
-
-        assertEquals(18, probableFibNrPrimeCount);
+    static Sequence<BigInteger> fibonacciSequence() {
+        record Pair(BigInteger first, BigInteger second) {
+            Pair next() {
+                return new Pair(second, first.add(second));
+            }
+        }
+        return Sequence
+                .generate(new Pair(BigInteger.ZERO, BigInteger.ONE), Pair::next)
+                .map(Pair::first);
     }
 
-    static Sequence<BigInteger> fibonacciSequence() {
-        final BigInteger[] seedValue = {BigInteger.ZERO, BigInteger.ONE};
-        return Sequence
-                .generate(seedValue, pair -> new BigInteger[]{pair[1], pair[0].add(pair[1])})
-                .map(pair -> pair[0]);
+    @Nested
+    class FibonacciAndGoldenRatioTests {
+
+        private static final int SCALE = 15;
+
+        @TestFactory
+        Sequence<DynamicTest> testConsecutiveFibNrRatiosConvergeToGoldenRatio() {
+            return fibonacciSequence()
+                    .skipWhile(n -> n.equals(BigInteger.ZERO))
+                    .onEach(It::println)
+                    .map(BigDecimal::new)
+                    .zipWithNext((cur, next) -> next.divide(cur, SCALE, RoundingMode.HALF_UP))
+                    .mapIndexed(this::fibRatioApproximatesGoldenRatio)
+                    .take(100)
+                    .skip(14);
+        }
+
+        @NotNull
+        private DynamicTest fibRatioApproximatesGoldenRatio(int index, BigDecimal ratio) {
+            final int ratioNr = index + 1;
+            final var displayName = "Ratio " + ratioNr + ": " + ratio + " approximates golden ratio";
+
+            return dynamicTest(displayName, () -> assertEquals(GOLDEN_RATIO, ratio.doubleValue(), 1e-5));
+        }
     }
 
     @Nested
@@ -81,7 +102,7 @@ class CustomSequenceTest {
         }
 
         private DynamicTest everyFifthContainsBuzz(IndexedValue<String> indexedValue) {
-            final  int n = indexedValue.index() + 1;
+            final int n = indexedValue.index() + 1;
             String name = "Value at n=" + n + " contains buzz";
             return dynamicTest(name, () -> assertTrue(indexedValue.value().contains("buzz")));
         }
@@ -99,7 +120,7 @@ class CustomSequenceTest {
         }
 
         private DynamicTest everyThirdContainsFizz(IndexedValue<String> indexedValue) {
-            final  int n = indexedValue.index() + 1;
+            final int n = indexedValue.index() + 1;
             String name = "Value at n=" + n + " contains fizz";
             return dynamicTest(name, () -> assertTrue(indexedValue.value().contains("fizz")));
         }
@@ -113,7 +134,7 @@ class CustomSequenceTest {
         }
 
         @NotNull
-        private static String next(int index, String current, int modulo,  String string) {
+        private static String next(int index, String current, int modulo, String string) {
             return next(index, current, modulo, 0, string);
         }
 
@@ -157,9 +178,10 @@ class CustomSequenceTest {
                     .start()
                     .fizz()
                     .bizz()
-                    .even()
+//                    .even()
                     .buzz()
-                    .odd();
+//                    .odd()
+            ;
 
             final long count = fizzBuzzer
                     .take(100_000)

@@ -16,7 +16,7 @@ class CarDemoTest {
     @DisplayName("find first station car brand less than 20_000")
     void testFindFirstStationCarLessThan20_000() {
         final var imperative = FindFirstCar.firstStationCarLessThan20_000Imperative(cars);
-        final var streamsResult = FindFirstCar.firstStationCarLessThan20_000Imperative(cars);
+        final var streamsResult = FindFirstCar.firstStationCarLessThan20_000ByStream(cars);
         final var sequencesResult = FindFirstCar.firstStationCarLessThan20_000BySequence(cars);
 
         assertAll(
@@ -40,7 +40,7 @@ class CarDemoTest {
 
     @Test
     void testGroupBy() {
-        final var imperative = CarsGroupedByType.groupByImperative(CarDemo.cars);
+        final var imperative = CarsGroupedByType.groupByCarTypeImperative(CarDemo.cars);
         final var streamsResult = CarsGroupedByType.groupByUsingStream(CarDemo.cars);
         final var tempSequencesResult = CarsGroupedByType.groupByUsingSequence(CarDemo.cars);
 

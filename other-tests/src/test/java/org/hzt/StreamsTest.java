@@ -25,6 +25,7 @@ import org.hzt.utils.sequences.Sequence;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -40,6 +41,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.MonthDay;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -51,6 +53,8 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -78,6 +82,7 @@ import static org.hzt.utils.function.predicates.ComparingPredicates.greaterThan;
 import static org.hzt.utils.function.predicates.StringPredicates.containsAllOf;
 import static org.hzt.utils.numbers.DoubleX.GOLDEN_RATIO;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class StreamsTest {
@@ -897,9 +902,9 @@ class StreamsTest {
     }
 
     @Nested
-    class StreamReduceWrong {
+    class ParallelStreamMisuseTests {
 
-        @Test
+        @RepeatedTest(10)
         void testStreamReduceSubtraction() {
             final var reduce = IntStream.range(0, 100_000)
                     .reduce(100, (i1, i2) -> i1 - i2);
@@ -914,10 +919,34 @@ class StreamsTest {
             assertNotEquals(reduce, reduceParallel);
         }
 
-        @Test
+        @RepeatedTest(10)
+        void testStreamToListWithForEach() {
+            List<Integer> listSequential = new ArrayList<>();
+            IntStream.range(0, 100_000).forEach(listSequential::add);
+
+            List<Integer> listParallel = new ArrayList<>();
+            boolean indexOutOfBoundThrown = false;
+            try {
+                IntStream.range(0, 100_000)
+                        .parallel()
+                        .forEach(listParallel::add);
+            } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace();
+                indexOutOfBoundThrown = true;
+            }
+            assumeFalse(indexOutOfBoundThrown);
+
+            System.out.println("listSequential size = " + listSequential.size());
+            System.out.println("listParallel size = " + listParallel.size());
+
+            assertNotEquals(listSequential, listParallel);
+        }
+
+        @RepeatedTest(10)
         void testStreamReduceStringBuilder() {
-            final var reduce = reduceWithStringBuilder(IntStream.range(0, 100)
-                    .mapToObj(Objects::toString));
+            final var reduce = IntStream.range(0, 100)
+                    .mapToObj(Objects::toString)
+                    .reduce(new StringBuilder(), StringBuilder::append, StringBuilder::append);
 
             final var parallelStream = IntStream.range(0, 100)
                     .mapToObj(Objects::toString)
@@ -925,14 +954,15 @@ class StreamsTest {
 
             println("reduce = " + reduce);
 
+            final var identity = new StringBuilder();
+            final BiFunction<StringBuilder, String, StringBuilder> accumulator = StringBuilder::append;
+            final BinaryOperator<StringBuilder> combiner = StringBuilder::append;
+
+            //noinspection ResultOfMethodCallIgnored
             assertAll(
-                    () -> assertThrows(IndexOutOfBoundsException.class, () -> reduceWithStringBuilder(parallelStream)),
+                    () -> assertThrows(IndexOutOfBoundsException.class, () -> parallelStream.reduce(identity, accumulator, combiner)),
                     () -> assertEquals(190, reduce.length())
             );
-        }
-
-        private StringBuilder reduceWithStringBuilder(Stream<String> stream) {
-            return stream.reduce(new StringBuilder(), StringBuilder::append, StringBuilder::append);
         }
     }
 

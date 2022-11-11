@@ -70,12 +70,13 @@ class SpliteratorTest {
 
         @Test
         void testTrySplitFromArrayList() {
-            final var spliterator = IntStream.range(0, 1_000_000)
+            final var list = IntStream.range(0, 1_000_000)
                     .filter(i -> i % 3 == 0)
                     .map(i -> i * 2)
                     .boxed()
-                    .toList()
-                    .spliterator();
+                    .toList();
+
+            final var spliterator = list.spliterator();
 
             List<Spliterator<Integer>> spliterators = createSpliteratorList(spliterator);
             printSpliteratorEstimatedSizes(spliterators);

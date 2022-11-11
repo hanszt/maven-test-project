@@ -1,6 +1,5 @@
 package demo;
 
-import demo.sequences.MySequence;
 import org.hzt.utils.collections.MapX;
 import org.hzt.utils.collections.MutableListX;
 import org.hzt.utils.sequences.Sequence;
@@ -37,21 +36,23 @@ public final class CarDemo {
     public static class FindFirstCar {
 
         public static void main(String[] args) {
-            println("imperative:");
-            final var result1 = firstStationCarLessThan20_000Imperative(cars);
-            println(result1);
-            println("By stream:");
-            final var result2 = firstStationCarLessThan20_000ByStream(cars);
-            println(result2);
+//            println("imperative:");
+//            final var result1 = firstStationCarLessThan20_000Imperative(cars);
+//            println(result1);
+//            println("By stream:");
+//            final var result2 = firstStationCarLessThan20_000ByStream(cars);
+//            println(result2);
+            final var result3 = firstStationCarLessThan20_000BySequence(cars);
+            println(result3);
         }
 
         public static String firstStationCarLessThan20_000Imperative(List<Car> cars) {
             for (var car : cars) {
-                final var leap = car.isPriceLessThanEqual20_000();
-                if (leap) {
-                    final var yearAfter2000 = car.isOfTypeStationCar();
-                    if (yearAfter2000) {
-                        return car.brand();
+                final var carPriceLessThanEqual20000 = car.isPriceLessThanEqual20_000();
+                if (carPriceLessThanEqual20000) {
+                    final var carOfTypeStationCar = car.isOfTypeStationCar();
+                    if (carOfTypeStationCar) {
+                        return car.printAndGetBrand();
                     }
                 }
             }
@@ -68,7 +69,7 @@ public final class CarDemo {
         }
 
         public static String firstStationCarLessThan20_000BySequence(List<Car> cars) {
-            return MySequence.of(cars)
+            return Sequence.of(cars)
                     .filter(Car::isPriceLessThanEqual20_000)
                     .filter(Car::isOfTypeStationCar)
                     .map(Car::printAndGetBrand)
@@ -85,15 +86,16 @@ public final class CarDemo {
             println("By stream:");
             final var result2 = allCarBrandsStationCarsLessThan20_000Imperative(cars);
             println(result2);
+            println("By sequence:");
+            final var result3 = allCarBrandsStationCarsLessThan20_000Imperative(cars);
+            println(result3);
         }
 
         public static List<String> allCarBrandsStationCarsLessThan20_000Imperative(List<Car> cars) {
             List<String> brands = new ArrayList<>();
             for (var car : cars) {
-                final var leap = car.isPriceLessThanEqual20_000();
-                if (leap) {
-                    final var yearAfter2000 = car.isOfTypeStationCar();
-                    if (yearAfter2000) {
+                if (car.isPriceLessThanEqual20_000()) {
+                    if (car.isOfTypeStationCar()) {
                         brands.add(car.brand());
                     }
                 }
@@ -110,7 +112,7 @@ public final class CarDemo {
         }
 
         public static List<String> allCarBrandsStationCarsLessThan20_000BySequence(List<Car> cars) {
-            return MySequence.of(cars)
+            return Sequence.of(cars)
                     .filter(Car::isPriceLessThanEqual20_000)
                     .filter(Car::isOfTypeStationCar)
                     .map(Car::printAndGetBrand)
@@ -122,7 +124,7 @@ public final class CarDemo {
 
         public static void main(String[] args) {
             println("Imperative");
-            final var carNamesGroupedByTypeImperative = groupByImperative(cars);
+            final var carNamesGroupedByTypeImperative = groupByCarTypeImperative(cars);
             println("Stream");
             final var carNamesGroupedByTypeStream = groupByUsingStream(cars);
             println("Sequence");
@@ -132,7 +134,7 @@ public final class CarDemo {
             println("carsNamesGroupedByTypeSequence = " + carNamesGroupedByTypeSequence);
         }
 
-        public static Map<Car.Type, List<String>> groupByImperative(List<Car> cars) {
+        public static Map<Car.Type, List<String>> groupByCarTypeImperative(List<Car> cars) {
             Map<Car.Type, List<String>> map = new HashMap<>();
             for (Car car : cars) {
                 if (car.isPriceLessThanEqual20_000()) {
