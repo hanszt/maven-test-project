@@ -60,13 +60,13 @@ class ParallelStreamsTest {
 
         long timesFaster = durationSequential / durationParallel;
 
-        final var ints = resultParallel.second();
+        final var arrayParallel = resultParallel.second();
 
         println("timesFaster = " + timesFaster);
-        println("Array: " + Arrays.toString(ints));
+        println("Array: " + Arrays.toString(arrayParallel));
 
         assertAll(
-                () -> assertArrayEquals(ints, resultSequential.second()),
+                () -> assertArrayEquals(arrayParallel, resultSequential.second()),
                 () -> assertTrue(durationSequential > durationParallel)
         );
     }

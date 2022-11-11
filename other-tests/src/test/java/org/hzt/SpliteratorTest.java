@@ -62,7 +62,7 @@ class SpliteratorTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class TrySplitTests {
 
-        private static final int TIMES_TO_SPLIT = 10;
+        private static final int TIMES_TO_SPLIT = 3;
 
         TrySplitTests() {
             System.out.println("Constructing TrySplitTests...");
@@ -78,7 +78,7 @@ class SpliteratorTest {
                     .spliterator();
 
             List<Spliterator<Integer>> spliterators = createSpliteratorList(spliterator);
-            printSpliteratorSizes(spliterators);
+            printSpliteratorEstimatedSizes(spliterators);
 
             assertEquals(timesSplitRaisedToPowerOfTwo(), spliterators.size());
         }
@@ -92,7 +92,7 @@ class SpliteratorTest {
                     .spliterator();
 
             List<Spliterator<Integer>> spliterators = createSpliteratorList(spliterator);
-            printSpliteratorSizes(spliterators);
+            printSpliteratorEstimatedSizes(spliterators);
 
             assertEquals(timesSplitRaisedToPowerOfTwo(), spliterators.size());
         }
@@ -107,7 +107,7 @@ class SpliteratorTest {
             final var spliterator = treeSet.spliterator();
 
             List<Spliterator<Integer>> spliterators = createSpliteratorList(spliterator);
-            printSpliteratorSizes(spliterators);
+            printSpliteratorEstimatedSizes(spliterators);
 
             assertEquals(timesSplitRaisedToPowerOfTwo(), spliterators.size());
         }
@@ -122,7 +122,7 @@ class SpliteratorTest {
             final var spliterator = deque.spliterator();
 
             List<Spliterator<Integer>> spliterators = createSpliteratorList(spliterator);
-            printSpliteratorSizes(spliterators);
+            printSpliteratorEstimatedSizes(spliterators);
 
             assertEquals(timesSplitRaisedToPowerOfTwo(), spliterators.size());
         }
@@ -133,7 +133,7 @@ class SpliteratorTest {
             final var ofInt = IntStream.of(ints).spliterator();
 
             List<Spliterator<Integer>> spliterators = createSpliteratorList(ofInt);
-            printSpliteratorSizes(spliterators);
+            printSpliteratorEstimatedSizes(spliterators);
 
             assertEquals(timesSplitRaisedToPowerOfTwo(), spliterators.size());
         }
@@ -145,7 +145,7 @@ class SpliteratorTest {
                     .spliterator();
 
             List<Spliterator<Integer>> spliterators = createSpliteratorList(spliterator);
-            printSpliteratorSizes(spliterators);
+            printSpliteratorEstimatedSizes(spliterators);
 
             assertEquals(1, spliterators.size());
         }
@@ -155,7 +155,7 @@ class SpliteratorTest {
             final var spliterator = IntStream.range(0, 1_000_000).spliterator();
 
             List<Spliterator<Integer>> spliterators = createSpliteratorList(spliterator);
-            printSpliteratorSizes(spliterators);
+            printSpliteratorEstimatedSizes(spliterators);
 
             assertEquals(timesSplitRaisedToPowerOfTwo(), spliterators.size());
         }
@@ -168,12 +168,12 @@ class SpliteratorTest {
                     .spliterator();
 
             List<Spliterator<Integer>> spliterators = createSpliteratorList(spliterator);
-            printSpliteratorSizes(spliterators);
+            printSpliteratorEstimatedSizes(spliterators);
 
             assertEquals(1, spliterators.size());
         }
 
-        private static void printSpliteratorSizes(List<Spliterator<Integer>> spliterators) {
+        private static void printSpliteratorEstimatedSizes(List<Spliterator<Integer>> spliterators) {
             final var longs = spliterators.stream()
                     .mapToLong(Spliterator::estimateSize)
                     .toArray();
