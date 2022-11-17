@@ -1,8 +1,6 @@
 package demo;
 
-import org.hzt.utils.collections.MapX;
-import org.hzt.utils.collections.MutableListX;
-import org.hzt.utils.sequences.Sequence;
+import demo.sequences.Sequence;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import static demo.It.println;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
-import static org.hzt.utils.It.println;
 
 public final class CarDemo {
 
@@ -37,11 +35,11 @@ public final class CarDemo {
 
         public static void main(String[] args) {
 //            println("imperative:");
-//            final var result1 = firstStationCarLessThan20_000Imperative(cars);
-//            println(result1);
-//            println("By stream:");
-//            final var result2 = firstStationCarLessThan20_000ByStream(cars);
-//            println(result2);
+            final var result1 = firstStationCarLessThan20_000Imperative(cars);
+            println(result1);
+            println("By stream:");
+            final var result2 = firstStationCarLessThan20_000ByStream(cars);
+            println(result2);
             final var result3 = firstStationCarLessThan20_000BySequence(cars);
             println(result3);
         }
@@ -158,10 +156,10 @@ public final class CarDemo {
                     .collect(groupingBy(Car::type, mapping(Car::brand, toList())));
         }
 
-        public static MapX<Car.Type, MutableListX<String>> groupByUsingSequence(List<Car> cars) {
+        public static Map<Car.Type, List<String>> groupByUsingSequence(List<Car> cars) {
             return Sequence.of(cars)
                     .filter(Car::isPriceLessThanEqual20_000)
-                    .groupMapping(Car::type, Car::brand);
+                    .groupBy(Car::type, Car::brand);
         }
     }
 }

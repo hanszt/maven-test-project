@@ -465,7 +465,7 @@ class StreamsTest {
         final SetX<Integer> integers = IntStream.iterate(0, i -> i < 100, i -> ++i)
                 .collect(MutableSetX::empty, Set::add, Set::addAll);
 
-        final SetX<Integer> set = Sequence.generate(0, i -> ++i).takeWhile(i -> i < 100).toSetX();
+        final SetX<Integer> set = Sequence.iterate(0, i -> ++i).takeWhile(i -> i < 100).toSetX();
 
         assertAll(
                 () -> assertEquals(100, integers.size()),

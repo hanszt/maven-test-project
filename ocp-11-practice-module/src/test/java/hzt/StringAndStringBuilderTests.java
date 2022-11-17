@@ -2,8 +2,7 @@ package hzt;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class StringAndStringBuilderTests {
 
@@ -68,5 +67,9 @@ class StringAndStringBuilderTests {
         assertEquals(10 ,sb.length());
     }
 
+    @Test
+    void testStringBuilderWithSameContentDoNotEqual() {
+        assertNotEquals(new StringBuilder("hallo"), new StringBuilder("hallo"));
+    }
 
 }

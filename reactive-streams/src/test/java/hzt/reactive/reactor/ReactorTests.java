@@ -28,7 +28,7 @@ class ReactorTests {
 
     @Test
     void testGenerateFluxFromIterable() {
-        final var mono = Flux.fromIterable(Sequence.generate(0, i -> ++i))
+        final var mono = Flux.fromIterable(Sequence.iterate(0, i -> ++i))
                 .take(10)
                 .collect(Collectors.toList());
 

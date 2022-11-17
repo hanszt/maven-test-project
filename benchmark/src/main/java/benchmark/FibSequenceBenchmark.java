@@ -52,7 +52,7 @@ public class FibSequenceBenchmark {
 
     private static Sequence<BigInteger> fibonacciSSequence() {
         final BigInteger[] seed = {ZERO, ONE};
-        return Sequence.generate(seed, fibPair -> new BigInteger[]{fibPair[1], fibPair[0].add(fibPair[1])})
+        return Sequence.iterate(seed, fibPair -> new BigInteger[]{fibPair[1], fibPair[0].add(fibPair[1])})
                 .map(fibPair -> fibPair[0]);
     }
 

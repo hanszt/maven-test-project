@@ -26,8 +26,8 @@ Some modules require the following custom dependencies:
 <dependencies>
     <dependency>
         <groupId>org.hzt.utils</groupId>
-        <artifactId>test-data-generator</artifactId>
-        <version>${test-data-generator.version}</version>
+        <artifactId>test-utils</artifactId>
+        <version>${test-utils.version}</version>
     </dependency>
     <dependency>
         <groupId>org.hzt.utils</groupId>

@@ -9,7 +9,7 @@ final class ArrayIterator<T> implements Iterator<T> {
     private final int size;
     private final IntFunction<T> indexToValueMapper;
 
-    public ArrayIterator(int size, IntFunction<T> indexToValueMapper) {
+    ArrayIterator(int size, IntFunction<T> indexToValueMapper) {
         this.size = size;
         this.indexToValueMapper = indexToValueMapper;
     }

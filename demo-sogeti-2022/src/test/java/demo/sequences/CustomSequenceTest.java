@@ -1,10 +1,7 @@
 package demo.sequences;
 
-import org.hzt.utils.It;
-import org.hzt.utils.sequences.Sequence;
-import org.hzt.utils.sequences.primitives.IntSequence;
-import org.hzt.utils.tuples.IndexedValue;
-import org.jetbrains.annotations.NotNull;
+import demo.IndexedValue;
+import demo.It;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,8 +11,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-import static org.hzt.utils.It.println;
-import static org.hzt.utils.numbers.DoubleX.GOLDEN_RATIO;
+import static demo.It.println;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,7 +26,7 @@ class CustomSequenceTest {
             }
         }
         return Sequence
-                .generate(new Pair(BigInteger.ZERO, BigInteger.ONE), Pair::next)
+                .iterate(new Pair(BigInteger.ZERO, BigInteger.ONE), Pair::next)
                 .map(Pair::first);
     }
 
@@ -47,16 +43,18 @@ class CustomSequenceTest {
                     .map(BigDecimal::new)
                     .zipWithNext((cur, next) -> next.divide(cur, SCALE, RoundingMode.HALF_UP))
                     .mapIndexed(this::fibRatioApproximatesGoldenRatio)
-                    .take(100)
-                    .skip(14);
+                    .take(200)
+                    .skip(12)
+                    ;
         }
 
-        @NotNull
         private DynamicTest fibRatioApproximatesGoldenRatio(int index, BigDecimal ratio) {
+            final double GOLDEN_RATIO = (1 + Math.sqrt(5)) / 2.0;
             final int ratioNr = index + 1;
-            final var displayName = "Ratio " + ratioNr + ": " + ratio + " approximates golden ratio";
+            final var delta = 1e-5;
+            final var displayName = "Ratio " + ratioNr + ": " + ratio + " approximates golden ratio with error " + delta;
 
-            return dynamicTest(displayName, () -> assertEquals(GOLDEN_RATIO, ratio.doubleValue(), 1e-5));
+            return dynamicTest(displayName, () -> assertEquals(GOLDEN_RATIO, ratio.doubleValue(), delta));
         }
     }
 
@@ -133,12 +131,10 @@ class CustomSequenceTest {
             return current.chars().allMatch(Character::isDigit);
         }
 
-        @NotNull
         private static String next(int index, String current, int modulo, String string) {
             return next(index, current, modulo, 0, string);
         }
 
-        @NotNull
         private static String next(int index, String current, int modulo, int offSet, String string) {
             int value = index + 1;
             final boolean isNaturalNr = isNaturalNr(current);
@@ -150,7 +146,7 @@ class CustomSequenceTest {
         }
 
         static FizzBuzzer start() {
-            return IntSequence.generate(1, n -> n + 1).mapToObj(String::valueOf)::iterator;
+            return Sequence.iterate(1, n -> n + 1).map(String::valueOf)::iterator;
         }
 
         default FizzBuzzer fizz() {
@@ -178,9 +174,9 @@ class CustomSequenceTest {
                     .start()
                     .fizz()
                     .bizz()
-//                    .even()
+                    .even()
                     .buzz()
-//                    .odd()
+                    .odd()
             ;
 
             final long count = fizzBuzzer

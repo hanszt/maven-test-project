@@ -8,12 +8,14 @@ final class FilteringIterator<T> implements Iterator<T> {
 
     private final Iterator<T> iterator;
     private final Predicate<? super T> predicate;
+    private boolean sendWhen;
     private State nextState = State.NEXT_UNKNOWN;
     private T nextItem = null;
 
-    FilteringIterator(Iterator<T> iterator, Predicate<? super T> predicate) {
+    FilteringIterator(Iterator<T> iterator, Predicate<? super T> predicate, boolean sendWhen) {
         this.iterator = iterator;
         this.predicate = predicate;
+        this.sendWhen = sendWhen;
     }
 
     @Override
@@ -41,7 +43,7 @@ final class FilteringIterator<T> implements Iterator<T> {
     private void calculateNext() {
         while (iterator.hasNext()) {
             T item = iterator.next();
-            if (predicate.test(item)) {
+            if (predicate.test(item) == sendWhen) {
                 nextItem = item;
                 nextState = State.CONTINUE;
                 return;

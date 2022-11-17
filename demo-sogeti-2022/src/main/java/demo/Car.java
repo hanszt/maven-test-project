@@ -1,6 +1,6 @@
 package demo;
 
-import static org.hzt.utils.It.println;
+import static demo.It.println;
 
 public record Car(String brand, Type type, int price) {
 

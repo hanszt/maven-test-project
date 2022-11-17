@@ -1,7 +1,8 @@
 package demo;
 
-import org.hzt.utils.iterables.Collectable;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
 import static demo.CarDemo.CarsGroupedByType;
@@ -10,6 +11,7 @@ import static demo.CarDemo.cars;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@DisplayNameGeneration(DisplayNameGenerator.IndicativeSentences.class)
 class CarDemoTest {
 
     @Test
@@ -42,9 +44,7 @@ class CarDemoTest {
     void testGroupBy() {
         final var imperative = CarsGroupedByType.groupByCarTypeImperative(CarDemo.cars);
         final var streamsResult = CarsGroupedByType.groupByUsingStream(CarDemo.cars);
-        final var tempSequencesResult = CarsGroupedByType.groupByUsingSequence(CarDemo.cars);
-
-        final var sequencesResult = tempSequencesResult.mapByValues(Collectable::toList).toMap();
+        final var sequencesResult = CarsGroupedByType.groupByUsingSequence(CarDemo.cars);
 
         assertAll(
                 () -> assertEquals(streamsResult, imperative),

@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-public final class GeneratorIterator<T> implements Iterator<T> {
+final class GeneratorIterator<T> implements Iterator<T> {
 
     private final Supplier<? extends T> initSupplier;
     private final UnaryOperator<T> nextValueSupplier;
