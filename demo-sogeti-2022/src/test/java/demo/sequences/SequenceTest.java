@@ -559,7 +559,7 @@ class SequenceTest {
     void testSequenceFromStream() {
         final var stream = IntStream.range(0, 100).boxed();
 
-        final var list = Sequence.of(stream.iterator())
+        final var list = Sequence.of(stream::iterator)
                 .filter(i -> i % 2 == 0)
                 .sortedBy(It::self)
                 .windowed(3, 1, true)

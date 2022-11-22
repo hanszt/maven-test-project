@@ -1,6 +1,9 @@
 package org.hzt;
 
 import org.apache.commons.math3.complex.Complex;
+import org.apache.commons.math3.transform.DftNormalization;
+import org.apache.commons.math3.transform.FastFourierTransformer;
+import org.apache.commons.math3.transform.TransformType;
 import org.hzt.utils.It;
 import org.hzt.utils.collections.primitives.IntList;
 import org.hzt.utils.collections.primitives.IntMutableList;
@@ -75,6 +78,9 @@ class RecursiveSamplesTest {
                 .toArray(Complex[]::new);
 
         final var fastFourierTransform = RecursiveSamples.fastFourierTransform(complexes);
+        final var fastFourierTransform1 = RecursiveSamplesKt.fft(complexes);
+        final var expected = new FastFourierTransformer(DftNormalization.STANDARD)
+                .transform(complexes, TransformType.FORWARD);
 
         final var largerValueCount = Arrays.stream(fastFourierTransform)
                 .mapToDouble(Complex::abs)
@@ -84,8 +90,14 @@ class RecursiveSamplesTest {
 
         assertAll(
                 () -> assertEquals(complexes.length, fastFourierTransform.length),
-                () -> assertEquals(2, largerValueCount)
+                () -> assertEquals(2, largerValueCount),
+                () -> assertArrayEquals(fastFourierTransform, fastFourierTransform1),
+                () -> assertArrayEquals(toRintAbsArray(expected), toRintAbsArray(fastFourierTransform1))
         );
+    }
+
+    private static double[] toRintAbsArray(Complex[] fastFourierTransform1) {
+        return Arrays.stream(fastFourierTransform1).mapToDouble(Complex::abs).map(Math::rint).toArray();
     }
 
     @ParameterizedTest
@@ -169,7 +181,7 @@ class RecursiveSamplesTest {
 
             System.out.println("factorial = " + factorial1);
 
-            assertEquals(factorial1 ,factorial2);
+            assertEquals(factorial1, factorial2);
         }
 
         @Test

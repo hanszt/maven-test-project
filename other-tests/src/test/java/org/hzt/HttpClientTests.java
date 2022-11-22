@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.ProxySelector;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Paths;
@@ -47,7 +47,7 @@ class HttpClientTests {
     void testPostSynchronous() {
         HttpClient client = buildHttpClient();
 
-        assertThrows(HttpConnectTimeoutException.class, () -> send(client));
+        assertThrows(ConnectException.class, () -> send(client));
     }
 
     private void send(HttpClient client) throws IOException, InterruptedException {

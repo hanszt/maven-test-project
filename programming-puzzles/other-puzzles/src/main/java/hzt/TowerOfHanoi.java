@@ -1,11 +1,14 @@
 package hzt;
 
+import org.hzt.utils.It;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({"squid:S106", "squid:S2234"})
+import static org.hzt.utils.It.printf;
+import static org.hzt.utils.It.println;
+
 public final class TowerOfHanoi {
 
     private static final int MAX_NUMBER_OF_DISKS_IN_GAME = 10;
@@ -15,11 +18,11 @@ public final class TowerOfHanoi {
 
     public static void main(final String[] args) {
         for (int numberOfDisks = 1; numberOfDisks <= MAX_NUMBER_OF_DISKS_IN_GAME; numberOfDisks++) {
-            System.out.printf("%nFor a game with %d disks:%n", numberOfDisks);
+            printf("%nFor a game with %d disks:%n", numberOfDisks);
             final var moves = playTowerOfHanoiGame(numberOfDisks);
-            moves.forEach(System.out::println);
-            System.out.printf("%nTotal number of moves: %d%n", moves.size());
-            System.out.println("----------------------------------------");
+            moves.forEach(It::println);
+            printf("%nTotal number of moves: %d%n", moves.size());
+            println("----------------------------------------");
         }
     }
 
@@ -42,6 +45,7 @@ public final class TowerOfHanoi {
         return moves;
     }
 
+    @SuppressWarnings({"squid:S2234"})
     private static void moveDisk(final int diskNumber,
                                  final char fromRod,
                                  final char targetRod,

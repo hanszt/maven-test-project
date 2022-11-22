@@ -5,14 +5,15 @@ import org.apache.commons.math3.util.ArithmeticUtils;
 import org.hzt.utils.PreConditions;
 import org.hzt.utils.collections.primitives.IntList;
 import org.hzt.utils.collections.primitives.IntMutableList;
-import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import static org.hzt.utils.It.println;
 
 /**
  * @see <a href="https://www.youtube.com/watch?v=SPri4PTUY_8">Tail Call Optimization</a>
+ * @see <a href="programming-puzzles/other-puzzles">other puzzles module</a> for more recursive examples
  */
 public final class RecursiveSamples {
 
@@ -48,49 +49,29 @@ public final class RecursiveSamples {
     /**
      * It is assumed the length of the input array is a power of two
      *
+     * @see <a href="https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/FFT.java.html">Fast Fourier Transform</a>
      * @param input the complex nr array to apply the fast fourier transform to
      * @return the fourier transform of the input
      */
     public static Complex[] fastFourierTransform(Complex[] input) {
         final int length = input.length;
-        // base case
         if (length == 1) {
             return new Complex[]{input[0]};
         }
-
         if (!ArithmeticUtils.isPowerOfTwo(length)) {
             throw new IllegalArgumentException("The length: " + length + " is not a power of 2");
         }
-
         final var halfLength = length / 2;
-
         final var halfLengthArray = new Complex[halfLength];
-
-        // compute FFT of even terms
-        for (int k = 0; k < halfLength; k++) {
-            halfLengthArray[k] = input[2 * k];
-        }
+        Arrays.setAll(halfLengthArray, k -> input[2 * k]);
         final Complex[] evenFFT = fastFourierTransform(halfLengthArray);
-
-        // compute FFT of odd terms
-        // reuse the array (to avoid n log n space)
-        for (int k = 0; k < halfLength; k++) {
-            halfLengthArray[k] = input[2 * k + 1];
-        }
+        Arrays.setAll(halfLengthArray, k -> input[2 * k + 1]);
         final Complex[] oddFFT = fastFourierTransform(halfLengthArray);
-
-        return combine(evenFFT, oddFFT, length, halfLength);
-    }
-
-    @NotNull
-    private static Complex[] combine(Complex[] evenFFT, Complex[] oddFFT, int length, int halfLength) {
         final var result = new Complex[length];
+
         for (int k = 0; k < halfLength; k++) {
             final var phi = -(2 * Math.PI) * k / length;
-            final var angle = new Complex(Math.cos(phi), Math.sin(phi));
-
-            final var complex = angle.multiply(oddFFT[k]);
-
+            final var complex = new Complex(Math.cos(phi), Math.sin(phi)).multiply(oddFFT[k]);
             result[k] = evenFFT[k].add(complex);
             result[k + halfLength] = evenFFT[k].subtract(complex);
         }

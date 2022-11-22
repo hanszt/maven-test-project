@@ -4,11 +4,10 @@ import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @see <a href="https://github.com/jenetics/colt">CERN Open Source Libraries for High Performance Scientific and Technical Computing in Java.</a>
- * @see org.hzt.colt.ColtMathLibrary
  */
 class ColtMathLibraryTests {
 

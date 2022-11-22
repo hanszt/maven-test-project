@@ -35,7 +35,7 @@ import java.util.stream.StreamSupport;
 
 import static java.util.Spliterator.ORDERED;
 
-@SuppressWarnings("WhileLoopReplaceableByForEach")
+@SuppressWarnings({"WhileLoopReplaceableByForEach", "squid:S1448"})
 @FunctionalInterface
 public interface Sequence<T> extends Iterable<T> {
 
@@ -47,10 +47,6 @@ public interface Sequence<T> extends Iterable<T> {
 
     static <T> Sequence<T> of(final Iterable<T> iterable) {
         return iterable::iterator;
-    }
-
-    static <T> Sequence<T> of(final Iterator<T> iterator) {
-        return () -> iterator;
     }
 
     static <T> Sequence<T> empty() {

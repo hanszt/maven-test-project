@@ -50,7 +50,7 @@
         <streamex.version>0.8.1</streamex.version>
         <jool.version>0.9.14</jool.version>
         <org.hzt-utils.version>0.7.5.11</org.hzt-utils.version>
-        <cyclops.version>10.4.0</cyclops.version>
+        <cyclops.version>10.4.1</cyclops.version>
         <!--reactive-streams-->
         <reactive-streams-tck.version>1.0.3</reactive-streams-tck.version>
         <rxjava.version>3.1.5</rxjava.version>
