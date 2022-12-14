@@ -2,7 +2,7 @@ open module other.tests {
 
     requires java.desktop;
     requires java.net.http;
-    requires slf4j.api;
+    requires org.slf4j;
     requires commons.beanutils;
     requires hzt.utils.core;
     requires one.util.streamex;

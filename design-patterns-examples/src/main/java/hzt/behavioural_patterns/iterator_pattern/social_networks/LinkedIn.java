@@ -57,7 +57,7 @@ public class LinkedIn implements SocialNetwork {
 
     private static void simulateNetworkLatency() {
         try {
-            TimeUnit.NANOSECONDS.sleep(2500);
+            TimeUnit.NANOSECONDS.sleep(500);
         } catch (InterruptedException ex) {
             ex.printStackTrace();
             Thread.currentThread().interrupt();

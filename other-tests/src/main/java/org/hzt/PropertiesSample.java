@@ -13,8 +13,6 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import static java.lang.System.out;
-
 public class PropertiesSample {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesSample.class);
@@ -26,6 +24,7 @@ public class PropertiesSample {
     private static final String PROP_FILE2_LOCATION = PROPERTIES_INPUT_DIR + "/xml-properties.xml";
     private static final String PROP_NAME_QUEUE_MANAGER = "queue.manager";
 
+    @SuppressWarnings("squid:S106")
     public static void main(String... args) {
         LOGGER.info("Hello Test project");
         File propertiesFile = new File(PROP_FILE1_LOCATION);
@@ -50,7 +49,7 @@ public class PropertiesSample {
             properties2.storeToXML(fileOutputStreamXml, "store to properties file");
             properties2.remove("imageIcon");
             properties2.store(fileWriter, "store to properties file");
-            properties2.list(out);
+            properties2.list(System.out);
             enumerate(properties1);
         } catch (IOException e) {
             LOGGER.error("Io error: ", e);
@@ -59,7 +58,7 @@ public class PropertiesSample {
     }
 
     private static void enumerate(Properties appProps) {
-        LambdaLogging.logIfInfoEnabled(() -> String.format("%nEnumeration of %s%n", appProps.toString()));
+        LOGGER.atInfo().setMessage(() -> "%nEnumeration of %s%n".formatted(appProps.toString())).log();
 
         Iterable<Object> valueEnumeration = () -> appProps.elements().asIterator();
         valueEnumeration.forEach(value -> LOGGER.info("value: {}", value));

@@ -1,4 +1,4 @@
 open module java.seventien.tests {
-    requires slf4j.api;
+    requires org.slf4j;
     requires jdk.incubator.vector;
 }

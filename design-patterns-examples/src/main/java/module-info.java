@@ -1,5 +1,5 @@
 open module design.patterns.examples {
-    requires slf4j.api;
+    requires org.slf4j;
     requires java.desktop;
     requires java.sql;
     requires org.jooq.jool;

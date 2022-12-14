@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.hzt.TimingUtils.sleep;
 
 public class AsyncService {
-    private static final int DELAY = 500;
-    private static final int INIT_DELAY = 1_000; // ms
+    private static final int DELAY = 100;
+    private static final int INIT_DELAY = 200; // ms
 
     private final AtomicLong value = new AtomicLong(0);
     private final Executor executor = Executors.newFixedThreadPool(4);

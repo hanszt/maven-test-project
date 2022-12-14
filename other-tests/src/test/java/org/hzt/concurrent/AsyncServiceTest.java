@@ -60,26 +60,26 @@ class AsyncServiceTest {
     void testIgnoringExceptions() {
         asyncService.initialize();
         given().ignoreException(IllegalStateException.class)
-                .await().atMost(Duration.ofSeconds(5))
-                .atLeast(Duration.ofMillis(500))
+                .await().atMost(Duration.ofSeconds(1))
+                .atLeast(Duration.ofMillis(100))
                 .until(asyncService::getValue, equalTo(0L));
     }
 
     @Test
     void whenAssertingTimeout_thenNotExceeded() {
         var service = new AsyncService(true);
-        assertTimeout(Duration.ofSeconds(2), () -> addValues(service));
+        assertTimeout(Duration.ofSeconds(1), () -> addValues(service));
     }
 
     @Test
     void whenAssertingTimeoutPreemptively_thenNotExceeded() {
         var service = new AsyncService(true);
-        assertTimeoutPreemptively(Duration.ofSeconds(2), () -> addValues(service));
+        assertTimeoutPreemptively(Duration.ofSeconds(1), () -> addValues(service));
     }
 
     private void addValues(AsyncService service) {
         service.addValue(3);
-        service.addValue(4, Duration.ofMillis(1200));
+        service.addValue(4, Duration.ofMillis(500));
         await().until(service::getValue, value -> value == 7);
     }
 }

@@ -1,6 +1,6 @@
 open module scheduling.samples {
     requires quartz;
-    requires slf4j.api;
+    requires org.slf4j;
 
     exports hzt to quartz;
 }

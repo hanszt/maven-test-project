@@ -77,7 +77,6 @@ public final class Streams {
      * @see <a href="https://en.wikipedia.org/wiki/Sieve_of_Pritchard">Sieve of Pritchard</a>
      * @see <a href="https://stackoverflow.com/questions/43760641/java-8-streams-and-the-sieve-of-eratosthenes">Java 8: streams and the Sieve of Eratosthenes</a>
      */
-    @SuppressWarnings("squid:S3864")
     public static LongStream primes() {
         return LongStream
                 .iterate(2, l -> ++l)

@@ -59,7 +59,7 @@ public class HelloSelenium {
         final var acceptButton = driver.findElement(By.id("L2AGLb"));
         sleep(Duration.ofSeconds(1));
         acceptButton.click();
-        sleep(Duration.ofSeconds(2));
+        sleep(Duration.ofSeconds(1));
         final var searchBox = driver.findElement(By.name("q"));
 
         searchBox.sendKeys(searchString);

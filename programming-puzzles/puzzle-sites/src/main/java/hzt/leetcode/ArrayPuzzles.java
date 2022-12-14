@@ -126,7 +126,7 @@ public final class ArrayPuzzles {
      * and that buy order will be removed from the backlog. Else, the sell order is added to the backlog.
      * <p>
      * Return the total amount of orders in the backlog after placing all the orders from the input. Since this number can be large,
-     * return it modulo 109 + 7.
+     * return it modulo 10e9 + 7.
      * <p>
      * Constraints:
      * <p>
@@ -136,7 +136,7 @@ public final class ArrayPuzzles {
      * orderType-i is either 0 or 1.
      *
      * @param orders the orders containing orders[i] = [price-i, amount-i, orderType-i]
-     * @return nr of orders as modulo 109 + 7
+     * @return nr of orders as modulo 10e9 + 7
      * <p>
      * Credits to: xecute
      *
@@ -144,7 +144,7 @@ public final class ArrayPuzzles {
      *
      * Accepted	49 ms	79.6 MB
      */
-    public static int getNumberOfBacklogOrders(final int[][] orders) {
+    public static int getNumberOfBacklogOrders(final int[]... orders) {
         final Comparator<Order> compareByOrderPrice = Comparator.comparingInt(order -> order.price);
         final Queue<Order> sells = new PriorityQueue<>(compareByOrderPrice);
         final Queue<Order> buys = new PriorityQueue<>(compareByOrderPrice.reversed());

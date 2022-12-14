@@ -97,6 +97,16 @@ class NumberTests {
     }
 
     @Test
+    void testBigDecimalFromEmptyString() {
+        assertThrows(NumberFormatException.class, () -> new BigDecimal(""));
+    }
+
+    @Test
+    void testBigDecimalMovePointLeft() {
+        assertEquals(0, BigDecimal.valueOf(0.10).compareTo(BigDecimal.TEN.movePointLeft(2)));
+    }
+
+    @Test
     void testToHexString() {
         assertEquals("14", Integer.toHexString(20));
     }

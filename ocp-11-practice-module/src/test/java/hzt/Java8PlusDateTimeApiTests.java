@@ -84,7 +84,7 @@ class Java8PlusDateTimeApiTests {
      */
     @ParameterizedTest(name = "Japanese date {0} converts to {1}")
     @MethodSource("argumentsLocalDatesFromJapaneseDates")
-    void testLocalDatesFromJapaneseDates(String japaneseDate, String expected) {
+    void testLocalDatesFromJapaneseDates(String japaneseDate, LocalDate expected) {
 
         final var japaneseEraDtf = DateTimeFormatter.ofPattern("GGGGy年M月d日")
                 .withChronology(JapaneseChronology.INSTANCE)
@@ -92,7 +92,7 @@ class Java8PlusDateTimeApiTests {
 
         final var localDate = LocalDate.parse(japaneseDate, japaneseEraDtf);
 
-        assertEquals(expected, localDate.toString());
+        assertEquals(expected, localDate);
     }
 
     private static Stream<Arguments> argumentsLocalDatesFromJapaneseDates() {

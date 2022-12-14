@@ -15,13 +15,19 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.converter.ArgumentConverter;
 import org.junit.jupiter.params.converter.ConvertWith;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
+import static java.util.function.Predicate.not;
+import static org.hzt.RecursiveSamples.Aoc2020Sampe.MAX_STEP_APART;
 import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -40,10 +46,72 @@ class RecursiveSamplesTest {
 
         final var fib = RecursiveSamples.fib(n);
 
+        //1, 1, 2, 3, 5, 8, 13, 21, 34, 55...
         assertAll(
                 () -> assertEquals(55, fib),
                 () -> assertEquals(expected, fib)
         );
+    }
+
+    @Test
+    void testFibWithCache() {
+        final var n = 5_000;
+
+        final var expected = Streams.fibonacciStream()
+                .skip(n)
+                .findFirst()
+                .orElseThrow();
+
+        final var actual = RecursiveSamples.fibWithCash(n);
+
+        assertEquals(expected, actual);
+    }
+
+    @Nested
+    class Aoc2020SampeTests {
+
+        @Test
+        void testDay10Part2Aoc2020() {
+            final var ints = IntStream.of(16, 10, 15, 5, 1, 11, 7, 19, 6, 12, 4).sorted().toArray();
+            final var input = new int[ints.length + 2];
+            final var firstValue = 0;
+            final var lastValue = ints[ints.length - 1] + MAX_STEP_APART;
+            System.arraycopy(ints, 0, input, 1, ints.length);
+            input[0] = firstValue; // add socket jolt value
+            input[input.length - 1] = lastValue; // add built in phone adaptor jolt value
+
+            final var result = RecursiveSamples.Aoc2020Sampe.numberOfWaysToCompleteAdaptorChain(input);
+            final var expected = RecursiveSamples.Aoc2020Sampe.numberOfWaysToCompleteAdaptorChainWithCache(input);
+
+            assertAll(
+                    () -> assertEquals(8L, result),
+                    () -> assertEquals(result, expected)
+            );
+        }
+
+        @Test
+        void testDay10Part2Aoc2020WithCache() throws IOException {
+            final var ints = sortedInput();
+            final var input = new int[ints.length + 2];
+            final var firstValue = 0;
+            final var lastValue = ints[ints.length - 1] + MAX_STEP_APART;
+            System.arraycopy(ints, 0, input, 1, ints.length);
+            input[0] = firstValue; // add socket jolt value
+            input[input.length - 1] = lastValue; // add built in phone adaptor jolt value
+            final var result = RecursiveSamples.Aoc2020Sampe.numberOfWaysToCompleteAdaptorChainWithCache(input);
+
+            assertEquals(99_214_346_656_768L, result);
+        }
+
+        private static int[] sortedInput() throws IOException {
+            try (final var lines = Files.lines(Path.of("input/20201210-input-day10.txt"))) {
+                return lines
+                        .filter(not(String::isEmpty))
+                        .mapToInt(Integer::parseInt)
+                        .sorted()
+                        .toArray();
+            }
+        }
     }
 
     @Test
@@ -123,6 +191,19 @@ class RecursiveSamplesTest {
         );
     }
 
+    @ParameterizedTest(name = "the least common multiple of {0} and {1} should be {2}")
+    @CsvSource({
+            "12, 36, 36",
+            "13, 17, 221",
+            "5, 7, 35",
+            "6, 4, 12",
+            "24, 36, 72"}
+    )
+    void testLeastCommonMultiple(long nr1, long nr2, long expected) {
+        final var lcm = RecursiveSamples.lcm(nr1, nr2);
+        assertEquals(expected, lcm);
+    }
+
     @ParameterizedTest
     @MethodSource("bigIntCommonDivisorParams")
     void testGreatestCommonDivisorBigInt(
@@ -191,8 +272,11 @@ class RecursiveSamplesTest {
 
         @Test
         void testNoStackOverflowWithKotlinTailCallOptimizationOrLoopVersionInJava() {
-            final var factorial = RecursiveSamplesKt.factorial(50_000);
-            final var factorialFromJavaLoop = RecursiveSamples.factorialTailRecOptimization(50_000);
+            final var n = 10_000;
+
+            final var factorial = RecursiveSamplesKt.factorial(n);
+            final var factorialFromJavaLoop = RecursiveSamples.factorialTailRecOptimization(n);
+
             assertEquals(factorial, factorialFromJavaLoop);
         }
 

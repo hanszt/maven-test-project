@@ -49,7 +49,7 @@ public class CompletableFutureSample {
 
     private static String computationallyIntensiveMethod() {
         final var STRING = "This is a String that is computationally intensive: 1";
-        sleep(Duration.ofSeconds(1));
+        sleep(Duration.ofMillis(500));
         return STRING;
     }
 
@@ -57,10 +57,10 @@ public class CompletableFutureSample {
      * @see <a href="https://youtu.be/IwJ-SCfXoAU?t=8188">Complatable future google stock async</a>
      */
     public CompletableFuture<Integer> getStockPriceAndThenCombine() {
-        CompletableFuture<Integer> googleStock = CompletableFuture.supplyAsync(() -> supplyPrice(Duration.ofSeconds(1), 500));
-        CompletableFuture<Integer> teslaStock = CompletableFuture.supplyAsync(() -> supplyPrice(Duration.ofMillis(300), 1_000));
+        CompletableFuture<Integer> googleStock = CompletableFuture.supplyAsync(() -> supplyPrice(Duration.ofMillis(200), 500));
+        CompletableFuture<Integer> teslaStock = CompletableFuture.supplyAsync(() -> supplyPrice(Duration.ofMillis(100), 1_000));
         CompletableFuture<Integer> completableFuture = googleStock.thenCombine(teslaStock, Integer::sum);
-        sleep(Duration.ofSeconds(1));
+        sleep(Duration.ofMillis(200));
         return completableFuture;
     }
 
@@ -74,8 +74,8 @@ public class CompletableFutureSample {
      * single completable future
      */
     public CompletableFuture<Integer> getStockPriceThenComposeAndThanCombine() {
-        var goog = CompletableFuture.supplyAsync(() -> supplyPrice(Duration.ofSeconds(1), 500));
-        var tesla = CompletableFuture.supplyAsync(() -> supplyPrice(Duration.ofMillis(400), 1_000));
+        var goog = CompletableFuture.supplyAsync(() -> supplyPrice(Duration.ofMillis(100), 500));
+        var tesla = CompletableFuture.supplyAsync(() -> supplyPrice(Duration.ofMillis(200), 1_000));
 
         final var future1 = CompletableFuture.supplyAsync(() -> goog)
                 .thenCompose(CompletableFuture::toCompletableFuture);
@@ -84,7 +84,7 @@ public class CompletableFutureSample {
                 .thenCompose(CompletableFuture::toCompletableFuture);
 
         CompletableFuture<Integer> completableFuture = future1.thenCombine(future2, Integer::sum);
-        sleep(Duration.ofSeconds(2));
+        sleep(Duration.ofMillis(300));
         return completableFuture;
     }
 

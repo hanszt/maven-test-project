@@ -18,7 +18,7 @@ class FutureTests {
     void testGetOnFuture() throws ExecutionException, InterruptedException {
         var executorService = Executors.newSingleThreadExecutor();
         Future<String> future = executorService.submit(() -> {
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.MILLISECONDS.sleep(500);
             return "DONE";
         });
         //    Waits if necessary for the computation to complete, and then retrieves its result.

@@ -5,7 +5,8 @@ import com.google.common.collect.Lists;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
 import org.hzt.utils.io.FileX;
-import org.hzt.utils.strings.StringX;
+import org.hzt.utils.iterables.Collectable;
+import org.hzt.utils.sequences.Sequence;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -13,10 +14,7 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class GuavaTests {
 
@@ -63,7 +61,7 @@ class GuavaTests {
         void testBloomFilterUsedProperly() {
             final double falsePositiveProbability = .01;
 
-            final List<String> strings = FileX.of("input/random_words.txt").useLines(seq -> seq.map(StringX::toString).toList());
+            final List<String> strings = FileX.of("input/random_words.txt").useLines(Sequence::toList);
 
             BloomFilter<String> bloomFilter = BloomFilter
                     .create(Funnels.stringFunnel(Charset.defaultCharset()), strings.size(), falsePositiveProbability);
@@ -81,7 +79,7 @@ class GuavaTests {
         void testBloomFilterUsedWithToSmallExpectedInsertions() {
             final double falsePositiveProbability = .01;
 
-            final List<String> strings = FileX.of("input/random_words.txt").useLines(seq -> seq.map(StringX::toString).toList());
+            final List<String> strings = FileX.of("input/random_words.txt").useLines(Collectable::toList);
 
             BloomFilter<String> bloomFilter = BloomFilter
                     .create(Funnels.stringFunnel(Charset.defaultCharset()), strings.size() / 10, falsePositiveProbability);
@@ -100,7 +98,6 @@ class GuavaTests {
         @Test
         void testCollectToBloomFilter() {
             final var bloomFilter = FileX.of("input/random_words.txt").useLines(seq -> seq
-                    .map(StringX::toString)
                     .collect(BloomFilter.toBloomFilter(Funnels.stringFunnel(Charset.defaultCharset()), 500)));
 
             assertAll(

@@ -204,9 +204,8 @@ class StreamsTest {
                 .orElseThrow());
 
         final var result = timer.getResult();
-        final var duration = timer.getDuration();
-        String formattedDuration = String.format("%2d:%02d s", duration.toSecondsPart(), duration.toMillisPart());
-        println("Duration: " + formattedDuration);
+
+        println("Duration: " + timer.formattedDurationInSeconds());
 
         final var decimalValue = result.doubleValue();
         println("result = " + decimalValue);
@@ -561,7 +560,7 @@ class StreamsTest {
 
             @TestFactory
             Sequence<DynamicTest> testConsecutiveFibNrRatiosConvergeToGoldenRatio() {
-                return Sequence.ofStream(fibonacciStream())
+                return Sequence.of(fibonacciStream()::iterator)
                         .skipWhile(n -> n.equals(BigInteger.ZERO))
                         .onEach(It::println)
                         .map(BigDecimal::new)
@@ -622,23 +621,48 @@ class StreamsTest {
 
     }
 
-    @Test
-    void testFirst10Primes() {
-        final var firstTenPrimes = Streams.primes()
-                .limit(10)
-                .toArray();
+    @Nested
+    class PrimeTests {
+        @Test
+        void testFirst10Primes() {
+            final var firstTenPrimes = Streams.primes()
+                    .limit(10)
+                    .toArray();
 
-        assertArrayEquals(new long[]{2L, 3L, 5L, 7L, 11L, 13L, 17L, 19L, 23L, 29L}, firstTenPrimes);
-    }
+            assertArrayEquals(new long[]{2L, 3L, 5L, 7L, 11L, 13L, 17L, 19L, 23L, 29L}, firstTenPrimes);
+        }
 
-    @Test
-    void testFirstPrimeLargerThan10Digits() {
-        final var primeTenDigits = Streams
-                .primes()
-                .dropWhile(l -> Long.toString(l).length() < 5)
-                .findFirst();
+        @Test
+        void testFirstPrimeLargerThan10Digits() {
+            final var primeTenDigits = Streams
+                    .primes()
+                    .dropWhile(l -> Long.toString(l).length() < 5)
+                    .findFirst();
 
-        assertEquals(OptionalLong.of(10007), primeTenDigits);
+            assertEquals(OptionalLong.of(10007), primeTenDigits);
+        }
+
+        @Test
+        void testLargePrime() {
+            final var n = 5_000;
+
+            final var timer = Timer.timeAnIntFunction(n, i -> Streams.primes()
+                    .takeWhile(p -> p < n)
+                    .toArray());
+
+            final var primes = timer.getResult();
+            final long biggest = primes[primes.length - 1];
+
+            println("duration = " + timer.formattedDurationInSeconds());
+            println("biggest = " + biggest);
+
+            final var expected = PrimeNrCalculator.sieveOfEratosthenes(n).reduce(0, (acc, v) -> v);
+
+            assertAll(
+                    () -> assertEquals(4999, biggest),
+                    () -> assertEquals(expected, biggest)
+            );
+        }
     }
 
     @Test

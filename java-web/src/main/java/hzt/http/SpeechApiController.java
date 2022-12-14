@@ -18,6 +18,8 @@ import java.net.http.HttpResponse;
 public class SpeechApiController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpeechApiController.class);
+    public static final String REFACTOR_CODE_TO_GET_URL_FROM_CUSTOMIZABLE_PARAM = "squid:S1075";
+
     public static void main(String[] args) {
         try {
             Transcript transcript = new Transcript();
@@ -28,7 +30,7 @@ public class SpeechApiController {
 
             LOGGER.info("json = {}", json);
 
-            @SuppressWarnings("squid:S1075")
+            @SuppressWarnings(REFACTOR_CODE_TO_GET_URL_FROM_CUSTOMIZABLE_PARAM)
             HttpRequest postRequest = HttpRequest.newBuilder()
                     .uri(new URI("https://api.assemblyai.com/v2/transcript"))
                     .headers("Authorization", "API_KEY_TO_BE_SPECIFIED")

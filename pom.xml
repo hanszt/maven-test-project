@@ -27,6 +27,7 @@
         <module>math-utils-samples</module>
         <module>programming-puzzles</module>
         <module>demo-sogeti-2022</module>
+        <module>kotlin-samples</module>
     </modules>
 
     <properties>
@@ -35,9 +36,10 @@
         <coverage.target>50%</coverage.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--dependencies-->
-        <kotlin.version>1.7.20</kotlin.version>
+        <kotlin.version>1.7.22</kotlin.version>
         <!--logging-->
-        <log4j.version>2.19.0</log4j.version>
+        <slf4j.version>2.0.5</slf4j.version>
+        <logback-classic.version>1.4.5</logback-classic.version>
         <!--test-->
         <junit.jupiter.version>5.9.0</junit.jupiter.version>
         <mockito.version>4.8.0</mockito.version>
@@ -54,25 +56,15 @@
         <!--reactive-streams-->
         <reactive-streams-tck.version>1.0.3</reactive-streams-tck.version>
         <rxjava.version>3.1.5</rxjava.version>
-        <spring-boot-starter-webflux.version>2.7.3</spring-boot-starter-webflux.version>
+        <spring-boot-starter-webflux.version>3.0.0</spring-boot-starter-webflux.version>
         <scala.binary.version>2.13</scala.binary.version>
-        <akka.version>2.6.20</akka.version>
+        <akka.version>2.7.0</akka.version>
         <!--plugins-->
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
         <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
     </properties>
-
-    <!--https://stackoverflow.com/questions/13834141/create-local-maven-repository-->
-    <repositories>
-        <repository>
-            <id>local-maven-repo</id>
-            <!--https://stackoverflow.com/questions/3084629/finding-the-root-directory-of-a-multi-module-maven-reactor-project-->
-            <!--suppress MavenModelInspection -->
-            <url>file:///${maven.multiModuleProjectDirectory}/_local-mvn-repo</url>
-        </repository>
-    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -177,19 +169,14 @@
     <dependencies>
         <!-- Logging Dependencies -->
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback-classic.version}</version>
         </dependency>
         <!-- TEST SCOPE DEPENDENCIES -->
         <dependency>
@@ -225,6 +212,16 @@
         </dependency>
         <!--https://mvnrepository.com/artifact/com.google.guava/guava -->
     </dependencies>
+
+    <!--https://stackoverflow.com/questions/13834141/create-local-maven-repository-->
+    <repositories>
+        <repository>
+            <id>local-maven-repo</id>
+            <!--https://stackoverflow.com/questions/3084629/finding-the-root-directory-of-a-multi-module-maven-reactor-project-->
+            <!--suppress MavenModelInspection -->
+            <url>file:///${maven.multiModuleProjectDirectory}/_local-mvn-repo</url>
+        </repository>
+    </repositories>
 
     <build>
 

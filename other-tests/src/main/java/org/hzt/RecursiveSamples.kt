@@ -1,16 +1,16 @@
 package org.hzt
 
 import org.apache.commons.math3.complex.Complex
-import java.math.BigInteger
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
+import java.math.BigInteger as BigInt
 
-fun factorial(n: Int): BigInteger = factorial(BigInteger.ONE, n.toBigInteger())
+fun factorial(n: Int): BigInt = factorial(BigInt.ONE, n.toBigInteger())
 
-tailrec fun factorial(acc: BigInteger, n: BigInteger): BigInteger =
-    if (n <= BigInteger.ONE) acc else factorial(acc.multiply(n), n.subtract(BigInteger.ONE))
+tailrec fun factorial(acc: BigInt, n: BigInt): BigInt =
+    if (n <= BigInt.ONE) acc else factorial(acc.multiply(n), n.subtract(BigInt.ONE))
 
 fun findFixPoint() = findFixPoint(1.0)
 
@@ -60,4 +60,21 @@ fun fft(input: Array<Complex>): Array<Complex> {
 }
 
 fun isPowerOfTwo(n: Int) = (n > 0) && ((n and (n - 1)) == 0)
+
+fun fib(n: Int, cache: MutableMap<Int, BigInt> = HashMap()): BigInt {
+    require(n >= 0) { "the position n in the fib sequence must be greater than 0 but was $n" }
+    if (n == 0) {
+        return BigInt.ZERO
+    }
+    if (n <= 2) {
+        return BigInt.ONE
+    }
+    val fibNr = cache[n]
+    if (fibNr != null) {
+        return fibNr
+    }
+    val nextFib = fib(n - 1, cache).add(fib(n - 2, cache))
+    cache[n] = nextFib
+    return nextFib
+}
 

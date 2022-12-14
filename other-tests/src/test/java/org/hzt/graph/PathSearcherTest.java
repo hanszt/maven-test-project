@@ -22,8 +22,8 @@ class PathSearcherTest {
         int source = 0;
         List<List<PathSearcher.Node>> adjacencyList = buildAdjacencyList(numberOfNodes);
         // Calculating the single-source-shortest-path
-        PathSearcher pathSearcher = new PathSearcher(numberOfNodes);
-        pathSearcher.dijkstra(adjacencyList, new PathSearcher.Node(source, 0));
+        PathSearcher pathSearcher = new PathSearcher(adjacencyList);
+        pathSearcher.dijkstra(new PathSearcher.Node(source, 0));
         final var distances = pathSearcher.getDistances();
 
         printResult(source, distances);
@@ -42,15 +42,11 @@ class PathSearcherTest {
 
     @NotNull
     private static List<List<PathSearcher.Node>> buildAdjacencyList(int numberOfNodes) {
-        // Adjacency list representation of the
-        // connected edges by declaring List class object
-        // Declaring object of type List<Node>
         List<List<PathSearcher.Node>> adjacencyList = new ArrayList<>();
 
         // Initialize list for every value
         for (int i = 0; i < numberOfNodes; i++) {
-            List<PathSearcher.Node> nodes = new ArrayList<>();
-            adjacencyList.add(nodes);
+            adjacencyList.add(new ArrayList<>());
         }
 
         // create connections

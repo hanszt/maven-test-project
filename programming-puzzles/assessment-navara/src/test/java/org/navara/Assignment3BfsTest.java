@@ -100,13 +100,13 @@ class Assignment3BfsTest {
 
     @Test
     void testSolutionLargeMatrix() {
-        final int[][] inputGrid = MatrixGenerator.buildMatrix(100, 100, 8, 10);
+        final int[][] inputGrid = MatrixGenerator.buildMatrix(50, 50, 8, 10);
 
         TestUtils.printMatrix(inputGrid);
 
-        final var solution = assignment3Bfs.solution(50, inputGrid);
+        final var solution = assignment3Bfs.solution(30, inputGrid);
 
-        assertEquals(46, solution);
+        assertEquals(170, solution);
     }
 
 

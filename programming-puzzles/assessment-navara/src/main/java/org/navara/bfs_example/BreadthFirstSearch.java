@@ -1,8 +1,8 @@
 package org.navara.bfs_example;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.navara.utils.MessageConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  */
 public final class BreadthFirstSearch {
 
-    private static final Logger LOGGER = LogManager.getLogger(BreadthFirstSearch.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BreadthFirstSearch.class);
 
     private final MessageConsumer messageConsumer;
 
@@ -93,6 +93,6 @@ public final class BreadthFirstSearch {
                 .search(4, firstNeighbor)
                 .orElseThrow();
 
-        LOGGER.info(result);
+        LOGGER.info("Result: {}", result);
     }
 }

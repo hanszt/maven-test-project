@@ -1,11 +1,13 @@
 package hzt.leetcode;
 
 import org.hzt.utils.sequences.Sequence;
-import org.hzt.utils.strings.StringX;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -13,39 +15,31 @@ import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.params.provider.Arguments.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @SuppressWarnings("SpellCheckingInspection")
 class HztStringFunTest {
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            " -> a",
+    @ParameterizedTest(name = "The increment of `{0}` should be: `{1}`")
+    @CsvSource(value = {
+            "'' -> a",
             "z -> aa",
             "hallo -> hallp",
             "zzz -> aaaa",
             "aaa -> aab",
             "azz -> baa",
             "jdgyz -> jdgza",
-            "zzzzzzz -> aaaaaaaa"})
-    void testIncrementStringLikeNr(final String string) {
-        final var split = StringX.of(string).split(" -> ");
-        final var input = split.first();
-        final var expected = split.last();
-
+            "zzzzzzz -> aaaaaaaa"}, delimiterString = " -> ")
+    void testIncrementStringLikeNr(final String input, String expected) {
         final var actual = HztStringFun.incrementLowerCaseAlphabeticString(input);
-
         assertEquals(expected, actual);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "a -> ",
+    @ParameterizedTest(name = "The decrement of `{0}` should be: `{1}`")
+    @CsvSource(value = {
+            "a -> ''",
             "aa -> z",
             "hallp -> hallo",
             "aaaa -> zzz",
@@ -54,18 +48,13 @@ class HztStringFunTest {
             "bcaa -> bbzz",
             "jdgza -> jdgyz",
             "aaaaaaaa -> zzzzzzz",
-            "magnolia -> magnolhz"})
-    void testDecrementStringLikeNr(final String string) {
-        final var split = StringX.of(string).split(" -> ");
-        final var input = split.first();
-        final var expected = split.last();
-
+            "magnolia -> magnolhz"}, delimiterString = " -> ")
+    void testDecrementStringLikeNr(final String input, String expected) {
         final var actual = HztStringFun.decrementLowerCaseAlphabeticString(input);
-
         assertEquals(expected, actual);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "`{0}` is not compatible for string increment or decrement")
     @ValueSource(strings = {" ", "aweq we", "asda1", "!asdwq", "aAsdw"})
     void testStringsNotCompatibleForIncrementAndDecrementStringMethods(final String string) {
         assertAll(
@@ -75,13 +64,13 @@ class HztStringFunTest {
     }
 
     @Test
-    @DisplayName("Test generate decremental String array")
+    @DisplayName("Test generate decremental String ints")
     void testThrows() {
-       assertThrows(IllegalArgumentException.class, () -> HztStringFun.decrementLowerCaseAlphabeticString(""));
+        assertThrows(IllegalArgumentException.class, () -> HztStringFun.decrementLowerCaseAlphabeticString(""));
     }
 
     @Test
-    @DisplayName("Test generate incremental String array")
+    @DisplayName("Test generate incremental String ints")
     void testGenerateIncrementalStringArray() {
         final var strings = Stream.iterate("raar", HztStringFun::incrementLowerCaseAlphabeticString)
                 .limit(3_500_000)
@@ -94,7 +83,7 @@ class HztStringFunTest {
     }
 
     @Test
-    @DisplayName("Test generate decremental String array")
+    @DisplayName("Test generate decremental String ints")
     void testGenerateDecrementalStringArray() {
         final var strings = Stream
                 .iterate("test", Predicate.not(""::equals), HztStringFun::decrementLowerCaseAlphabeticString)
@@ -110,7 +99,7 @@ class HztStringFunTest {
                 .iterate("raar", HztStringFun::incrementLowerCaseAlphabeticString)
                 .limit(3_500_000);
 
-        assertFalse(Sequence.ofStream(stream).isSorted(String::compareTo));
+        assertFalse(Sequence.of(stream::iterator).isSorted(String::compareTo));
     }
 
     @ParameterizedTest
@@ -126,7 +115,7 @@ class HztStringFunTest {
         );
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "The reverse zigzag of {0} with {1} rows is: {2}")
     @MethodSource("provideArgumentsForZigZagConversionTests")
     void testReverseZigZagConversion(final String inputString, final int nrOfRows, final String expected) {
 
@@ -143,4 +132,22 @@ class HztStringFunTest {
                 arguments("PHASIYIRPLIGAN", 5, "PAYPALISHIRING")
         );
     }
+
+    @TestFactory
+    Stream<DynamicTest> testNrOfDistinctSequences() {
+        record Test(String s, String t, int expected) {
+            DynamicTest toDynamicTest() {
+                final var displayName = "The nr of distinct subsequences of '%s' which equal '%s', should be %d".formatted(s, t, expected);
+                final var actual = HztStringFun.numDistinct(s, t);
+                return dynamicTest(displayName, () -> assertEquals(expected, actual));
+            }
+        }
+        return Stream.of(new Test("rabbbit", "rabbit", 3),
+                        new Test("babgbag", "bag", 5),
+                        new Test("loop", "ga", 0),
+                        new Test("pennenlikker", "pen", 4))
+                .map(Test::toDynamicTest);
+    }
+
+
 }

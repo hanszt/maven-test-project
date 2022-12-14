@@ -57,7 +57,7 @@ public class Facebook implements SocialNetwork {
 
     private static void simulateNetworkLatency() {
         try {
-            TimeUnit.MILLISECONDS.sleep(2500);
+            TimeUnit.MILLISECONDS.sleep(500);
         } catch (InterruptedException ex) {
             ex.printStackTrace();
             Thread.currentThread().interrupt();

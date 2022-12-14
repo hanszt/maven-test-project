@@ -1,7 +1,7 @@
 module com.example.pdf.exporters {
 
     requires jasperreports;
-    requires slf4j.api;
+    requires org.slf4j;
     requires itextpdf;
     requires java.sql;
     requires org.apache.pdfbox;

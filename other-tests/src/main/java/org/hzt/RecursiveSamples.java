@@ -8,6 +8,8 @@ import org.hzt.utils.collections.primitives.IntMutableList;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hzt.utils.It.println;
 
@@ -23,7 +25,7 @@ public final class RecursiveSamples {
     /**
      * @param n The index in the sequence you want the fibonacci nr of
      * @return the fibonacci nr at n
-     *
+     * <p>
      * This method has O(2^n) time complexity which is exponential and very bad
      */
     public static long fib(int n) {
@@ -35,6 +37,29 @@ public final class RecursiveSamples {
             return 1;
         }
         return fib(n - 1) + fib(n - 2);
+    }
+
+    public static BigInteger fibWithCash(int n) {
+        final var cache = new HashMap<Integer, BigInteger>();
+        final var fib = fib(n, cache);
+        println("cache size = " + cache.size());
+        return fib;
+    }
+
+    public static BigInteger fib(int n, Map<Integer, BigInteger> cache) {
+        PreConditions.require(n >= 0, () -> "the position n in the fib sequence must be greater than 0 but was " + n);
+        if (n == 0) {
+            return BigInteger.ZERO;
+        }
+        if (n <= 2) {
+            return BigInteger.ONE;
+        }
+        if (cache.containsKey(n)) {
+            return cache.get(n);
+        }
+        final var nextFib = fib(n - 1, cache).add(fib(n - 2, cache));
+        cache.put(n, nextFib);
+        return nextFib;
     }
 
     public static int sum(int start, int end) {
@@ -49,11 +74,11 @@ public final class RecursiveSamples {
     /**
      * It is assumed the length of the input array is a power of two
      *
-     * @see <a href="https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/FFT.java.html">Fast Fourier Transform</a>
      * @param input the complex nr array to apply the fast fourier transform to
      * @return the fourier transform of the input
+     * @see <a href="https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/FFT.java.html">Fast Fourier Transform</a>
      */
-    public static Complex[] fastFourierTransform(Complex[] input) {
+    public static Complex[] fastFourierTransform(Complex... input) {
         final int length = input.length;
         if (length == 1) {
             return new Complex[]{input[0]};
@@ -76,6 +101,57 @@ public final class RecursiveSamples {
             result[k + halfLength] = evenFFT[k].subtract(complex);
         }
         return result;
+    }
+
+    static final class Aoc2020Sampe {
+
+        static final int MAX_STEP_APART = 3;
+
+        private Aoc2020Sampe() {
+        }
+
+        static long numberOfWaysToCompleteAdaptorChainWithCache(final int[] sortedArray) {
+            final var cache = new HashMap<String, Long>();
+            final var count = numberOfWaysToCompleteAdaptorChainWithCache(sortedArray, cache);
+            println("cache size = " + cache.size());
+            return count;
+        }
+
+        static long numberOfWaysToCompleteAdaptorChain(final int[] sortedArray) {
+            final var length = sortedArray.length;
+            if (length == 1) {
+                return 1L;
+            }
+            println(Arrays.toString(sortedArray));
+            long arrangements = 0L;
+            final var current = sortedArray[0];
+            for (var i = 1; i < length && sortedArray[i] - current <= MAX_STEP_APART; i++) {
+                arrangements += numberOfWaysToCompleteAdaptorChain(Arrays.copyOfRange(sortedArray, i, length));
+            }
+            return arrangements;
+        }
+
+        static long numberOfWaysToCompleteAdaptorChainWithCache(final int[] sortedArray, Map<String, Long> cache) {
+            final var length = sortedArray.length;
+            if (length == 1) {
+                return 1L;
+            }
+            long arrangements = 0;
+            final var current = sortedArray[0];
+            for (var i = 1; i < length && sortedArray[i] - current <= MAX_STEP_APART; i++) {
+                final var subArray = Arrays.copyOfRange(sortedArray, i, length);
+                final var arrayAsString = Arrays.toString(subArray);
+                final var cachedArrangements = cache.get(arrayAsString);
+                if (cachedArrangements != null) {
+                    arrangements += cachedArrangements;
+                } else {
+                    final var subArrangements = numberOfWaysToCompleteAdaptorChainWithCache(subArray, cache);
+                    cache.put(arrayAsString, subArrangements);
+                    arrangements += subArrangements;
+                }
+            }
+            return arrangements;
+        }
     }
 
     /**
@@ -105,6 +181,20 @@ public final class RecursiveSamples {
         return gcdByEuclidesAlgorithm(n2, n1.mod(n2));
     }
 
+    /**
+     * Calculates the least common multiple of two longs
+     * <p>
+     * <a href="https://www.baeldung.com/java-least-common-multiple">Finding the Least Common Multiple in Java</a>
+     *
+     * @param nr1 nr 1
+     * @param nr2 nr 2
+     * @return The least common multiple
+     */
+    public static long lcm(long nr1, long nr2) {
+        final var gcd = gcdByEuclidesAlgorithm(nr1, nr2);
+        return Math.abs(nr1 * nr2) / gcd;
+    }
+
     public static IntList tailRecursionWithReturn(int n) {
         return tailRecursionWithReturn(n, IntMutableList.empty());
     }
@@ -118,7 +208,7 @@ public final class RecursiveSamples {
     }
 
     public static IntList headRecursionWithReturn(int n) {
-        return headRecursionWithReturn(n, IntMutableList.empty());
+        return IntList.copyOf(headRecursionWithReturn(n, IntMutableList.empty()));
     }
 
     public static IntList headRecursionWithReturn(int n, IntList resultList) {
@@ -130,7 +220,7 @@ public final class RecursiveSamples {
     }
 
     /**
-     * @param x the initial value
+     * @param x        the initial value
      * @param integers the list subject be filled
      * @see <a  href="https://www.youtube.com/watch?v=o2nQDij5eqs">Head Recursion and Tail Recursion in Java</a>
      */
@@ -142,7 +232,7 @@ public final class RecursiveSamples {
     }
 
     /**
-     * @param x the initial value
+     * @param x        the initial value
      * @param integers the list subject be filled
      * @see <a  href="https://www.youtube.com/watch?v=o2nQDij5eqs">Head Recursion and Tail Recursion in Java</a>
      */
@@ -165,13 +255,11 @@ public final class RecursiveSamples {
 
     /**
      * Tail recursion optimization is not supported in java
-     * @see RecursiveSamples#factorialTailRecOptimization(int) subject see the result of tail recursion optimization. (Transformation in loop)
+     *
+     * @see RecursiveSamples#factorialTailRecOptimization(int) to see the result of tail recursion optimization. (Transformation in loop)
      */
     public static BigInteger factorial(BigInteger acc, BigInteger n) {
-        if (n.compareTo(BigInteger.ONE) <= 0) {
-            return acc;
-        }
-        return factorial(acc.multiply(n), n.subtract(BigInteger.ONE));
+        return n.compareTo(BigInteger.ONE) <= 0 ? acc : factorial(acc.multiply(n), n.subtract(BigInteger.ONE));
     }
 
     public static BigInteger factorialTailRecOptimization(int n) {

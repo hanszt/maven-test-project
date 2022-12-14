@@ -22,18 +22,19 @@ public class PathSearcher {
     private final int[] distances;
     private final Set<Node> settled;
     private final Queue<Node> priorityQueue;
-    private List<List<Node>> adjacencyList;
+    private final List<List<Node>> adjacencyList;
 
-    public PathSearcher(int numberOfNodes) {
-        distances = new int[numberOfNodes];
+    public PathSearcher(List<List<Node>> adjacencyList) {
+        this.adjacencyList = adjacencyList;
+        final var nrOfNodes = adjacencyList.size();
+        distances = new int[nrOfNodes];
         settled = new HashSet<>();
-        priorityQueue = new PriorityQueue<>(numberOfNodes, Comparator.comparingInt(Node::cost));
+        priorityQueue = new PriorityQueue<>(nrOfNodes, Comparator.comparingInt(Node::cost));
     }
 
     // Method 1
     // Dijkstra's Algorithm
-    public void dijkstra(List<List<Node>> adjacencyList, Node start) {
-        this.adjacencyList = adjacencyList;
+    public void dijkstra(Node start) {
         Arrays.fill(distances, Integer.MAX_VALUE);
         // Add source value to the priority queue
         priorityQueue.add(start);

@@ -54,7 +54,7 @@ class ApacheCommonsMath3LibraryTests {
             final var expectedLength = doubles1.length * 2 - 1;
 
             final var convolve = MathArrays.convolve(doubles1, doubles2);
-            final var fftConvolve = Arrays.stream(MyMathArrays.fftConvolveLineair(doubles1, doubles2))
+            final var fftConvolve = Arrays.stream(FftConvolver.fftConvolveLineair(doubles1, doubles2))
                     .mapToDouble(Complex::getReal)
                     .map(Math::rint)
                     .limit(expectedLength)
@@ -78,7 +78,7 @@ class ApacheCommonsMath3LibraryTests {
             final var doubles1 = arrays[0];
             final var doubles2 = arrays[1];
 
-            final var fftConvolve = MyMathArrays.fftConvolveLineair(doubles1, doubles2);
+            final var fftConvolve = FftConvolver.fftConvolveLineair(doubles1, doubles2);
 
             final var v0 = doubles1[0] * doubles2[0];
             final var v1 = doubles1[1] * doubles2[0] + doubles1[0] * doubles2[1];
@@ -103,8 +103,8 @@ class ApacheCommonsMath3LibraryTests {
             final var doubles1 = arrays[0];
             final var doubles2 = arrays[1];
 
-            final var doubles = MyMathArrays.fftConvolveLineairInPlace(doubles1, doubles2);
-            final var complexes = MyMathArrays.fftConvolveLineair(doubles1, doubles2);
+            final var doubles = FftConvolver.fftConvolveLineairInPlace(doubles1, doubles2);
+            final var complexes = FftConvolver.fftConvolveLineair(doubles1, doubles2);
 
             final var expected = Arrays.stream(complexes).mapToDouble(Complex::getReal).toArray();
 

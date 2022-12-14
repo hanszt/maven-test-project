@@ -107,6 +107,10 @@ public class Person implements Comparable<Person> {
         return firstName.compareTo(other.getFirstName());
     }
 
+    public String fullName() {
+        return firstName + " " + lastName;
+    }
+
     @Override
     public boolean equals(Object obj) {
         return this == obj || (obj instanceof Person other && Objects.equals(this.lastName, other.lastName));

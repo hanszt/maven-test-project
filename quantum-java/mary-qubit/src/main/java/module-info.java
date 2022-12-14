@@ -1,7 +1,7 @@
 module mary.qubit {
 
     requires javafx.controls;
-    requires slf4j.api;
+    requires org.slf4j;
     requires strange;
     requires strangefx;
 

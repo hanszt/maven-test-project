@@ -33,6 +33,11 @@ public final class Timer<R> {
         return Duration.of(durationInNanos, ChronoUnit.NANOS);
     }
 
+    public String formattedDurationInSeconds() {
+        final var duration = getDuration();
+        return String.format("%2d:%02d s", duration.toSecondsPart(), duration.toMillisPart());
+    }
+
     /**
      * @param t the parameter the function is applied to
      * @param function the function that is applied to the parameter t

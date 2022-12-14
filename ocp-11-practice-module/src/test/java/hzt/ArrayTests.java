@@ -4,6 +4,8 @@ import hzt.model.Student;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Comparator.comparingInt;
 import static org.junit.jupiter.api.Assertions.*;
@@ -110,6 +112,50 @@ class ArrayTests {
                 () -> assertArrayEquals(b, c),
                 () -> assertArrayEquals(c, d)
         );
+    }
+
+    @Test
+    void testArrayCopyOfRangeSameRangeAsSubList() {
+        final var list = IntStream.range(0, 100).boxed().collect(Collectors.toList());
+        final var ints = IntStream.range(0, 100).toArray();
+
+        final var copyOfRange = Arrays.copyOfRange(ints, 2, ints.length - 2);
+        final var integers = list.subList(2, list.size() - 2);
+
+        final var expected = integers.stream()
+                .mapToInt(i -> i)
+                .toArray();
+
+        assertArrayEquals(expected, copyOfRange);
+    }
+
+
+    @Test
+    void makeACopyToALargerArray() {
+        int[] result = new int[14];
+        int[] ints = {1, 2, 3, 4, 5, 6};
+        int[] prepend = {1, 2, 3};
+        int[] append = {1,2,4,8,16};
+
+        System.arraycopy(prepend, 0, result, 0, prepend.length);
+        System.arraycopy(ints, 0, result, prepend.length, ints.length);
+        System.arraycopy(append, 0, result, prepend.length + ints.length, append.length);
+
+        assertArrayEquals(new int[]{1, 2, 3, 1, 2, 3, 4, 5, 6, 1, 2, 4, 8, 16}, result);
+    }
+
+    @Test
+    void makeACopyToALargerArrayUsingStreams() {
+        int[] ints = {1, 2, 3, 4, 5, 6};
+
+        final var concatenated = IntStream.concat(
+                        IntStream.concat(
+                                IntStream.of(1, 2, 3),
+                                IntStream.of(ints)),
+                        IntStream.iterate(1, i -> 2 * i).limit(5))
+                .toArray();
+
+        assertArrayEquals(new int[]{1, 2, 3, 1, 2, 3, 4, 5, 6, 1, 2, 4, 8, 16}, concatenated);
     }
 
 }

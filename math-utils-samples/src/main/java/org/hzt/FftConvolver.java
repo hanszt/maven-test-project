@@ -9,9 +9,9 @@ import org.hzt.utils.sequences.Sequence;
 
 import java.util.Arrays;
 
-public final class MyMathArrays {
+public final class FftConvolver {
 
-    private MyMathArrays() {
+    private FftConvolver() {
     }
 
     /**

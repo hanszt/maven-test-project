@@ -1,7 +1,7 @@
 open module reactive.streams {
     requires akka.stream;
     requires akka.actor;
-    requires slf4j.api;
+    requires org.slf4j;
     requires org.reactivestreams;
     requires io.reactivex.rxjava3;
     requires reactor.core;

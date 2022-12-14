@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.IntPredicate;
+import java.util.stream.IntStream;
 
 public final class HztStringFun {
 
@@ -176,5 +177,49 @@ public final class HztStringFun {
             curRow += goingDown ? 1 : -1;
         }
         return rows;
+    }
+
+    /**
+     * 115. Distinct Subsequences
+     *
+     * @see <a href="">https://leetcode.com/problems/distinct-subsequences/</a>
+     * <p>
+     * // Cases
+     * // s = "babgag" t = pbag =>
+     * // s = "", t = ""
+     * // s = "pinkpinkpink" t = "pipnk"
+     * Idea
+     * // countAllSubsequences from 'startS' index,  'startT'
+     * *
+     * 0,0
+     * 1,1
+     * 2,2
+     */
+    public static int numDistinct(String s, String t) {
+        final var cache = new int[s.length()][t.length()];
+        for (var ints : cache) {
+            Arrays.fill(ints, -1);
+        }
+        return IntStream.range(0, s.length())
+                .map(start -> numDistinct(s, t, start, 0, cache))
+                .sum();
+    }
+
+    private static int numDistinct(String s, String t, int startS, int startT, int[][] cache) {
+        if (startS >= s.length() || startT >= t.length() || s.charAt(startS) != t.charAt(startT)) {
+            return 0;
+        }
+        if (startT == t.length() - 1) {
+            return 1;
+        }
+        if (cache[startS][startT] != -1) {
+            return cache[startS][startT];
+        }
+        int count = 0;
+        for (int start = startS + 1; start < s.length(); ++start) {
+            count += numDistinct(s, t, start, startT + 1, cache);
+        }
+        cache[startS][startT] = count;
+        return count;
     }
 }

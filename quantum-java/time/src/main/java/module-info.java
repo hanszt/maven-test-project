@@ -1,7 +1,7 @@
 open module time {
 
     requires javafx.controls;
-    requires slf4j.api;
+    requires org.slf4j;
 
     exports org.hzt to javafx.graphics;
 }
