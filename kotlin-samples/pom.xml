@@ -12,6 +12,9 @@
     </parent>
 
     <artifactId>kotlin-samples</artifactId>
+    <properties>
+        <kotest-assertions-core-jvm.version>5.5.4</kotest-assertions-core-jvm.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -22,9 +25,18 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test</artifactId>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.kotest/kotest-assertions-core-jvm -->
+        <dependency>
+            <groupId>io.kotest</groupId>
+            <artifactId>kotest-assertions-core-jvm</artifactId>
+            <version>${kotest-assertions-core-jvm.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
+        <sourceDirectory>src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -40,6 +52,18 @@
                         <configuration>
                             <sourceDirs>
                                 <source>src/main/kotlin</source>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>process-test-sources</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <source>src/test/kotlin</source>
                             </sourceDirs>
                         </configuration>
                     </execution>

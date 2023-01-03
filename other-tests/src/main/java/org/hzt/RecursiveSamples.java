@@ -72,6 +72,8 @@ public final class RecursiveSamples {
     }
 
     /**
+     * An implementation of the fft using the Cooley-Tukey algorithm
+     * <p>
      * It is assumed the length of the input array is a power of two
      *
      * @param input the complex nr array to apply the fast fourier transform to

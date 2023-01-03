@@ -1,8 +1,13 @@
 package hzt;
 
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -133,16 +138,30 @@ class BitWiseOperatorTests {
         assertEquals('B', bUpperCase);
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {1, 4, 5, 6, 3, 7, 6, 8, 4, 89, 3, 563})
-    void testMultiplyByTwoUsingBitShift(int value) {
-        assertEquals(value * 2, value << 1);
+    @TestFactory
+    Stream<DynamicTest> testRightBitWiseOperatorSameAsDividingByTwo() {
+        return IntStream.range(0, 100)
+                .mapToObj(i -> DynamicTest.dynamicTest(String.format("%d divide by 2 same as right bitshift of %d to 1", i, i),
+                        () -> assertEquals(i >>> 1, i / 2)));
+    }
+
+    @TestFactory
+    Stream<DynamicTest> testLeftBitWiseOperatorSameAsMultiplyingByTwo() {
+        return IntStream.range(0, 100)
+                .mapToObj(i -> DynamicTest.dynamicTest(String.format("%d multiplied by 2 same as left bitshift of %d to 1", i, i),
+                        () -> assertEquals(i << 1, i * 2)));
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1, 4, 5, 6, 3, 7, 6, 8, 4, 89, 3, 563})
-    void testDividingByTwoUsingBitShift(int value) {
-        assertEquals(value / 2, value >> 1);
+    void testMultiplyByFourUsingBitShift(int value) {
+        assertEquals(value * 4, value << 2);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 4, 5, 6, 3, 7, 6, 8, 4, 89, 3, 563})
+    void testDividingByFourUsingBitShift(int value) {
+        assertEquals(value / 4, value >> 2);
     }
 
     @ParameterizedTest

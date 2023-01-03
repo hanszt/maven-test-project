@@ -1,0 +1,2 @@
+module rust.from.java {
+}

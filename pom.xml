@@ -28,6 +28,7 @@
         <module>programming-puzzles</module>
         <module>demo-sogeti-2022</module>
         <module>kotlin-samples</module>
+        <module>rust-from-java</module>
     </modules>
 
     <properties>
@@ -42,7 +43,7 @@
         <logback-classic.version>1.4.5</logback-classic.version>
         <!--test-->
         <junit.jupiter.version>5.9.0</junit.jupiter.version>
-        <mockito.version>4.8.0</mockito.version>
+        <mockito.version>4.10.0</mockito.version>
         <awaitility.version>4.2.0</awaitility.version>
         <!--utils-->
         <commons-beanutils.version>1.9.4</commons-beanutils.version>

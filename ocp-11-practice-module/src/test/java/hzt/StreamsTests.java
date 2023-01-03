@@ -2,6 +2,7 @@ package hzt;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,9 +14,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.function.Predicate.not;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 class StreamsTests {
 
@@ -33,6 +32,24 @@ class StreamsTests {
         personMap.entrySet().forEach(System.out::println);
 
         assertFalse(personMap.isEmpty());
+    }
+
+    @Test
+    void testSortedExecutedOnAllElementsBeforeContinuing() {
+        List<String> orderCalled = new ArrayList<>();
+
+        final var doubles = IntStream.of(6, 1, 456, 2)
+                .limit(8)
+                .peek(s -> orderCalled.add("peek"))
+                .peek(s -> orderCalled.add("pre-sort"))
+                .sorted()
+                .peek(s -> orderCalled.add("post-sort"))
+                .toArray();
+
+        assertAll(
+                () -> assertEquals(List.of("peek", "pre-sort", "peek", "pre-sort", "peek", "pre-sort", "peek", "pre-sort", "post-sort", "post-sort", "post-sort", "post-sort"), orderCalled),
+                () -> assertEquals(1, doubles[0])
+        );
     }
 
     @Test

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import kotlin.test.assertEquals
 
-internal class OverloadsKtTest {
+internal class OverloadsTest {
 
     @Test
     fun `overload with different list content possible when specifying jvm name`() {

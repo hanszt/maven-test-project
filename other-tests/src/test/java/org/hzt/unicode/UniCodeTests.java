@@ -8,10 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.Arrays;
 
 import static org.hzt.utils.It.println;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unicode's encode graphemes instead of characters
@@ -66,16 +63,16 @@ class UniCodeTests {
     @Test
     void testFromCodePointToLowAndHighSurrogate() {
         final var codePoint = 0x1f600;
-        final var supplementaryCodePoint = Character.isSupplementaryCodePoint(codePoint);
-        println("supplementaryCodePoint = " + supplementaryCodePoint);
 
         final var lowSurrogate = Character.lowSurrogate(codePoint);
         final var highSurrogate = Character.highSurrogate(codePoint);
         final var surrogates = new int[]{highSurrogate, lowSurrogate};
         final var smileyFace = new String(surrogates, 0, surrogates.length);
+
         println(smileyFace);
 
         assertAll(
+                () -> assertTrue(Character.isSupplementaryCodePoint(codePoint)),
                 () -> assertTrue(Character.isLowSurrogate(lowSurrogate)),
                 () -> assertTrue(Character.isHighSurrogate(highSurrogate)),
                 () -> assertEquals(2, smileyFace.length()),
@@ -171,11 +168,6 @@ class UniCodeTests {
 
     private boolean areNotEqualChars(String s, int i, int j) {
         final var c1 = s.charAt(i);
-        if (Character.isHighSurrogate(c1)) {
-            --j;
-        } else if (Character.isLowSurrogate(c1)) {
-            ++j;
-        }
-        return c1 != s.charAt(j);
+        return c1 != s.charAt(Character.isHighSurrogate(c1) ? j - 1 : Character.isLowSurrogate(c1) ? j + 1 : j);
     }
 }

@@ -49,8 +49,14 @@ class RecursiveSamplesTest {
         //1, 1, 2, 3, 5, 8, 13, 21, 34, 55...
         assertAll(
                 () -> assertEquals(55, fib),
-                () -> assertEquals(expected, fib)
+                () -> assertEquals(expected, fib),
+                () -> assertEquals(55, fibonacciBinet(n))
         );
+    }
+
+    public static double fibonacciBinet(int n) {
+        double goldenRatio = (1 + Math.sqrt(5)) / 2;
+        return Math.round(Math.pow(goldenRatio, n) / Math.sqrt(5));
     }
 
     @Test

@@ -28,8 +28,14 @@ class PrimitiveTests {
         int b = 20;
         a += (a = 4);
         b = b + (b = 5);
-        assertEquals(14, a);
-        assertEquals(25, b);
+
+        int finalA = a;
+        int finalB = b;
+
+        assertAll(
+                () -> assertEquals(14, finalA),
+                () -> assertEquals(25, finalB)
+        );
     }
 
     /**

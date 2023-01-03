@@ -16,8 +16,7 @@ import java.util.Set;
  * @see <a href="https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-in-java-using-priorityqueue/">
  * *     Dijkstra’s shortest path algorithm in Java using PriorityQueue</a>
  */
-@SuppressWarnings("squid:S2384")
-public class PathSearcher {
+public final class PathSearcher {
 
     private final int[] distances;
     private final Set<Node> settled;
@@ -25,7 +24,7 @@ public class PathSearcher {
     private final List<List<Node>> adjacencyList;
 
     public PathSearcher(List<List<Node>> adjacencyList) {
-        this.adjacencyList = adjacencyList;
+        this.adjacencyList = List.copyOf(adjacencyList);
         final var nrOfNodes = adjacencyList.size();
         distances = new int[nrOfNodes];
         settled = new HashSet<>();
@@ -36,53 +35,38 @@ public class PathSearcher {
     // Dijkstra's Algorithm
     public void dijkstra(Node start) {
         Arrays.fill(distances, Integer.MAX_VALUE);
-        // Add source value to the priority queue
         priorityQueue.add(start);
-        // Distance to the source is 0
-        distances[start.value] = 0;
-        while (settled.size() != distances.length) {
-            // Terminating condition check when
-            // the priority queue is empty, return
-            if (priorityQueue.isEmpty()) {
-                return;
-            }
-            // Removing the minimum distance value from the priority queue
+        distances[start.index] = 0;
+        while (!priorityQueue.isEmpty()) {
             Node node = priorityQueue.remove();
-
-            // Adding the value whose distance is finalized
-            if (!settled.contains(node)) {
-                // Continue keyword skips execution for following check
-                // We don't have to call e_Neighbors(u)
-                // if u is already present in the settled set.
-                settled.add(node);
-                processNeighbors(node);
+            if (settled.contains(node)) {
+                continue;
             }
-        }
-    }
-
-    private void processNeighbors(Node node) {
-        final var adjListIndex = node.value;
-        final var neighbors = adjacencyList.get(adjListIndex);
-        for (Node neighbor : neighbors) {
-            // If current value hasn't already been processed
-            if (!settled.contains(neighbor)) {
+            settled.add(node);
+            final var adjListIndex = node.index;
+            final var neighbors = adjacencyList.get(adjListIndex);
+            for (Node neighbor : neighbors) {
+                // If current index hasn't already been processed
+                if (settled.contains(neighbor)) {
+                    continue;
+                }
                 int edgeDistance = neighbor.cost;
                 int newDistance = distances[adjListIndex] + edgeDistance;
 
                 // If new distance is cheaper in cost
-                if (newDistance < distances[neighbor.value]) {
-                    distances[neighbor.value] = newDistance;
+                if (newDistance < distances[neighbor.index]) {
+                    distances[neighbor.index] = newDistance;
                 }
-                // Add the current value to the queue
-                priorityQueue.add(new Node(neighbor.value, distances[neighbor.value]));
+                // Add the current index to the queue
+                priorityQueue.add(new Node(neighbor.index, distances[neighbor.index]));
             }
         }
     }
 
     public int[] getDistances() {
-        return distances;
+        return Arrays.copyOf(distances, distances.length);
     }
 
-    record Node(int value, int cost) {
+    record Node(int index, int cost) {
     }
 }

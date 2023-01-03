@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hzt.graph.PathSearcher.*;
 import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
@@ -20,10 +21,10 @@ class PathSearcherTest {
     void testDijkstraUsingPriorityQueue() {
         int numberOfNodes = 5;
         int source = 0;
-        List<List<PathSearcher.Node>> adjacencyList = buildAdjacencyList(numberOfNodes);
+        List<List<Node>> adjacencyList = buildAdjacencyList(numberOfNodes);
         // Calculating the single-source-shortest-path
         PathSearcher pathSearcher = new PathSearcher(adjacencyList);
-        pathSearcher.dijkstra(new PathSearcher.Node(source, 0));
+        pathSearcher.dijkstra(new Node(source, 0));
         final var distances = pathSearcher.getDistances();
 
         printResult(source, distances);
@@ -41,24 +42,23 @@ class PathSearcherTest {
     }
 
     @NotNull
-    private static List<List<PathSearcher.Node>> buildAdjacencyList(int numberOfNodes) {
-        List<List<PathSearcher.Node>> adjacencyList = new ArrayList<>();
+    private static List<List<Node>> buildAdjacencyList(int numberOfNodes) {
+        List<List<Node>> adjacencyList = new ArrayList<>();
 
-        // Initialize list for every value
+        // Initialize list for every index
         for (int i = 0; i < numberOfNodes; i++) {
             adjacencyList.add(new ArrayList<>());
         }
-
         // create connections
         final var nodes = adjacencyList.get(0);
-        nodes.add(new PathSearcher.Node(1, 9));
-        nodes.add(new PathSearcher.Node(2, 6));
-        nodes.add(new PathSearcher.Node(3, 5));
-        nodes.add(new PathSearcher.Node(4, 3));
+        nodes.add(new Node(1, 9));
+        nodes.add(new Node(2, 6));
+        nodes.add(new Node(3, 5));
+        nodes.add(new Node(4, 3));
 
         final var nodes1 = adjacencyList.get(2);
-        nodes1.add(new PathSearcher.Node(1, 2));
-        nodes1.add(new PathSearcher.Node(3, 4));
+        nodes1.add(new Node(1, 2));
+        nodes1.add(new Node(3, 4));
         return adjacencyList;
     }
 

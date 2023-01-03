@@ -52,3 +52,7 @@ target
 # Java serialization #
 ######################
 *.ser
+
+# Rust #
+########
+Cargo.lock
