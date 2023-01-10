@@ -37,13 +37,15 @@
         <coverage.target>50%</coverage.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--dependencies-->
-        <kotlin.version>1.7.22</kotlin.version>
+        <!--kotlin-->
+        <kotlin.version>1.8.0</kotlin.version>
+        <kotest-assertions.version>5.5.4</kotest-assertions.version>
         <!--logging-->
         <slf4j.version>2.0.5</slf4j.version>
         <logback-classic.version>1.4.5</logback-classic.version>
         <!--test-->
         <junit.jupiter.version>5.9.0</junit.jupiter.version>
-        <mockito.version>4.10.0</mockito.version>
+        <mockito.version>4.11.0</mockito.version>
         <awaitility.version>4.2.0</awaitility.version>
         <!--utils-->
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
@@ -162,6 +164,12 @@
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-test</artifactId>
                 <version>${kotlin.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.kotest</groupId>
+                <artifactId>kotest-assertions-core-jvm</artifactId>
+                <version>${kotest-assertions.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

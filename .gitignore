@@ -17,6 +17,7 @@
 *.iso
 *.rar
 *.tar
+*.jar
 *.zip
 
 ### IntelliJ IDEA ###
@@ -56,3 +57,14 @@ target
 # Rust #
 ########
 Cargo.lock
+
+# Tomcat #
+##########
+**/tomcat-local/**/temp
+**/tomcat-local/**/examples
+
+## Unignored files #
+####################
+!**/tomcat-local/**/*.jar
+!**/tomcat-local/**/*.dll
+!**/tomcat-local/**/*.exe
