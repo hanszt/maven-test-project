@@ -40,9 +40,8 @@ public class PatternMatching {
             case NavigableSet<?> navigableSet -> navigableSet.pollFirst() instanceof Integer i ? i : 0;
             case Collection<?> c -> c.size();
             case Point(int x, int y) when x + y < 10 -> x * y;
-            case Point(int x, int y) -> x + y;
-//            this could also be done. Not yet recognized by Intellij (2022-009-25)
-//            case Point(int x, var y) -> x + y;
+//            case Point(int x, int y) -> x + y;
+            case Point(int x, var y) -> x + y;
             default -> throw new IllegalStateException("Could not obtain value...");
         };
     }

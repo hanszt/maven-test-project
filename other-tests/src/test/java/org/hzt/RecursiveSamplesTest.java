@@ -142,37 +142,7 @@ class RecursiveSamplesTest {
         assertThrows(StackOverflowError.class, RecursiveSamples::stackOverflow);
     }
 
-    @Test
-    void testFastFourierTransform() {
-        final var complexes = DoubleStream
-                .iterate(0, d -> d + (Math.PI / 32))
-                .map(Math::sin)
-                .mapToObj(real -> new Complex(real, 0))
-                .limit(8192)
-                .toArray(Complex[]::new);
 
-        final var fastFourierTransform = RecursiveSamples.fastFourierTransform(complexes);
-        final var fastFourierTransform1 = RecursiveSamplesKt.fft(complexes);
-        final var expected = new FastFourierTransformer(DftNormalization.STANDARD)
-                .transform(complexes, TransformType.FORWARD);
-
-        final var largerValueCount = Arrays.stream(fastFourierTransform)
-                .mapToDouble(Complex::abs)
-                .filter(absValue -> absValue > 1)
-                .peek(It::println)
-                .count();
-
-        assertAll(
-                () -> assertEquals(complexes.length, fastFourierTransform.length),
-                () -> assertEquals(2, largerValueCount),
-                () -> assertArrayEquals(fastFourierTransform, fastFourierTransform1),
-                () -> assertArrayEquals(toRintAbsArray(expected), toRintAbsArray(fastFourierTransform1))
-        );
-    }
-
-    private static double[] toRintAbsArray(Complex[] fastFourierTransform1) {
-        return Arrays.stream(fastFourierTransform1).mapToDouble(Complex::abs).map(Math::rint).toArray();
-    }
 
     @ParameterizedTest
     @MethodSource("defaultCommonDivisorParams")

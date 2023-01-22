@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PatternMatchingTest {
 
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "'{0}' should evaluated to integer: {1}")
     @CsvSource({
             "param1, 6",
             "par, 7",

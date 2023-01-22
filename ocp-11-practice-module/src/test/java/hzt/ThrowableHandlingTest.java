@@ -2,10 +2,9 @@ package hzt;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-class ThrowableHandling {
+class ThrowableHandlingTest {
 
     //q27 test 5
 //    A NullPointerException never occurs because the index expression must be completely evaluated before any part of
@@ -34,11 +33,12 @@ class ThrowableHandling {
 //    At this time, if the array reference is null, you will get a NullPointerException.
     @Test
     void testExceptionHandling() {
-        assertThrows(MyException.class, ThrowableHandling::printArrayElement);
+        assertThrows(MyException.class, ThrowableHandlingTest::printArrayElement);
     }
 
     private static void printArrayElement() {
         int[] a = null;
+        //noinspection DataFlowIssue
         System.out.println(a[method()]);
     }
 
@@ -66,13 +66,17 @@ class ThrowableHandling {
     void testExceptionInInitializerErrorThrownWhenExceptionThrownInStaticBlock() {
         final var exceptionInInitializerError = assertThrows(ExceptionInInitializerError.class, AX::new);
 
-        assertEquals("Index 0 out of bounds for length 0", exceptionInInitializerError.getCause().getMessage());
+        assertAll(
+                () -> assertNull(exceptionInInitializerError.getMessage()),
+                () -> assertEquals("Index 0 out of bounds for length 0", exceptionInInitializerError.getCause().getMessage())
+        );
     }
 
     static class AX {
         static int[] x = new int[0];
 
         static {
+            //noinspection DataFlowIssue
             x[0] = 10;
         }
     }

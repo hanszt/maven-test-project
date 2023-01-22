@@ -3,6 +3,7 @@ package hzt;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -109,6 +110,12 @@ class NumberTests {
     @Test
     void testToHexString() {
         assertEquals("14", Integer.toHexString(20));
+    }
+
+    @Test
+    void testBintIntegerEquals() {
+        final var equals = BigInteger.valueOf(0).equals(BigInteger.ZERO);
+        assertTrue(equals);
     }
 
 }

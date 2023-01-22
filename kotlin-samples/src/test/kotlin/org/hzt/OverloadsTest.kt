@@ -1,8 +1,8 @@
-package org.hzt.tests
+package org.hzt
 
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import kotlin.test.assertEquals
 
 internal class OverloadsTest {
 
@@ -14,8 +14,8 @@ internal class OverloadsTest {
         val strings = listOfValues(listOf("this", "is", "a", "test"))
 
         assertAll(
-            { assertEquals(intValues.size, longValues.size) },
-            { assertEquals(strings.size, intValues.size) }
+            { intValues.size shouldBe longValues.size },
+            { strings.size shouldBe intValues.size }
         )
     }
 
@@ -23,6 +23,6 @@ internal class OverloadsTest {
     fun `overload with different lambda's is possible`() {
         val string: String = callBackOverload<String> { "Hello" }
         val long = callBackOverload { 5L }
-        assertEquals(string.length, long.toInt())
+        string.length shouldBe long.toInt()
     }
 }

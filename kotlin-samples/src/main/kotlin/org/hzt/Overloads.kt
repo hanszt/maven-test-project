@@ -1,4 +1,4 @@
-package org.hzt.tests
+package org.hzt
 
 @JvmName("listOfLongValues")
 fun listOfValues(values: List<Long>): List<Long> = values

@@ -12,6 +12,9 @@ fun factorial(n: Int): BigInt = factorial(BigInt.ONE, n.toBigInteger())
 tailrec fun factorial(acc: BigInt, n: BigInt): BigInt =
     if (n <= BigInt.ONE) acc else factorial(acc.multiply(n), n.subtract(BigInt.ONE))
 
+tailrec fun gcdByEuclidesAlgorithm(n1: Long, n2: Long): Long =
+    if (n2 == 0L) n1 else gcdByEuclidesAlgorithm(n2, n1 % n2)
+
 fun findFixPoint() = findFixPoint(1.0)
 
 /**
@@ -37,9 +40,10 @@ tailrec fun findFixPoint(x: Double = 1.0, eps: Double = 1E-15): Double =
  * @param input the complex nr array to apply the fast fourier transform to
  * @return the fourier transform of the input
  */
-fun fft(input: Array<Complex>): Array<Complex> {
-    if (input.size == 1) return arrayOf(input[0])
-
+suspend fun SequenceScope<Array<Complex>>.fft(input: Array<Complex>): Array<Complex> {
+    if (input.size == 1) {
+        return arrayOf(input[0])
+    }
     require(isPowerOfTwo(input.size)) { "The length: ${input.size} is not a power of 2" }
 
     val halfSize = input.size / 2
@@ -56,6 +60,7 @@ fun fft(input: Array<Complex>): Array<Complex> {
         fft[k] = even.add(complex)
         fft[k + halfSize] = even.subtract(complex)
     }
+    yield(fft)
     return fft
 }
 
@@ -63,17 +68,11 @@ fun isPowerOfTwo(n: Int) = (n > 0) && ((n and (n - 1)) == 0)
 
 fun fib(n: Int, cache: MutableMap<Int, BigInt> = HashMap()): BigInt {
     require(n >= 0) { "the position n in the fib sequence must be greater than 0 but was $n" }
-    if (n == 0) {
-        return BigInt.ZERO
-    }
-    if (n <= 2) {
-        return BigInt.ONE
-    }
+    if (n == 0) return BigInt.ZERO
+    if (n <= 2) return BigInt.ONE
     val fibNr = cache[n]
-    if (fibNr != null) {
-        return fibNr
-    }
-    val nextFib = fib(n - 1, cache).add(fib(n - 2, cache))
+    if (fibNr != null) return fibNr
+    val nextFib = fib(n - 1, cache) + (fib(n - 2, cache))
     cache[n] = nextFib
     return nextFib
 }

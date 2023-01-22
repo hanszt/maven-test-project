@@ -102,7 +102,7 @@ class HztStringFunTest {
         assertFalse(Sequence.of(stream::iterator).isSorted(String::compareTo));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "`{2}` using `{1}` rows, should be converted to `{0}`")
     @MethodSource("provideArgumentsForZigZagConversionTests")
     void testZigZagConversion(final String expected, final int nrOfRows, final String inputString) {
 
@@ -135,19 +135,15 @@ class HztStringFunTest {
 
     @TestFactory
     Stream<DynamicTest> testNrOfDistinctSequences() {
-        record Test(String s, String t, int expected) {
-            DynamicTest toDynamicTest() {
-                final var displayName = "The nr of distinct subsequences of '%s' which equal '%s', should be %d".formatted(s, t, expected);
-                final var actual = HztStringFun.numDistinct(s, t);
-                return dynamicTest(displayName, () -> assertEquals(expected, actual));
-            }
-        }
-        return Stream.of(new Test("rabbbit", "rabbit", 3),
-                        new Test("babgbag", "bag", 5),
-                        new Test("loop", "ga", 0),
-                        new Test("pennenlikker", "pen", 4))
-                .map(Test::toDynamicTest);
+        return Stream.of(nrOfDistinctSequencesTest("rabbbit", "rabbit", 3),
+                        nrOfDistinctSequencesTest("babgbag", "bag", 5),
+                        nrOfDistinctSequencesTest("loop", "ga", 0),
+                        nrOfDistinctSequencesTest("pennenlikker", "pen", 4));
     }
 
-
+    DynamicTest nrOfDistinctSequencesTest(String s, String t, int expected) {
+        final var displayName = "The nr of distinct subsequences of '%s' which equal '%s', should be %d".formatted(s, t, expected);
+        final var actual = HztStringFun.numDistinct(s, t);
+        return dynamicTest(displayName, () -> assertEquals(expected, actual));
+    }
 }

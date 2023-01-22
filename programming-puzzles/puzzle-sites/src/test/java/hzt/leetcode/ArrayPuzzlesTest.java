@@ -55,20 +55,19 @@ class ArrayPuzzlesTest {
 
     @TestFactory
     Stream<DynamicTest> testNrOfBacklogOrders() {
-        record Test(int expected, int[]... orders) {
-            DynamicTest toDynamicTest() {
-                var ordersList = Arrays.stream(orders).map(Arrays::toString).toList();
-                var displayName = "With input: %s, the nr of backlog orders should be: %d".formatted(ordersList, expected);
-                int actual = ArrayPuzzles.getNumberOfBacklogOrders(orders);
-                return dynamicTest(displayName, () -> assertEquals(expected, actual));
-            }
-        }
         return Stream.of(
-                new Test(6, new int[][]{{10, 5, 0}, {15, 2, 1}, {25, 1, 1}, {30, 4, 0}}),
-                new Test(999_999_984, new int[][]{{7, 1000000000, 1}, {15, 3, 0}, {5, 999999995, 0}, {5, 1, 1}}),
-                new Test(999_999_926, new int[][]{{7, 2000000000, 0}, {15, 3, 1}, {5, 999999945, 0}, {5, 8, 1}}),
-                new Test(52, new int[][]{{10, 5, 1}, {20, 2, 1}, {25, 7, 0}, {34, 52, 1}})
-        ).map(Test::toDynamicTest);
+                nrOfBacklogOrdersTest(6, new int[][]{{10, 5, 0}, {15, 2, 1}, {25, 1, 1}, {30, 4, 0}}),
+                nrOfBacklogOrdersTest(999_999_984, new int[][]{{7, 1000000000, 1}, {15, 3, 0}, {5, 999999995, 0}, {5, 1, 1}}),
+                nrOfBacklogOrdersTest(999_999_926, new int[][]{{7, 2000000000, 0}, {15, 3, 1}, {5, 999999945, 0}, {5, 8, 1}}),
+                nrOfBacklogOrdersTest(52, new int[][]{{10, 5, 1}, {20, 2, 1}, {25, 7, 0}, {34, 52, 1}})
+        );
+    }
+
+    DynamicTest nrOfBacklogOrdersTest(int expected, int[]... orders) {
+        var ordersList = Arrays.stream(orders).map(Arrays::toString).toList();
+        var displayName = "With input: %s, the nr of backlog orders should be: %d".formatted(ordersList, expected);
+        int actual = ArrayPuzzles.getNumberOfBacklogOrders(orders);
+        return dynamicTest(displayName, () -> assertEquals(expected, actual));
     }
 
 }

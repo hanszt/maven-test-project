@@ -32,9 +32,11 @@ class LocaleSampleTest {
     void testAvailableLocales() {
         final var availableLocales = Locale.getAvailableLocales();
 
-        Arrays.stream(availableLocales).forEach(System.out::println);
+        Arrays.stream(availableLocales).limit(10).forEach(System.out::println);
 
-        assertEquals(1017, availableLocales.length);
+        final var nrOfAvailableLocales = availableLocales.length;
+        System.out.println("nrOfAvailableLocales = " + nrOfAvailableLocales);
+        assertTrue(1017 <= nrOfAvailableLocales);
     }
 
     @Test

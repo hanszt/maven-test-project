@@ -28,6 +28,7 @@ This project consists of multiple modules:
 14. [quantum-java](quantum-java/README.md)
 15. [math-utils-samples](math-utils-samples/README.md)
 16. [benchmark](benchmark/README.md)
+17. [kotlin-samples](kotlin-samples/README.md)
 
 The module [Programming puzzles][file:programming-puzzles-readme] contains also separate modules with different types of puzzels.
 
@@ -112,3 +113,5 @@ mvn install -pl :B -am
 As described here:
 
 - [Define modules list which shall be build in Maven multiproject build](https://stackoverflow.com/questions/26429476/define-modules-list-which-shall-be-build-in-maven-multiproject-build/26439938#26439938)
+
+---

@@ -14,5 +14,8 @@ class TestCloneable {
 
         assertNotEquals(clone, array);
         assertArrayEquals(clone, array);
+        final var i = 4;
+        clone[i] = 100;
+        assertNotEquals(clone[i], array[i]);
     }
 }

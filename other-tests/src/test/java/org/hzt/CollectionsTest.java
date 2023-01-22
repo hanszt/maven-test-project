@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CollectionsTest {
 
@@ -35,7 +35,20 @@ class CollectionsTest {
     void testSwapTwoElements() {
         List<String> strings = new ArrayList<>(List.of("Hello", "this", "is", "a", "test"));
         Collections.swap(strings, 0, strings.size() - 1);
-
         assertEquals(List.of("test", "this", "is", "a", "Hello"), strings);
+    }
+
+    @Test
+    void testCollectionsRotate() {
+        final var list = new ArrayList<>(List.of("This", "is", "a", "test"));
+        Collections.rotate(list, 2);
+        assertEquals(List.of("a", "test", "This", "is"), list);
+    }
+
+    @Test
+    void testCollectionsDisjoint() {
+        final var list1 = new ArrayList<>(List.of("This", "is", "a", "test"));
+        final var list2 = new ArrayList<>(List.of("some", "other", "stuff"));
+        assertTrue(Collections.disjoint(list1, list2));
     }
 }

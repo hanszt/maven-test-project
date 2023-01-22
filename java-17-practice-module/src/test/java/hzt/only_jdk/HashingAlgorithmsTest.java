@@ -38,7 +38,7 @@ class HashingAlgorithmsTest {
         );
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "`{0}` should be hashed to sha256: `{1}`")
     @MethodSource("hashTestArguments")
     void testSha256Hashing(String input, String expected) {
         final var hash = HashingAlgorithms.toHexadecimalHash(input, HashingAlgorithms.Algorithm.SHA_256);
