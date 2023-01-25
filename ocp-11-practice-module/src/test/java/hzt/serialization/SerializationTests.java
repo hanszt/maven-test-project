@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 //q 46 test 3
 class SerializationTests {
@@ -36,7 +35,7 @@ class SerializationTests {
     }
 
 
-    // uncomment this when a default contructor is present
+    // uncomment this when a default constructor is present
 //    @Test
 //    void testDeserializingMoo() throws IOException, ClassNotFoundException {
 //        final var input = new Moo();
@@ -49,11 +48,12 @@ class SerializationTests {
 //    }
 
 
-    private Object serializeAndDeserialize(Object object, String targetFileName) throws IOException, ClassNotFoundException {
+    private <T> T serializeAndDeserialize(T object, String targetFileName) throws IOException, ClassNotFoundException {
         try (var objectOutputStream = new ObjectOutputStream(new FileOutputStream(targetFileName));
              var objectInputStream = new ObjectInputStream(new FileInputStream(targetFileName))) {
             objectOutputStream.writeObject(object);
-            return objectInputStream.readObject();
+            //noinspection unchecked
+            return (T) objectInputStream.readObject();
         }
     }
 
@@ -71,18 +71,13 @@ class SerializationTests {
         };
 
         final var portFolio = new PortFolio("My account", bonds);
-        final var o = serializeAndDeserialize(portFolio, "custom.ser");
+        final var dsPortFolio = serializeAndDeserialize(portFolio, "custom.ser");
 
-        if (o instanceof PortFolio) {
-            final var dsPortFolio = (PortFolio) o;
-            final var dsBonds = dsPortFolio.getBonds();
-            Stream.of(dsBonds).forEach(System.out::println);
+        final var dsBonds = dsPortFolio.getBonds();
+        Stream.of(dsBonds).forEach(System.out::println);
 
-            assertArrayEquals(portFolio.getBonds(), dsBonds);
-            assertEquals(portFolio.getAccountName(), dsPortFolio.getAccountName());
-        } else {
-            fail(o + " not of type " + PortFolio.class.getSimpleName());
-        }
+        assertArrayEquals(portFolio.getBonds(), dsBonds);
+        assertEquals(portFolio.getAccountName(), dsPortFolio.getAccountName());
     }
 
     static class Boo {
