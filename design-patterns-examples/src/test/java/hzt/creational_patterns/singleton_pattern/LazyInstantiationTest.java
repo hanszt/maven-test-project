@@ -7,20 +7,27 @@ import static org.junit.jupiter.api.Assertions.*;
 class LazyInstantiationTest {
 
     @Test
-    void testSafeLazyInitialization() {
+    void testUnSafeLazyInitialization() {
         final var unsafeLazySingleton = LazyInstantiation.getUnsafeLazyInstance();
         final var unsafeHello = unsafeLazySingleton.hello();
 
-        final var safelyInitialized = LazyInstantiation.isSafelyInitialized();
+        assertAll(
+                () -> assertEquals("Unsafe hello", unsafeHello),
+                () -> assertSame(unsafeLazySingleton, LazyInstantiation.getUnsafeLazyInstance())
+        );
+    }
 
+    @Test
+    void testSafeLazyInitialization() {
+        final var isInitialized = LazyInstantiation.isSafelyInitialized();
         final var safeLazySingleton = LazyInstantiation.getSafeLazyInstance();
         final var safeHello = safeLazySingleton.hello();
 
         assertAll(
-                () -> assertFalse(safelyInitialized),
-                () -> assertEquals("Unsafe hello", unsafeHello),
+                () -> assertFalse(isInitialized),
                 () -> assertTrue(LazyInstantiation.isSafelyInitialized()),
-                () -> assertEquals("Safe hello", safeHello)
+                () -> assertEquals("Safe hello", safeHello),
+                () -> assertSame(safeLazySingleton, LazyInstantiation.getSafeLazyInstance())
         );
     }
 }

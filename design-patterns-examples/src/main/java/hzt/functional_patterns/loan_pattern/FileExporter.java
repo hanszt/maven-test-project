@@ -20,7 +20,7 @@ public class FileExporter {
             contentWriter.accept(writer);
             return Optional.of(file);
         } catch (IOException e) {
-            LOGGER.error("A Io error occurred. An Email should be send to admin", e);
+            LOGGER.error("A Io error occurred", e);
             return Optional.empty();
         }
     }

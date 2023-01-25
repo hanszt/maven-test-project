@@ -428,6 +428,10 @@ public interface Sequence<T> extends Iterable<T> {
         return false;
     }
 
+    default boolean any() {
+        return iterator().hasNext();
+    }
+
     default boolean all(final Predicate<? super T> predicate) {
         final var iterator = iterator();
         while (iterator.hasNext()) {
@@ -446,5 +450,9 @@ public interface Sequence<T> extends Iterable<T> {
             }
         }
         return true;
+    }
+
+    default boolean none() {
+        return !iterator().hasNext();
     }
 }

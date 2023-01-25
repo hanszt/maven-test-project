@@ -729,5 +729,21 @@ class SequenceTest {
             final var anyOdd = Sequence.of(2, 4, 8, 15, 12, 10_254_678, 13_528).any(i -> i % 2 != 0);
             assertTrue(anyOdd);
         }
+
+        @Test
+        void testAny() {
+            final var anyOdd = Sequence.of(2, 4, 8, 15, 12, 10_254_678, 13_528).any();
+            assertTrue(anyOdd);
+        }
+
+        @Test
+        void testNotAny() {
+            assertFalse(Sequence.empty().any());
+        }
+
+        @Test
+        void testNone() {
+            assertTrue(Sequence.empty().none());
+        }
     }
 }
