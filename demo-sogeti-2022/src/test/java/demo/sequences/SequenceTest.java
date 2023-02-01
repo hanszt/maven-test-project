@@ -26,15 +26,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static demo.It.printf;
 import static demo.It.println;
@@ -744,6 +750,85 @@ class SequenceTest {
         @Test
         void testNone() {
             assertTrue(Sequence.empty().none());
+        }
+    }
+
+    @Nested
+    class CustomFlattenMethodTests {
+
+        @Test
+        void testFlatten() {
+            final var collections = List.of(List.of("hallo"), List.of("this", "is"), Set.of("a"), Set.of("Test"));
+
+            final var list = Sequence.of(collections)
+                    .flatten()
+                    .toList();
+
+            System.out.println("list = " + list);
+
+            assertEquals(List.of("hallo", "this", "is", "a", "Test"), list);
+        }
+
+        @Test
+        void testFlattenStreamIteratorEnumerationAndIterable() {
+            final var iterableLike = List.of(
+                    Stream.of("hallo"),
+                    List.of("this", "is"),
+                    Set.of("a").iterator(),
+                    List.of("more", "stuf").spliterator(),
+                    new StringTokenizer("Test"));
+
+            final var list = Sequence.of(iterableLike)
+                    .<String>flatten()
+                    .toList();
+
+            System.out.println("list = " + list);
+
+            assertEquals(List.of("hallo", "this", "is", "a", "more", "stuf", "Test"), list);
+        }
+
+        @Test
+        void testFlattenNonMatchingTypeThrows() {
+            final var list = List.of("non matching", List.of("this", "is"), Set.of("a").iterator(), new StringTokenizer("Test"));
+
+            final var sequence = Sequence.of(list).flatten();
+
+            final var exception = assertThrows(UnsupportedOperationException.class, sequence::toList);
+            final var expected = "No default converter to iterator for item of type: 'String'";
+
+            assertEquals(expected, exception.getMessage());
+        }
+
+
+        interface Sequence<T> extends demo.sequences.Sequence<T> {
+
+            static <T> Sequence<T> of(Iterable<T> iterable) {
+                return iterable::iterator;
+            }
+
+            default <R> Sequence<R> flatten() {
+                return () -> new FlatteningIterator<>(iterator(), this::toIteratorOrThrow);
+            }
+
+            private <R> Iterator<R> toIteratorOrThrow(Object item) {
+                final Iterator<?> iterator;
+                if (item instanceof Iterable<?> iterable) {
+                    iterator = iterable.iterator();
+                } else if (item instanceof Stream<?> stream) {
+                    iterator = stream.iterator();
+                } else if (item instanceof Enumeration<?> enumeration) {
+                    iterator = enumeration.asIterator();
+                } else if (item instanceof Spliterator<?> spliterator) {
+                    iterator = Spliterators.iterator(spliterator);
+                } else if (item instanceof Iterator<?> iter) {
+                    iterator = iter;
+                } else {
+                    final var type = item.getClass().getSimpleName();
+                    throw new UnsupportedOperationException("No default converter to iterator for item of type: '" + type + "'");
+                }
+                //noinspection unchecked
+                return (Iterator<R>) iterator;
+            }
         }
     }
 }

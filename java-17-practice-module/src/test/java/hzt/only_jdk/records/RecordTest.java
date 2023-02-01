@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class RecordTest {
 
@@ -16,6 +15,7 @@ class RecordTest {
         final var roles = hans.roles();
         assertThrows(UnsupportedOperationException.class, () -> roles.remove("Maintainer"));
         System.out.println(roles);
+        assertEquals(2, roles.size());
     }
 
     @Test
@@ -24,5 +24,6 @@ class RecordTest {
         final var roles = hans.roles();
         assertDoesNotThrow(() -> roles.remove("Maintainer"));
         System.out.println(roles);
+        assertEquals(1, roles.size());
     }
 }

@@ -5,6 +5,7 @@ import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 import org.apache.commons.math3.util.ArithmeticUtils;
+import org.hzt.utils.PreConditions;
 import org.hzt.utils.sequences.Sequence;
 
 import java.util.Arrays;
@@ -31,7 +32,7 @@ public final class FftConvolver {
         final var transform1 = fastFourierTransformer.transform(array1, TransformType.FORWARD);
         final var transform2 = fastFourierTransformer.transform(array2, TransformType.FORWARD);
 
-        final Complex[] pointWiseMultiplied = Sequence.of(transform1)
+        final var pointWiseMultiplied = Sequence.of(transform1)
                 .zip(Sequence.of(transform2), Complex::multiply)
                 .toTypedArray(Complex[]::new);
 
@@ -65,12 +66,9 @@ public final class FftConvolver {
     }
 
     private static void checkPreconditions(int length1, int length2) {
-        if (!ArithmeticUtils.isPowerOfTwo(length1)) {
-            throw new ArithmeticException("Both arrays should have a length that is a power of two. Try padding with zero's");
-        }
-        if (length1 != length2) {
-            throw new IllegalArgumentException("Dimensions don't agree");
-        }
+        PreConditions.require(length1 == length2, () -> "Dimensions don't agree");
+        PreConditions.require(ArithmeticUtils.isPowerOfTwo(length1),
+                () -> "Both arrays should have a length that is a power of two. Try padding with zero's");
     }
 
     /**

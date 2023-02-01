@@ -6,19 +6,21 @@ import org.apache.commons.math3.transform.DftNormalization
 import org.apache.commons.math3.transform.FastFourierTransformer
 import org.apache.commons.math3.transform.TransformType
 import org.hzt.utils.It
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import java.util.*
 import kotlin.math.round
 import kotlin.math.sin
 
 internal class RecursiveSamplesKtTest {
 
     @Test
-    fun `test fib with cash`() = fib(5_000) shouldBe RecursiveSamples.fibWithCash(5_000)
+    fun `test fib with cash`() = fibWithCash(5_000) shouldBe RecursiveSamples.fibWithCash(5_000)
+
+    @Test
+    fun `test memoized fib`() = memoizedFib(1_500) shouldBe RecursiveSamples.memoizedFib(1_500)
 
     @ParameterizedTest(name = "The greatest common divisor of `{0}` and `{1}` should be `{2}`")
     @CsvSource(
@@ -33,6 +35,11 @@ internal class RecursiveSamplesKtTest {
 
     @Test
     fun `test fast fourier transform`() {
+        fun toRoundedAbsArray(complexes: Array<Complex>) = complexes
+                .map(Complex::abs)
+                .map(::round)
+                .toDoubleArray()
+
         val complexes = generateSequence(0.0) { it + Math.PI / 32 }
             .map(::sin)
             .map { real -> Complex(real, 0.0) }
@@ -41,7 +48,7 @@ internal class RecursiveSamplesKtTest {
             .toTypedArray()
 
         val fastFourierTransform = RecursiveSamples.fastFourierTransform(*complexes)
-        val sequence = sequence { fft(complexes) }
+        val fft = fft(complexes)
         val expected = FastFourierTransformer(DftNormalization.STANDARD).transform(complexes, TransformType.FORWARD)
 
         val largerValueCount = fastFourierTransform
@@ -50,21 +57,11 @@ internal class RecursiveSamplesKtTest {
             .onEach(It::println)
             .count()
 
-        val transformFromSuspendFun = sequence.last()
-        sequence.count()
-        println("sequence count = ${sequence.count()}")
-
         assertAll(
             { fastFourierTransform.size shouldBe complexes.size },
             { largerValueCount shouldBe 2 },
-            { assertArrayEquals(fastFourierTransform, transformFromSuspendFun) },
-            { assertArrayEquals(toRoundedAbsArray(expected), toRoundedAbsArray(transformFromSuspendFun)) }
+            { assertArrayEquals(fastFourierTransform, fft) },
+            { assertArrayEquals(toRoundedAbsArray(expected), toRoundedAbsArray(fft)) }
         )
     }
-
-    private fun toRoundedAbsArray(complexes: Array<Complex>): DoubleArray =
-        complexes
-            .map(Complex::abs)
-            .map(::round)
-            .toDoubleArray()
 }

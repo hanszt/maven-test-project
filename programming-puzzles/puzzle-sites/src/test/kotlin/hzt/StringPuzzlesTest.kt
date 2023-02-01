@@ -39,16 +39,16 @@ internal class StringPuzzlesTest {
 
     @TestFactory
     fun `test nr of distinct sequences`(): List<DynamicTest> {
-        fun dynamicTest(s: String, t: String, expected: Int): DynamicTest {
+        fun test(s: String, t: String, expected: Int): DynamicTest {
             val displayName = "The nr of distinct subsequences of '$s' which equal '$t', should be: $expected"
             val actual = numDistinct(s, t)
             return dynamicTest(displayName) { assertEquals(expected, actual) }
         }
         return listOf(
-            dynamicTest("rabbbit", "rabbit", 3),
-            dynamicTest("babgbag", "bag", 5),
-            dynamicTest("loop", "ga", 0),
-            dynamicTest("pennenlikker", "pen", 4)
+            test("rabbbit", "rabbit", 3),
+            test("babgbag", "bag", 5),
+            test("loop", "ga", 0),
+            test("pennenlikker", "pen", 4)
         )
     }
 }

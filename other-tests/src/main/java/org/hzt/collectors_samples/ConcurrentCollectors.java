@@ -92,7 +92,7 @@ public final class ConcurrentCollectors {
                 StringBuffer::toString, CH_CONCURRENT_NOID);
     }
 
-    private static <A> A throwIfCombinerCalled(A left, A right) {
+    static <A> A throwIfCombinerCalled(A left, A right) {
         throw new IllegalStateException("Combiner used in non concurrent non order preserving collector");
     }
 

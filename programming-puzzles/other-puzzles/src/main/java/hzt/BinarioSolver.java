@@ -26,9 +26,10 @@ public class BinarioSolver {
     }
 
     private static int[][] solvePuzzle(final int[][] input) {
-        final Function<int[], String> arrayToString = a -> IntSequence.of(a)
-                .mapToObj(BinarioSolver::toChar)
-                .joinToString();
+        final Function<int[], String> arrayToString = array ->
+                IntSequence.of(array)
+                        .mapToObj(BinarioSolver::toChar)
+                        .joinToString();
 
         Sequence.of(input)
                 .map(arrayToString)

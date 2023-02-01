@@ -40,10 +40,8 @@ tailrec fun findFixPoint(x: Double = 1.0, eps: Double = 1E-15): Double =
  * @param input the complex nr array to apply the fast fourier transform to
  * @return the fourier transform of the input
  */
-suspend fun SequenceScope<Array<Complex>>.fft(input: Array<Complex>): Array<Complex> {
-    if (input.size == 1) {
-        return arrayOf(input[0])
-    }
+fun fft(input: Array<Complex>): Array<Complex> {
+    if (input.size == 1) return arrayOf(input[0])
     require(isPowerOfTwo(input.size)) { "The length: ${input.size} is not a power of 2" }
 
     val halfSize = input.size / 2
@@ -60,20 +58,49 @@ suspend fun SequenceScope<Array<Complex>>.fft(input: Array<Complex>): Array<Comp
         fft[k] = even.add(complex)
         fft[k + halfSize] = even.subtract(complex)
     }
-    yield(fft)
     return fft
 }
 
 fun isPowerOfTwo(n: Int) = (n > 0) && ((n and (n - 1)) == 0)
 
-fun fib(n: Int, cache: MutableMap<Int, BigInt> = HashMap()): BigInt {
+fun fibWithCash(n: Int, cache: MutableMap<Int, BigInt> = HashMap()): BigInt {
     require(n >= 0) { "the position n in the fib sequence must be greater than 0 but was $n" }
     if (n == 0) return BigInt.ZERO
     if (n <= 2) return BigInt.ONE
     val fibNr = cache[n]
     if (fibNr != null) return fibNr
-    val nextFib = fib(n - 1, cache) + (fib(n - 2, cache))
+    val nextFib = fibWithCash(n - 1, cache) + fibWithCash(n - 2, cache)
     cache[n] = nextFib
     return nextFib
 }
 
+fun memoizedFib(n: Int): BigInt {
+    class Holder {
+        val memFib = ::fib.memoized()
+        fun fib(n: Int): BigInt {
+            require(n >= 0) { "the position n in the fib sequence must be greater than 0 but was $n" }
+            return when {
+                n == 0 -> BigInt.ZERO
+                n <= 2 -> BigInt.ONE
+                else -> memFib(n - 1).add(memFib(n - 2))
+            }
+        }
+    }
+    return Holder().memFib(n)
+}
+
+fun <T, R> ((T) -> R).memoized(): ((T) -> R) {
+    if (this is Memoized) return this
+    val cache = HashMap<T, R>()
+    return object : Memoized<T, R> {
+        override fun invoke(item: T): R {
+            val result = cache[item]
+            if (result != null) return result
+            val value = this@memoized.invoke(item)
+            cache[item] = value
+            return value
+        }
+    }
+}
+
+private interface Memoized<T, R> : (T) -> R

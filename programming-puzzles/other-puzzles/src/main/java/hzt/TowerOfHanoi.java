@@ -12,6 +12,7 @@ import static org.hzt.utils.It.println;
 public final class TowerOfHanoi {
 
     private static final int MAX_NUMBER_OF_DISKS_IN_GAME = 10;
+    private static final String PARAMETERS_SHOULD_BE_PASSED_IN_CORRECT_ORDER = "java:S2234";
 
     private TowerOfHanoi() {
     }
@@ -42,10 +43,10 @@ public final class TowerOfHanoi {
     static List<String> playTowerOfHanoiGame(final int numberOfDisks) {
         final List<String> moves = new ArrayList<>();
         moveDisk(numberOfDisks, 'a', 'c', 'b', moves);
-        return moves;
+        return List.copyOf(moves);
     }
 
-    @SuppressWarnings({"squid:S2234"})
+    @SuppressWarnings({PARAMETERS_SHOULD_BE_PASSED_IN_CORRECT_ORDER})
     private static void moveDisk(final int diskNumber,
                                  final char fromRod,
                                  final char targetRod,

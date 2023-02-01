@@ -1,10 +1,5 @@
 package org.hzt;
 
-import org.apache.commons.math3.complex.Complex;
-import org.apache.commons.math3.transform.DftNormalization;
-import org.apache.commons.math3.transform.FastFourierTransformer;
-import org.apache.commons.math3.transform.TransformType;
-import org.hzt.utils.It;
 import org.hzt.utils.collections.primitives.IntList;
 import org.hzt.utils.collections.primitives.IntMutableList;
 import org.hzt.utils.sequences.Sequence;
@@ -22,8 +17,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 import static java.util.function.Predicate.not;
@@ -60,6 +53,20 @@ class RecursiveSamplesTest {
     }
 
     @Test
+    void testBigIntFib() {
+        final var n = 30;
+
+        final var expected = Streams.fibonacciStream()
+                .skip(n)
+                .findFirst()
+                .orElseThrow();
+
+        final var actual = RecursiveSamples.bigIntFib(n);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
     void testFibWithCache() {
         final var n = 5_000;
 
@@ -69,6 +76,22 @@ class RecursiveSamplesTest {
                 .orElseThrow();
 
         final var actual = RecursiveSamples.fibWithCash(n);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testMemoizedFib() {
+        final var n = 1500;
+
+        final var expected = Streams.fibonacciStream()
+                .skip(n)
+                .findFirst()
+                .orElseThrow();
+
+        final var actual = RecursiveSamples.memoizedFib(n);
+
+        System.out.println("actual = " + actual);
 
         assertEquals(expected, actual);
     }

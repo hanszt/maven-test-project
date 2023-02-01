@@ -8,7 +8,7 @@ import org.hzt.test.model.Book;
 import org.hzt.test.model.Painting;
 import org.hzt.utils.It;
 import org.hzt.utils.iterables.Collectable;
-import org.hzt.utils.ranges.IntRange;
+import org.hzt.utils.sequences.Sequence;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Nested;
@@ -48,6 +48,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Comparator.comparing;
+import static org.hzt.collectors_samples.MyCollectors.chunking;
 import static org.hzt.iterators.Enumerations.sizedEnumeration;
 import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,13 +59,13 @@ class OtherTests {
     @Test
     void testChars() {
         IntStream.range(33, 900)
-                .mapToObj(OtherTests::toCharacter)
+                .mapToObj(i -> (char) i)
                 .forEach(It::println);
 
         println();
 
         "Hello".chars()
-                .mapToObj(OtherTests::toCharacter)
+                .mapToObj(i -> (char) i)
                 .forEach(It::println);
 
         String.format("Hello,%nI'm Hans").lines().forEach(It::printf);
@@ -72,14 +73,13 @@ class OtherTests {
         assertEquals(893, c);
     }
 
-    private static Character toCharacter(int i) {
-        return (char) i;
-    }
-
     @Test
     void testStreamFindFirstNotNullSafe() {
         final var bics = List.of(new Bic(null), new Bic(null));
-        assertThrows(NullPointerException.class, () -> getAnyNameThrowingNull(bics));
+        assertThrows(NullPointerException.class, () -> bics.stream()
+                .filter(Objects::nonNull)
+                .map(Bic::getName)
+                .findAny());
     }
 
     @Test
@@ -91,15 +91,12 @@ class OtherTests {
     @Test
     void testStreamFindFirstNotNullSafeButNotThrowing() {
         final var expected = "Sophie";
-        final var anyName = getAnyNameThrowingNull(List.of(new Bic(expected), new Bic(null)));
-        anyName.ifPresentOrElse(assertIsEqualTo(expected), () -> fail("Not present"));
-    }
 
-    private Optional<String> getAnyNameThrowingNull(List<Bic> bics) {
-        return bics.stream()
-                .filter(Objects::nonNull)
+        final var anyName = Stream.of(new Bic(expected), new Bic(null))
                 .map(Bic::getName)
                 .findAny();
+
+        anyName.ifPresentOrElse(assertIsEqualTo(expected), () -> fail("Not present"));
     }
 
     private Optional<String> getAnyName(List<Bic> bics) {
@@ -170,20 +167,20 @@ class OtherTests {
         opt.ifPresentOrElse(assertIsEqualTo(bic), () -> fail("Not present"));
     }
 
-    private static <T> Consumer<T> assertIsEqualTo(T other) {
-        return t -> assertEquals(t, other);
+    private static <T> Consumer<T> assertIsEqualTo(T expected) {
+        return actual -> assertEquals(expected, actual);
     }
 
     @Test
     void testCreatingBathes() {
+
+        final int BATCH_SIZE = 100;
+
         List<String> data = IntStream.range(0, 950)
                 .mapToObj(i -> "item " + i)
                 .toList();
 
-        final int BATCH_SIZE = 100;
-
-        final var expected = IntRange.of(0, 950)
-                .mapToObj(i -> "item " + i)
+        final var expected = Sequence.of(data)
                 .chunked(BATCH_SIZE)
                 .map(Collectable::toList)
                 .toList();
@@ -192,11 +189,16 @@ class OtherTests {
                 .mapToObj(i -> data.subList(i * BATCH_SIZE, Math.min(data.size(), (i + 1) * BATCH_SIZE)))
                 .toList();
 
+        List<List<String>> batches2 = data.stream()
+                .collect(chunking(BATCH_SIZE))
+                .toList();
+
         printBatches(batches);
 
         assertAll(
                 () -> assertEquals(10, batches.size()),
-                () -> assertEquals(expected, batches)
+                () -> assertEquals(expected, batches),
+                () -> assertEquals(batches, batches2)
         );
     }
 
@@ -388,18 +390,6 @@ class OtherTests {
     }
 
     @Test
-    void testStartingWithMaxRangeGetNumbersByDivisor() {
-        final var DIVISOR = 20;
-        var array = IntStream.range(0, Integer.MAX_VALUE)
-                .parallel()
-                .filter(i -> i % DIVISOR == 0)
-                .toArray();
-        final var expected = (Integer.MAX_VALUE / DIVISOR) + 1;
-
-        assertEquals(expected, array.length);
-    }
-
-    @Test
     void testGenerateArrayContainingMaxIntValueElementsThrowsOutOfMemoryError() {
         final var intStream = IntStream.rangeClosed(0, Integer.MAX_VALUE);
         //noinspection ResultOfMethodCallIgnored
@@ -550,7 +540,9 @@ class OtherTests {
      */
     @Test
     void testExecNvidiaSmi() throws IOException {
-        Process process = Runtime.getRuntime().exec("nvidia-smi");
+        Process process = new ProcessBuilder("nvidia-smi").start();
+
+        assertTrue(process.isAlive());
 
         try (final var inputStream = process.getInputStream()) {
             final var result = new String(inputStream.readAllBytes());

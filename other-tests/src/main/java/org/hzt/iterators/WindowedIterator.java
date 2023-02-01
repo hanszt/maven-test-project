@@ -49,9 +49,9 @@ public final class WindowedIterator<T> extends AbstractIterator<List<T>> {
         final int gap = step - size;
         size = calculateNextSize(size);
         if (gap >= 0) {
-            computeNextForWindowedSequenceNoOverlap(windowInitCapacity, gap);
+            computeNextWindowNoOverlap(windowInitCapacity, gap);
         } else {
-            computeNextForWindowedSequenceOverlapping(windowInitCapacity);
+            computeNextWindowOverlapping(windowInitCapacity);
         }
         step = calculateNextStep(step);
         return List.copyOf(nextWindow);
@@ -67,7 +67,7 @@ public final class WindowedIterator<T> extends AbstractIterator<List<T>> {
         return Math.max(next, 1);
     }
 
-    private void computeNextForWindowedSequenceOverlapping(int windowInitCapacity) {
+    private void computeNextWindowOverlapping(int windowInitCapacity) {
         nextWindow = nextWindow.isEmpty() ? new ArrayList<>(windowInitCapacity) : new ArrayList<>(nextWindow);
         calculateNextOverlappingWindow();
         if (!partialWindows && nextWindow.size() < size) {
@@ -86,7 +86,7 @@ public final class WindowedIterator<T> extends AbstractIterator<List<T>> {
         }
     }
 
-    private void computeNextForWindowedSequenceNoOverlap(int bufferInitCapacity, int gap) {
+    private void computeNextWindowNoOverlap(int bufferInitCapacity, int gap) {
         int skip = gap;
         nextWindow = new ArrayList<>(bufferInitCapacity);
         while (iterator.hasNext()) {

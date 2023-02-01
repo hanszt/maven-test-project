@@ -2,6 +2,7 @@ package org.hzt;
 
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.util.ArithmeticUtils;
+import org.hzt.Functions.MemIntFunction;
 import org.hzt.utils.PreConditions;
 import org.hzt.utils.collections.primitives.IntList;
 import org.hzt.utils.collections.primitives.IntMutableList;
@@ -19,6 +20,9 @@ import static org.hzt.utils.It.println;
  */
 public final class RecursiveSamples {
 
+    private static final String SHOULD_BE_STATIC = "java:S2694";
+    private static final String FIB_PRECONDITION = "the position n in the fib sequence must be greater than 0 but was ";
+
     private RecursiveSamples() {
     }
 
@@ -29,7 +33,7 @@ public final class RecursiveSamples {
      * This method has O(2^n) time complexity which is exponential and very bad
      */
     public static long fib(int n) {
-        PreConditions.require(n >= 0, () -> "the position n in the fib sequence must be greater than 0 but was " + n);
+        PreConditions.require(n >= 0, () -> FIB_PRECONDITION + n);
         if (n == 0) {
             return 0;
         }
@@ -37,6 +41,17 @@ public final class RecursiveSamples {
             return 1;
         }
         return fib(n - 1) + fib(n - 2);
+    }
+
+    public static BigInteger bigIntFib(int n) {
+        PreConditions.require(n >= 0, () -> FIB_PRECONDITION + n);
+        if (n == 0) {
+            return BigInteger.ZERO;
+        }
+        if (n <= 2) {
+            return BigInteger.ONE;
+        }
+        return bigIntFib(n - 1).add(bigIntFib(n - 2));
     }
 
     public static BigInteger fibWithCash(int n) {
@@ -47,19 +62,39 @@ public final class RecursiveSamples {
     }
 
     public static BigInteger fib(int n, Map<Integer, BigInteger> cache) {
-        PreConditions.require(n >= 0, () -> "the position n in the fib sequence must be greater than 0 but was " + n);
+        PreConditions.require(n >= 0, () -> FIB_PRECONDITION + n);
         if (n == 0) {
             return BigInteger.ZERO;
         }
         if (n <= 2) {
             return BigInteger.ONE;
         }
-        if (cache.containsKey(n)) {
-            return cache.get(n);
+        final var next = cache.get(n);
+        if (next != null) {
+            return next;
         }
         final var nextFib = fib(n - 1, cache).add(fib(n - 2, cache));
         cache.put(n, nextFib);
         return nextFib;
+    }
+
+    public static BigInteger memoizedFib(int n) {
+        @SuppressWarnings(SHOULD_BE_STATIC)
+        class Holder {
+            final MemIntFunction<BigInteger> memFib = MemIntFunction.of(this::fib).memoized();
+
+            BigInteger fib(int n) {
+                PreConditions.require(n >= 0, () -> FIB_PRECONDITION + n);
+                if (n == 0) {
+                    return BigInteger.ZERO;
+                }
+                if (n <= 2) {
+                    return BigInteger.ONE;
+                }
+                return memFib.apply(n - 1).add(memFib.apply(n - 2));
+            }
+        }
+        return new Holder().fib(n);
     }
 
     public static int sum(int start, int end) {

@@ -8,18 +8,25 @@ import org.apache.commons.math3.util.MathArrays;
 import org.hzt.utils.collections.primitives.DoubleCollection;
 import org.hzt.utils.collections.primitives.DoubleList;
 import org.hzt.utils.sequences.primitives.DoubleSequence;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.DynamicTest.*;
 
 class ApacheCommonsMath3LibraryTests {
 
-    @Test
-    void testIsPowerOf2() {
-        assertTrue(ArithmeticUtils.isPowerOfTwo(8));
+    @TestFactory
+    Stream<DynamicTest> testIsPowerOf2() {
+        return IntStream.of(1, 2, 4, 8, 16, 32, 2048)
+                .mapToObj(n -> dynamicTest(n + " should be a power of two",
+                        () -> assertTrue(ArithmeticUtils.isPowerOfTwo(8))));
     }
 
     /**

@@ -4,8 +4,12 @@ import org.hzt.model.Employee;
 import org.hzt.model.Person;
 import org.hzt.test.TestSampleGenerator;
 import org.hzt.test.model.Book;
+import org.hzt.test.model.Museum;
+import org.hzt.test.model.Painting;
 import org.hzt.utils.It;
 import org.hzt.utils.Lazy;
+import org.hzt.utils.collections.ListX;
+import org.hzt.utils.ranges.IntRange;
 import org.hzt.utils.sequences.Sequence;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
@@ -28,15 +32,14 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.*;
-import static org.hzt.collectors_samples.CollectorSamples.toNavigableMap;
-import static org.hzt.collectors_samples.CollectorSamples.toNavigableSet;
+import static org.hzt.collectors_samples.MyCollectors.*;
 import static org.hzt.utils.It.println;
 import static org.hzt.utils.Patterns.blankStringPattern;
 import static org.hzt.utils.collectors.BigDecimalCollectors.averagingBigDecimal;
@@ -44,9 +47,9 @@ import static org.hzt.utils.collectors.BigDecimalCollectors.summarizingBigDecima
 import static org.hzt.utils.function.predicates.StringPredicates.contains;
 import static org.junit.jupiter.api.Assertions.*;
 
-class CollectorSamplesTest {
+class MyCollectorsTest {
 
-    private static final Lazy<List<String>> lazyReadWordsOfShakespeare = Lazy.of(CollectorSamplesTest::readWordsInWorksOfShakespeare);
+    private static final Lazy<List<String>> lazyReadWordsOfShakespeare = Lazy.of(MyCollectorsTest::readWordsInWorksOfShakespeare);
 
     @Test
     void testGetExpectedWhenOnlyOneInList() {
@@ -58,7 +61,7 @@ class CollectorSamplesTest {
 
         var actual = items.stream()
                 .filter(CashBalance::isOpening)
-                .collect(CollectorSamplesTest.toFirstElementIfSizeOne()).orElse(null);
+                .collect(MyCollectorsTest.toFirstElementIfSizeOne()).orElse(null);
 
         items.forEach(It::println);
 
@@ -66,7 +69,7 @@ class CollectorSamplesTest {
     }
 
     private static <T> Collector<T, ?, Optional<T>> toFirstElementIfSizeOne() {
-        return collectingAndThen(toUnmodifiableList(), CollectorSamplesTest::returnElementIfSizeOne);
+        return collectingAndThen(toUnmodifiableList(), MyCollectorsTest::returnElementIfSizeOne);
     }
 
     private static <T> Optional<T> returnElementIfSizeOne(List<T> list) {
@@ -84,7 +87,7 @@ class CollectorSamplesTest {
                         new CashBalance("ing", true),
                         new CashBalance("triodos", false))
                 .filter(CashBalance::isOpening)
-                .collect(CollectorSamplesTest.toFirstElementIfSizeOne())
+                .collect(MyCollectorsTest.toFirstElementIfSizeOne())
                 .orElse(null);
 
         assertNull(actual);
@@ -94,7 +97,7 @@ class CollectorSamplesTest {
     void testGetNullWhenEmptyList() {
         var actual = Stream.<CashBalance>empty()
                 .filter(CashBalance::isOpening)
-                .collect(CollectorSamplesTest.toFirstElementIfSizeOne())
+                .collect(MyCollectorsTest.toFirstElementIfSizeOne())
                 .orElse(null);
 
         assertNull(actual);
@@ -353,6 +356,77 @@ class CollectorSamplesTest {
         return Collector.of(ArrayList::new, List::add, combiner, Collector.Characteristics.IDENTITY_FINISH);
     }
 
+    /**
+     * These intermediate collect methods are evaluated eagerly in each step. So not very efficient
+     */
+    @Nested
+    class StreamReturningCollectorTests {
+
+        @Test
+        void testFattenFilterMapToListByIntermediateCollectors() {
+            final var museumList = TestSampleGenerator.createMuseumList();
+
+            final var expected = museumList.stream()
+                    .map(Museum::getPaintings)
+                    .flatMap(Collection::stream)
+                    .filter(Painting::isInMuseum)
+                    .map(Painting::painter)
+                    .toList();
+
+            final var painters = museumList.stream()
+                    .collect(flattenToStream(Museum::getPaintings))
+                    .collect(filterToStream(Painting::isInMuseum))
+                    .collect(mapToStream(Painting::painter))
+                    .toList();
+
+            expected.forEach(System.out::println);
+
+            assertEquals(expected, painters);
+        }
+
+        @Test
+        void testCollectWindowing() {
+            final var nrs = IntRange.of(0, 1_000).boxed();
+
+            final var windowSize = 135;
+            final var step = 9;
+            final var expected = Sequence.of(nrs)
+                    .windowed(windowSize, step, true, ListX::toList)
+                    .toList();
+
+            final var painters = nrs.stream()
+                    // after this collect, the stream is evaluated even-though it returns a stream again
+                    .collect(windowing(windowSize, step, true))
+                    .toList();
+
+            expected.forEach(System.out::println);
+
+            assertEquals(expected, painters);
+        }
+    }
+
+    @Test
+    void testNestedIntermediateCollectorsEvaluateLazy() {
+        final var actual = new ArrayList<>();
+
+        final var localDate = IntStream.of(1, 2, 3, 4)
+                .mapToObj(Long::valueOf)
+                .collect(
+                        peeking(actual::add,
+                                mapping(LocalDate::ofEpochDay,
+                                        filtering(not(LocalDate::isLeapYear),
+                                                forEach(actual::add)))));
+
+        assertAll(
+                () -> assertNull(localDate),
+                () -> assertEquals(List.of(
+                        1L, LocalDate.ofEpochDay(1L),
+                        2L, LocalDate.ofEpochDay(2L),
+                        3L, LocalDate.ofEpochDay(3L),
+                        4L, LocalDate.ofEpochDay(4L)), actual)
+        );
+    }
+
     @Nested
     class ConcurrentCollectorTests {
 
@@ -387,7 +461,7 @@ class CollectorSamplesTest {
             final var sequentialList = words.stream()
                     .filter(not(String::isBlank))
                     .limit(maxSize)
-                    .collect(Collectors.toList());
+                    .collect(toList());
 
             final var actual = words.parallelStream()
                     .filter(not(String::isBlank))
@@ -428,7 +502,7 @@ class CollectorSamplesTest {
 
             final var expected = words.stream()
                     .filter(not(String::isBlank))
-                    .collect(Collectors.toList());
+                    .collect(toList());
 
             final var list = words.parallelStream()
                     .filter(not(String::isBlank))
@@ -448,7 +522,7 @@ class CollectorSamplesTest {
             final NavigableSet<String> expected = words.stream()
                     .filter(not(String::isBlank))
                     .limit(maxSize)
-                    .collect(Collectors.collectingAndThen(Collectors.toSet(), TreeSet::new));
+                    .collect(collectingAndThen(toSet(), TreeSet::new));
 
             final NavigableSet<String> actual = words.parallelStream()
                     .filter(not(String::isBlank))
@@ -505,7 +579,7 @@ class CollectorSamplesTest {
 
             final var sequentialSet = words.stream()
                     .filter(not(String::isBlank))
-                    .collect(Collectors.toSet());
+                    .collect(toSet());
 
             System.out.println("set size = " + set.size());
 
@@ -527,7 +601,7 @@ class CollectorSamplesTest {
             final var expected = words.parallelStream()
                     .filter(not(String::isBlank))
                     .distinct()
-                    .collect(Collectors.toConcurrentMap(s -> s, String::length));
+                    .collect(toConcurrentMap(s -> s, String::length));
 
             final var actual = words.parallelStream()
                     .filter(not(String::isBlank))
@@ -552,7 +626,7 @@ class CollectorSamplesTest {
 
             final var expected = words.parallelStream()
                     .filter(not(String::isBlank))
-                    .collect(Collectors.joining());
+                    .collect(joining());
 
             final var actual = words.parallelStream()
                     .filter(not(String::isBlank))

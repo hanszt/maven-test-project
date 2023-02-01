@@ -2,6 +2,7 @@ package org.hzt;
 
 import org.hzt.utils.It;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -50,5 +51,29 @@ class CollectionsTest {
         final var list1 = new ArrayList<>(List.of("This", "is", "a", "test"));
         final var list2 = new ArrayList<>(List.of("some", "other", "stuff"));
         assertTrue(Collections.disjoint(list1, list2));
+    }
+
+    @Test
+    void testNCopies() {
+        final var strings = Collections.nCopies(100, "test");
+        assertEquals(100, strings.size());
+    }
+
+    @Nested
+    class BinarySearchTest {
+
+        @Test
+        void testBinarySearch() {
+            final var strings = List.of("a", "b", "c", "d", "e", "f", "v", "x", "z");
+            final var index = Collections.binarySearch(strings, "c");
+            assertEquals(2, index);
+        }
+
+        @Test
+        void testBinarySearchNotFound() {
+            final var strings = List.of("a", "b", "c", "d", "e", "f", "v", "x", "z");
+            final var index = Collections.binarySearch(strings, "y");
+            assertEquals(-9, index);
+        }
     }
 }

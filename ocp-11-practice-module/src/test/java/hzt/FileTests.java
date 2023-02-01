@@ -6,14 +6,15 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static java.lang.System.getProperty;
+import static org.junit.jupiter.api.Assertions.*;
 
 class FileTests {
     // Instances of the File class are immutable; that is, once created,
-// the abstract pathname represented by a File object will never change.
+    // the abstract pathname represented by a File object will never change.
     //q29 test 6
     @Test
     void testCreateFileWithFileClass() throws IOException {
@@ -39,6 +40,16 @@ class FileTests {
                 () -> assertTrue(isMade),
                 () -> assertTrue(parentDeleted)
         );
+    }
+
+    @Test
+    void testCreateParentStream() {
+        final var java = Stream.iterate(new File(getProperty("user.dir")), Objects::nonNull, File::getParentFile)
+                .filter(file -> file.getName().toLowerCase().contains("java"))
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals("C:\\_Programming\\Java", java.getAbsolutePath());
     }
 
     @ParameterizedTest

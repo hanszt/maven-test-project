@@ -1,6 +1,6 @@
 package org.hzt.concurrent;
 
-import org.hzt.collectors_samples.CollectorSamples;
+import org.hzt.collectors_samples.MyCollectors;
 import org.hzt.utils.It;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +48,7 @@ class CompletableFutureSampleTest {
         final var combinedPrice = completableFutureSample.getStockPriceThenComposeAndThanCombine();
 
         final var future = Stream.of(googleStockPrice, teslaStockprice, combinedPrice)
-                .collect(CollectorSamples.toFuture());
+                .collect(MyCollectors.toFuture());
 
         final var sum = future.join()
                 .mapToInt(Integer::intValue)

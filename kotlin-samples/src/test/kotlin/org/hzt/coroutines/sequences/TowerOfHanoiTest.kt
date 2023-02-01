@@ -2,6 +2,7 @@ package org.hzt.coroutines.sequences
 
 import io.kotest.matchers.sequences.shouldContainInOrder
 import io.kotest.matchers.shouldBe
+import org.hzt.coroutines.sequences.poc.sequence
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -23,7 +24,7 @@ class TowerOfHanoiTest {
     @Test
     fun `tower of Hanoi with 3 disks`() {
         val nrOfDisks = 3
-        val instructions = org.hzt.coroutines.sequences.poc.sequence { moveDisk(nrOfDisks, 'a', 'c', 'b') }
+        val instructions = sequence { moveDisk(nrOfDisks, 'a', 'c', 'b') }
         val expectedNrOfMoves = (2.0.pow(nrOfDisks.toDouble()) - 1).toInt()
         val expected = sequenceOf(
             "Move disk  1 from rod a to rod c",
@@ -50,7 +51,7 @@ class TowerOfHanoiTest {
         delimiterString = " -> "
     )
     fun `test tower of hanoi nr of moves`(nrOfDisks: Int, expectedNrOfMoves: Int) = assertAll(
-        { org.hzt.coroutines.sequences.poc.sequence { moveDisk(nrOfDisks, 'a', 'c', 'b') }.count() shouldBe expectedNrOfMoves },
+        { sequence { moveDisk(nrOfDisks, 'a', 'c', 'b') }.count() shouldBe expectedNrOfMoves },
         { expectedNrOfMoves shouldBe (2.0.pow(nrOfDisks.toDouble()) - 1).toInt() }
     )
 }
