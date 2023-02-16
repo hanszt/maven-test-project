@@ -48,7 +48,7 @@ class GeneratorTest {
         }
     }
 
-    private <T> void yieldFromInfiniteLoop(GeneratorScope<T> scope, T initial, UnaryOperator<T> operator) {
+    private static <T> void yieldFromInfiniteLoop(GeneratorScope<T> scope, T initial, UnaryOperator<T> operator) {
         T acc = initial;
         //noinspection InfiniteLoopStatement
         while (true) {
@@ -213,15 +213,14 @@ class GeneratorTest {
     class FibonacciGeneratorTest {
 
         private final Generator.GeneratorBuilder<Long> fibonacciBuilder = Generator.builder(scope -> {
-            scope.yieldNext(1L); // first Fibonacci number
-            var cur = 1L;
+            var cur = 0L;
             var next = 1L;
             //noinspection InfiniteLoopStatement
             while (true) {
                 scope.yieldNext(next); // next Fibonacci number
-                final var tmp = cur + next;
+                final var newNext = cur + next;
                 cur = next;
-                next = tmp;
+                next = newNext;
             }
         });
 
