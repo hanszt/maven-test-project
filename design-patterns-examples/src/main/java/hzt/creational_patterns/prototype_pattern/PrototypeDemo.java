@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 class PrototypeDemo {
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String... args) throws IOException {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.print("Enter Employee Id: ");

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class GenericsBoundsExample {
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         List<? super IOException> exceptions;
 
         exceptions = new ArrayList<>();

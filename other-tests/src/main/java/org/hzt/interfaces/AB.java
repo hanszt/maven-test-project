@@ -13,7 +13,7 @@ public class AB implements A {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AB.class);
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         Bic bic = new Bic("");
         LOGGER.info("{}", bic);
         List<String> strings = new ArrayList<>(List.of("Hallo" ,"hoe", "gaat", "het?"));

@@ -7,7 +7,7 @@ public class AdapterPatternDemo {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdapterPatternDemo.class);
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         // Round fits round, no surprise.
         RoundHole hole = new RoundHole(5);
         RoundPeg roundPeg = new RoundPeg(5);

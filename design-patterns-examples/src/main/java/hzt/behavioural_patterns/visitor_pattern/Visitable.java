@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 public interface Visitable {
 
     @SafeVarargs
-
     static <T> VisitableFactory<T> visiting(Function<T, Object>... functions) {
         return () -> Arrays.stream(functions);
     }

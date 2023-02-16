@@ -24,7 +24,7 @@ public class AtomikosSample {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomikosSample.class);
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         try {
             new AtomikosSample().placeOrder("3", 12);
         } catch (HeuristicRollbackException | SystemException | HeuristicMixedException | RollbackException e) {

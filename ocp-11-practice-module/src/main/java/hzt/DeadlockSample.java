@@ -18,7 +18,7 @@ public class DeadlockSample {
     //Here, you can see that both the threads are waiting for each other to release the lock. So in effect both are stuck!
     // This is a classic case of a deadlock.
     //So the output cannot be determined.
-    public static void main(String[] args) {
+    public static void main(String... args) {
         StringBuffer sb1 = new StringBuffer();
         StringBuffer sb2 = new StringBuffer();
         new Thread(() -> appendValsAndPrint(sb1, sb2, "X", "Y")).start();

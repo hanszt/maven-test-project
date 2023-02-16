@@ -2,7 +2,7 @@ package hzt;
 
 public class WeirdSyntax {
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         boolean b1 = false;
         int i1 = 2;
         int i2 = 3;

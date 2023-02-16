@@ -8,6 +8,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import static hzt.functional_patterns.continuation_pattern.Continuations.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @see <a href="https://blog.marcinchwedczuk.pl/continuations-in-java">Continuations in Java</a>
+ */
 class ContinuationsTest {
 
     @Test

@@ -19,7 +19,7 @@ public class SSLClientSample {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SSLClientSample.class);
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         String result = SSLClientSample.makeConnection();
         LOGGER.info(result);
     }

@@ -20,7 +20,7 @@ public class Demo {
 
     private static final String LINKEDIN_ID = "2";
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         System.out.println("Please specify social network to target spam tool (default:Facebook):");
         System.out.println("1. Facebook");
         System.out.println("2. LinkedIn");

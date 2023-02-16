@@ -221,7 +221,7 @@ public final class Streams {
         return StreamSupport.stream(() -> Spliterators.spliteratorUnknownSize(iterator, ORDERED), ORDERED, false);
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         final var scanner = new Scanner(System.in);
         final var maxNrOfMultiLines = 8;
 

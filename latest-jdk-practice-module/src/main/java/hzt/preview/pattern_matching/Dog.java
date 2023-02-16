@@ -1,4 +1,4 @@
-package hzt.only_jdk.pattern_matching;
+package hzt.preview.pattern_matching;
 
 import java.time.LocalDate;
 

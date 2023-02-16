@@ -72,7 +72,7 @@ class BigDecimalSampleTest {
     }
 
     static class Runner {
-        public static void main(String[] args) {
+        public static void main(String... args) {
             var bigDecimal = new BigDecimal("123.1267854341");
             var bigDecimal2 = new BigDecimal("1231267854341");
 

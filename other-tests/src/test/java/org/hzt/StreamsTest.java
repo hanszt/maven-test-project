@@ -127,14 +127,14 @@ class StreamsTest {
 
     @Test
     void testStreamLimit() {
-        List<Integer> list = getIntegerStream(100).collect(Collectors.toList());
+        List<Integer> list1 = getIntegerStream(100).collect(Collectors.toList());
         List<Integer> list2 = getIntegerStream(100).collect(Collectors.toList());
-        Collections.shuffle(list);
+        Collections.shuffle(list1);
         Collections.shuffle(list2);
 
-        list.sort(Comparator.naturalOrder());
+        list1.sort(Comparator.naturalOrder());
 
-        final var expectedLimitedList = list.subList(0, 10);
+        final var expectedLimitedList = list1.subList(0, 10);
 
         final var limitedList = list2.stream()
                 .sorted()

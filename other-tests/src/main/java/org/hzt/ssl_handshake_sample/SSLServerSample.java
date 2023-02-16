@@ -16,7 +16,7 @@ public class SSLServerSample {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SSLServerSample.class);
     
-    public static void main(String[] args) {
+    public static void main(String... args) {
         var startTime = LocalDateTime.now();
         var durationTillShutdown = Duration.ofMinutes(15);
         setupShutdownTimer(durationTillShutdown);

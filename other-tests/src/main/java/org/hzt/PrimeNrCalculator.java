@@ -38,7 +38,7 @@ public final class PrimeNrCalculator {
                 .filter(i -> sieve[i]);
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         final var n = 1_000_000_000;
         final var timer = Timer.timeAnIntFunction(n, PrimeNrCalculator::sieveOfEratosthenes);
         final var primes = timer.getResult().toArray();

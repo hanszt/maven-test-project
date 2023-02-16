@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 class GenerateBill {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String... args) throws IOException {
         GetPlanFactory planFactory = new GetPlanFactory();
 
         System.out.print("Enter the name of plan for which the bill will be generated: ");

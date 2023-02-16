@@ -19,7 +19,7 @@ class Outsider {
 
 public class InnerClasses {
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         Outsider os = new Outsider();
         Outsider.Insider insider = os.new Insider();
         insider.print();

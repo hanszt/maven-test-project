@@ -10,7 +10,7 @@ import kotlin.coroutines.*
 import kotlin.experimental.ExperimentalTypeInference
 
 /**
- * Source: https://github.com/Kotlin/coroutines-examples/blob/master/examples/suspendingSequence/suspendingSequence-example.kt
+ * Source: [Elizarov: suspendingSequence-example.kt](https://github.com/Kotlin/coroutines-examples/blob/master/examples/suspendingSequence/suspendingSequence-example.kt)
  *
  */
 @OptIn(DelicateCoroutinesApi::class)
@@ -19,15 +19,7 @@ fun main() {
     runBlocking(context) {
         // asynchronously generate a number every 500 ms
         val seq = suspendingSequence(context) {
-            log("Starting generator")
-            for (i in 1..10) {
-                log("Generator yields $i")
-                yield(i)
-                val generatorSleep = 500L
-                log("Generator goes to sleep for $generatorSleep ms")
-                delay(generatorSleep)
-            }
-            log("Generator is done")
+            yieldNextInt()
         }
         // simulate async work by sleeping randomly
         val random = Random()
@@ -39,6 +31,18 @@ fun main() {
             delay(consumerSleep)
         }
     }
+}
+
+private suspend fun SuspendingSequenceScope<Int>.yieldNextInt() {
+    log("Starting generator")
+    for (i in 1..10) {
+        log("Generator yields $i")
+        yield(i)
+        val generatorSleep = 500L
+        log("Generator goes to sleep for $generatorSleep ms")
+        delay(generatorSleep)
+    }
+    log("Generator is done")
 }
 
 interface SuspendingSequenceScope<in T> {

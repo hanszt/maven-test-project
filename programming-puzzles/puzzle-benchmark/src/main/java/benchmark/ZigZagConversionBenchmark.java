@@ -42,7 +42,7 @@ public class ZigZagConversionBenchmark {
         return StringPuzzlesKt.zigZagConversion(STRING_TO_CONVERT, NR_OF_COLUMNS);
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         Options options = new OptionsBuilder()
                 .include(ZigZagConversionBenchmark.class.getSimpleName())
                 .forks(2)

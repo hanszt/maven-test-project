@@ -15,7 +15,7 @@ public class Launcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Launcher.class);
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         final var simplePublisher = new SimplePublisher(10);
         final var subscriber = new SimpleSubscriber();
         simplePublisher.subscribe(subscriber);

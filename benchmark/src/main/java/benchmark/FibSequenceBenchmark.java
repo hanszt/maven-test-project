@@ -57,7 +57,7 @@ public class FibSequenceBenchmark {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         Options options = new OptionsBuilder()
                 .include(FibSequenceBenchmark.class.getSimpleName())
                 .forks(2)

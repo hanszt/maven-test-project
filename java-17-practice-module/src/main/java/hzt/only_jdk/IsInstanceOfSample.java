@@ -7,7 +7,7 @@ public class IsInstanceOfSample {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IsInstanceOfSample.class);
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         try {
             testIsInstanceTest();
         } catch (ClassNotFoundException e) {

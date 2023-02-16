@@ -12,7 +12,7 @@ public class Base64EncoderAndDecoder {
     private static final Logger LOGGER = LoggerFactory.getLogger(Base64EncoderAndDecoder.class);
     private static final String KEY_BASE_64 = "V2Vsa29tMTIz";
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         var base64EncoderAndDecoder = new Base64EncoderAndDecoder();
         base64EncoderAndDecoder.base64DecodeAndEncodeReturnDecoded(KEY_BASE_64);
         }

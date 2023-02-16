@@ -82,7 +82,7 @@ public class InterpreterDemo {
         return stack.pop();
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         final var conversionFromCelsiusToFahrenheit = "celsius * 9 / 5 + thirty";
 
         String postfix = convertToPostfix(conversionFromCelsiusToFahrenheit);

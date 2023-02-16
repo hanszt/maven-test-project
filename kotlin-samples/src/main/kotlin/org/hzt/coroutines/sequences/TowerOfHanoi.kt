@@ -1,7 +1,8 @@
 package org.hzt.coroutines.sequences
 
 import org.hzt.coroutines.sequences.poc.SequenceScope
-import org.hzt.coroutines.sequences.poc.sequence
+import org.hzt.coroutines.sequences.poc.iterator
+import org.hzt.utils.sequences.Sequence
 import java.util.concurrent.TimeUnit
 
 
@@ -20,7 +21,12 @@ suspend fun SequenceScope<String>.moveDisk(diskNumber: Int, fromRod: Char, targe
     moveDisk(diskNumber - 1, auxRod, targetRod, fromRod)
 }
 
-fun main() = sequence { moveDisk(3, 'a', 'c', 'b') }
+fun towerOfHanoiSequence(nrOfDiks: Int): Sequence<String> {
+    val iterator = iterator { moveDisk(nrOfDiks, 'a', 'c', 'b') }
+    return Sequence.of(Iterable { iterator })
+}
+
+fun main() = towerOfHanoiSequence(3)
     .onEach { TimeUnit.MILLISECONDS.sleep(500) }
     .forEach(::println)
 

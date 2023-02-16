@@ -344,7 +344,7 @@ public class FibHeap {
         int p = extract_min();
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         FibHeap obj = create_heap();
         obj.insert(7);
         obj.insert(26);

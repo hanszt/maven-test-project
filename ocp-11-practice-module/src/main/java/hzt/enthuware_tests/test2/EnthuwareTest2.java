@@ -8,7 +8,7 @@ import java.util.function.Function;
 @SuppressWarnings("ALL")
 public class EnthuwareTest2 {
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         final @NonNull String s = "Hallo   ";
         final var test2 = new EnthuwareTest2();
         final var trimmed = test2.testVarInFunctionNotAllowed(s);
@@ -42,20 +42,20 @@ public class EnthuwareTest2 {
 }
 
 abstract class AmazingClass {
-    void amazingMethod(Collection c) {
-        System.out.println("Got collection");
+    void amazingMethod(Collection<String> c) {
+        System.out.println("Got collection" + c);
     }
 
 }
 
 // test 2 q 1: 'void amazingMethod(Collection l)' not overridden by 'void amazingMethod(List l)'
 class SpecialAmazingClass extends AmazingClass {
-    void amazingMethod(List l) {
-        System.out.println("Got list");
+    void amazingMethod(List<String> l) {
+        System.out.println("Got list " + l);
     }
 
-    public static void main(String[] args) {
-        List<String> al = new ArrayList<String>();
+    public static void main(String... args) {
+        List<String> al = new ArrayList<>();
         Collection<String> c = al;
         AmazingClass ac = new SpecialAmazingClass();
         ac.amazingMethod(c);
@@ -65,11 +65,11 @@ class SpecialAmazingClass extends AmazingClass {
 //test 2 q 21
 //run with a b c as args
 class FunWithArgs {
-    public static void main(String[][] args) {
+    public static void main(String[]... args) {
         System.out.println(args[0][1]);
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         var fwa = new FunWithArgs();
         String[][] newargs = {args};
         fwa.main(newargs);
@@ -80,7 +80,7 @@ class Instinker {
 
     //test 2 q 32
     //The args array is never null! Notice the simulated else. There is no else!
-    public static void main(String[] args) {
+    public static void main(String... args) {
         var hasParams = (args == null ? false : true);
         if (hasParams) {
             System.out.println("has params");

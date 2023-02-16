@@ -14,7 +14,7 @@ public class JavaRustFFI {
     @SuppressWarnings(NO_SNAKE_CASE_IN_JAVA)
     public static native byte[] optimize_from_memory(byte[] data);
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         System.load(new File("rust-from-java/optimize/target/debug/optimize.dll").getAbsolutePath());
 
         hello();

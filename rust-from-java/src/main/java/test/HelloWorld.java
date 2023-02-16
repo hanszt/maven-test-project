@@ -15,7 +15,7 @@ public class HelloWorld {
         System.load(new File("rust-from-java/mylib/target/debug/mylib.dll").getAbsolutePath());
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         String output = HelloWorld.hello("Hans");
         System.out.println(output);
     }

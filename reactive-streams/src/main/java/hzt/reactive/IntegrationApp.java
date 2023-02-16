@@ -26,7 +26,7 @@ public class IntegrationApp {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationApp.class);
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         var reactorPublisher = reactorPublisher();
         var akkaStreamsProcessor = akkaStreamProcessor();
         reactorPublisher.subscribe(akkaStreamsProcessor);

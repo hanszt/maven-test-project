@@ -67,7 +67,7 @@ public class ObjectPoolDemo {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         ObjectPoolDemo objectPool = new ObjectPoolDemo();
         objectPool.tearDown();
         objectPool.testObjectPool();

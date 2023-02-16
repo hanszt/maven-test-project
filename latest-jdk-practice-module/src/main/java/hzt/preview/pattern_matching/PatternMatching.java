@@ -1,4 +1,4 @@
-package hzt.only_jdk.pattern_matching;
+package hzt.preview.pattern_matching;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -6,7 +6,7 @@ import java.util.NavigableSet;
 
 public class PatternMatching {
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         Animal animal = Math.random() < .5 ? new Dog("dog1", LocalDate.EPOCH) : new Cat("cat1", LocalDate.EPOCH);
         final var animalSound = getAnimalSound(animal);
         System.out.println("animalSound = " + animalSound);

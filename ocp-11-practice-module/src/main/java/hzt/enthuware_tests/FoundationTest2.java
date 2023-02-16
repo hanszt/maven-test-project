@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class FoundationTest2 {
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         String s1 = "Hallo";
         String s = s1.intern();
         System.out.println(s);

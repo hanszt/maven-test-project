@@ -25,7 +25,7 @@ public class JasperReportGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JasperReportGenerator.class);
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         try {
             final var fileName = "country-flags.pdf";
             LOGGER.info("generating jasper report '{}'...", fileName);

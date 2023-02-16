@@ -33,7 +33,7 @@ public final class CarDemo {
 
     public static class FindFirstCar {
 
-        public static void main(String[] args) {
+        public static void main(String... args) {
 //            println("imperative:");
             final var result1 = firstStationCarLessThan20_000Imperative(cars);
             println(result1);
@@ -77,7 +77,7 @@ public final class CarDemo {
 
     public static class FindAllCars {
 
-        public static void main(String[] args) {
+        public static void main(String... args) {
             println("imperative:");
             final var result1 = allCarBrandsStationCarsLessThan20_000Imperative(cars);
             println(result1);
@@ -120,7 +120,7 @@ public final class CarDemo {
 
     public static class CarsGroupedByType {
 
-        public static void main(String[] args) {
+        public static void main(String... args) {
             println("Imperative");
             final var carNamesGroupedByTypeImperative = groupByCarTypeImperative(cars);
             println("Stream");

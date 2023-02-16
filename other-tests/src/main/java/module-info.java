@@ -1,6 +1,7 @@
 open module other.tests {
 
     requires java.desktop;
+    requires java.management;
     requires java.net.http;
     requires org.slf4j;
     requires commons.beanutils;
@@ -12,4 +13,6 @@ open module other.tests {
     requires org.eclipse.collections.impl;
     requires org.eclipse.collections.api;
     requires kotlin.stdlib;
+
+
 }

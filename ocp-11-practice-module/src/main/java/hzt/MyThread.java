@@ -26,7 +26,7 @@ public class MyThread extends Thread {
         out.printf(END_MESSAGE_FORMATTER, Thread.currentThread().getName());
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         out.printf(START_MESSAGE_FORMATTER, Thread.currentThread().getName());
         for (int i = 0; i < 100; i++) {
             Thread thread = new MyThread();

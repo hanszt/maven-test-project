@@ -9,39 +9,50 @@ import org.junit.jupiter.api.TestFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.stream.LongStream;
 
 import static demo.It.println;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class CustomSequenceTest {
 
-    static Sequence<BigInteger> fibonacciSequence() {
-        record Pair(BigInteger first, BigInteger second) {
-            Pair next() {
-                return new Pair(second, first.add(second));
-            }
-        }
-        return Sequence
-                .iterate(new Pair(BigInteger.ZERO, BigInteger.ONE), Pair::next)
-                .map(Pair::first);
-    }
+    private static final DecimalFormat RATIO_FORMAT = new DecimalFormat("0.00000000");
+    /**
+     * @see <a href= "https://docs.oracle.com/javase/7/docs/api/java/text/DecimalFormat.html">DecimalFormat</a>
+     */
+    private static final DecimalFormat ERROR_FORMAT = new DecimalFormat("0.000E0");
 
     @Nested
     class FibonacciAndGoldenRatioTests {
 
-        private static final int SCALE = 15;
+        private static final Sequence<BigInteger> fibonacciSequence = Sequence
+                .iterate(new Pair(BigInteger.ZERO, BigInteger.ONE), Pair::next)
+                .map(Pair::first);
+
+        private record Pair(BigInteger first, BigInteger second) {
+            Pair next() {
+                return new Pair(second, first.add(second));
+            }
+        }
+
+        private static final int PRECISION = 1_000;
+        private static final BigDecimal GOLDEN_RATIO =
+                (BigDecimal.ONE.add(BigDecimal.valueOf(5)
+                                .sqrt(new MathContext(PRECISION, RoundingMode.HALF_UP)))
+                        .multiply(BigDecimal.valueOf(0.5)));
+
 
         @TestFactory
         Sequence<DynamicTest> testConsecutiveFibNrRatiosConvergeToGoldenRatio() {
-            return fibonacciSequence()
-                    .skipWhile(n -> n.equals(BigInteger.ZERO))
+            return fibonacciSequence
+                    .skip(1) // skip first element to avoid division by zero
                     .onEach(It::println)
                     .map(BigDecimal::new)
-                    .zipWithNext((cur, next) -> next.divide(cur, SCALE, RoundingMode.HALF_UP))
+                    .zipWithNext((cur, next) -> next.divide(cur, PRECISION, RoundingMode.HALF_UP))
                     .mapIndexed(this::fibRatioApproximatesGoldenRatio)
                     .take(200)
                     .skip(12)
@@ -49,12 +60,106 @@ class CustomSequenceTest {
         }
 
         private DynamicTest fibRatioApproximatesGoldenRatio(int index, BigDecimal ratio) {
-            final double GOLDEN_RATIO = (1 + Math.sqrt(5)) / 2.0;
-            final int ratioNr = index + 1;
-            final var delta = 1e-5;
-            final var displayName = "Ratio " + ratioNr + ": " + ratio + " approximates golden ratio with error " + delta;
+            final var error = GOLDEN_RATIO.subtract(ratio).abs();
 
-            return dynamicTest(displayName, () -> assertEquals(GOLDEN_RATIO, ratio.doubleValue(), delta));
+            final var displayName = "Ratio " + (index + 1) + ": " + RATIO_FORMAT.format(ratio) +
+                    " approximates golden ratio with error " + ERROR_FORMAT.format(error);
+
+            final var ratioAsDouble = ratio.doubleValue();
+            final var golderRatio = GOLDEN_RATIO.doubleValue();
+            final var margin = 1e-5;
+            return dynamicTest(displayName, () -> assertEquals(golderRatio, ratioAsDouble, margin));
+        }
+    }
+
+    @Nested
+    class TribonacciAndRauzyRatioTests {
+
+        private static final Sequence<BigInteger> tribonacciSequence = Sequence
+                .iterate(new Triple(BigInteger.ZERO, BigInteger.ONE, BigInteger.ONE), Triple::next)
+                .map(Triple::first);
+
+        private record Triple(BigInteger first, BigInteger second, BigInteger third) {
+            Triple next() {
+                return new Triple(second, third, first.add(second).add(third));
+            }
+        }
+
+        private static final int PRECISION = 1_000;
+        /**
+         * with k solution of k^3+k^2+k-1=0
+         *
+         * @see <a href="https://en.wikipedia.org/wiki/Rauzy_fractal">Rauzy fractal</a>
+         */
+        private static final double RAUZY_FRACTAL_RATIO;
+
+        static {
+            final var a = 17 + 3 * Math.sqrt(33);
+            RAUZY_FRACTAL_RATIO = 3 / (-1 - (2 / Math.cbrt(a)) + Math.cbrt(a));
+        }
+
+        /**
+         * @see <a href= "https://docs.oracle.com/javase/7/docs/api/java/text/DecimalFormat.html">DecimalFormat</a>
+         */
+        private static final DecimalFormat ERROR_FORMAT = new DecimalFormat("0.000E0");
+
+
+        @TestFactory
+        Sequence<DynamicTest> testConsecutiveNrRatiosConvergeToRauzyRatio() {
+            return tribonacciSequence
+                    .skip(1) // skip first element to avoid division by zero
+                    .onEach(It::println)
+                    .map(BigDecimal::new)
+                    .zipWithNext((cur, next) -> next.divide(cur, PRECISION, RoundingMode.HALF_UP))
+                    .mapIndexed(this::ratioApproximatesRauzyRatio)
+                    .take(200)
+                    .skip(13)
+                    ;
+        }
+
+        private DynamicTest ratioApproximatesRauzyRatio(int index, BigDecimal ratio) {
+            final var rauzyRatio = BigDecimal.valueOf(RAUZY_FRACTAL_RATIO);
+            final var error = rauzyRatio.subtract(ratio).abs();
+
+            final var displayName = "Ratio " + (index + 1) + ": " + RATIO_FORMAT.format(ratio) +
+                    " approximates golden ratio with error " + ERROR_FORMAT.format(error);
+
+            final var ratioAsDouble = ratio.doubleValue();
+            final var golderRatio = rauzyRatio.doubleValue();
+            final var margin = 1e-5;
+            return dynamicTest(displayName, () -> assertEquals(golderRatio, ratioAsDouble, margin));
+        }
+    }
+
+    @Nested
+    class MaclaurinExpansionForETest {
+
+        private static final int PRECISION = 1_000;
+        /**
+         * @see <a href="https://blogs.ubc.ca/infiniteseriesmodule/units/unit-3-power-series/taylor-series/maclaurin-expansion-of-ex/">
+         * Maclaurin Expansion of e^x</a>
+         */
+        private static final Sequence<BigDecimal> macLaurinSequenceXIs1 = Sequence
+                .iterate(0, n -> n + 1)
+                .map(MaclaurinExpansionForETest::factorial)
+                .map(BigDecimal::new)
+                .map(factorial -> BigDecimal.ONE.divide(factorial, PRECISION, RoundingMode.HALF_UP));
+
+        private static BigInteger factorial(long n) {
+            return LongStream.rangeClosed(2, n)
+                    .mapToObj(BigInteger::valueOf)
+                    .reduce(BigInteger.ONE, BigInteger::multiply);
+        }
+
+        @Test
+        void testConvertToE() {
+            final var e = macLaurinSequenceXIs1
+                    .take(15)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            System.out.println("e = " + RATIO_FORMAT.format(e));
+
+            assertEquals(Math.E, e.doubleValue(), 1e-10);
         }
     }
 
@@ -169,15 +274,14 @@ class CustomSequenceTest {
             return mapIndexed((index, value) -> next(index, value, 2, 1, "odd"))::iterator;
         }
 
-        static void main(String[] args) {
+        static void main(String... args) {
             final FizzBuzzer fizzBuzzer = FizzBuzzer
                     .start()
                     .fizz()
                     .bizz()
                     .even()
                     .buzz()
-                    .odd()
-            ;
+                    .odd();
 
             final long count = fizzBuzzer
                     .take(100_000)

@@ -23,7 +23,7 @@ public class RaceConditionExampleThreads extends Thread{
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         new RaceConditionExampleThreads().start();
         new RaceConditionExampleThreads().start();
     }

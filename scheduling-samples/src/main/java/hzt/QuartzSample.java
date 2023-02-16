@@ -66,7 +66,7 @@ public final class QuartzSample {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         LOGGER.info("Quartz sample started");
 
         final var scheduler = new QuartzSample(Clock.systemDefaultZone()).start();

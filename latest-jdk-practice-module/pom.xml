@@ -20,6 +20,10 @@
     <dependencies>
         <dependency>
             <groupId>org.hzt.utils</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hzt.utils</groupId>
             <artifactId>test-utils</artifactId>
             <scope>test</scope>
         </dependency>
@@ -39,6 +43,14 @@
                         <!--https://www.baeldung.com/java-preview-features-->
                         --enable-preview
                     </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <argLine>--enable-preview</argLine>
                 </configuration>
             </plugin>
         </plugins>

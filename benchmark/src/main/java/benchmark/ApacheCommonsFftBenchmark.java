@@ -45,7 +45,7 @@ public class ApacheCommonsFftBenchmark {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         Options options = new OptionsBuilder()
                 .include(ApacheCommonsFftBenchmark.class.getSimpleName())
                 .forks(2)

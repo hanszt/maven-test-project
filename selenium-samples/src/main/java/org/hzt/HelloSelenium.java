@@ -20,7 +20,7 @@ public class HelloSelenium {
         this.driver = driver;
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         searchGoogle("java", "software testing", "selenium testing");
     }
 

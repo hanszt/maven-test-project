@@ -19,7 +19,7 @@ import static java.util.function.Predicate.not;
 public class StreamSplitting {
 
     private static final Pattern SENTENCE_SPLITTER = Pattern.compile("[ ,.!?\r\n]");
-    public static void main(String[] args) {
+    public static void main(String... args) {
         StreamSplitting streamSplitting = new StreamSplitting();
         out.println("Partitioning by:");
         streamSplitting.partitioningBy(10, 15, x -> x % 2 == 0)
