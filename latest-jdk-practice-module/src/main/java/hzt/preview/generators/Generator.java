@@ -16,7 +16,7 @@ public interface Generator<T> extends AutoCloseable {
 
     void close();
 
-    static <T> GeneratorBuilder<T> from(Consumer<GeneratorScope<T>> scopeConsumer) {
+    static <T> GeneratorBuilder<T> builder(Consumer<GeneratorScope<T>> scopeConsumer) {
         return () -> new GeneratorImpl<>(scopeConsumer);
     }
 

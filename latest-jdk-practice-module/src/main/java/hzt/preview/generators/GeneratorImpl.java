@@ -18,6 +18,16 @@ final class GeneratorImpl<T> implements Generator<T> {
     }
 
     @Override
+    public Iterator<T> iterator() {
+        if (closed.get()) {
+            throw new IllegalStateException("Generator is already closed");
+        }
+        final var generatorIterator = new GeneratorIterator<>(scopeConsumer);
+        iteratorList.add(generatorIterator);
+        return generatorIterator;
+    }
+
+    @Override
     public void close() {
         try {
             final var generatorException = new GeneratorException("Exception while closing generator...");
@@ -38,15 +48,5 @@ final class GeneratorImpl<T> implements Generator<T> {
         } catch (@SuppressWarnings(CATCH_SPECIFIC_EXCEPTIONS) Exception e) {
             generatorException.addSuppressed(e);
         }
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        if (closed.get()) {
-            throw new IllegalStateException("Generator is already closed");
-        }
-        final var generatorIterator = new GeneratorIterator<>(scopeConsumer);
-        iteratorList.add(generatorIterator);
-        return generatorIterator;
     }
 }

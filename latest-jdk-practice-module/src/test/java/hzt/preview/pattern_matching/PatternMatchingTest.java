@@ -12,15 +12,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PatternMatchingTest {
 
 
-    @ParameterizedTest(name = "'{0}' should evaluated to integer: {1}")
+    @ParameterizedTest(name = "`{0}` should evaluated to integer: {1}")
     @CsvSource({
             "param1, 6",
             "par, 7",
             "This is a test!, 15"
     })
-    void testStringToInteger(String input, String actual) {
-        final var expected = Integer.parseInt(actual);
-
+    void testStringToInteger(String input, int expected) {
         final var length = PatternMatching.toInteger(input);
 
         assertEquals(expected, length);

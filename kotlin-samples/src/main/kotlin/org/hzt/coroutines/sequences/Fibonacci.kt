@@ -14,4 +14,6 @@ val fibonacci = sequence {
     }
 }
 
-fun main() = fibonacci.take(10).onEach { TimeUnit.MILLISECONDS.sleep(250) }.forEach(::println)
+fun main() = fibonacci.take(10)
+    .onEach { TimeUnit.MILLISECONDS.sleep(250) }
+    .forEach(::println)

@@ -1,24 +1,18 @@
 package hzt.preview.generators;
 
+import org.hzt.utils.TimingUtils;
+
 import java.time.Duration;
 
 public class TowerOfHanoi {
 
     public static void main(String... args) {
         final var nrOfDisks = 6;
-        Generator.<String>from(scope -> moveDisk(scope, nrOfDisks, 'a', 'c', 'b'))
+        Generator.<String>builder(scope -> moveDisk(scope, nrOfDisks, 'a', 'c', 'b'))
                 .consumeAsStream(s -> s
-                        .peek(e -> sleep(Duration.ofMillis(200)))
+                        .peek(e -> TimingUtils.sleep(Duration.ofMillis(200)))
                         .forEach(System.out::println)
                 );
-    }
-
-    private static void sleep(Duration duration) {
-        try {
-            Thread.sleep(duration);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 
     static void moveDisk(
