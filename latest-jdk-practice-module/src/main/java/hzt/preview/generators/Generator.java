@@ -16,12 +16,12 @@ public interface Generator<T> extends AutoCloseable {
 
     void close();
 
-    static <T> GeneratorBuilder<T> builder(Consumer<GeneratorScope<T>> scopeConsumer) {
+    static <T> Builder<T> yieldingFrom(Consumer<GeneratorScope<T>> scopeConsumer) {
         return () -> new GeneratorImpl<>(scopeConsumer);
     }
 
     @FunctionalInterface
-    interface GeneratorBuilder<T> {
+    interface Builder<T> {
 
         Generator<T> generator();
 

@@ -27,7 +27,7 @@ class GeneratorTest {
 
     @Test
     <T> void testEmptyGenerator() {
-        final var generatorBuilder = Generator.<T>builder(scope -> {
+        final var generatorBuilder = Generator.<T>yieldingFrom(scope -> {
         });
         try (final var emptyGenerator = generatorBuilder.generator()) {
             assertFalse(emptyGenerator.iterator().hasNext());
@@ -37,7 +37,7 @@ class GeneratorTest {
     @Test
     void testOneEltGenerator() {
         List<Integer> oneEltList = List.of(1);
-        var list = Generator.<Integer>builder(scope -> yieldValuesFromList(scope, oneEltList))
+        var list = Generator.<Integer>yieldingFrom(scope -> yieldValuesFromList(scope, oneEltList))
                 .useAsSequence(Sequence::toList);
         assertEquals(oneEltList, list);
     }
@@ -61,14 +61,14 @@ class GeneratorTest {
     void testTwoEltGenerator() {
         List<Integer> twoEltList = List.of(1, 2);
         List<Integer> result = Generator
-                .<Integer>builder(scope -> yieldValuesFromList(scope, twoEltList))
+                .<Integer>yieldingFrom(scope -> yieldValuesFromList(scope, twoEltList))
                 .useAsStream(Stream::toList);
         assertEquals(twoEltList, result);
     }
 
     @Test
     void testInfiniteGenerator() {
-        final var generatorBuilder = Generator.<Integer>builder(scope -> yieldFromInfiniteLoop(scope, 0, i -> i + 1));
+        final var generatorBuilder = Generator.<Integer>yieldingFrom(scope -> yieldFromInfiniteLoop(scope, 0, i -> i + 1));
 
         int NUM_ELEMENTS_TO_INSPECT = 1_000;
         final var pair = generatorBuilder.useAsSequence(s -> s
@@ -90,7 +90,7 @@ class GeneratorTest {
     void testInfiniteGeneratorIsLazy() {
         AtomicInteger integer = new AtomicInteger(0);
         final var build = Generator
-                .<Integer>builder(scope -> yieldFromInfiniteLoop(scope, 0, i -> i + 1))
+                .<Integer>yieldingFrom(scope -> yieldFromInfiniteLoop(scope, 0, i -> i + 1))
                 .useAsSequence(s -> s.onEach(e -> integer.incrementAndGet())
                         .onEach(System.out::println));
 
@@ -109,7 +109,7 @@ class GeneratorTest {
         AtomicInteger integer = new AtomicInteger(0);
 
         final var sequence = Generator
-                .<Integer>builder(scope -> yieldFromInfiniteLoop(scope, 0, i -> i + 1))
+                .<Integer>yieldingFrom(scope -> yieldFromInfiniteLoop(scope, 0, i -> i + 1))
                 .useAsSequence(seq -> seq.onEach(i -> integer.incrementAndGet())
                         .onEach(System.out::println));
 
@@ -118,7 +118,7 @@ class GeneratorTest {
 
     @Test
     void testInfiniteGeneratorLeavesNoRunningThreads() {
-        final var generator = Generator.<Integer>builder(scope -> yieldFromInfiniteLoop(scope, 1, i -> i)).generator();
+        final var generator = Generator.<Integer>yieldingFrom(scope -> yieldFromInfiniteLoop(scope, 1, i -> i)).generator();
         Iterator<Integer> iterator = generator.iterator();
         try (generator) {
             int NUM_ELEMENTS_TO_INSPECT = 1000;
@@ -143,7 +143,7 @@ class GeneratorTest {
 
     @Test
     <T> void testGeneratorRaisingExceptionHasNext() {
-        try (Generator<T> generator = Generator.<T>builder(scope -> CustomRuntimeException.throwIt()).generator()) {
+        try (Generator<T> generator = Generator.<T>yieldingFrom(scope -> CustomRuntimeException.throwIt()).generator()) {
             Iterator<T> iterator = generator.iterator();
             //noinspection ResultOfMethodCallIgnored
             assertThrows(CustomRuntimeException.class, iterator::hasNext);
@@ -153,7 +153,7 @@ class GeneratorTest {
 
     @Test
     <T> void testGeneratorRaisingExceptionNext() {
-        try (Generator<T> generator = Generator.<T>builder(scope -> CustomRuntimeException.throwIt()).generator()) {
+        try (Generator<T> generator = Generator.<T>yieldingFrom(scope -> CustomRuntimeException.throwIt()).generator()) {
             Iterator<T> iterator = generator.iterator();
             assertThrows(CustomRuntimeException.class, iterator::next);
         }
@@ -177,7 +177,7 @@ class GeneratorTest {
                     "Move disk  1 from rod a to rod c");
 
             List<String> instructions = Generator
-                    .<String>builder(scope -> moveDisk(scope, nrOfDisks, 'a', 'c', 'b'))
+                    .<String>yieldingFrom(scope -> moveDisk(scope, nrOfDisks, 'a', 'c', 'b'))
                     .useAsSequence(s -> s
                             .onEach(System.out::println)
                             .toList());
@@ -199,7 +199,7 @@ class GeneratorTest {
         )
         void testTowerOfHanoiNrOfMoves(int nrOfDisks, int expectedNrOfMoves) {
             List<String> instructions = Generator
-                    .<String>builder(scope -> moveDisk(scope, nrOfDisks, 'a', 'c', 'b'))
+                    .<String>yieldingFrom(scope -> moveDisk(scope, nrOfDisks, 'a', 'c', 'b'))
                     .useAsSequence(Collectable::toList);
 
             assertAll(
@@ -212,7 +212,7 @@ class GeneratorTest {
     @Nested
     class FibonacciGeneratorTest {
 
-        private final Generator.GeneratorBuilder<Long> fibonacciBuilder = Generator.builder(scope -> {
+        private final Generator.Builder<Long> fibonacciBuilder = Generator.yieldingFrom(scope -> {
             var cur = 0L;
             var next = 1L;
             //noinspection InfiniteLoopStatement
