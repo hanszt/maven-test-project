@@ -1,5 +1,6 @@
 package org.hzt
 
+import org.hzt.utils.Timer
 import java.util.stream.IntStream
 
 fun sieveOfEratosthenes(n: Int): IntStream {

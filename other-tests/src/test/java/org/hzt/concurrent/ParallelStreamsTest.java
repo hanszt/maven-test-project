@@ -1,6 +1,6 @@
 package org.hzt.concurrent;
 
-import org.hzt.TimingUtils;
+import org.hzt.utils.TimingUtils;
 import org.hzt.utils.tuples.Pair;
 import org.junit.jupiter.api.Test;
 

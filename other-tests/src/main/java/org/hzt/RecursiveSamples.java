@@ -129,15 +129,15 @@ public final class RecursiveSamples {
         final Complex[] evenFFT = fastFourierTransform(halfLengthArray);
         Arrays.setAll(halfLengthArray, k -> input[2 * k + 1]);
         final Complex[] oddFFT = fastFourierTransform(halfLengthArray);
-        final var result = new Complex[length];
+        final var fft = new Complex[length];
 
         for (int k = 0; k < halfLength; k++) {
             final var phi = -(2 * Math.PI) * k / length;
             final var complex = new Complex(Math.cos(phi), Math.sin(phi)).multiply(oddFFT[k]);
-            result[k] = evenFFT[k].add(complex);
-            result[k + halfLength] = evenFFT[k].subtract(complex);
+            fft[k] = evenFFT[k].add(complex);
+            fft[k + halfLength] = evenFFT[k].subtract(complex);
         }
-        return result;
+        return fft;
     }
 
     static final class Aoc2020Sampe {

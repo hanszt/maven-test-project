@@ -13,16 +13,18 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.concurrent.CompletionException;
 
 import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.*;
 
 /**
  * @see <a href="https://openjdk.java.net/groups/net/httpclient/intro.html">
  *     Introduction to the Java HTTP Client</a>
  */
+@SuppressWarnings("HttpUrlsUsage")
 class HttpClientTests {
 
     @Test
@@ -33,14 +35,17 @@ class HttpClientTests {
                 .uri(URI.create("http://openjdk.java.net/"))
                 .build();
 
-        final var result = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
-                .join();
+        try {
+            final var result = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .thenApply(HttpResponse::body)
+                    .join();
 
-        println(result);
-
-        assumeTrue(() -> result.contains("body"));
-        assertTrue(result.contains("body"));
+            println(result);
+            assumeTrue(result.contains("body"));
+            assertTrue(result.contains("body"));
+        }  catch (CompletionException e) {
+            abort("The following exception was thrown: " + e.getMessage());
+        }
     }
 
     @Test
