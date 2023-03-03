@@ -58,11 +58,10 @@ class BigDecimalSampleTest {
         assertEquals(BigDecimal.valueOf(0.5), BigDecimal.ONE.divide(TWO));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Parsing {0} by patten `{1}` should yield {2} as BigDecimal value")
     @MethodSource("decimalFormatParams")
     void testDecimalFormat(String input, String pattern, BigDecimal expected) {
-        final var actual = BigDecimalSample.parseBigDecimal(input, pattern);
-        assertEquals(expected, actual);
+        assertEquals(expected, BigDecimalSample.parseBigDecimal(input, pattern));
     }
 
     private static List<Arguments> decimalFormatParams() {

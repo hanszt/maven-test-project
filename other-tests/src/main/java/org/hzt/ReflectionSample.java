@@ -45,7 +45,7 @@ public final class ReflectionSample {
          * Function that tries to return the given property path
          */
         public static <T, R> Function<R, T> propertyAccessorFunction(final String name) {
-            return new Function<R, T>() {
+            return new Function<>() {
                 @Override
                 public T apply(R input) {
                     try {

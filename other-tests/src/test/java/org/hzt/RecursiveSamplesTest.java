@@ -167,18 +167,16 @@ class RecursiveSamplesTest {
 
 
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "The greatest common divisor of {0} and {1} should be {2}")
     @MethodSource("defaultCommonDivisorParams")
     void testGreatestCommonDivisor(long first, long second, long expected) {
-        final var gcd = RecursiveSamples.gcdByEuclidesAlgorithm(first, second);
-        assertEquals(expected, gcd);
+        assertEquals(expected, RecursiveSamples.gcdByEuclidesAlgorithm(first, second));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "The greatest common divisor of {0} and {1} should be {2}")
     @MethodSource("defaultCommonDivisorParams")
     void testGreatestIntCommonDivisor(int first, int second, int expected) {
-        final var gcd = RecursiveSamples.gcdByEuclidesAlgorithm(first, second);
-        assertEquals(expected, gcd);
+        assertEquals(expected, RecursiveSamples.gcdByEuclidesAlgorithm(first, second));
     }
 
     static Sequence<Arguments> defaultCommonDivisorParams() {
@@ -190,7 +188,7 @@ class RecursiveSamplesTest {
         );
     }
 
-    @ParameterizedTest(name = "the least common multiple of {0} and {1} should be {2}")
+    @ParameterizedTest(name = "The least common multiple of {0} and {1} should be {2}")
     @CsvSource({
             "12, 36, 36",
             "13, 17, 221",
@@ -199,18 +197,16 @@ class RecursiveSamplesTest {
             "24, 36, 72"}
     )
     void testLeastCommonMultiple(long nr1, long nr2, long expected) {
-        final var lcm = RecursiveSamples.lcm(nr1, nr2);
-        assertEquals(expected, lcm);
+        assertEquals(expected, RecursiveSamples.lcm(nr1, nr2));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "The greatest common divisor of {0} and {1} should be {2}")
     @MethodSource("bigIntCommonDivisorParams")
     void testGreatestCommonDivisorBigInt(
             @ConvertWith(ToBigIntegerConverter.class) BigInteger first,
             @ConvertWith(ToBigIntegerConverter.class) BigInteger second,
             @ConvertWith(ToBigIntegerConverter.class) BigInteger expected) {
-        final var gcd = RecursiveSamples.gcdByEuclidesAlgorithm(first, second);
-        assertEquals(expected, gcd);
+        assertEquals(expected, RecursiveSamples.gcdByEuclidesAlgorithm(first, second));
     }
 
     static class ToBigIntegerConverter implements ArgumentConverter {

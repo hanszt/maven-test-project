@@ -19,9 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.stream.IntStream;
 
-import static java.time.DayOfWeek.MONDAY;
-import static java.time.DayOfWeek.SUNDAY;
-import static java.time.DayOfWeek.WEDNESDAY;
+import static java.time.DayOfWeek.*;
 import static java.time.Month.*;
 import static java.util.stream.Collectors.partitioningBy;
 import static org.awaitility.Awaitility.await;
@@ -42,6 +40,34 @@ class JavaTimeTest {
                 .toLocalDateTime();
 
         assertEquals(dateTime.toLocalDate(), dateTimeFromOldDate.toLocalDate());
+    }
+
+    @Test
+    void testDateShouldNotBeMutable() {
+        ZoneId.getAvailableZoneIds().forEach(System.out::println);
+
+        final var instant = LocalDate.of(2022, FEBRUARY, 2)
+                .atStartOfDay(ZoneId.of("Europe/Amsterdam"))
+                .toInstant();
+
+        final var event = new Event(Date.from(instant));
+        final var date = event.date();
+        assert date != null;
+        date.setTime(2L);
+
+        assertEquals(Date.from(instant), event.date());
+    }
+
+    private record Event(Date date) {
+
+        Event(Date date) {
+            this.date = date != null ? new Date(date.getTime()) : null;
+        }
+
+        @Override
+        public Date date() {
+            return date != null ? new Date(date.getTime()) : null;
+        }
     }
 
     /**

@@ -10,7 +10,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-import java.util.stream.StreamSupport;
 
 import static org.hzt.utils.It.println;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -32,7 +31,7 @@ class JavaLegacyTests {
         }
 
         final List<Integer> lsw = Sequence.of(iterable).toList();
-        final List<Integer> ld = StreamSupport.stream(iterable.spliterator(), false).toList();
+        final List<Integer> ld = Streams.stream(iterable).toList();
         final List<String> list = Collections.list(dictionary.keys());
 
         assertAll(

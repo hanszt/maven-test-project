@@ -19,8 +19,6 @@ import static org.hzt.utils.It.println;
  * @see <a href="programming-puzzles/other-puzzles">other puzzles module</a> for more recursive examples
  */
 public final class RecursiveSamples {
-
-    private static final String SHOULD_BE_STATIC = "java:S2694";
     private static final String FIB_PRECONDITION = "the position n in the fib sequence must be greater than 0 but was ";
 
     private RecursiveSamples() {
@@ -79,8 +77,9 @@ public final class RecursiveSamples {
     }
 
     public static BigInteger memoizedFib(int n) {
-        @SuppressWarnings(SHOULD_BE_STATIC)
-        class Holder {
+        @SuppressWarnings(Context.SHOULD_BE_STATIC)
+        class Context {
+            static final String SHOULD_BE_STATIC = "java:S2694";
             final MemIntFunction<BigInteger> memFib = MemIntFunction.of(this::fib).memoized();
 
             BigInteger fib(int n) {
@@ -94,7 +93,7 @@ public final class RecursiveSamples {
                 return memFib.apply(n - 1).add(memFib.apply(n - 2));
             }
         }
-        return new Holder().fib(n);
+        return new Context().memFib.apply(n);
     }
 
     public static int sum(int start, int end) {
@@ -147,13 +146,6 @@ public final class RecursiveSamples {
         private Aoc2020Sampe() {
         }
 
-        static long numberOfWaysToCompleteAdaptorChainWithCache(final int[] sortedArray) {
-            final var cache = new HashMap<String, Long>();
-            final var count = numberOfWaysToCompleteAdaptorChainWithCache(sortedArray, cache);
-            println("cache size = " + cache.size());
-            return count;
-        }
-
         static long numberOfWaysToCompleteAdaptorChain(final int[] sortedArray) {
             final var length = sortedArray.length;
             if (length == 1) {
@@ -168,7 +160,14 @@ public final class RecursiveSamples {
             return arrangements;
         }
 
-        static long numberOfWaysToCompleteAdaptorChainWithCache(final int[] sortedArray, Map<String, Long> cache) {
+        static long numberOfWaysToCompleteAdaptorChainWithCache(final int[] sortedArray) {
+            final var cache = new HashMap<String, Long>();
+            final var count = numberOfWaysToCompleteAdaptorChainWithCache(sortedArray, cache);
+            println("cache size = " + cache.size());
+            return count;
+        }
+
+        private static long numberOfWaysToCompleteAdaptorChainWithCache(final int[] sortedArray, Map<String, Long> cache) {
             final var length = sortedArray.length;
             if (length == 1) {
                 return 1L;
@@ -198,24 +197,15 @@ public final class RecursiveSamples {
      * @see <a href="https://www.baeldung.com/java-greatest-common-divisor">Finding Greatest Common Divisor in Java</a>
      */
     public static long gcdByEuclidesAlgorithm(long n1, long n2) {
-        if (n2 == 0) {
-            return n1;
-        }
-        return gcdByEuclidesAlgorithm(n2, n1 % n2);
+        return n2 == 0 ? n1 : gcdByEuclidesAlgorithm(n2, n1 % n2);
     }
 
     public static int gcdByEuclidesAlgorithm(int n1, int n2) {
-        if (n2 == 0) {
-            return n1;
-        }
-        return gcdByEuclidesAlgorithm(n2, n1 % n2);
+        return n2 == 0 ? n1 : gcdByEuclidesAlgorithm(n2, n1 % n2);
     }
 
     public static BigInteger gcdByEuclidesAlgorithm(BigInteger n1, BigInteger n2) {
-        if (BigInteger.ZERO.equals(n2)) {
-            return n1;
-        }
-        return gcdByEuclidesAlgorithm(n2, n1.mod(n2));
+        return BigInteger.ZERO.equals(n2) ? n1 : gcdByEuclidesAlgorithm(n2, n1.mod(n2));
     }
 
     /**
