@@ -30,7 +30,6 @@
         <module>kotlin-samples</module>
         <module>rust-from-java</module>
         <module>latest-jdk-practice-module</module>
-        <module>java-cassandra</module>
     </modules>
 
     <properties>
