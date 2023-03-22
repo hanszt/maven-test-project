@@ -31,8 +31,12 @@ class EnthuwareTest1Tests {
             }
         }
         System.out.println(" i = " + i + ", j = " + j);
-        assertEquals(0, i);
-        assertEquals(-1, j);
+
+        int finalJ = j;
+        assertAll(
+                () -> assertEquals(0, i),
+                () -> assertEquals(-1, finalJ)
+        );
     }
 
     @Test
@@ -44,8 +48,10 @@ class EnthuwareTest1Tests {
         final var c = map1.merge("c", 3, Integer::sum);
         System.out.println(map1);
 
-        assertEquals(2, b);
-        assertEquals(3, c);
+        assertAll(
+                () -> assertEquals(2, b),
+                () -> assertEquals(3, c)
+        );
     }
 
     static int wiggler(int x) {
@@ -75,8 +81,10 @@ class EnthuwareTest1Tests {
         Map<?, ?> wildCardMap = new HashMap<>(stringMap);
 //        wildCardMap.putAll(stringMap);
 
-        assertTrue(wildCardMap.containsKey("Hallo"));
-        assertTrue(wildCardMap.containsValue("Sophie"));
+        assertAll(
+                () -> assertTrue(wildCardMap.containsKey("Hallo")),
+                () -> assertTrue(wildCardMap.containsValue("Sophie"))
+        );
     }
 
     @Test

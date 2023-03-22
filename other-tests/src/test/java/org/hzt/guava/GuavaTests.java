@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 
@@ -98,7 +99,7 @@ class GuavaTests {
         @Test
         void testCollectToBloomFilter() {
             final var bloomFilter = FileX.of("input/random_words.txt").useLines(seq -> seq
-                    .collect(BloomFilter.toBloomFilter(Funnels.stringFunnel(Charset.defaultCharset()), 500)));
+                    .collect(BloomFilter.toBloomFilter(Funnels.stringFunnel(StandardCharsets.UTF_8), 500)));
 
             assertAll(
                     () -> assertEquals(199, bloomFilter.approximateElementCount()),

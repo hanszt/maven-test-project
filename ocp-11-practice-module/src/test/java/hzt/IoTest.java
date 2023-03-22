@@ -60,7 +60,7 @@ class IoTest {
             var files = walk
                     .map(Path::toFile)
                     .filter(File::isFile)
-                    .collect(Collectors.toUnmodifiableList());
+                    .toList();
 
             final var strings = new IoSamples().executePrivilegedFunction(files, File::toString);
             strings.forEach(System.out::println);
@@ -115,9 +115,6 @@ class IoTest {
     private static void copy(String records1, String records2) {
         try (InputStream is = new FileInputStream(records1);
              OutputStream os = new FileOutputStream(records2);) {  //1
-            if (os == null) {
-//                os = new FileOutputStream("c:\\default.txt");  //2 objects declared in try with resources are final
-            }
             byte[] buffer = new byte[1024];
             int bytesRead;
             while ((bytesRead = is.read(buffer)) != -1) {  //3
