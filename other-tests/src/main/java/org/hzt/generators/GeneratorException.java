@@ -1,4 +1,4 @@
-package hzt.preview.generators;
+package org.hzt.generators;
 
 public class GeneratorException extends RuntimeException {
 

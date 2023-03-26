@@ -1,4 +1,4 @@
-package hzt.preview.generators;
+package org.hzt.generators;
 
 import org.hzt.utils.It;
 import org.hzt.utils.TimingUtils;

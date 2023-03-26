@@ -8,12 +8,10 @@ open class Tag(private val name: String) {
     val children = mutableListOf<Tag>()
     val attributes = mutableListOf<Attribute>()
 
-    override fun toString(): String {
-        return "<$name" +
-                (if (attributes.isEmpty()) "" else attributes.joinToString(separator = "", prefix = " ")) + ">" +
-                (if (children.isEmpty()) "" else children.joinToString(separator = "")) +
-                "</$name>"
-    }
+    override fun toString(): String = "<$name" +
+            (if (attributes.isEmpty()) "" else attributes.joinToString(separator = "", prefix = " ")) + ">" +
+            (if (children.isEmpty()) "" else children.joinToString(separator = "")) +
+            "</$name>"
 }
 
 class Attribute(private val name: String, private val value: String) {
@@ -50,38 +48,36 @@ fun TR.td(color: String? = null, align: String = "left", init: TD.() -> Unit) =
 
 fun Tag.text(s: Any?) = doInit(Text(s.toString())) {}
 
-fun renderProductTable(): String {
-    return html {
-        table {
-            tr(color = getTitleColor()) {
-                td {
-                    text("Product")
-                }
-                td {
-                    text("Price")
-                }
-                td {
-                    text("Popularity")
-                }
+fun renderProductTable(): String = html {
+    table {
+        tr(color = getTitleColor()) {
+            td {
+                text("Product")
             }
-            val products = getProducts()
-            for ((index, product) in products.withIndex()) {
-                tr {
-                    td(color = getCellColor(index, 0)) {
-                        text(product.description)
-                    }
-                    td(color = getCellColor(index, 1)) {
-                        text(product.price)
-                    }
-                    td(color = getCellColor(index, 2)) {
-                        text(product.popularity)
-                    }
+            td {
+                text("Price")
+            }
+            td {
+                text("Popularity")
+            }
+        }
+        val products = getProducts()
+        for ((index, product) in products.withIndex()) {
+            tr {
+                td(color = getCellColor(index, 0)) {
+                    text(product.description)
+                }
+                td(color = getCellColor(index, 1)) {
+                    text(product.price)
+                }
+                td(color = getCellColor(index, 2)) {
+                    text(product.popularity)
                 }
             }
         }
-        center {  }
-    }.toString()
-}
+    }
+    center {  }
+}.toString()
 
 data class Product(val description: String, val price: Double, val popularity: Int)
 

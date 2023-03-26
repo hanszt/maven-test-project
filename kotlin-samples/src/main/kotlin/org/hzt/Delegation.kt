@@ -7,12 +7,12 @@ package org.hzt
  */
 interface Base {
     val message: String
-    fun message(): String
+    fun messageByMethod(): String
 }
 
 class BaseImpl(x: Int) : Base {
     override val message = "BaseImpl: x = $x"
-    override fun message(): String = message
+    override fun messageByMethod(): String = message
 }
 
 class Derived(base: Base) : Base by base {
@@ -23,6 +23,6 @@ class Derived(base: Base) : Base by base {
 fun main() {
     val baseImpl = BaseImpl(10)
     val derived = Derived(baseImpl)
-    println(derived.message())
+    println(derived.messageByMethod())
     println(derived.message)
 }

@@ -12,7 +12,7 @@ class DelegationKtTest {
         val derived = Derived(baseImpl)
 
         assertAll(
-            { assertEquals("BaseImpl: x = 10", derived.message()) },
+            { assertEquals("BaseImpl: x = 10", derived.messageByMethod()) },
             { assertEquals("Message of Derived", derived.message) }
         )
     }

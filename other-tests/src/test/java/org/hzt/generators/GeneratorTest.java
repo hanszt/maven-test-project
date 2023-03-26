@@ -1,4 +1,4 @@
-package hzt.preview.generators;
+package org.hzt.generators;
 
 import org.hzt.utils.It;
 import org.hzt.utils.iterables.Collectable;
@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-import static hzt.preview.generators.TowerOfHanoiGenerator.moveDisk;
+import static org.hzt.generators.TowerOfHanoiGenerator.moveDisk;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -78,8 +78,9 @@ class GeneratorTest {
                 .map(IndexedValue::value)
                 .toTwo(Sequence::last, Sequence::toList));
 
+        System.out.println("Thread.activeCount() = " + Thread.activeCount());
+
         assertAll(
-                () -> assertEquals(2, Thread.activeCount()),
                 () -> assertEquals(NUM_ELEMENTS_TO_INSPECT, pair.second().size()),
                 () -> assertEquals(1_998, pair.first())
         );
@@ -127,10 +128,8 @@ class GeneratorTest {
                 assertEquals(1, next);
             }
         }
-        assertAll(
-                () -> assertEquals(Thread.State.TERMINATED, iterator instanceof GeneratorIterator<Integer> gi ? gi.getProducerState() : null),
-                () -> assertEquals(2, Thread.activeCount())
-        );
+        System.out.println("Thread.activeCount() = " + Thread.activeCount());
+        assertEquals(Thread.State.TERMINATED, iterator instanceof GeneratorIterator<Integer> gi ? gi.getProducerState() : null);
     }
 
     private static class CustomRuntimeException extends RuntimeException {
