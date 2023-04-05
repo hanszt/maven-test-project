@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -42,13 +43,14 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static demo.It.printf;
 import static demo.It.println;
 import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayNameGeneration(ReplaceCamelCaseBySentence.class)
 class SequenceTest {
+
+    public static final ZoneId AMSTERDAM_ZONE_ID = ZoneId.of("Europe/Amsterdam");
 
     @Test
     void testFlatMap() {
@@ -631,11 +633,12 @@ class SequenceTest {
 
     @Test
     void testSequenceOfZoneIds() {
-        final var now = Instant.now();
-        final var current = now.atZone(ZoneId.systemDefault());
-        printf("Current time is %s%n%n", current);
 
-        final var noneWholeHourZoneOffsetSummaries = getTimeZoneSummaries(now, id -> nonWholeHourOffsets(now, id));
+        final var instant = LocalDateTime.parse("2023-10-04T20:00:00")
+                .atZone(AMSTERDAM_ZONE_ID)
+                .toInstant();
+
+        final var noneWholeHourZoneOffsetSummaries = getTimeZoneSummaries(instant, id -> nonWholeHourOffsets(instant, id));
 
         noneWholeHourZoneOffsetSummaries.forEach(It::println);
 
@@ -648,11 +651,11 @@ class SequenceTest {
 
     @Test
     void testTimeZonesAntarctica() {
-        final var now = Instant.now();
-        final var current = now.atZone(ZoneId.systemDefault());
-        printf("Current time is %s%n%n", current);
+        final var instant = LocalDateTime.parse("2022-04-03T12:23:43")
+                .atZone(AMSTERDAM_ZONE_ID)
+                .toInstant();
 
-        final var timeZonesAntarctica = getTimeZoneSummaries(now, id -> id.getId().contains("Antarctica"));
+        final var timeZonesAntarctica = getTimeZoneSummaries(instant, id -> id.getId().contains("Antarctica"));
 
         timeZonesAntarctica.forEach(It::println);
 
