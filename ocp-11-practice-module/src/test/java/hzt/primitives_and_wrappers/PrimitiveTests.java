@@ -1,12 +1,14 @@
 package hzt.primitives_and_wrappers;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.text.DecimalFormat;
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PrimitiveTests {
 
@@ -56,6 +58,46 @@ class PrimitiveTests {
             );
         } finally {
             Locale.setDefault(defaultLocale);
+        }
+    }
+
+    /**
+     * @see <a href="https://www.baeldung.com/java-operators">Java Operators</a>
+     */
+    @Nested
+    class BooleanOperatorTets {
+
+        @ParameterizedTest(name = "{0} && {1} should return {2}")
+        @CsvSource({
+                "true, true, true",
+                "true, false, false",
+                "false, true, false",
+                "false, false, false"
+        })
+        void testLogicalAndOperator(boolean condition1, boolean condition2, boolean expected) {
+            assertEquals(expected, condition1 && condition2);
+        }
+
+        @ParameterizedTest(name = "{0} || {1} should return {2}")
+        @CsvSource({
+                "true, true, true",
+                "true, false, true",
+                "false, true, true",
+                "false, false, false"
+        })
+        void testLogicalOrOperator(boolean condition1, boolean condition2, boolean expected) {
+            assertEquals(expected, condition1 || condition2);
+        }
+
+        @ParameterizedTest(name = "{0} ^ {1} should return {2}")
+        @CsvSource({
+                "true, true, false",
+                "true, false, true",
+                "false, true, true",
+                "false, false, false"
+        })
+        void testLogicalExclusiveOrOperator(boolean condition1, boolean condition2, boolean expected) {
+            assertEquals(expected, condition1 ^ condition2);
         }
     }
 }

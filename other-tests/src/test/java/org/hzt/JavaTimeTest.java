@@ -158,7 +158,7 @@ class JavaTimeTest {
             final var actual = localDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
             final var expected = date.toString("dd-MM-yyyy");
 
-            It.println(actual);
+            println(actual);
 
             assertEquals(expected, actual);
         }
