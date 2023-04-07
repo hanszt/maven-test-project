@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class JavaDateTests {
 
+    public static final ZoneId AMSTERDAM_TIME_ZONE = ZoneId.of("Europe/Amsterdam");
+
     @BeforeEach
     void setup() {
         Locale.setDefault(Locale.GERMANY);
@@ -29,7 +31,7 @@ class JavaDateTests {
     void testFormatDate() {
         Date date = Date.from(LocalDate.of(2021, 11, 26)
                 .atStartOfDay()
-                .atZone(ZoneId.of("Europe/Amsterdam"))
+                .atZone(AMSTERDAM_TIME_ZONE)
                 .toInstant());
 
         assertAll(
@@ -62,14 +64,14 @@ class JavaDateTests {
 
     @Test
     void testDateToLocalDate() {
-        final var localDate = JavaDate.toLocalDate(new java.sql.Date(2));
+        final var localDate = JavaDate.toLocalDate(new java.sql.Date(2), AMSTERDAM_TIME_ZONE);
         System.out.println("localDate = " + localDate);
         assertEquals(LocalDate.EPOCH, localDate);
     }
 
     @Test
     void testDateToLocalTime() {
-        final var localDate = JavaDate.toLocalTime(new java.sql.Time(2));
+        final var localDate = JavaDate.toLocalTime(new java.sql.Time(2), AMSTERDAM_TIME_ZONE);
         System.out.println("localTime = " + localDate);
         assertEquals(LocalTime.of(1, 0), localDate);
     }

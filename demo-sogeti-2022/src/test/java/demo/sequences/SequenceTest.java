@@ -50,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayNameGeneration(ReplaceCamelCaseBySentence.class)
 class SequenceTest {
 
-    public static final ZoneId AMSTERDAM_ZONE_ID = ZoneId.of("Europe/Amsterdam");
+    private static final ZoneId AMSTERDAM_ZONE_ID = ZoneId.of("Europe/Amsterdam");
 
     @Test
     void testFlatMap() {
@@ -361,7 +361,7 @@ class SequenceTest {
 
     @Test
     void testSequenceWithConstrainOnceMethodCanOnlyBeUsedOnce() {
-        Sequence<List<Integer>> windowedSequence = Sequence.of(Arrays.asList(1, 2, 3, 4, 5, 3, -1, 6, 12))
+        Sequence<List<Integer>> windowedSequence = Sequence.of(1, 2, 3, 4, 5, 3, -1, 6, 12)
                 .onEach(It::println)
                 .filter(i -> i % 2 == 0)
                 .windowed(2)
@@ -774,14 +774,14 @@ class SequenceTest {
 
         @Test
         void testFlattenStreamIteratorEnumerationAndIterable() {
-            final var iterableLike = List.of(
+            final var iterableLikeList = List.of(
                     Stream.of("hallo"),
                     List.of("this", "is"),
                     Set.of("a").iterator(),
                     List.of("more", "stuf").spliterator(),
                     new StringTokenizer("Test"));
 
-            final var list = Sequence.of(iterableLike)
+            final var list = Sequence.of(iterableLikeList)
                     .<String>flatten()
                     .toList();
 
@@ -813,7 +813,7 @@ class SequenceTest {
                 return () -> new FlatteningIterator<>(iterator(), this::toIteratorOrThrow);
             }
 
-            private <R> Iterator<R> toIteratorOrThrow(Object item) {
+            private <R> Iterator<R> toIteratorOrThrow(T item) {
                 final Iterator<?> iterator;
                 if (item instanceof Iterable<?> iterable) {
                     iterator = iterable.iterator();

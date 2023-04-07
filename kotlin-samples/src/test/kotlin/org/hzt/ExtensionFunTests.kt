@@ -55,10 +55,9 @@ class ExtensionFunTests {
     @TestFactory
     fun `make any object invokable`(): List<DynamicTest> {
 
-        infix fun Any?.`should resolve to`(expected: String) =
+        infix fun <T> T.`should resolve to`(expected: String) =
             dynamicTest("invoking `${this}()` should return: $expected") {
-                operator fun Any?.invoke() = this?.toString() ?: "null"
-
+                operator fun T?.invoke() = this?.toString() ?: "null"
                 assertEquals(expected, this())
             }
 

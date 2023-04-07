@@ -10,15 +10,15 @@ public final class JavaDate {
     private JavaDate() {
     }
 
-    public static LocalDate toLocalDate(Date date) {
+    public static LocalDate toLocalDate(Date date, ZoneId zoneId) {
         return date instanceof java.sql.Date sqlDate ? sqlDate.toLocalDate() : date.toInstant()
-                .atZone(ZoneId.systemDefault())
+                .atZone(zoneId)
                 .toLocalDate();
     }
 
-    public static LocalTime toLocalTime(Date date) {
+    public static LocalTime toLocalTime(Date date, ZoneId zoneId) {
         return date instanceof java.sql.Time sqlTime ? sqlTime.toLocalTime() : date.toInstant()
-                .atZone(ZoneId.systemDefault())
+                .atZone(zoneId)
                 .toLocalTime();
     }
 }

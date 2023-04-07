@@ -11,10 +11,7 @@ import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
-import javax.transaction.UserTransaction;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.UUID;
 
 /**
@@ -35,23 +32,23 @@ public class AtomikosSample {
     @SuppressWarnings({"squid:S1160", "SqlNoDataSourceInspection"})
     public void placeOrder(String productId, int amount) throws HeuristicRollbackException, SystemException,
             HeuristicMixedException, RollbackException {
-        UserTransaction userTransaction = new UserTransactionImp();
-        AtomikosDataSourceBean inventoryDataSource = new AtomikosDataSourceBean();
-        AtomikosNonXADataSourceBean orderDataSource = new AtomikosNonXADataSourceBean();
+        var userTransaction = new UserTransactionImp();
+        var inventoryDataSource = new AtomikosDataSourceBean();
+        var orderDataSource = new AtomikosNonXADataSourceBean();
 
-        String orderId = UUID.randomUUID().toString();
+        var orderId = UUID.randomUUID().toString();
 
-        try (Connection inventoryConnection = inventoryDataSource.getConnection();
-             Connection orderConnection = orderDataSource.getConnection();
-             Statement statement1 = inventoryConnection.createStatement();
-             Statement statement2 = orderConnection.createStatement()) {
+        try (var inventoryConnection = inventoryDataSource.getConnection();
+             var orderConnection = orderDataSource.getConnection();
+             var statement1 = inventoryConnection.createStatement();
+             var statement2 = orderConnection.createStatement()) {
 
             userTransaction.begin();
 
-            String query1 = "update Inventory set balance = balance - " + amount + " where productId ='" +
+            var query1 = "update Inventory set balance = balance - " + amount + " where productId ='" +
                     productId + "'";
             statement1.executeUpdate(query1);
-            String query2 = "insert into Orders values ( '" + orderId + "', '" + productId + "', " + amount + " )";
+            var query2 = "insert into Orders values ( '" + orderId + "', '" + productId + "', " + amount + " )";
             statement2.executeUpdate(query2);
             userTransaction.commit();
         } catch (NotSupportedException | SQLException e) {
