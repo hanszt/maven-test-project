@@ -3,7 +3,7 @@ package org.hzt
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
-class OtherTests {
+class CharTests {
 
     @Test
     fun testIncrementChars() {

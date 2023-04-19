@@ -130,13 +130,16 @@ class ExtensionFunTests {
     fun `array different syntax`() {
         operator fun Int.Companion.get(vararg values: Int) = intArrayOf(*values)
         operator fun Double.Companion.get(vararg values: Double) = doubleArrayOf(*values)
+        operator fun String.Companion.get(vararg  values: String) = arrayOf(*values)
 
         val specialNrs = Double[Math.PI, Math.E]
         val evenNrs = Int[2, 4, 6, 8, 10]
+        val words = String["This", "is", "a", "string", "array"]
 
         assertAll(
             { assertArrayEquals(doubleArrayOf(Math.PI, Math.E), specialNrs) },
-            { assertArrayEquals(intArrayOf(2, 4, 6, 8, 10), evenNrs) }
+            { assertArrayEquals(intArrayOf(2, 4, 6, 8, 10), evenNrs) },
+            { assertArrayEquals(arrayOf("This", "is", "a", "string", "array"), words) }
         )
     }
 }
