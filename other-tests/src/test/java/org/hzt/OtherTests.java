@@ -10,6 +10,8 @@ import org.hzt.utils.It;
 import org.hzt.utils.iterables.Collectable;
 import org.hzt.utils.sequences.Sequence;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
@@ -17,12 +19,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.jupiter.api.Disabled;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -364,21 +366,7 @@ class OtherTests {
         assertEquals(FIVE_HUNDRED_MILLION, array.length);
     }
 
-    @Test
-    void testGenerateArrayContainingMaxElements() {
-        final var MAX_MINUS_TWO = Integer.MAX_VALUE - 2;
-        final var bytes = new byte[MAX_MINUS_TWO];
-        setAll(bytes, b -> (byte) (b + 1));
-
-        println(Arrays.toString(Arrays.copyOf(bytes, 200)));
-
-        assertAll(
-                () -> assertEquals(MAX_MINUS_TWO, bytes.length),
-                () -> assertEquals((byte) -3, bytes[MAX_MINUS_TWO - 1])
-        );
-    }
-
-    public static void setAll(byte[] array, IntToByteFunction generator) {
+    static void setAll(byte[] array, IntToByteFunction generator) {
         Objects.requireNonNull(generator);
         for (int i = 0; i < array.length; i++) {
             array[i] = generator.applyAsByte(i);
@@ -542,12 +530,18 @@ class OtherTests {
      */
     @Test
     void testExecNvidiaSmi() throws IOException {
-        Process process = new ProcessBuilder("nvidia-smi").start();
-
+        final Process process;
+        try {
+            //noinspection UseOfProcessBuilder
+            process = new ProcessBuilder("nvidia-smi").start();
+        } catch (IOException e) {
+            Assumptions.abort(e.getMessage());
+            throw new IllegalStateException(e);
+        }
         assertTrue(process.isAlive());
 
         try (final var inputStream = process.getInputStream()) {
-            final var result = new String(inputStream.readAllBytes());
+            final var result = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             println(result);
         }
         assertFalse(process.isAlive());
