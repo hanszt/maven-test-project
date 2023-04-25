@@ -41,7 +41,7 @@ class GeneratorTest {
         assertEquals(List.of(1), list);
     }
 
-    private <T> void valuesFromList(GeneratorScope<T> scope, List<T> elements) {
+    private static <T> void yieldValues(GeneratorScope<T> scope, Iterable<T> elements) {
         for (T element : elements) {
             scope.yieldNext(element);
         }
@@ -60,7 +60,7 @@ class GeneratorTest {
     void testTwoEltGenerator() {
         List<Integer> twoEltList = List.of(1, 2);
         List<Integer> result = Generator
-                .<Integer>yieldingFrom(scope -> valuesFromList(scope, twoEltList))
+                .<Integer>yieldingFrom(scope -> yieldValues(scope, twoEltList))
                 .useAsStream(Stream::toList);
         assertEquals(twoEltList, result);
     }
@@ -68,7 +68,7 @@ class GeneratorTest {
     @Test
     void testInfiniteGenerator() {
 
-        int NUM_ELEMENTS_TO_INSPECT = 1_000;
+        long NUM_ELEMENTS_TO_INSPECT = 1_000L;
         final var pair = Generator.<Integer>yieldingFrom(scope -> nextInInfiniteLoop(scope, 0, i -> i + 1))
                 .useAsSequence(s -> s
                 .filter(i -> i % 2 == 0)
@@ -143,7 +143,6 @@ class GeneratorTest {
     <T> void testGeneratorRaisingExceptionHasNext() {
         try (Generator<T> generator = Generator.<T>yieldingFrom(scope -> CustomRuntimeException.throwIt()).generator()) {
             Iterator<T> iterator = generator.iterator();
-            //noinspection ResultOfMethodCallIgnored
             assertThrows(CustomRuntimeException.class, iterator::hasNext);
         }
 
@@ -176,7 +175,7 @@ class GeneratorTest {
 
             List<String> instructions = Generator
                     .<String>yieldingFrom(scope -> moveDisk(scope, nrOfDisks, 'a', 'c', 'b'))
-                    .useAsSequence(s -> s
+                    .useAsSequence(sequence -> sequence
                             .onEach(It::println)
                             .toList());
 

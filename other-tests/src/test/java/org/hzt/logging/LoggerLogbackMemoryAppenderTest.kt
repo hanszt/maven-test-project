@@ -7,20 +7,21 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 
-internal class LoggerMemoryAppenderTest {
+internal class LoggerLogbackMemoryAppenderTest {
 
     @Test
-    fun whenTestingOnlyLogging_ThenAMemoryAppenderShouldCatchThem() {
+    fun `when testing only logging, then a memory appender should should be used to log the message`() {
         val msg = "This is the test message"
         val loggerName = BusinessWorker::class.java.name
 
-        val memoryAppender = MemoryAppender()
-        memoryAppender.context = LoggerFactory.getILoggerFactory() as Context
-        (LoggerFactory.getLogger(loggerName) as Logger).apply {
-            level = Level.DEBUG
-            addAppender(memoryAppender)
+        val memoryAppender = MemoryAppender().apply appender@{
+            context = LoggerFactory.getILoggerFactory() as Context
+            (LoggerFactory.getLogger(loggerName) as Logger).apply {
+                level = Level.DEBUG
+                addAppender(this@appender)
+            }
+            start()
         }
-        memoryAppender.start()
         BusinessWorker.generateLogs(msg)
 
         println(memoryAppender.loggedEvents)
