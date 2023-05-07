@@ -344,7 +344,7 @@ class SequenceTest {
     }
 
     @Test
-    void testDistinctBy2() {
+    void testDistinctByLength() {
         final var list = List.of("This", "test", "is", "a", "test", "for", "distinct", "by");
 
         final var words = Sequence.of(list)
@@ -645,7 +645,7 @@ class SequenceTest {
         assertEquals(23, noneWholeHourZoneOffsetSummaries.count());
     }
 
-    private boolean nonWholeHourOffsets(final Instant instant, final ZoneId id) {
+    private static boolean nonWholeHourOffsets(final Instant instant, final ZoneId id) {
         return instant.atZone(id).getOffset().getTotalSeconds() % 3600 != 0;
     }
 
