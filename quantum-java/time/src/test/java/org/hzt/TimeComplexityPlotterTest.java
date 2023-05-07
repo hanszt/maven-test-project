@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TimeComplexityPlotterTest {
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "when applying {0} to shor and the classic function, shor's result should be smaller")
     @ValueSource(doubles = {50 * Math.E, 90 * Math.E, 10 * Math.PI, 8, 200})
     void testShorIsFasterThanClassical(double value) {
         final var classicTime = TimeComplexityPlotter.classic.applyAsDouble(value);

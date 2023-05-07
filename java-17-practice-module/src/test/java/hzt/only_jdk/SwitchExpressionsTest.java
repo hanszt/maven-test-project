@@ -7,11 +7,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SwitchExpressionsTest {
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "The date created by the switch should be after LocalDate.EPOCH minus one day")
     @ValueSource(strings = {"a", "w", "epoch", "print", "w", "hallo"})
     void testSwitchExpression(String string) {
         LocalDate localDate = switch (string) {
@@ -30,31 +31,31 @@ class SwitchExpressionsTest {
         return LocalDate.of(2000,1,1);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0} should be a zipcode from Utrecht")
     @ValueSource(strings = {"3445", "3764", "3543","3245", "5674"})
     void utrechtZipCodesTest(String zipCode) {
         assertEquals("Utrecht", provinceNameByZipCode(zipCode));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0} should be a zipcode from Zuid-Holland")
     @ValueSource(strings = {"2311", "2313", "2314"})
     void zuidHollandZipCodesTest(String zipCode) {
         assertEquals("Zuid-Holland", provinceNameByZipCode(zipCode));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0} should be a zipcode from Noord-Holland")
     @ValueSource(strings = {"2344", "1234", "3452"})
     void noordHollandZipCodesTest(String zipCode) {
         assertEquals("Noord-Holland", provinceNameByZipCode(zipCode));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0} should be a zipcode from Zeeland")
     @ValueSource(strings = {"4331", "4333", "4334"})
     void zeelandZipCodesTest(String zipCode) {
         assertEquals("Zeeland", provinceNameByZipCode(zipCode));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0} should be an invalid zipcode")
     @ValueSource(strings = {"453gw", "245gw", "sdffs", "sdfssf", "sdfs", "2312"})
     void throwIllegalStateExceptionWhenUnknownZipCode(String zipCode) {
         Assertions.assertThrows(IllegalStateException.class, () -> provinceNameByZipCode(zipCode));

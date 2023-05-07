@@ -168,8 +168,8 @@ class PathTests {
         return Files.createSymbolicLink(link, target);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"src/test/java/hzt/EnumTests.java", "README.md"})
+    @ParameterizedTest(name = "`{0}` should be implicitly converted to a path that exists in the project")
+    @ValueSource(strings = {"src/test/java/hzt/EnumTests.java", "README.md", "src/../README.md"})
     void testImplicitConversionToPath_pathsExist(Path path) {
         assertTrue(path.toFile().exists());
     }

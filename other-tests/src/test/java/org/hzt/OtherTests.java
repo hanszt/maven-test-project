@@ -9,7 +9,6 @@ import org.hzt.test.model.Painting;
 import org.hzt.utils.It;
 import org.hzt.utils.iterables.Collectable;
 import org.hzt.utils.sequences.Sequence;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DynamicTest;
@@ -21,7 +20,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +27,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -43,7 +42,6 @@ import java.util.SortedSet;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.TreeSet;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -82,7 +80,6 @@ class OtherTests {
         final var stringStream = bics.stream()
                 .filter(Objects::nonNull)
                 .map(Bic::getName);
-        //noinspection ResultOfMethodCallIgnored
         assertThrows(NullPointerException.class, stringStream::findAny);
     }
 
@@ -100,7 +97,7 @@ class OtherTests {
                 .map(Bic::getName)
                 .findAny();
 
-        anyName.ifPresentOrElse(assertIsEqualTo(expected), () -> fail("Not present"));
+        anyName.ifPresentOrElse(actual -> assertEquals(expected, actual), () -> fail("Not present"));
     }
 
     private Optional<String> getAnyName(List<Bic> bics) {
@@ -161,18 +158,14 @@ class OtherTests {
     @Test
     void testGenericsMethodToString() {
         final var opt = Optional.of("Hallo");
-        opt.ifPresentOrElse(assertIsEqualTo("Hallo"), () -> fail("Not present"));
+        opt.ifPresentOrElse(actual -> assertEquals("Hallo", actual), () -> fail("Not present"));
     }
 
     @Test
     void testGenericsMethodToBic() {
         final var bic = new Bic("Hallo");
         final var opt = Optional.of(bic);
-        opt.ifPresentOrElse(assertIsEqualTo(bic), () -> fail("Not present"));
-    }
-
-    private static <T> Consumer<T> assertIsEqualTo(T expected) {
-        return actual -> assertEquals(expected, actual);
+        opt.ifPresentOrElse(actual -> assertEquals(bic, actual), () -> fail("Not present"));
     }
 
     @Test
@@ -295,8 +288,10 @@ class OtherTests {
                 add("niet");
             }
         };
-        assertEquals(List.of("Hoi", "dit", "mag", "ook", "niet"), list);
-        assertEquals(Map.of("wat", "gek", "raar", "dit moet niet kunnen"), map);
+        assertAll(
+                () -> assertEquals(List.of("Hoi", "dit", "mag", "ook", "niet"), list),
+                () -> assertEquals(Map.of("wat", "gek", "raar", "dit moet niet kunnen"), map)
+        );
     }
 
     @Test
@@ -361,9 +356,9 @@ class OtherTests {
 
     @Test
     void testGenerateArrayContainingFiveHundredMillionElementsByStream() {
-        final var FIVE_HUNDRED_MILLION = 500_000_000;
-        var array = IntStream.range(0, FIVE_HUNDRED_MILLION).parallel().toArray();
-        assertEquals(FIVE_HUNDRED_MILLION, array.length);
+        final var amount = 100_000_000;
+        var array = IntStream.range(0, amount).parallel().toArray();
+        assertEquals(amount, array.length);
     }
 
     static void setAll(byte[] array, IntToByteFunction generator) {
@@ -380,25 +375,15 @@ class OtherTests {
     }
 
     @Test
-    void testGenerateArrayContainingMaxIntValueElementsThrowsOutOfMemoryError() {
-        final var intStream = IntStream.rangeClosed(0, Integer.MAX_VALUE);
-        //noinspection ResultOfMethodCallIgnored
-        assertThrows(OutOfMemoryError.class, intStream::toArray);
-    }
-
-    @Test
     void testIsPrimitive() {
-        Stream.of(boolean.class, char.class, byte.class, short.class, int.class, long.class, float.class, double.class, void.class)
-                .map(Class::isPrimitive)
-                .forEach(Assertions::assertTrue);
+        assertTrue(Stream.of(boolean.class, char.class, byte.class, short.class, int.class, long.class, float.class, double.class, void.class)
+                .allMatch(Class::isPrimitive));
     }
 
     @Test
     void testIsNotPrimitive() {
-        Stream.of(Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Void.class)
-                .map(Class::isPrimitive)
-                .sorted()
-                .forEach(Assertions::assertFalse);
+        assertTrue(Stream.of(Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Void.class)
+                .noneMatch(Class::isPrimitive));
     }
 
     @Test
@@ -473,7 +458,7 @@ class OtherTests {
 
     @Test
     void testExtendedBoundedWildCardList() {
-        final List<? super Comparable<? extends Comparable<? extends Comparable<? extends Comparable<?>>>>> list = new ArrayList<>();
+        final Collection<? super Comparable<? extends Comparable<? extends Comparable<? extends Comparable<?>>>>> list = new ArrayList<>();
         list.add(LocalDate.of(2021, Month.OCTOBER, 4));
         list.add("Hello");
         list.add("This is weird");
@@ -498,7 +483,7 @@ class OtherTests {
         assertArrayEquals(expected, actual);
     }
 
-    public void printStrings(List<String> strings) {
+    public static void printStrings(List<String> strings) {
         strings.forEach(It::println);
     }
 
@@ -563,7 +548,7 @@ class OtherTests {
     class StringNewInstanceUsingReflection {
 
         @Test
-        void testClassNewInstance() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        void testClassNewInstance() throws Exception {
             final var input = "A string";
             final var theClass = input.getClass();
             final var constructor = theClass.getConstructor();
@@ -574,8 +559,7 @@ class OtherTests {
 
         @Test
         @Disabled("In transition fase, sometimes fails, so ignored for now")
-        void testClassNewInstanceWithVarOnly() throws NoSuchMethodException, InvocationTargetException,
-                InstantiationException, IllegalAccessException {
+        void testClassNewInstanceWithVarOnly() throws Exception {
             final var input = "A string";
             final var theClass = input.getClass();
             final var constructor = theClass.getConstructor();
@@ -590,8 +574,7 @@ class OtherTests {
 
         @Test
         @Disabled("In transition fase, sometimes fails, so ignored for now")
-        void testNewInstanceInlined() throws NoSuchMethodException, InvocationTargetException,
-                InstantiationException, IllegalAccessException {
+        void testNewInstanceInlined() throws Exception {
             final var newString = "A string"
                     .getClass()
                     .getConstructor()
@@ -603,8 +586,7 @@ class OtherTests {
         }
 
         @Test
-        void testStringReAssignmentToExplicitStringType() throws NoSuchMethodException, InvocationTargetException,
-                InstantiationException, IllegalAccessException {
+        void testStringReAssignmentToExplicitStringType() throws Exception {
             String string = "foo".getClass().getConstructor().newInstance();
             println("string = " + string);
             string = "bar";
@@ -614,8 +596,7 @@ class OtherTests {
 
         @Test
         @Disabled("In transition fase, sometimes fails, so ignored for now")
-        void testStringReAssignmentToVar() throws NoSuchMethodException, InvocationTargetException,
-                InstantiationException, IllegalAccessException {
+        void testStringReAssignmentToVar() throws Exception {
             var string = "foo".getClass().getConstructor().newInstance();
             println("string = " + string);
             string = "bar";

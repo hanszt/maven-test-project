@@ -18,19 +18,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleUnaryOperator;
 
+/**
+ * A tiny java fx app to show the difference in time complexity for computing the prime factorizations of a number using shor's algorithm versus using a classic algorithm
+ */
 public class TimeComplexityPlotter extends Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeComplexityPlotter.class);
 
-    static final DoubleUnaryOperator classic = x -> Math.exp(Math.pow(64. / 9. * x * Math.log(x) * Math.log(x), 1. / 3));
-    static final DoubleUnaryOperator shor = x -> Math.pow(x, 3.);
+    static final DoubleUnaryOperator classic = x -> Math.exp(Math.pow(64.0 / 9.0 * x * Math.log(x) * Math.log(x), 1.0 / 3));
+    static final DoubleUnaryOperator shor = x -> Math.pow(x, 3.0);
 
     @Override
     public void start(Stage stage) {
         LOGGER.info("Starting graph to show time difference for factorization between the classical algorithm and Shor's algorithm...");
 
         final var functions = List.of(classic, shor);
-        final var chart = plotFunctions(functions, 0.000001, 20);
+        final var chart = plotFunctions(functions, 0.000001, 25);
         final var scene = new Scene(chart, 640, 480);
 
         final var style = "/style.css";
@@ -44,8 +47,8 @@ public class TimeComplexityPlotter extends Application {
 
     public static Chart plotFunctions(List<DoubleUnaryOperator> functions, double xStart, double xEnd) {
         final int div = 500;
-        final double step = 1. / div * (xEnd - xStart);
-        final Axis<Number> xAxis = new NumberAxis(xStart, xEnd, .1 * (xEnd - xStart));
+        final double step = 1.0 / div * (xEnd - xStart);
+        final Axis<Number> xAxis = new NumberAxis(xStart, xEnd, 0.1 * (xEnd - xStart));
         final Axis<Number> yAxis = new NumberAxis();
         final ObservableList<XYChart.Series<Number, Number>> series = FXCollections.observableArrayList();
         final var chart = new LineChart<>(xAxis, yAxis, series);

@@ -135,7 +135,7 @@ class Java8PlusDateTimeApiTests {
      * @param localDate the date to test if it is a leap year
      * @see <a href="https://www.baeldung.com/parameterized-tests-junit-5">Implicit Conversion</a>
      */
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0} should not be a leap year")
     @ValueSource(strings = {"2022-10-03", "1983-01-03", "1989-10-18", "1994-10-20"})
     void testParameterImplicitlyParsedToLocalDate(LocalDate localDate) {
         assertFalse(localDate.isLeapYear());

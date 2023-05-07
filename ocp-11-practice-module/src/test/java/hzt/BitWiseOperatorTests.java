@@ -148,25 +148,25 @@ class BitWiseOperatorTests {
     @TestFactory
     Stream<DynamicTest> testLeftBitWiseOperatorSameAsMultiplyingByTwo() {
         return IntStream.range(0, 100)
-                .mapToObj(i -> DynamicTest.dynamicTest(String.format("%d multiplied by 2 same as left bitshift of %d to 1", i, i),
+                .mapToObj(i -> DynamicTest.dynamicTest(String.format("%d multiplied by 2 should be the same as a left bitshift of %d by 1", i, i),
                         () -> assertEquals(i << 1, i * 2)));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0} << 2 should be the same as {0} * 4")
     @ValueSource(ints = {1, 4, 5, 6, 3, 7, 6, 8, 4, 89, 3, 563})
-    void testMultiplyByFourUsingBitShift(int value) {
+    void testMultiplyByFourUsingBitShiftLeft(int value) {
         assertEquals(value * 4, value << 2);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0} / 4 should be the same as {0} >> 4")
     @ValueSource(ints = {1, 4, 5, 6, 3, 7, 6, 8, 4, 89, 3, 563})
-    void testDividingByFourUsingBitShift(int value) {
+    void testDividingByFourUsingBitShiftRight(int value) {
         assertEquals(value / 4, value >> 2);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0} should be an odd number")
     @ValueSource(ints = {1, 4, 5, 6, 3, 7, 6, 8, 4, 89, 3, 563})
     void testCheckOddNumber(int value) {
-        assertEquals(value % 2 == 1, (value & 1) == 1);
+        assertEquals(value % 2 != 0, (value & 1) == 1);
     }
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -17,6 +18,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,10 +31,10 @@ class FilesTests {
 
         final var maxSearchDepth = Integer.MAX_VALUE;
         try (var fileContent = Files
-                .find(Path.of("iotests\\pathtest"), maxSearchDepth, this::isRegularFileEndingWithTestTxt)) {
+                .find(Path.of("iotests\\pathtest"), maxSearchDepth, FilesTests::isRegularFileEndingWithTestTxt)) {
 
             final var result = fileContent
-                    .map(this::readContentAsString)
+                    .map(FilesTests::readContentAsString)
                     .findFirst()
                     .orElseThrow();
 
@@ -50,7 +52,7 @@ class FilesTests {
         assertEquals(54, lineCount);
     }
 
-    private String readContentAsString(Path path) {
+    private static String readContentAsString(Path path) {
         try {
             return Files.readString(path);
         } catch (IOException e) {
@@ -58,7 +60,7 @@ class FilesTests {
         }
     }
 
-    private boolean isRegularFileEndingWithTestTxt(Path path, BasicFileAttributes attributes) {
+    private static boolean isRegularFileEndingWithTestTxt(Path path, BasicFileAttributes attributes) {
         return path.endsWith("test.txt") && attributes.isRegularFile();
     }
 
@@ -77,7 +79,7 @@ class FilesTests {
         final var lastModifiedTime = Files.getLastModifiedTime(Path.of("./pom.xml"));
 
         final var dateTime = lastModifiedTime.toInstant()
-                .atZone(ZoneId.systemDefault())
+                .atZone(ZoneId.of("Europe/Amsterdam"))
                 .toLocalDateTime();
 
         System.out.println(dateTime);
@@ -90,22 +92,7 @@ class FilesTests {
         final List<Path> regularFiles = new ArrayList<>();
         final List<Path> directories = new ArrayList<>();
         final var start = Path.of("./src");
-        final var path = Files.walkFileTree(start, new SimpleFileVisitor<>() {
-
-            @Override
-            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
-                if (attrs.isRegularFile()) {
-                    regularFiles.add(path);
-                }
-                return CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
-                directories.add(dir);
-                return CONTINUE;
-            }
-        });
+        final var path = Files.walkFileTree(start, new ConsumingFileVisitor(regularFiles::add, directories::add));
 
         System.out.println("path.toAbsolutePath() = " + path.toAbsolutePath());
         System.out.println("regular files size = " + regularFiles.size());
@@ -179,7 +166,7 @@ class FilesTests {
         var source = Paths.get("iotests\\test1.txt");
         var targetDir = source.resolveSibling("text2.txt");
 
-        try (var bw = new BufferedWriter(new FileWriter(targetDir.toFile()))) {
+        try (var bw = new BufferedWriter(new FileWriter(targetDir.toFile(), StandardCharsets.UTF_8))) {
             bw.write("hello");
         }
 
@@ -192,4 +179,28 @@ class FilesTests {
         );
     }
 
+    private static final class ConsumingFileVisitor extends SimpleFileVisitor<Path> {
+
+        private final Consumer<Path> regularFileConsumer;
+        private final Consumer<Path> directoryConsumer;
+
+        private ConsumingFileVisitor(Consumer<Path> regularFileConsumer, Consumer<Path> directoryConsumer) {
+            this.regularFileConsumer = regularFileConsumer;
+            this.directoryConsumer = directoryConsumer;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+            if (attrs.isRegularFile()) {
+                regularFileConsumer.accept(path);
+            }
+            return CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+            directoryConsumer.accept(dir);
+            return CONTINUE;
+        }
+    }
 }

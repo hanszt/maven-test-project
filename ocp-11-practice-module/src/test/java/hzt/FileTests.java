@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -47,14 +48,14 @@ class FileTests {
         OsAssumptions.assumeIsWindowsOs();
 
         final var java = Stream.iterate(new File(getProperty("user.dir")), Objects::nonNull, File::getParentFile)
-                .filter(file -> file.getName().toLowerCase().contains("java"))
+                .filter(file -> file.getName().toLowerCase(Locale.ROOT).contains("java"))
                 .findFirst()
                 .orElseThrow();
 
         assertEquals("C:\\_Programming\\Java", java.getAbsolutePath());
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "The string `{0}` should be implicitly converted to a file object")
     @ValueSource(strings = {"file1", "file2"})
     void testImplicitConversionToFile(File file) {
         assertFalse(file.exists());

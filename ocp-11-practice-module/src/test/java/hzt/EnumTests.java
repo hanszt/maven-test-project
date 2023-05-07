@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class EnumTests {
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "APRIL should be the first month of the quarter also containing {0}")
     @ValueSource(strings = {"APRIL", "MAY", "JUNE"})
     void testEnumNameImplicitConversionToEnum(Month month) {
         assertSame(Month.APRIL, month.firstMonthOfQuarter());

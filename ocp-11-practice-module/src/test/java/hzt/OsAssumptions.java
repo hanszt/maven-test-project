@@ -4,6 +4,9 @@ import java.util.Locale;
 
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+/**
+ * A class to make assumptions about the operating system that is being worked with
+ */
 public final class OsAssumptions {
 
     private OsAssumptions() {
