@@ -44,6 +44,8 @@ class FileTests {
 
     @Test
     void testCreateParentStream() {
+        OsAssumptions.assumeIsWindowsOs();
+
         final var java = Stream.iterate(new File(getProperty("user.dir")), Objects::nonNull, File::getParentFile)
                 .filter(file -> file.getName().toLowerCase().contains("java"))
                 .findFirst()

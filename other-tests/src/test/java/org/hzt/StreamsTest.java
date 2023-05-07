@@ -230,8 +230,10 @@ class StreamsTest {
         println("Parallel in milliseconds = " + parallelTimeInMillis);
         println("parallelTimer.getResult() = " + parallelTimer.getResult());
         //assert
-        assertTrue(parallelTimeInMillis < seqTimeInMillis);
-        assertEquals(parallelTimer.getResult(), sequentialTimer.getResult());
+        assertAll(
+                () -> assertTrue(parallelTimeInMillis < seqTimeInMillis),
+                () -> assertEquals(parallelTimer.getResult(), sequentialTimer.getResult())
+        );
     }
 
     @Nested
@@ -983,7 +985,6 @@ class StreamsTest {
             final BiFunction<StringBuilder, String, StringBuilder> accumulator = StringBuilder::append;
             final BinaryOperator<StringBuilder> combiner = StringBuilder::append;
 
-            //noinspection ResultOfMethodCallIgnored
             assertAll(
                     () -> assertThrows(IndexOutOfBoundsException.class, () -> parallelStream.reduce(identity, accumulator, combiner)),
                     () -> assertEquals(190, reduce.length())

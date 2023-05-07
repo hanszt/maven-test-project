@@ -5,18 +5,18 @@ import java.time.LocalDate;
 public sealed class Animal permits Cat, Dog {
 
     private final String name;
-    private final LocalDate dateOdBirth;
+    private final LocalDate dateOfBirth;
 
-    Animal(String name, LocalDate dateOdBirth) {
+    Animal(String name, LocalDate dateOfBirth) {
         this.name = name;
-        this.dateOdBirth = dateOdBirth;
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getName() {
         return name;
     }
 
-    public LocalDate getDateOdBirth() {
-        return dateOdBirth;
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
     }
 }

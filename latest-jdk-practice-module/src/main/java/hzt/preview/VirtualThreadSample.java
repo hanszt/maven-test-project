@@ -41,7 +41,7 @@ public class VirtualThreadSample {
                 counts[index] = counts[index] + 1;
                 TimeUnit.NANOSECONDS.sleep(1);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                Thread.currentThread().interrupt();
             }
         }
     }

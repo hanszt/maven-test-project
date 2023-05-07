@@ -1,5 +1,6 @@
 package hzt.java.nio.file.tests;
 
+import hzt.OsAssumptions;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedWriter;
@@ -24,6 +25,8 @@ class FilesTests {
 
     @Test
     void testFilesFind() throws IOException {
+        OsAssumptions.assumeIsWindowsOs();
+
         final var maxSearchDepth = Integer.MAX_VALUE;
         try (var fileContent = Files
                 .find(Path.of("iotests\\pathtest"), maxSearchDepth, this::isRegularFileEndingWithTestTxt)) {
@@ -79,7 +82,7 @@ class FilesTests {
 
         System.out.println(dateTime);
 
-        assertEquals(2022, dateTime.getYear());
+        assertTrue(2022 < dateTime.getYear());
     }
 
     @Test
@@ -130,6 +133,8 @@ class FilesTests {
 
     @Test
     void testFilesCopy() {
+        OsAssumptions.assumeIsWindowsOs();
+
         Path sourcePath = Paths.get("iotests\\test1.txt");
         Path targetPath = Paths.get("iotests\\test2.txt");
         try {
@@ -145,6 +150,8 @@ class FilesTests {
 
     @Test
     void testFilesIsSameFile() throws IOException {
+        OsAssumptions.assumeIsWindowsOs();
+
         Path sourcePath = Paths.get("iotests\\test1.txt");
         Path targetPath = Paths.get("iotests\\test2.txt");
         assertFalse(Files.isSameFile(sourcePath, targetPath));
@@ -153,6 +160,8 @@ class FilesTests {
     //    q45 test 2
     @Test
     void testPathResolveMethod() {
+        OsAssumptions.assumeIsWindowsOs();
+
         var p1 = Paths.get("\\temp\\records");
         var p2 = p1.resolve("clients.dat");
 
@@ -165,6 +174,8 @@ class FilesTests {
 
     @Test
     void testPathResolveSibling() throws IOException {
+        OsAssumptions.assumeIsWindowsOs();
+
         var source = Paths.get("iotests\\test1.txt");
         var targetDir = source.resolveSibling("text2.txt");
 

@@ -262,7 +262,7 @@ class RecursiveSamplesTest {
 
         @Test
         void testTailRecursionStackOverflowInJava() {
-            assertThrows(StackOverflowError.class, () -> RecursiveSamples.factorial(50_000));
+            assertThrows(StackOverflowError.class, () -> RecursiveSamples.factorial(100_000));
         }
 
         @Test

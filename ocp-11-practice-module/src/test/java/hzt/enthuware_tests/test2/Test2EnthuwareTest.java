@@ -1,5 +1,6 @@
 package hzt.enthuware_tests.test2;
 
+import hzt.OsAssumptions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -126,6 +127,8 @@ class Test2EnthuwareTest {
 //    4. paths do not start or end with \.
     @Test
     void testSubPath() {
+        OsAssumptions.assumeIsWindowsOs();
+
         Path p1 = Paths.get("C:\\Temp\\pathtest\\someFolder\\otherFolder\\test.txt");
         final var subPath = p1.subpath(0, 2);
         assertEquals(Path.of("Temp\\pathtest"), subPath);
