@@ -1,6 +1,7 @@
 package hzt;
 
 import org.hzt.utils.It;
+import org.hzt.utils.PreConditions;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -11,13 +12,11 @@ import static org.hzt.utils.It.println;
 
 public final class TowerOfHanoi {
 
-    private static final int MAX_NUMBER_OF_DISKS_IN_GAME = 10;
-    private static final String PARAMETERS_SHOULD_BE_PASSED_IN_CORRECT_ORDER = "java:S2234";
-
     private TowerOfHanoi() {
     }
 
     public static void main(final String[] args) {
+        final int MAX_NUMBER_OF_DISKS_IN_GAME = 10;
         for (int numberOfDisks = 1; numberOfDisks <= MAX_NUMBER_OF_DISKS_IN_GAME; numberOfDisks++) {
             printf("%nFor a game with %d disks:%n", numberOfDisks);
             final var moves = playTowerOfHanoiGame(numberOfDisks);
@@ -36,6 +35,7 @@ public final class TowerOfHanoi {
      *    --|--    |      |                  |      |    --|--
      *   ---|---   |      |                  |      |   ---|---
      *
+     * @see <a href="https://www.youtube.com/watch?v=8lhxIOAfDss">Recursion 'Super Power'</a>
      * @param numberOfDisks the nr Of disks to move from rod a to rod c
      * @return the queue with the moves to take to set the disks in the target position
      */
@@ -46,18 +46,17 @@ public final class TowerOfHanoi {
         return List.copyOf(moves);
     }
 
-    @SuppressWarnings({PARAMETERS_SHOULD_BE_PASSED_IN_CORRECT_ORDER})
-    private static void moveDisk(final int diskNumber,
-                                 final char fromRod,
-                                 final char targetRod,
-                                 final char auxRod,
+    private static void moveDisk(final int n,
+                                 final char from,
+                                 final char to,
+                                 final char aux,
                                  final List<String> moves) {
-        if (diskNumber == 1) {
-            moves.add(String.format("Move disk %2d from rod %c to rod %c", diskNumber, fromRod, targetRod));
+        PreConditions.require(n >= 0, () -> "The nr of disks (n) can not be negative (n = " + n  + ")");
+        if (n == 0) {
             return;
         }
-        moveDisk(diskNumber - 1, fromRod, auxRod, targetRod, moves);
-        moves.add(String.format("Move disk %2d from rod %c to rod %c", diskNumber, fromRod, targetRod));
-        moveDisk(diskNumber - 1, auxRod, targetRod, fromRod, moves);
+        moveDisk(n - 1, from, aux, to, moves);
+        moves.add("Move disk %2d from rod %c to rod %c".formatted(n, from, to));
+        moveDisk(n - 1, aux, to, from, moves);
     }
 }

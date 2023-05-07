@@ -9,6 +9,7 @@ import org.hzt.utils.It;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -27,16 +28,24 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.math.BigInteger.*;
-import static java.util.Spliterator.*;
+import static java.util.Spliterator.IMMUTABLE;
+import static java.util.Spliterator.ORDERED;
 import static java.util.function.Predicate.not;
-import static org.hzt.utils.It.*;
+import static org.hzt.utils.It.printf;
+import static org.hzt.utils.It.println;
 
 public final class Streams {
 
     private Streams() {
     }
 
-    public static Stream<Integer> streamFromIterator(Iterator<Integer> iterator) {
+    public static <T> Stream<T> stream(Iterable<T> iterable) {
+        return iterable instanceof Collection<T> collection ?
+                collection.stream() :
+                StreamSupport.stream(iterable::spliterator, 0, false);
+    }
+
+    public static <T> Stream<T> streamFromIterator(Iterator<T> iterator) {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator, 0), false);
     }
 
@@ -218,7 +227,7 @@ public final class Streams {
                 throw new NoSuchElementException("No next line found");
             }
         };
-        return StreamSupport.stream(() -> Spliterators.spliteratorUnknownSize(iterator, ORDERED), ORDERED, false);
+        return stream(() -> iterator);
     }
 
     public static void main(String... args) {

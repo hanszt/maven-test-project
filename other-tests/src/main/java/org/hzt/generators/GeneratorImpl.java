@@ -1,4 +1,4 @@
-package hzt.preview.generators;
+package org.hzt.generators;
 
 import java.util.ArrayList;
 import java.util.Iterator;

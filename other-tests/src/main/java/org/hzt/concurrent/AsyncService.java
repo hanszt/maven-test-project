@@ -1,11 +1,11 @@
 package org.hzt.concurrent;
 
+import org.hzt.utils.TimingUtils;
+
 import java.time.Duration;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static org.hzt.TimingUtils.sleep;
 
 public class AsyncService {
     private static final int DELAY = 100;
@@ -25,7 +25,7 @@ public class AsyncService {
 
     void initialize() {
         executor.execute(() -> {
-            sleep(Duration.ofMillis(INIT_DELAY));
+            TimingUtils.sleep(Duration.ofMillis(INIT_DELAY));
             initialized = true;
         });
     }
@@ -41,7 +41,7 @@ public class AsyncService {
     void addValue(long val, Duration delay) {
         throwIfNotInitialized();
         executor.execute(() -> {
-            sleep(delay);
+            TimingUtils.sleep(delay);
             value.addAndGet(val);
         });
     }

@@ -15,6 +15,7 @@ import java.text.DecimalFormat;
 import java.util.stream.LongStream;
 
 import static demo.It.println;
+import static java.math.BigInteger.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
@@ -30,7 +31,7 @@ class CustomSequenceTest {
     class FibonacciAndGoldenRatioTests {
 
         private static final Sequence<BigInteger> fibonacciSequence = Sequence
-                .iterate(new Pair(BigInteger.ZERO, BigInteger.ONE), Pair::next)
+                .iterate(new Pair(ZERO, ONE), Pair::next)
                 .map(Pair::first);
 
         private record Pair(BigInteger first, BigInteger second) {
@@ -49,7 +50,7 @@ class CustomSequenceTest {
         @TestFactory
         Sequence<DynamicTest> testConsecutiveFibNrRatiosConvergeToGoldenRatio() {
             return fibonacciSequence
-                    .skip(1) // skip first element to avoid division by zero
+                    .filterNot(ZERO::equals)
                     .onEach(It::println)
                     .map(BigDecimal::new)
                     .zipWithNext((cur, next) -> next.divide(cur, PRECISION, RoundingMode.HALF_UP))
@@ -76,7 +77,7 @@ class CustomSequenceTest {
     class TribonacciAndRauzyRatioTests {
 
         private static final Sequence<BigInteger> tribonacciSequence = Sequence
-                .iterate(new Triple(BigInteger.ZERO, BigInteger.ONE, BigInteger.ONE), Triple::next)
+                .iterate(new Triple(ZERO, ONE, ONE), Triple::next)
                 .map(Triple::first);
 
         private record Triple(BigInteger first, BigInteger second, BigInteger third) {
@@ -148,7 +149,7 @@ class CustomSequenceTest {
         private static BigInteger factorial(long n) {
             return LongStream.rangeClosed(2, n)
                     .mapToObj(BigInteger::valueOf)
-                    .reduce(BigInteger.ONE, BigInteger::multiply);
+                    .reduce(ONE, BigInteger::multiply);
         }
 
         @Test

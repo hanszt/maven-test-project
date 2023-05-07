@@ -13,8 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class LocaleTests {
 
@@ -39,8 +38,10 @@ class LocaleTests {
         calendar.set(2021, Calendar.FEBRUARY, 26);
         Date date = calendar.getTime();
 
-        assertEquals("US", Locale.getDefault().getCountry());
-        assertEquals("Feb 26, 2021", DateFormat.getDateInstance().format(date));
+        assertAll(
+                () -> assertEquals("US", Locale.getDefault().getCountry()),
+                () -> assertEquals("Feb 26, 2021", DateFormat.getDateInstance().format(date))
+        );
     }
 
     @Test

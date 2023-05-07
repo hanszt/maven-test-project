@@ -1,5 +1,7 @@
 package org.hzt;
 
+import org.hzt.utils.Timer;
+
 import java.util.Arrays;
 import java.util.stream.IntStream;
 

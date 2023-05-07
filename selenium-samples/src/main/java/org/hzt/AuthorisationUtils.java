@@ -1,7 +1,6 @@
 package org.hzt;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.devtools.DevTools;
 import org.openqa.selenium.devtools.HasDevTools;
 import org.openqa.selenium.devtools.v107.network.Network;
 import org.openqa.selenium.devtools.v107.network.model.Headers;
@@ -21,7 +20,7 @@ public final class AuthorisationUtils {
     @SuppressWarnings("SameParameterValue")
     public void sendCredentialsUsingDevTools(String username, String password) {
         if (driver instanceof HasDevTools hasDevTools) {
-            final DevTools devTools = hasDevTools.getDevTools();
+            final var devTools = hasDevTools.getDevTools();
             devTools.createSession();
 
             final var maxTotalBufferSize = Optional.of(100_000);

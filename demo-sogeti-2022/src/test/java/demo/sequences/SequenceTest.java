@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -42,13 +43,14 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static demo.It.printf;
 import static demo.It.println;
 import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayNameGeneration(ReplaceCamelCaseBySentence.class)
 class SequenceTest {
+
+    private static final ZoneId AMSTERDAM_ZONE_ID = ZoneId.of("Europe/Amsterdam");
 
     @Test
     void testFlatMap() {
@@ -359,7 +361,7 @@ class SequenceTest {
 
     @Test
     void testSequenceWithConstrainOnceMethodCanOnlyBeUsedOnce() {
-        Sequence<List<Integer>> windowedSequence = Sequence.of(Arrays.asList(1, 2, 3, 4, 5, 3, -1, 6, 12))
+        Sequence<List<Integer>> windowedSequence = Sequence.of(1, 2, 3, 4, 5, 3, -1, 6, 12)
                 .onEach(It::println)
                 .filter(i -> i % 2 == 0)
                 .windowed(2)
@@ -631,11 +633,12 @@ class SequenceTest {
 
     @Test
     void testSequenceOfZoneIds() {
-        final var now = Instant.now();
-        final var current = now.atZone(ZoneId.systemDefault());
-        printf("Current time is %s%n%n", current);
 
-        final var noneWholeHourZoneOffsetSummaries = getTimeZoneSummaries(now, id -> nonWholeHourOffsets(now, id));
+        final var instant = LocalDateTime.parse("2023-10-04T20:00:00")
+                .atZone(AMSTERDAM_ZONE_ID)
+                .toInstant();
+
+        final var noneWholeHourZoneOffsetSummaries = getTimeZoneSummaries(instant, id -> nonWholeHourOffsets(instant, id));
 
         noneWholeHourZoneOffsetSummaries.forEach(It::println);
 
@@ -648,11 +651,11 @@ class SequenceTest {
 
     @Test
     void testTimeZonesAntarctica() {
-        final var now = Instant.now();
-        final var current = now.atZone(ZoneId.systemDefault());
-        printf("Current time is %s%n%n", current);
+        final var instant = LocalDateTime.parse("2022-04-03T12:23:43")
+                .atZone(AMSTERDAM_ZONE_ID)
+                .toInstant();
 
-        final var timeZonesAntarctica = getTimeZoneSummaries(now, id -> id.getId().contains("Antarctica"));
+        final var timeZonesAntarctica = getTimeZoneSummaries(instant, id -> id.getId().contains("Antarctica"));
 
         timeZonesAntarctica.forEach(It::println);
 
@@ -771,14 +774,14 @@ class SequenceTest {
 
         @Test
         void testFlattenStreamIteratorEnumerationAndIterable() {
-            final var iterableLike = List.of(
+            final var iterableLikeList = List.of(
                     Stream.of("hallo"),
                     List.of("this", "is"),
                     Set.of("a").iterator(),
                     List.of("more", "stuf").spliterator(),
                     new StringTokenizer("Test"));
 
-            final var list = Sequence.of(iterableLike)
+            final var list = Sequence.of(iterableLikeList)
                     .<String>flatten()
                     .toList();
 
@@ -810,7 +813,7 @@ class SequenceTest {
                 return () -> new FlatteningIterator<>(iterator(), this::toIteratorOrThrow);
             }
 
-            private <R> Iterator<R> toIteratorOrThrow(Object item) {
+            private <R> Iterator<R> toIteratorOrThrow(T item) {
                 final Iterator<?> iterator;
                 if (item instanceof Iterable<?> iterable) {
                     iterator = iterable.iterator();

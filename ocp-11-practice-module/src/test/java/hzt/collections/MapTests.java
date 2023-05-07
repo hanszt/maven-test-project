@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -72,9 +71,7 @@ class MapTests {
     }
 
     private boolean addToGradesIfPresent(Map<String, List<Double>> groupedValues, double grade, String key) {
-        final var newGrades = groupedValues.computeIfPresent(key,
-                (name, value) -> new ArrayList<>(List.of(grade)));
-        return Optional.ofNullable(newGrades).isPresent();
+        return groupedValues.computeIfPresent(key, (name, _list) -> new ArrayList<>(List.of(grade))) != null;
     }
 
     private List<Double> addPersonAndGrade(Map<String, List<Double>> groupedValues, double grade, String key) {
@@ -125,16 +122,19 @@ class MapTests {
         for (int i = 1; i <= 100; i++) {
             map.put(System.nanoTime(), new Student(i, "Person " + i, 6.5 + (1.2 * RANDOM.nextGaussian())));
         }
-        map.entrySet().forEach(System.out::println);
+        final var entries = map.entrySet();
+        entries.forEach(System.out::println);
 
-        final var firstEntry = map.entrySet().iterator().next();
-        final var lastEntry = last(map.entrySet());
+        final var firstEntry = entries.iterator().next();
+        final var lastEntry = entries.stream()
+                .reduce((acc, e) -> e)
+                .orElseThrow();
 
-        final var minimumTimestamp = map.entrySet().stream()
+        final var minimumTimestamp = entries.stream()
                 .min(Map.Entry.comparingByKey())
                 .orElseThrow();
 
-        final var maxTimestamp = map.entrySet().stream()
+        final var maxTimestamp = entries.stream()
                 .max(Map.Entry.comparingByKey())
                 .orElseThrow();
 
@@ -145,15 +145,6 @@ class MapTests {
                 () -> assertEquals(firstEntry, minimumTimestamp),
                 () -> assertEquals(lastEntry, maxTimestamp)
         );
-    }
-
-    private static <T> T last(Iterable<T> iterable) {
-        var iterator = iterable.iterator();
-        T t = iterator.next();
-        while (iterator.hasNext()) {
-            t = iterator.next();
-        }
-        return t;
     }
 
     @Test
@@ -206,7 +197,7 @@ class MapTests {
                 .boxed()
                 .collect(Collectors.toMap(i -> i, AtomicInteger::new));
 
-        updateMapValues(map.values());
+        updateAtomicInts(map.values());
 
         final var count = map.values().stream()
                 .filter(i -> i.get() == 0)
@@ -215,7 +206,7 @@ class MapTests {
         assertEquals(5, count);
     }
 
-    private static void updateMapValues(Collection<AtomicInteger> values) {
+    private static void updateAtomicInts(Collection<AtomicInteger> values) {
         int counter = 0;
         for (AtomicInteger value : values) {
             if (counter % 2 == 0) {
@@ -224,6 +215,4 @@ class MapTests {
             counter++;
         }
     }
-
-
 }

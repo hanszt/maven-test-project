@@ -4,7 +4,7 @@ package org.hzt
 fun listOfValues(values: List<Long>): List<Long> = values
 
 @JvmName("listOfIntValues")
-fun listOfValues(values: List<Int>): List<Int> = values
+fun listOfValues(values: List<Int>): List<Int> = values.map { it * 2 }
 
 @JvmName("listOfValues")
 fun <T> listOfValues(values: List<T>): List<T> = values

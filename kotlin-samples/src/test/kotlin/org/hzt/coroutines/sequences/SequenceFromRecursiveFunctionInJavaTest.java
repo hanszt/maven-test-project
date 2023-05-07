@@ -4,6 +4,7 @@ import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import org.hzt.coroutines.sequences.poc.MySequencesKt;
 import org.hzt.coroutines.sequences.poc.SequenceScope;
+import org.hzt.utils.PreConditions;
 import org.hzt.utils.sequences.Sequence;
 import org.junit.jupiter.api.Test;
 
@@ -60,25 +61,25 @@ class SequenceFromRecursiveFunctionInJavaTest {
 
     private void moveDisk(
             final SequenceScope<String> scope,
-            final int diskNumber,
+            final int nrOfDisks,
             final char fromRod,
             final char targetRod,
             final char auxRod,
             final Continuation<? super Unit> continuation) {
-        if (diskNumber == 1) {
-            scope.yield(String.format("Move disk %2d from rod %c to rod %c", diskNumber, fromRod, targetRod), continuation);
+        PreConditions.require(nrOfDisks >= 0, () -> "The nr of disks (n) can not be negative (n = " + nrOfDisks  + ")");
+        if (nrOfDisks == 0) {
             return;
         }
-        moveDisk(scope, diskNumber - 1, fromRod, auxRod, targetRod, continuation);
-        scope.yield(String.format("Move disk %2d from rod %c to rod %c", diskNumber, fromRod, targetRod), continuation);
-        moveDisk(scope, diskNumber - 1, auxRod, targetRod, fromRod, continuation);
+        moveDisk(scope, nrOfDisks - 1, fromRod, auxRod, targetRod, continuation);
+        scope.yield(String.format("Move disk %2d from rod %c to rod %c", nrOfDisks, fromRod, targetRod), continuation);
+        moveDisk(scope, nrOfDisks - 1, auxRod, targetRod, fromRod, continuation);
     }
 
     @Test
     void testImplementationInKotlinAndThenCallingFromJavaWorks() {
         final var nrOfDisks = 3;
 
-        final var instructionsFromKtFile = TowerOfHanoiKt.towerOfHanoiSequence(nrOfDisks).toList();
+        final var instructionsFromKtFile = TowerOfHanoiKt.towerOfHanoiStream(nrOfDisks).toList();
 
         final var expectedNrOfMoves = (int) (Math.pow(2, nrOfDisks) - 1);
 

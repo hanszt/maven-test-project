@@ -1,5 +1,6 @@
 package org.hzt
 
+import org.hzt.utils.Timer
 import java.util.stream.IntStream
 
 fun sieveOfEratosthenes(n: Int): IntStream {
@@ -26,7 +27,7 @@ private tailrec fun sieveOfEratosthenes(n: Int, sieve: BooleanArray, p: Int = 2)
 
 fun main() {
     val n = 1_000_000_000
-    val timer = Timer.timeAnIntFunction(n) { sieveOfEratosthenes(it) }
+    val timer = Timer.timeAnIntFunction(n, ::sieveOfEratosthenes)
     val primes = timer.result.toArray()
     val biggest = primes[primes.size - 1]
     println("primes length = " + primes.size)

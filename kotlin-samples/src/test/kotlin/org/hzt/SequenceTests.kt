@@ -19,10 +19,13 @@ class SequenceTests {
         "(1)+((2))+(((3))) -> 3",
         "2 -> 0",
         "(2) -> 1",
-        delimiterString = " -> ")
-    fun `test maximum nesting-depth using scan`(s: String, expected: Int) =
-        s.filter { it in "()" }
-        .map { if (it == '(') 1 else -1 }
-        .scan(0, Int::plus)
-        .max() shouldBe expected
+        "(((((((((((((4 -> 13",
+        "17)))))))) -> 0",
+        delimiterString = " -> "
+    )
+    fun String.`test maximum nesting-depth using scan`(expected: Int) =
+        filter { it in "()" }
+            .map { if (it == '(') 1 else -1 }
+            .scan(0, Int::plus)
+            .max() shouldBe expected
 }

@@ -1,4 +1,4 @@
-package hzt.preview.generators;
+package org.hzt.generators;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -75,8 +75,12 @@ final class GeneratorIterator<T> implements Iterator<T>, GeneratorScope<T>, Auto
     }
 
     private Thread buildAndStartProducerThread() {
-        //a virtual thread is always a daemon thread. See setDaemon(boolean) method
-        return Thread.ofVirtual().start(this::setNext);
+        //As soon as this module is migrated to java 21, a virtual thread can be used for this
+        // a virtual thread is always a daemon thread. See setDaemon(boolean) method
+        final var thread = new Thread(this::setNext);
+        thread.setDaemon(true);
+        thread.start();
+        return thread;
     }
 
     private void setNext() {

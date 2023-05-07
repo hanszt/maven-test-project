@@ -49,7 +49,7 @@ class SwitchExpressionsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"4331"})
+    @ValueSource(strings = {"4331", "4333", "4334"})
     void zeelandZipCodesTest(String zipCode) {
         assertEquals("Zeeland", provinceNameByZipCode(zipCode));
     }
@@ -69,7 +69,7 @@ class SwitchExpressionsTest {
         return switch (zipCode) {
             case "2311", "2313", "2314" -> "Zuid-Holland";
             case "2344", "1234", "3452" -> "Noord-Holland";
-            case "4331" -> "Zeeland";
+            case "4331", "4332", "4333", "4334" -> "Zeeland";
             case "5454" -> {
                 doSomethingFirst();
                 yield "Brabant";

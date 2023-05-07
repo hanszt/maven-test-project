@@ -1,13 +1,12 @@
 package org.hzt.concurrent;
 
+import org.hzt.utils.TimingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-
-import static org.hzt.TimingUtils.sleep;
 
 /**
  * Completable future in Java is like first promise in Javascript
@@ -49,7 +48,7 @@ public class CompletableFutureSample {
 
     private static String computationallyIntensiveMethod() {
         final var STRING = "This is a String that is computationally intensive: 1";
-        sleep(Duration.ofMillis(500));
+        TimingUtils.sleep(Duration.ofMillis(500));
         return STRING;
     }
 
@@ -60,12 +59,12 @@ public class CompletableFutureSample {
         CompletableFuture<Integer> googleStock = CompletableFuture.supplyAsync(() -> supplyPrice(Duration.ofMillis(200), 500));
         CompletableFuture<Integer> teslaStock = CompletableFuture.supplyAsync(() -> supplyPrice(Duration.ofMillis(100), 1_000));
         CompletableFuture<Integer> completableFuture = googleStock.thenCombine(teslaStock, Integer::sum);
-        sleep(Duration.ofMillis(200));
+        TimingUtils.sleep(Duration.ofMillis(200));
         return completableFuture;
     }
 
     static int supplyPrice(Duration duration, int price) {
-        sleep(duration);
+        TimingUtils.sleep(duration);
         return price;
     }
 
@@ -84,7 +83,7 @@ public class CompletableFutureSample {
                 .thenCompose(CompletableFuture::toCompletableFuture);
 
         CompletableFuture<Integer> completableFuture = future1.thenCombine(future2, Integer::sum);
-        sleep(Duration.ofMillis(300));
+        TimingUtils.sleep(Duration.ofMillis(300));
         return completableFuture;
     }
 

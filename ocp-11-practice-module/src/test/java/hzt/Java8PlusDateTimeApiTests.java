@@ -9,9 +9,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.chrono.JapaneseChronology;
@@ -24,7 +26,7 @@ import java.util.stream.Stream;
 import static java.lang.System.out;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.params.provider.Arguments.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class Java8PlusDateTimeApiTests {
 
@@ -48,7 +50,7 @@ class Java8PlusDateTimeApiTests {
     }
 
     @Test
-    void testIsoFormant() {
+    void testIsoFormat() {
         final var fixedInstant = ZonedDateTime.parse("2011-12-03T10:15:30+01:00[Europe/Paris]").toInstant();
         var localDate = LocalDate.now(Clock.fixed(fixedInstant, ZoneId.systemDefault()));
         final var isoDateformat = localDate.format(DateTimeFormatter.ISO_DATE);
@@ -56,6 +58,32 @@ class Java8PlusDateTimeApiTests {
         out.println(isoDateformat);
 
         assertEquals("2011-12-03", isoDateformat);
+    }
+
+    /**
+     * @see <a href="https://www.youtube.com/watch?v=nEQhx9hGutQ">OffsetDateTime vs. ZonedDateTime: An Example</a>
+     * <p>
+     * OffsetDateTime has a simpler scenario in mind
+     * ZonedDateTime has the additional layer of questioning wheater the hour is ahead or behind to daylight savingstime
+     */
+    @Test
+    void testOffsetDateTimeVsZonedDateTime() {
+        final var fixed = Clock.fixed(Instant.parse("2019-07-03T10:15:30.00Z"), ZoneId.of("Europe/Amsterdam"));
+        final var zonedDateTime = ZonedDateTime.now(fixed);
+        final var offsetDateTime = OffsetDateTime.now(fixed);
+
+        out.println("offsetDateTime = " + offsetDateTime);
+        out.println("zonedDateTime = " + zonedDateTime);
+
+        final var months = 6;
+        final var zonedDateTimePlusSixMonths = zonedDateTime.plusMonths(months);
+        final var offsetDateTimePlusSixMonths = offsetDateTime.plusMonths(months);
+        final var epochSecondsDiff = zonedDateTimePlusSixMonths.toEpochSecond() - offsetDateTimePlusSixMonths.toEpochSecond();
+
+        out.println("zonedDateTimePlusSixMonths = " + zonedDateTimePlusSixMonths);
+        out.println("offsetDateTimePlusSixMonths = " + offsetDateTimePlusSixMonths);
+
+        assertEquals(3600, epochSecondsDiff);
     }
 
     @Test

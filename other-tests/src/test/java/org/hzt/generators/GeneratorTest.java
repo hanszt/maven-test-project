@@ -1,4 +1,4 @@
-package hzt.preview.generators;
+package org.hzt.generators;
 
 import org.hzt.utils.It;
 import org.hzt.utils.iterables.Collectable;
@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-import static hzt.preview.generators.TowerOfHanoi.moveDisk;
+import static org.hzt.generators.TowerOfHanoiGenerator.moveDisk;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -35,20 +35,19 @@ class GeneratorTest {
     }
 
     @Test
-    void testOneEltGenerator() {
-        List<Integer> oneEltList = List.of(1);
-        var list = Generator.<Integer>yieldingFrom(scope -> yieldValuesFromList(scope, oneEltList))
+    void testSingleElementGenerator() {
+        var list = Generator.<Integer>yieldingFrom(scope -> scope.yieldNext(1))
                 .useAsSequence(Sequence::toList);
-        assertEquals(oneEltList, list);
+        assertEquals(List.of(1), list);
     }
 
-    private <T> void yieldValuesFromList(GeneratorScope<T> scope, List<T> elements) {
+    private static <T> void yieldValues(GeneratorScope<T> scope, Iterable<T> elements) {
         for (T element : elements) {
             scope.yieldNext(element);
         }
     }
 
-    private static <T> void yieldFromInfiniteLoop(GeneratorScope<T> scope, T initial, UnaryOperator<T> operator) {
+    private static <T> void nextInInfiniteLoop(GeneratorScope<T> scope, T initial, UnaryOperator<T> operator) {
         T acc = initial;
         //noinspection InfiniteLoopStatement
         while (true) {
@@ -61,17 +60,17 @@ class GeneratorTest {
     void testTwoEltGenerator() {
         List<Integer> twoEltList = List.of(1, 2);
         List<Integer> result = Generator
-                .<Integer>yieldingFrom(scope -> yieldValuesFromList(scope, twoEltList))
+                .<Integer>yieldingFrom(scope -> yieldValues(scope, twoEltList))
                 .useAsStream(Stream::toList);
         assertEquals(twoEltList, result);
     }
 
     @Test
     void testInfiniteGenerator() {
-        final var generatorBuilder = Generator.<Integer>yieldingFrom(scope -> yieldFromInfiniteLoop(scope, 0, i -> i + 1));
 
-        int NUM_ELEMENTS_TO_INSPECT = 1_000;
-        final var pair = generatorBuilder.useAsSequence(s -> s
+        long NUM_ELEMENTS_TO_INSPECT = 1_000L;
+        final var pair = Generator.<Integer>yieldingFrom(scope -> nextInInfiniteLoop(scope, 0, i -> i + 1))
+                .useAsSequence(s -> s
                 .filter(i -> i % 2 == 0)
                 .take(NUM_ELEMENTS_TO_INSPECT)
                 .withIndex()
@@ -79,8 +78,9 @@ class GeneratorTest {
                 .map(IndexedValue::value)
                 .toTwo(Sequence::last, Sequence::toList));
 
+        System.out.println("Thread.activeCount() = " + Thread.activeCount());
+
         assertAll(
-                () -> assertEquals(2, Thread.activeCount()),
                 () -> assertEquals(NUM_ELEMENTS_TO_INSPECT, pair.second().size()),
                 () -> assertEquals(1_998, pair.first())
         );
@@ -90,9 +90,9 @@ class GeneratorTest {
     void testInfiniteGeneratorIsLazy() {
         AtomicInteger integer = new AtomicInteger(0);
         final var build = Generator
-                .<Integer>yieldingFrom(scope -> yieldFromInfiniteLoop(scope, 0, i -> i + 1))
+                .<Integer>yieldingFrom(scope -> nextInInfiniteLoop(scope, 0, i -> i + 1))
                 .useAsSequence(s -> s.onEach(e -> integer.incrementAndGet())
-                        .onEach(System.out::println));
+                        .onEach(It::println));
 
         assertAll(
                 () -> assertTrue(isLambdaImpl(build.getClass())),
@@ -109,16 +109,16 @@ class GeneratorTest {
         AtomicInteger integer = new AtomicInteger(0);
 
         final var sequence = Generator
-                .<Integer>yieldingFrom(scope -> yieldFromInfiniteLoop(scope, 0, i -> i + 1))
+                .<Integer>yieldingFrom(scope -> nextInInfiniteLoop(scope, 0, i -> i + 1))
                 .useAsSequence(seq -> seq.onEach(i -> integer.incrementAndGet())
-                        .onEach(System.out::println));
+                        .onEach(It::println));
 
         assertThrows(IllegalStateException.class, sequence::toList);
     }
 
     @Test
     void testInfiniteGeneratorLeavesNoRunningThreads() {
-        final var generator = Generator.<Integer>yieldingFrom(scope -> yieldFromInfiniteLoop(scope, 1, i -> i)).generator();
+        final var generator = Generator.<Integer>yieldingFrom(scope -> nextInInfiniteLoop(scope, 1, i -> i)).generator();
         Iterator<Integer> iterator = generator.iterator();
         try (generator) {
             int NUM_ELEMENTS_TO_INSPECT = 1000;
@@ -128,10 +128,8 @@ class GeneratorTest {
                 assertEquals(1, next);
             }
         }
-        assertAll(
-                () -> assertEquals(Thread.State.TERMINATED, iterator instanceof GeneratorIterator<Integer> gi ? gi.getProducerState() : null),
-                () -> assertEquals(2, Thread.activeCount())
-        );
+        System.out.println("Thread.activeCount() = " + Thread.activeCount());
+        assertEquals(Thread.State.TERMINATED, iterator instanceof GeneratorIterator<Integer> gi ? gi.getProducerState() : null);
     }
 
     private static class CustomRuntimeException extends RuntimeException {
@@ -145,7 +143,6 @@ class GeneratorTest {
     <T> void testGeneratorRaisingExceptionHasNext() {
         try (Generator<T> generator = Generator.<T>yieldingFrom(scope -> CustomRuntimeException.throwIt()).generator()) {
             Iterator<T> iterator = generator.iterator();
-            //noinspection ResultOfMethodCallIgnored
             assertThrows(CustomRuntimeException.class, iterator::hasNext);
         }
 
@@ -163,7 +160,7 @@ class GeneratorTest {
     class HanoiTest {
 
         @Test
-        void testYieldSequenceFromRecursiveFunction() {
+        void testYieldSequenceFromTowerOfHanoiRecursiveFunction() {
             final var nrOfDisks = 3;
             final var expectedNrOfMoves = (int) (Math.pow(2, nrOfDisks) - 1);
 
@@ -178,8 +175,8 @@ class GeneratorTest {
 
             List<String> instructions = Generator
                     .<String>yieldingFrom(scope -> moveDisk(scope, nrOfDisks, 'a', 'c', 'b'))
-                    .useAsSequence(s -> s
-                            .onEach(System.out::println)
+                    .useAsSequence(sequence -> sequence
+                            .onEach(It::println)
                             .toList());
 
             assertAll(

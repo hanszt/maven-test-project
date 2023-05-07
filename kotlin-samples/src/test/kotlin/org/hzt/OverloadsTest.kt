@@ -10,11 +10,14 @@ internal class OverloadsTest {
     fun `overload with different list content possible when specifying jvm name`() {
         val intList = listOf(1, 2, 3, 4)
         val intValues = listOfValues(intList)
+        println(intValues.joinToString())
         val longValues = listOfValues(listOf(1L, 2L, 3L, 4L))
+        println(longValues.joinToString())
         val strings = listOfValues(listOf("this", "is", "a", "test"))
 
         assertAll(
             { intValues.size shouldBe longValues.size },
+            { intValues.last() shouldBe longValues.last() * 2 },
             { strings.size shouldBe intValues.size }
         )
     }
