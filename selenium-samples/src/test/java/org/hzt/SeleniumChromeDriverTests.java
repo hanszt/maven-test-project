@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled("This test takes to long")
 class SeleniumChromeDriverTests {
 
     private final ChromeDriver driver = new ChromeDriver();

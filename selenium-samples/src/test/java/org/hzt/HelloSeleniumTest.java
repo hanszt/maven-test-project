@@ -1,7 +1,6 @@
 package org.hzt;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -12,10 +11,10 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import java.time.Duration;
 
 import static org.hzt.NetConnectionTestUtils.assumeCanConnectToHttpUrl;
+import static org.hzt.NetConnectionTestUtils.createFireFoxWebDriver;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled("This test takes to long")
 class HelloSeleniumTest {
 
     @Test
@@ -23,8 +22,7 @@ class HelloSeleniumTest {
         final var url = "https://selenium.dev";
 
         assumeCanConnectToHttpUrl(url);
-
-        final var webDriver = WebDriverManagerConfig.setupFirefoxWebDriver(new FirefoxOptions());
+        final var webDriver = createFireFoxWebDriver(new FirefoxOptions());
         final var screenshotPath = new HelloSelenium(webDriver).takeScreenshot(url);
 
         assertTrue(screenshotPath.toFile().exists());

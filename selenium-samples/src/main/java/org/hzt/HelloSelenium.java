@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,9 @@ public class HelloSelenium {
         acceptButton.click();
         sleep(Duration.ofSeconds(1));
         final var searchBox = driver.findElement(By.name("q"));
-
+        new Actions(driver)
+                .moveToElement(searchBox)
+                .perform();
         searchBox.sendKeys(searchString);
         sleep(Duration.ofSeconds(1));
         final var searchButton = driver.findElement(By.className("gNO89b"));

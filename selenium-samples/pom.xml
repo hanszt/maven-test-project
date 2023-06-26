@@ -17,8 +17,8 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <webdrivermanager.version>5.3.1</webdrivermanager.version>
-        <selenium-java.version>4.7.1</selenium-java.version>
+        <webdrivermanager.version>5.4.0</webdrivermanager.version>
+        <selenium-java.version>4.10.0</selenium-java.version>
     </properties>
 
     <dependencies>
