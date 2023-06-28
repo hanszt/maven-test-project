@@ -20,7 +20,7 @@ class PrimeNrCalculatorTest {
 
     @Test
     void testSieveOfEratosthenesTailRecursive() {
-        final var primes = PrimeNrCalculatorKt.sieveOfEratosthenes(50).toArray();
+        final var primes = PrimeNrCalculatorKt.intStreamBySieveOfEratosthenes(50).toArray();
 
         println(Arrays.toString(primes));
 
